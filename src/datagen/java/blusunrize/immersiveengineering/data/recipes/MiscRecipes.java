@@ -37,7 +37,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -859,7 +859,7 @@ public class MiscRecipes extends IERecipeProvider
 				.save(out, toRL("tinted_glass_lead_wire"));
 	}
 
-	private void buildGeneratedList(RecipeOutput out, ResourceLocation name)
+	private void buildGeneratedList(RecipeOutput out, Identifier name)
 	{
 		out.accept(name, GeneratedListRecipe.from(name), null);
 	}

@@ -19,7 +19,7 @@ import blusunrize.immersiveengineering.common.blocks.metal.ConnectorRedstoneBloc
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -84,7 +84,7 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		ArrayList<Component> tooltip = new ArrayList<>();
 
@@ -144,7 +144,7 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 			}
 
 			@Override
-			public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+			public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 			{
 				super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 				int col = color.getTextColor();

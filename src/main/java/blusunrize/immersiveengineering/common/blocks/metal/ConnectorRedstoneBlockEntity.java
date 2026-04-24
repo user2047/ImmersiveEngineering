@@ -30,7 +30,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -267,7 +267,7 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 	}
 
 	@Override
-	public Collection<ResourceLocation> getRequestedHandlers()
+	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(RedstoneNetworkHandler.ID);
 	}

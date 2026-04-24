@@ -18,7 +18,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.Palette;
@@ -51,7 +51,7 @@ public record MessageMultiblockSync(List<SyncedTemplate> templates) implements I
 		});
 	}
 
-	public record SyncedTemplate(BlockPos size, ResourceLocation name, StructureTemplate.Palette parts)
+	public record SyncedTemplate(BlockPos size, Identifier name, StructureTemplate.Palette parts)
 	{
 		private static final StreamCodec<RegistryFriendlyByteBuf, StructureBlockInfo> BLOCK_CODEC = StreamCodec.composite(
 				BlockPos.STREAM_CODEC, StructureBlockInfo::pos,
@@ -64,13 +64,13 @@ public record MessageMultiblockSync(List<SyncedTemplate> templates) implements I
 				.map(PaletteAccess::construct, Palette::blocks);
 		public static final StreamCodec<RegistryFriendlyByteBuf, SyncedTemplate> CODEC = StreamCodec.composite(
 				BlockPos.STREAM_CODEC, SyncedTemplate::size,
-				ResourceLocation.STREAM_CODEC, SyncedTemplate::name,
+				Identifier.STREAM_CODEC, SyncedTemplate::name,
 				PALETTE_CODEC, SyncedTemplate::parts,
 				SyncedTemplate::new
 		);
 
 
-		public SyncedTemplate(StructureTemplate template, ResourceLocation name)
+		public SyncedTemplate(StructureTemplate template, Identifier name)
 		{
 			this(new BlockPos(template.getSize()), name, ((TemplateAccess)template).getPalettes().get(0));
 		}

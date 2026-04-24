@@ -17,7 +17,7 @@ import net.minecraft.core.component.DataComponentPredicate.Builder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.crafting.DataComponentFluidIngredient;
@@ -29,10 +29,10 @@ public class CreateCompatModule extends StandardIECompatModule
 	@Override
 	public void init()
 	{
-		Fluid potionFluid = BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("create", "potion"));
+		Fluid potionFluid = BuiltInRegistries.FLUID.get(Identifier.fromNamespaceAndPath("create", "potion"));
 		//noinspection unchecked
 		DataComponentType<Enum<?>> bottleComponentType = (DataComponentType<Enum<?>>)BuiltInRegistries.DATA_COMPONENT_TYPE.get(
-				ResourceLocation.fromNamespaceAndPath("create", "potion_fluid_bottle_type")
+				Identifier.fromNamespaceAndPath("create", "potion_fluid_bottle_type")
 		);
 		if(bottleComponentType==null)
 			return;

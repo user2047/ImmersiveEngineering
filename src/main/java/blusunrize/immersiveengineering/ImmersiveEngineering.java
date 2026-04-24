@@ -45,7 +45,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -302,7 +302,7 @@ public class ImmersiveEngineering
 		}
 	}
 
-	public static ResourceLocation rl(String path)
+	public static Identifier rl(String path)
 	{
 		return IEApi.ieLoc(path);
 	}

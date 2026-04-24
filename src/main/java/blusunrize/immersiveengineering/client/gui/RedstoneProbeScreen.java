@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiSliderIE;
 import blusunrize.immersiveengineering.common.blocks.metal.ConnectorProbeBlockEntity;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -75,7 +75,7 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_sending").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_receiving").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());

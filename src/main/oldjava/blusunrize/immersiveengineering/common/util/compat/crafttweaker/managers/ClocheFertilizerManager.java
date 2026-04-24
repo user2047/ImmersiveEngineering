@@ -17,7 +17,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
 
@@ -53,8 +53,8 @@ public class ClocheFertilizerManager implements IRecipeManager<ClocheFertilizer>
 	@ZenCodeType.Method
 	public void addFertilizer(String recipePath, IIngredient fertilizer, float growthModifier)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
-		final ClocheFertilizer recipe = new ClocheFertilizer(resourceLocation, fertilizer.asVanillaIngredient(), growthModifier);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
+		final ClocheFertilizer recipe = new ClocheFertilizer(Identifier, fertilizer.asVanillaIngredient(), growthModifier);
 		CraftTweakerAPI.apply(new ActionAddRecipeCustomOutput<>(this, recipe, fertilizer));
 	}
 

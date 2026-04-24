@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.client.gui.info;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 
@@ -38,7 +38,7 @@ public class FertilizerInfoArea extends InfoArea
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics)
+	public void draw(GuiGraphicsExtractor graphics)
 	{
 		final int height = area.getHeight();
 		int stored = (int)(height*(fertilizerAmount.get()/(float)IEServerConfig.MACHINES.cloche_fertilizer.get()));

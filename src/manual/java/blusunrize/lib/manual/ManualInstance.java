@@ -37,7 +37,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -61,21 +61,21 @@ import java.util.stream.Stream;
 
 public abstract class ManualInstance implements ResourceManagerReloadListener, ClientAdvancements.Listener
 {
-	public ResourceLocation texture;
-	private final Map<ResourceLocation, Function<JsonObject, SpecialManualElement>> specialElements = new HashMap<>();
-	private final Tree<ResourceLocation, ManualEntry> contentTree;
-	private final List<Pair<List<ResourceLocation>, ManualEntry>> autoloadedEntries = new ArrayList<>();
-	private final List<List<ResourceLocation>> autoloadedSections = new ArrayList<>();
-	public Map<ResourceLocation, ManualEntry> contentsByName = new HashMap<>();
+	public Identifier texture;
+	private final Map<Identifier, Function<JsonObject, SpecialManualElement>> specialElements = new HashMap<>();
+	private final Tree<Identifier, ManualEntry> contentTree;
+	private final List<Pair<List<Identifier>, ManualEntry>> autoloadedEntries = new ArrayList<>();
+	private final List<List<Identifier>> autoloadedSections = new ArrayList<>();
+	public Map<Identifier, ManualEntry> contentsByName = new HashMap<>();
 	public final int pageWidth;
 	public final int pageHeight;
 	private int numFailedEntries = 0;
 
 	private boolean initialized = false;
 
-	private final Set<ResourceLocation> unlockedAdvancements = new HashSet<>();
+	private final Set<Identifier> unlockedAdvancements = new HashSet<>();
 
-	public ManualInstance(ResourceLocation texture, int pageWidth, int pageHeight, ResourceLocation name)
+	public ManualInstance(Identifier texture, int pageWidth, int pageHeight, Identifier name)
 	{
 		this.texture = texture;
 		this.pageHeight = pageHeight;
@@ -117,7 +117,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 					for(int i = 0; i < data.size(); i++)
 					{
 						JsonObject img = data.get(i).getAsJsonObject();
-						ResourceLocation loc = ManualUtils.getLocationForManual(
+						Identifier loc = ManualUtils.getLocationForManual(
 								GsonHelper.getAsString(img, "location"), this);
 						int uMin = GsonHelper.getAsInt(img, "uMin");
 						int vMin = GsonHelper.getAsInt(img, "vMin");
@@ -184,24 +184,24 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		);
 	}
 
-	public void registerSpecialElement(ResourceLocation resLoc, Function<JsonObject, SpecialManualElement> factory)
+	public void registerSpecialElement(Identifier resLoc, Function<JsonObject, SpecialManualElement> factory)
 	{
 		if(specialElements.containsKey(resLoc))
 			throw new IllegalArgumentException("Tried adding manual element type "+resLoc+" twice!");
 		specialElements.put(resLoc, factory);
 	}
 
-	public Tree.InnerNode<ResourceLocation, ManualEntry> getRoot()
+	public Tree.InnerNode<Identifier, ManualEntry> getRoot()
 	{
 		return contentTree.getRoot();
 	}
 
-	public Stream<Tree.AbstractNode<ResourceLocation, ManualEntry>> getAllEntriesAndCategories()
+	public Stream<Tree.AbstractNode<Identifier, ManualEntry>> getAllEntriesAndCategories()
 	{
 		return contentTree.fullStream();
 	}
 
-	public Function<JsonObject, SpecialManualElement> getElementFactory(ResourceLocation loc)
+	public Function<JsonObject, SpecialManualElement> getElementFactory(Identifier loc)
 	{
 		Function<JsonObject, SpecialManualElement> ret = specialElements.get(loc);
 		if(ret==null)
@@ -213,7 +213,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 
 	public abstract String getManualName();
 
-	public abstract String formatCategoryName(ResourceLocation s);
+	public abstract String formatCategoryName(Identifier s);
 
 	public abstract String formatEntryName(String s);
 
@@ -225,12 +225,12 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 
 	public abstract boolean showCategoryInList(String category);
 
-	public boolean showNodeInList(Tree.AbstractNode<ResourceLocation, ManualEntry> node)
+	public boolean showNodeInList(Tree.AbstractNode<Identifier, ManualEntry> node)
 	{
 		if(!node.isLeaf())
 			// on categories, check if any children are visible
 			return node.getChildren().stream().anyMatch(this::showNodeInList);
-		Optional<ResourceLocation> advancement = node.getLeafData().getRequiredAdvancement();
+		Optional<Identifier> advancement = node.getLeafData().getRequiredAdvancement();
 		return advancement.map(this.unlockedAdvancements::contains).orElse(true);
 	}
 
@@ -316,18 +316,18 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		return new ManualScreen(this, texture, useLastActive);
 	}
 
-	public void addEntry(InnerNode<ResourceLocation, ManualEntry> node, ManualEntry entry)
+	public void addEntry(InnerNode<Identifier, ManualEntry> node, ManualEntry entry)
 	{
 		int nextPrio = node.getChildren().size();
 		addEntry(node, entry, nextPrio);
 	}
 
-	public void addEntry(InnerNode<ResourceLocation, ManualEntry> node, ManualEntry entry, int priority)
+	public void addEntry(InnerNode<Identifier, ManualEntry> node, ManualEntry entry, int priority)
 	{
 		addEntry(node, entry, () -> priority);
 	}
 
-	public void addEntry(InnerNode<ResourceLocation, ManualEntry> node, ManualEntry entry, DoubleSupplier priority)
+	public void addEntry(InnerNode<Identifier, ManualEntry> node, ManualEntry entry, DoubleSupplier priority)
 	{
 		node.addNewLeaf(entry, priority);
 		reset();
@@ -339,18 +339,18 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		ManualScreen.lastActiveManual = null;
 	}
 
-	public ManualEntry addEntry(InnerNode<ResourceLocation, ManualEntry> node, ResourceLocation source)
+	public ManualEntry addEntry(InnerNode<Identifier, ManualEntry> node, Identifier source)
 	{
 		int nextPrio = node.getChildren().size();
 		return addEntry(node, source, nextPrio);
 	}
 
-	public ManualEntry addEntry(InnerNode<ResourceLocation, ManualEntry> node, ResourceLocation source, int priority)
+	public ManualEntry addEntry(InnerNode<Identifier, ManualEntry> node, Identifier source, int priority)
 	{
 		return addEntry(node, source, () -> priority);
 	}
 
-	public ManualEntry addEntry(InnerNode<ResourceLocation, ManualEntry> node, ResourceLocation source, DoubleSupplier priority)
+	public ManualEntry addEntry(InnerNode<Identifier, ManualEntry> node, Identifier source, DoubleSupplier priority)
 	{
 		ManualEntry.ManualEntryBuilder builder = new ManualEntry.ManualEntryBuilder(this);
 		builder.readFromFile(source);
@@ -359,12 +359,12 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		return entry;
 	}
 
-	public DoubleSupplier atOffsetFrom(InnerNode<ResourceLocation, ManualEntry> node, String baseEntry, double offset)
+	public DoubleSupplier atOffsetFrom(InnerNode<Identifier, ManualEntry> node, String baseEntry, double offset)
 	{
 		return atOffsetFrom(node, ManualUtils.getLocationForManual(baseEntry, this), offset);
 	}
 
-	public DoubleSupplier atOffsetFrom(InnerNode<ResourceLocation, ManualEntry> node, ResourceLocation baseEntry, double offset)
+	public DoubleSupplier atOffsetFrom(InnerNode<Identifier, ManualEntry> node, Identifier baseEntry, double offset)
 	{
 		return () -> {
 			double baseWeight = findEntry(baseEntry, node).getWeight();
@@ -373,7 +373,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 	}
 
 	@Nullable
-	public ManualEntry getEntry(ResourceLocation loc)
+	public ManualEntry getEntry(Identifier loc)
 	{
 		return contentsByName.get(loc);
 	}
@@ -447,14 +447,14 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 
 	private void cleanupOldAutoloadedEntries()
 	{
-		for(Pair<List<ResourceLocation>, ManualEntry> toRemove : autoloadedEntries)
+		for(Pair<List<Identifier>, ManualEntry> toRemove : autoloadedEntries)
 		{
 			getOrCreatePath(toRemove.getFirst(), p -> {
 			}, 0).removeLeaf(toRemove.getSecond());
 		}
-		for(List<ResourceLocation> toRemove : autoloadedSections)
+		for(List<Identifier> toRemove : autoloadedSections)
 		{
-			List<ResourceLocation> parent = toRemove.subList(0, toRemove.size()-1);
+			List<Identifier> parent = toRemove.subList(0, toRemove.size()-1);
 			getOrCreatePath(parent, p -> {
 				throw new RuntimeException(
 						p.toString()+" does not exist, but "+toRemove.get(parent.size())+" should exist?"
@@ -467,7 +467,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 
 	private void loadAutoEntries()
 	{
-		ResourceLocation autoLoc = ManualUtils.getLocationForManual("manual/autoload.json", this);
+		Identifier autoLoc = ManualUtils.getLocationForManual("manual/autoload.json", this);
 		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 		resourceManager.listPacks()
 				.map(p -> p.getResource(PackType.CLIENT_RESOURCES, autoLoc))
@@ -490,7 +490,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 				.forEach(p -> autoloadEntriesFromJson(p.getSecond(), new ArrayList<>()));
 	}
 
-	private void autoloadEntriesFromJson(JsonObject obj, List<ResourceLocation> backtrace)
+	private void autoloadEntriesFromJson(JsonObject obj, List<Identifier> backtrace)
 	{
 		final String entryListKey = "entry_list";
 		final String weightKey = "category_weight";
@@ -499,7 +499,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 			catWeight = obj.remove(weightKey).getAsDouble();
 		else
 			catWeight = 0;
-		InnerNode<ResourceLocation, ManualEntry> node = getOrCreatePath(backtrace, path -> {
+		InnerNode<Identifier, ManualEntry> node = getOrCreatePath(backtrace, path -> {
 			boolean parentIsAutoloaded = false;
 			for(int i = 1; i <= path.size(); ++i)
 				if(autoloadedSections.contains(path.subList(0, i)))
@@ -521,7 +521,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		}
 	}
 
-	private void loadEntriesInArray(JsonArray entriesOnLevel, List<ResourceLocation> backtrace, InnerNode<ResourceLocation, ManualEntry> mainNode)
+	private void loadEntriesInArray(JsonArray entriesOnLevel, List<Identifier> backtrace, InnerNode<Identifier, ManualEntry> mainNode)
 	{
 		for(JsonElement e : entriesOnLevel)
 		{
@@ -553,16 +553,16 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		}
 	}
 
-	private Tree.InnerNode<ResourceLocation, ManualEntry> getOrCreatePath(
-			List<ResourceLocation> path, Consumer<List<ResourceLocation>> onCreated, double newCatWeight
+	private Tree.InnerNode<Identifier, ManualEntry> getOrCreatePath(
+			List<Identifier> path, Consumer<List<Identifier>> onCreated, double newCatWeight
 	)
 	{
-		InnerNode<ResourceLocation, ManualEntry> currentNode = getRoot();
-		List<ResourceLocation> currentPath = new ArrayList<>();
-		for(ResourceLocation inner : path)
+		InnerNode<Identifier, ManualEntry> currentNode = getRoot();
+		List<Identifier> currentPath = new ArrayList<>();
+		for(Identifier inner : path)
 		{
 			currentPath.add(inner);
-			final InnerNode<ResourceLocation, ManualEntry> lastNode = currentNode;
+			final InnerNode<Identifier, ManualEntry> lastNode = currentNode;
 			currentNode = currentNode.getSubnode(inner).orElseGet(() -> {
 				onCreated.accept(new ArrayList<>(currentPath));
 				return lastNode.getOrCreateSubnode(inner, () -> newCatWeight);
@@ -572,7 +572,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		return currentNode;
 	}
 
-	public Leaf<ResourceLocation, ManualEntry> findEntry(ResourceLocation name, InnerNode<ResourceLocation, ManualEntry> parent)
+	public Leaf<Identifier, ManualEntry> findEntry(Identifier name, InnerNode<Identifier, ManualEntry> parent)
 	{
 		return parent.leafStream()
 				.filter(entry -> entry.getLeafData().getLocation().equals(name))

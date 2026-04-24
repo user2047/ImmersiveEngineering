@@ -45,7 +45,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -147,7 +147,7 @@ public class ModelPowerpack
 		{
 			matrixStackIn.pushPose();
 
-			ResourceLocation shaderTexture = banner.getItem() instanceof IShaderItem shaderItem?
+			Identifier shaderTexture = banner.getItem() instanceof IShaderItem shaderItem?
 					ShaderBannerRenderer.getShaderResourceLocation(shaderItem.getShaderName(), ieLoc("banner")):
 					null;
 			if(shaderTexture!=null)

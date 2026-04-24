@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInpu
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.UnsizedItemInput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -82,7 +82,7 @@ public class CrusherRecipeBuilder extends IERecipeBuilder<CrusherRecipeBuilder>
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		CrusherRecipe recipe = new CrusherRecipe(output, input, energy, secondaries);
 		out.accept(name, recipe, null, getConditions());

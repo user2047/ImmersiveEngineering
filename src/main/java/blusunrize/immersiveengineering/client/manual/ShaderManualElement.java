@@ -26,7 +26,7 @@ import blusunrize.lib.manual.gui.ManualScreen;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -167,7 +167,7 @@ public class ShaderManualElement extends SpecialManualElements
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
+	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		Lighting.setupFor3DItems();
 		float scale = 2;
@@ -196,7 +196,7 @@ public class ShaderManualElement extends SpecialManualElements
 	}
 
 	private void drawWrappedWithTransform(
-			GuiGraphics graphics, FormattedText text, int x, int y
+			GuiGraphicsExtractor graphics, FormattedText text, int x, int y
 	)
 	{
 		for(FormattedCharSequence line : manual.fontRenderer().split(text, 120))

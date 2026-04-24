@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.util.compat.jei;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.crafting.*;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -45,7 +45,7 @@ public class JEIRecipeTypes
 	}
 
 	private static <T extends Recipe<?>>
-	RecipeType<RecipeHolder<T>> createManual(ResourceLocation uid)
+	RecipeType<RecipeHolder<T>> createManual(Identifier uid)
 	{
 		Class<? extends RecipeHolder<T>> holderClass = (Class)RecipeHolder.class;
 		return new RecipeType<>(uid, holderClass);

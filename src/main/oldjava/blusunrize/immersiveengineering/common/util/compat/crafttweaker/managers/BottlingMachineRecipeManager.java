@@ -22,7 +22,7 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.tag.MCTag;
 import com.blamejared.crafttweaker.api.util.Many;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.common.util.Lazy;
@@ -66,7 +66,7 @@ public class BottlingMachineRecipeManager implements IRecipeManager<BottlingMach
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount[] inputs, Many<MCTag> fluidTag, IItemStack[] outputs)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 
 		final FluidTagInput fluidTagInput = CrTIngredientUtil.getFluidTagInput(fluidTag);
 
@@ -74,7 +74,7 @@ public class BottlingMachineRecipeManager implements IRecipeManager<BottlingMach
 		final IngredientWithSize[] ingredients = CrTIngredientUtil.getIngredientsWithSize(inputs);
 
 		final BottlingMachineRecipe recipe = IEServerConfig.MACHINES.bottlingMachineConfig.apply(
-				new BottlingMachineRecipe(resourceLocation, outputList, ingredients, fluidTagInput)
+				new BottlingMachineRecipe(Identifier, outputList, ingredients, fluidTagInput)
 		);
 
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));

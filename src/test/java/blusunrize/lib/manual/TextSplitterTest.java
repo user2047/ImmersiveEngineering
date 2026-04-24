@@ -10,7 +10,7 @@ package blusunrize.lib.manual;
 
 import blusunrize.lib.manual.SplitResult.Token;
 import blusunrize.lib.manual.gui.ManualScreen;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -186,7 +186,7 @@ public class TextSplitterTest
 		}
 
 		@Override
-		public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
+		public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 		{
 		}
 

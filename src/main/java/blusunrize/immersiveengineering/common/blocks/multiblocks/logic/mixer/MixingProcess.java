@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Process
 import blusunrize.immersiveengineering.common.util.inventory.MultiFluidTank;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ public class MixingProcess extends MultiblockProcessInMachine<MixerRecipe>
 	}
 
 	public MixingProcess(
-			BiFunction<Level, ResourceLocation, MixerRecipe> getRecipe, CompoundTag data, MultiFluidTank tank
+			BiFunction<Level, Identifier, MixerRecipe> getRecipe, CompoundTag data, MultiFluidTank tank
 	)
 	{
 		super(getRecipe, data);

@@ -22,7 +22,7 @@ import blusunrize.immersiveengineering.common.config.IEServerConfig.Wires.WireCo
 import blusunrize.immersiveengineering.common.register.IEBlocks.Connectors;
 import blusunrize.immersiveengineering.common.register.IEItems.Misc;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
@@ -168,7 +168,7 @@ public class IEWireTypes
 		}
 
 		@Override
-		public Collection<ResourceLocation> getRequestedHandlers()
+		public Collection<Identifier> getRequestedHandlers()
 		{
 			return ImmutableList.of();
 		}
@@ -255,7 +255,7 @@ public class IEWireTypes
 		}
 
 		@Override
-		public Collection<ResourceLocation> getRequestedHandlers()
+		public Collection<Identifier> getRequestedHandlers()
 		{
 			return ImmutableList.of(WireDamageHandler.ID);
 		}

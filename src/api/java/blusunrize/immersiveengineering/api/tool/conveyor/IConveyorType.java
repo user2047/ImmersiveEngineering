@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.api.tool.conveyor;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.Consumer;
@@ -26,7 +26,7 @@ public interface IConveyorType<T extends IConveyorBelt>
 
 	void initClientData(Consumer<IConveyorModelRender<T>> clientData);
 
-	ResourceLocation getId();
+	Identifier getId();
 
 	boolean acceptsCovers();
 }

@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 public class ExtractConveyorRender extends BasicConveyorRender<ExtractConveyor>
 {
-	public ExtractConveyorRender(ResourceLocation active, ResourceLocation inactive)
+	public ExtractConveyorRender(Identifier active, Identifier inactive)
 	{
 		super(active, inactive);
 	}

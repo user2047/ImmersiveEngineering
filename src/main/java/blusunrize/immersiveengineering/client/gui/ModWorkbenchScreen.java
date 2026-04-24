@@ -23,10 +23,10 @@ import blusunrize.immersiveengineering.common.gui.ModWorkbenchContainer;
 import blusunrize.immersiveengineering.common.items.EngineersBlueprintItem;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -40,7 +40,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchContainer>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("workbench");
+	private static final Identifier TEXTURE = makeTextureLocation("workbench");
 	private static final ButtonTexture PAGE_LEFT = new ButtonTexture(ieLoc("mod_workbench/page_left"));
 	private static final ButtonTexture PAGE_RIGHT = new ButtonTexture(ieLoc("mod_workbench/page_right"));
 
@@ -102,7 +102,7 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int i = 0; i < menu.ownSlotCount; i++)
 		{

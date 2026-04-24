@@ -22,7 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -148,7 +148,7 @@ public class ConnectorBlockStates extends ExtendedBlockstateProvider
 
 	private void floodlightModel()
 	{
-		ResourceLocation modelLoc = modLoc("block/metal_device/floodlight.obj.ie");
+		Identifier modelLoc = modLoc("block/metal_device/floodlight.obj.ie");
 		BlockModelBuilder offModel = ieObjBuilder("block/metal_device/floodlight_off", modelLoc)
 				.callback(FloodlightCallbacks.INSTANCE)
 				.layer(solid(), translucent())

@@ -15,7 +15,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -45,7 +45,7 @@ public abstract class IERecipeProvider extends RecipeProvider
 		super(p_248933_, provider);
 	}
 
-	protected ResourceLocation toRL(String s)
+	protected Identifier toRL(String s)
 	{
 		if(!s.contains("/"))
 			s = "crafting/"+s;
@@ -206,7 +206,7 @@ public abstract class IERecipeProvider extends RecipeProvider
 		return new NotCondition(new TagEmptyCondition(tag.location()));
 	}
 
-	public static ICondition getTagCondition(ResourceLocation tag)
+	public static ICondition getTagCondition(Identifier tag)
 	{
 		return getTagCondition(createItemWrapper(tag));
 	}

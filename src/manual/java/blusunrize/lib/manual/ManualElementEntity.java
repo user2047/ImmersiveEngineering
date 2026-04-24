@@ -12,7 +12,7 @@ import blusunrize.lib.manual.gui.ManualScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.nbt.CompoundTag;
@@ -36,7 +36,7 @@ public class ManualElementEntity extends SpecialManualElements
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mx, int my)
+	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mx, int my)
 	{
 		// Entity rendering code was largely borrowed from JustEnoughResources by way2muchnoise
 

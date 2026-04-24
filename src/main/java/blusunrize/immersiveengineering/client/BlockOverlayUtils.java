@@ -32,7 +32,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -44,7 +44,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -88,7 +88,7 @@ public class BlockOverlayUtils
 		);
 	}
 
-	private static void renderBlockOverlays(GuiGraphics graphics, DeltaTracker delta)
+	private static void renderBlockOverlays(GuiGraphicsExtractor graphics, DeltaTracker delta)
 	{
 		Player player = ClientUtils.mc().player;
 		if(player==null||ClientUtils.mc().hitResult==null)
@@ -139,7 +139,7 @@ public class BlockOverlayUtils
 	}
 
 	private static <S extends IMultiblockState> boolean renderMultiblockOverlay(
-			GuiGraphics graphics, IMultiblockBE<S> be, BlockHitResult absoluteHit, boolean hammer, int scaledWidth, int scaledHeight
+			GuiGraphicsExtractor graphics, IMultiblockBE<S> be, BlockHitResult absoluteHit, boolean hammer, int scaledWidth, int scaledHeight
 	)
 	{
 		final IMultiblockBEHelper<S> helper = be.getHelper();
@@ -156,13 +156,13 @@ public class BlockOverlayUtils
 
 	/* ----------- OVERLAY TEXT ----------- */
 
-	public static void drawBlockOverlayText(GuiGraphics graphics, Component[] text, int scaledWidth, int scaledHeight)
+	public static void drawBlockOverlayText(GuiGraphicsExtractor graphics, Component[] text, int scaledWidth, int scaledHeight)
 	{
 		if(text!=null&&text.length > 0)
 			drawBlockOverlayText(graphics, Arrays.asList(text), scaledWidth, scaledHeight);
 	}
 
-	public static void drawBlockOverlayText(GuiGraphics graphics, List<Component> text, int scaledWidth, int scaledHeight)
+	public static void drawBlockOverlayText(GuiGraphicsExtractor graphics, List<Component> text, int scaledWidth, int scaledHeight)
 	{
 		if(text.isEmpty())
 			return;
@@ -429,7 +429,7 @@ public class BlockOverlayUtils
 	/**
 	 * Draw overlay for a map in a frame, based on where the player's cursor is on the map
 	 */
-	public static void renderOreveinMapOverlays(GuiGraphics graphics, ItemFrame frameEntity, HitResult rayTraceResult, int scaledWidth, int scaledHeight)
+	public static void renderOreveinMapOverlays(GuiGraphicsExtractor graphics, ItemFrame frameEntity, HitResult rayTraceResult, int scaledWidth, int scaledHeight)
 	{
 		if(frameEntity==null)
 			return;
@@ -492,7 +492,7 @@ public class BlockOverlayUtils
 		if(decorations==null||minerals==null)
 			return;
 
-		List<ResourceLocation> target = null;
+		List<Identifier> target = null;
 		double lastDist = Double.MAX_VALUE;
 		for(Map.Entry<String, Entry> decoration : decorations.decorations().entrySet())
 		{
@@ -526,7 +526,7 @@ public class BlockOverlayUtils
 		if(target!=null)
 			for(int i = 0; i < target.size(); i++)
 			{
-				ResourceLocation id = target.get(i);
+				Identifier id = target.get(i);
 				MineralMix mix = MineralMix.RECIPES.getById(Minecraft.getInstance().level, id);
 				if(mix!=null)
 					graphics.drawString(font, I18n.get(mix.getTranslationKey(id)), scaledWidth/2+8, scaledHeight/2+8+i*font.lineHeight, 0xffffff, true);

@@ -16,7 +16,7 @@ import blusunrize.lib.manual.gui.GuiButtonManualNavigation;
 import blusunrize.lib.manual.gui.ManualScreen;
 import blusunrize.lib.manual.utils.ManualRecipeRef;
 import com.google.common.base.Preconditions;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 
@@ -62,7 +62,7 @@ public abstract class ManualElementIECrafting extends SpecialManualElements
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
+	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		highlighted = ItemStack.EMPTY;
 

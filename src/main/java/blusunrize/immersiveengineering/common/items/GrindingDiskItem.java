@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,7 +32,7 @@ public class GrindingDiskItem extends SawbladeItem
 			ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_STRIP, ItemAbilities.AXE_SCRAPE, ItemAbilities.AXE_WAX_OFF, Lib.WIRECUTTER_DIG
 	);
 	private static final ListTag ENCHANTS = new ListTag();
-	public static final ResourceLocation TEXTURE = ImmersiveEngineering.rl("item/grindingdisk_blade");
+	public static final Identifier TEXTURE = ImmersiveEngineering.rl("item/grindingdisk_blade");
 
 	static
 	{

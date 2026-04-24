@@ -24,7 +24,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -32,7 +32,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.DyeColor;
@@ -48,11 +48,11 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("radio_tower");
+	private static final Identifier TEXTURE = makeTextureLocation("radio_tower");
 	private static final ButtonTexture SAVE = new ButtonTexture(
 			ieLoc("radio_tower/save"), ieLoc("radio_tower/save_hovered")
 	);
-	private static final ResourceLocation SAVE_COLOR = ieLoc("radio_tower/save_color");
+	private static final Identifier SAVE_COLOR = ieLoc("radio_tower/save_color");
 
 	public RadioTowerScreen(RadioTowerMenu container, Inventory inventoryPlayer, Component title)
 	{
@@ -86,7 +86,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		Font font = getMinecraft().font;
 
@@ -109,7 +109,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(font, I18n.get(Lib.GUI_CONFIG+"radio_tower.saved_frequencies"), 14, 61, 0x2d1a00, false);
 	}
@@ -223,7 +223,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		private static final DecimalFormat FRQ_FORMAT = new DecimalFormat("###");
 
 		@Override
-		protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+		protected void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			Minecraft minecraft = Minecraft.getInstance();
 			graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
@@ -297,7 +297,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		}
 
 		@Override
-		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+		public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 			var rgb = Utils.vec4fFromDye(this.color);

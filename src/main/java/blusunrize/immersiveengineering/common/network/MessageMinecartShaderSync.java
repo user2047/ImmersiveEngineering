@@ -16,7 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -27,12 +27,12 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Optional;
 
-public record MessageMinecartShaderSync(int entityID, Optional<ResourceLocation> shader) implements IMessage
+public record MessageMinecartShaderSync(int entityID, Optional<Identifier> shader) implements IMessage
 {
 	public static final Type<MessageMinecartShaderSync> ID = IMessage.createType("minecart_shader_sync");
 	public static final StreamCodec<RegistryFriendlyByteBuf, MessageMinecartShaderSync> CODEC = StreamCodec.composite(
 			ByteBufCodecs.INT, MessageMinecartShaderSync::entityID,
-			ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC), MessageMinecartShaderSync::shader,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), MessageMinecartShaderSync::shader,
 			MessageMinecartShaderSync::new
 	);
 

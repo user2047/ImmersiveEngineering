@@ -19,7 +19,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
@@ -129,7 +129,7 @@ public class RailgunShotRenderer extends EntityRenderer<RailgunShotEntity>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(@Nonnull RailgunShotEntity entity)
+	public Identifier getTextureLocation(@Nonnull RailgunShotEntity entity)
 	{
 		return IEApi.ieLoc("textures/models/white.png");
 	}

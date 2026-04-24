@@ -23,7 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -41,7 +41,7 @@ public class AdvancementBuilder
 
 	private final String name;
 	private ItemStack icon;
-	private ResourceLocation background = null;
+	private Identifier background = null;
 	private AdvancementType frame = AdvancementType.TASK;
 	private boolean hidden = false;
 
@@ -101,7 +101,7 @@ public class AdvancementBuilder
 		return this;
 	}
 
-	private AdvancementBuilder background(ResourceLocation background)
+	private AdvancementBuilder background(Identifier background)
 	{
 		this.background = background;
 		return this;
@@ -190,9 +190,9 @@ public class AdvancementBuilder
 		return this;
 	}
 
-	public AdvancementBuilder talkToVillagers(ResourceLocation... professions)
+	public AdvancementBuilder talkToVillagers(Identifier... professions)
 	{
-		Arrays.stream(professions).sorted(Comparator.comparing(ResourceLocation::getPath))
+		Arrays.stream(professions).sorted(Comparator.comparing(Identifier::getPath))
 				.forEachOrdered(prof -> {
 					CompoundTag villagerData = new CompoundTag();
 					villagerData.putString("profession", prof.toString());

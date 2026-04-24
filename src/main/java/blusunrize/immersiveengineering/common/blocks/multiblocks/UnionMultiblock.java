@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
@@ -34,11 +34,11 @@ import java.util.function.Supplier;
 
 public class UnionMultiblock implements IMultiblock
 {
-	private final ResourceLocation name;
+	private final Identifier name;
 	private final List<TransformedMultiblock> parts;
 	private final Supplier<Component> displayName;
 
-	public UnionMultiblock(ResourceLocation name, List<TransformedMultiblock> parts)
+	public UnionMultiblock(Identifier name, List<TransformedMultiblock> parts)
 	{
 		this.name = name;
 		this.parts = parts;
@@ -51,7 +51,7 @@ public class UnionMultiblock implements IMultiblock
 	}
 
 	@Override
-	public ResourceLocation getUniqueName()
+	public Identifier getUniqueName()
 	{
 		return name;
 	}

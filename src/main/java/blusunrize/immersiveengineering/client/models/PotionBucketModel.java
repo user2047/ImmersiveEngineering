@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.RenderTypeGroup;
@@ -75,7 +75,7 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 				new OverrideHandler(baseModel.getOverrides(), bakery, context, spriteGetter),
 				context.getTransforms()
 		);
-		ResourceLocation fluidMaskLocation = IClientFluidTypeExtensions.of(IEFluids.POTION.get()).getStillTexture();
+		Identifier fluidMaskLocation = IClientFluidTypeExtensions.of(IEFluids.POTION.get()).getStillTexture();
 		for(var layerModel : baseModel.getRenderPasses(ItemStack.EMPTY, false))
 		{
 			var layerGroup = layerModel instanceof SimpleBakedModel simple?ModelUtils.copyTypes(simple): RenderTypeGroup.EMPTY;
@@ -100,7 +100,7 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 
 	public static class Loader implements IGeometryLoader<PotionBucketModel>
 	{
-		public static final ResourceLocation LOADER_NAME = ImmersiveEngineering.rl("potion_bucket");
+		public static final Identifier LOADER_NAME = ImmersiveEngineering.rl("potion_bucket");
 
 		@Nonnull
 		@Override

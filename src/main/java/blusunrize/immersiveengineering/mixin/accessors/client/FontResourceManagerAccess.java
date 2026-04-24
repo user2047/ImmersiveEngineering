@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.mixin.accessors.client;
 
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.gui.font.FontSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -21,5 +21,5 @@ import java.util.Map;
 public interface FontResourceManagerAccess
 {
 	@Accessor
-	Map<ResourceLocation, FontSet> getFontSets();
+	Map<Identifier, FontSet> getFontSets();
 }

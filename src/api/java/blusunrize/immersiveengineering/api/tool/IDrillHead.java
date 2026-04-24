@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.api.tool;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
@@ -80,5 +80,5 @@ public interface IDrillHead
 	 *
 	 * @return
 	 */
-	ResourceLocation getDrillTexture(ItemStack drill, ItemStack head);
+	Identifier getDrillTexture(ItemStack drill, ItemStack head);
 }

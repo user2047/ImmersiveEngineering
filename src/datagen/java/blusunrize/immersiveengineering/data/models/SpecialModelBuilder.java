@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.data.models;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -17,13 +17,13 @@ import java.util.function.BiFunction;
 
 public class SpecialModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-	private SpecialModelBuilder(ResourceLocation loaderId, T parent, ExistingFileHelper existingFileHelper)
+	private SpecialModelBuilder(Identifier loaderId, T parent, ExistingFileHelper existingFileHelper)
 	{
 		super(loaderId, parent, existingFileHelper, false);
 	}
 
 	public static <T extends ModelBuilder<T>>
-	BiFunction<T, ExistingFileHelper, SpecialModelBuilder<T>> forLoader(ResourceLocation loader)
+	BiFunction<T, ExistingFileHelper, SpecialModelBuilder<T>> forLoader(Identifier loader)
 	{
 		return (t, h) -> new SpecialModelBuilder<>(loader, t, h);
 	}

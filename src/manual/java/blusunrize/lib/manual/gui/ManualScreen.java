@@ -19,12 +19,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,13 +48,13 @@ public class ManualScreen extends Screen
 	private List<Button> pageButtons = new ArrayList<>();
 
 	@Nonnull
-	public AbstractNode<ResourceLocation, ManualEntry> currentNode;
+	public AbstractNode<Identifier, ManualEntry> currentNode;
 	public Stack<ManualLink> previousSelectedEntry = new Stack<>();
 	public int page;
 	public static ManualScreen lastActiveManual;
 
 	ManualInstance manual;
-	ResourceLocation texture;
+	Identifier texture;
 	private double[] lastClick;
 	private double[] lastDrag;
 	private EditBox searchField;
@@ -63,12 +63,12 @@ public class ManualScreen extends Screen
 
 	private final boolean setLastActive;
 
-	public ManualScreen(ManualInstance manual, ResourceLocation texture)
+	public ManualScreen(ManualInstance manual, Identifier texture)
 	{
 		this(manual, texture, true);
 	}
 
-	public ManualScreen(ManualInstance manual, ResourceLocation texture, boolean setLastActive)
+	public ManualScreen(ManualInstance manual, Identifier texture, boolean setLastActive)
 	{
 		super(Component.literal("manual"));
 		this.manual = manual;
@@ -83,7 +83,7 @@ public class ManualScreen extends Screen
 		return currentNode.getLeafData();
 	}
 
-	public void setCurrentNode(@Nonnull AbstractNode<ResourceLocation, ManualEntry> entry)
+	public void setCurrentNode(@Nonnull AbstractNode<Identifier, ManualEntry> entry)
 	{
 		currentNode = entry;
 		if(currentNode.isLeaf())
@@ -130,11 +130,11 @@ public class ManualScreen extends Screen
 		}
 		else
 		{
-			List<AbstractNode<ResourceLocation, ManualEntry>> children = new ArrayList<>();
-			for(AbstractNode<ResourceLocation, ManualEntry> node : currentNode.getChildren())
+			List<AbstractNode<Identifier, ManualEntry>> children = new ArrayList<>();
+			for(AbstractNode<Identifier, ManualEntry> node : currentNode.getChildren())
 				if(manual.showNodeInList(node))
 					children.add(node);
-			Consumer<AbstractNode<ResourceLocation, ManualEntry>> openEntry = sel -> {
+			Consumer<AbstractNode<Identifier, ManualEntry>> openEntry = sel -> {
 				if(sel!=null)
 				{
 					previousSelectedEntry.clear();
@@ -185,7 +185,7 @@ public class ManualScreen extends Screen
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float deltaTime)
+	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
 	{
 		final PoseStack transform = graphics.pose();
 		transform.pushPose();
@@ -249,7 +249,7 @@ public class ManualScreen extends Screen
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float deltaTime)
+	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
 	{
 		// TODO do we want this or not?
 		//  super.renderBackground(graphics, mouseX, mouseY, deltaTime);
@@ -292,7 +292,7 @@ public class ManualScreen extends Screen
 		super.removed();
 	}
 
-	private void drawCenteredStringScaled(GuiGraphics graphics, Font fr, String s, int x, int y, int colour, boolean shadow)
+	private void drawCenteredStringScaled(GuiGraphicsExtractor graphics, Font fr, String s, int x, int y, int colour, boolean shadow)
 	{
 		int xx = (int)Math.floor(x-(fr.width(s)/2.));
 		int yy = (int)Math.floor(y-(fr.lineHeight/2.));
@@ -453,8 +453,8 @@ public class ManualScreen extends Screen
 		else
 		{
 			search = search.toLowerCase(Locale.ENGLISH);
-			ArrayList<AbstractNode<ResourceLocation, ManualEntry>> lHeaders = new ArrayList<>();
-			Set<AbstractNode<ResourceLocation, ManualEntry>> lSpellcheck = new HashSet<>();
+			ArrayList<AbstractNode<Identifier, ManualEntry>> lHeaders = new ArrayList<>();
+			Set<AbstractNode<Identifier, ManualEntry>> lSpellcheck = new HashSet<>();
 			final String searchFinal = search;
 			manual.getAllEntriesAndCategories().forEach((node) ->
 			{
@@ -467,10 +467,10 @@ public class ManualScreen extends Screen
 						lSpellcheck.add(node);
 				}
 			});
-			List<AbstractNode<ResourceLocation, ManualEntry>> lCorrections =
+			List<AbstractNode<Identifier, ManualEntry>> lCorrections =
 					ManualUtils.getPrimitiveSpellingCorrections(search, lSpellcheck, 4,
 							(e) -> ManualUtils.getTitleForNode(e, manual));
-			for(AbstractNode<ResourceLocation, ManualEntry> node : lSpellcheck)
+			for(AbstractNode<Identifier, ManualEntry> node : lSpellcheck)
 				if(!lCorrections.contains(node))
 				{
 					if(node.isLeaf()&&node.getLeafData().listForSearch(search))

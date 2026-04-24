@@ -19,8 +19,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 
 public class AlloySmelterRecipeCategory extends IERecipeCategory<AlloyRecipe>
 {
@@ -30,7 +30,7 @@ public class AlloySmelterRecipeCategory extends IERecipeCategory<AlloyRecipe>
 	public AlloySmelterRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.ALLOY, "block.immersiveengineering.alloy_smelter");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/alloy_smelter.png");
+		Identifier background = IEApi.ieLoc("textures/gui/alloy_smelter.png");
 		setBackground(helper.createDrawable(background, 36, 15, 106, 56));
 		setIcon(IEMultiblockLogic.ALLOY_SMELTER.iconStack());
 		flame = helper.drawableBuilder(background, 177, 0, 14, 14).buildAnimated(200, IDrawableAnimated.StartDirection.TOP, true);
@@ -49,7 +49,7 @@ public class AlloySmelterRecipeCategory extends IERecipeCategory<AlloyRecipe>
 	}
 
 	@Override
-	public void draw(AlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(AlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 18, 21);
 		arrow.draw(graphics, 47, 20);

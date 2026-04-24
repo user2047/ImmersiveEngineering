@@ -17,11 +17,11 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.IllagerRenderer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class BulwarkRenderer extends IllagerRenderer<Bulwark>
 {
-	private static final ResourceLocation TEXTURE = IEApi.ieLoc("textures/entity/illager/bulwark.png");
+	private static final Identifier TEXTURE = IEApi.ieLoc("textures/entity/illager/bulwark.png");
 
 	public BulwarkRenderer(EntityRendererProvider.Context p_174354_)
 	{
@@ -95,7 +95,7 @@ public class BulwarkRenderer extends IllagerRenderer<Bulwark>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(Bulwark entity)
+	public Identifier getTextureLocation(Bulwark entity)
 	{
 		return TEXTURE;
 	}

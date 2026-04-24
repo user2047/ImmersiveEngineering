@@ -17,12 +17,12 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.network.MessageContainerUpdate;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -39,9 +39,9 @@ import java.util.function.Consumer;
 public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends AbstractContainerScreen<C>
 {
 	private final ResettableLazy<List<InfoArea>> infoAreas;
-	protected final ResourceLocation background;
+	protected final Identifier background;
 
-	public IEContainerScreen(C inventorySlotsIn, Inventory inv, Component title, ResourceLocation background)
+	public IEContainerScreen(C inventorySlotsIn, Inventory inv, Component title, Identifier background)
 	{
 		super(inventorySlotsIn, inv, title);
 		this.background = background;
@@ -62,7 +62,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		// Only difference to super version is the text color
 		graphics.drawString(this.font, title, titleLabelX, titleLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
@@ -70,7 +70,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.render(graphics, mouseX, mouseY, partialTicks);
 		List<Component> tooltip = new ArrayList<>();
@@ -100,7 +100,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 	}
 
 	@Override
-	protected final void renderBg(@Nonnull GuiGraphics graphics, float partialTicks, int x, int y)
+	protected final void renderBg(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)
 	{
 		drawBackgroundTexture(graphics);
 		drawContainerBackgroundPre(graphics, partialTicks, x, y);
@@ -108,12 +108,12 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 			area.draw(graphics);
 	}
 
-	protected void drawBackgroundTexture(GuiGraphics graphics)
+	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(background, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 	}
 
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float partialTicks, int x, int y)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)
 	{
 	}
 
@@ -123,7 +123,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 	{
 	}
 
-	public static ResourceLocation makeTextureLocation(String name)
+	public static Identifier makeTextureLocation(String name)
 	{
 		return ImmersiveEngineering.rl("textures/gui/"+name+".png");
 	}

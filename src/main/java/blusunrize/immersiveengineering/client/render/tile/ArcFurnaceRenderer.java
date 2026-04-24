@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 
 import java.util.List;
@@ -40,8 +40,8 @@ public class ArcFurnaceRenderer extends IEMultiblockRenderer<State>
 
 	public static final String NAME = "arc_furnace_electrodes";
 	public static DynamicModel ELECTRODES;
-	public static final ResourceLocation HOT_METLA_STILL = IEApi.ieLoc("block/fluid/hot_metal_still");
-	public static final ResourceLocation HOT_METLA_FLOW = IEApi.ieLoc("block/fluid/hot_metal_flow");
+	public static final Identifier HOT_METLA_STILL = IEApi.ieLoc("block/fluid/hot_metal_still");
+	public static final Identifier HOT_METLA_FLOW = IEApi.ieLoc("block/fluid/hot_metal_flow");
 
 	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn,

@@ -45,7 +45,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -86,7 +86,7 @@ public class SawmillLogic
 	public static final BlockPos REDSTONE_POS = new BlockPos(0, 1, 2);
 	private static final AABB SAWBLADE_AABB = new AABB(2.6875, 1, 1.375, 4.3125, 2, 1.625);
 
-	public static ResourceLocation MIF_CONDITION_SAWBLADE = ieLoc("sawmill/blade");
+	public static Identifier MIF_CONDITION_SAWBLADE = ieLoc("sawmill/blade");
 
 	static
 	{

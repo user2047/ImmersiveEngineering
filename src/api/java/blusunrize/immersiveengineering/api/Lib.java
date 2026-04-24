@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.DyeColor;
@@ -117,8 +117,8 @@ public class Lib
 
 	public static class GuiLayers
 	{
-		public static final ResourceLocation ITEMS = IEApi.ieLoc("items");
-		public static final ResourceLocation BLOCKS = IEApi.ieLoc("blocks");
+		public static final Identifier ITEMS = IEApi.ieLoc("items");
+		public static final Identifier BLOCKS = IEApi.ieLoc("blocks");
 	}
 
 	public static class DamageTypes

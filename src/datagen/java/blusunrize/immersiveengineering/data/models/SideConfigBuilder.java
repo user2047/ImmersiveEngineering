@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.client.models.ModelConfigurableSides.Load
 import blusunrize.immersiveengineering.client.models.ModelConfigurableSides.Type;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -31,7 +31,7 @@ public class SideConfigBuilder<T extends ModelBuilder<T>> extends CustomLoaderBu
 	}
 
 	private Type type;
-	private ResourceLocation baseName;
+	private Identifier baseName;
 
 	public SideConfigBuilder<T> type(Type type)
 	{
@@ -41,7 +41,7 @@ public class SideConfigBuilder<T extends ModelBuilder<T>> extends CustomLoaderBu
 		return this;
 	}
 
-	public SideConfigBuilder<T> baseName(ResourceLocation baseName)
+	public SideConfigBuilder<T> baseName(Identifier baseName)
 	{
 		Preconditions.checkNotNull(baseName);
 		Preconditions.checkState(this.baseName==null);

@@ -20,7 +20,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
@@ -65,11 +65,11 @@ public class BlueprintCraftingRecipeManager implements IRecipeManager<BlueprintC
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, String blueprintCategory, IIngredientWithAmount[] inputs, IItemStack output)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize[] ingredients = CrTIngredientUtil.getIngredientsWithSize(inputs);
 		final ItemStack results = output.getInternal();
 		final BlueprintCraftingRecipe recipe = IEServerConfig.MACHINES.autoWorkbenchConfig.apply(
-				new BlueprintCraftingRecipe(resourceLocation, blueprintCategory, IESerializableRecipe.of(results), ingredients)
+				new BlueprintCraftingRecipe(Identifier, blueprintCategory, IESerializableRecipe.of(results), ingredients)
 		);
 
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));

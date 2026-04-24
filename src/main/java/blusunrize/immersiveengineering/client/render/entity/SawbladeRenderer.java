@@ -25,7 +25,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,7 +39,7 @@ public class SawbladeRenderer extends EntityRenderer<SawbladeEntity>
 	public static final String NAME = "sawblade_entity";
 	public static DynamicModel MODEL;
 
-	public static final ResourceLocation SAWBLADE = IEApi.ieLoc("item/sawblade_blade");
+	public static final Identifier SAWBLADE = IEApi.ieLoc("item/sawblade_blade");
 	private static final VisibilityList DYNAMIC_GROUPS = VisibilityList.show("blade");
 	private final ItemRenderer itemRenderer;
 
@@ -81,7 +81,7 @@ public class SawbladeRenderer extends EntityRenderer<SawbladeEntity>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(@Nonnull SawbladeEntity entity)
+	public Identifier getTextureLocation(@Nonnull SawbladeEntity entity)
 	{
 		return SAWBLADE;
 	}

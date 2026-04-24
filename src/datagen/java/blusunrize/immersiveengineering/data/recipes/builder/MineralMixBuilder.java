@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.excavator.MineralMix;
 import blusunrize.immersiveengineering.api.excavator.MineralMix.BiomeTagPredicate;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -131,7 +131,7 @@ public class MineralMixBuilder extends IERecipeBuilder<MineralMixBuilder>
 				.spoil(Blocks.GRAVEL, 0.2f);
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		MineralMix recipe = new MineralMix(
 				outputs, spoils, weight, failChance, biomeTagPredicates, background

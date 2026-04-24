@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.client.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,10 +35,10 @@ public abstract class ClientBlockEntityScreen<T extends BlockEntity> extends Scr
 		this.guiTop = (this.height-this.ySize)/2;
 	}
 
-	protected abstract void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick);
+	protected abstract void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick);
 
 	@Override
-	public void render(GuiGraphics graphics, int mx, int my, float partial)
+	public void render(GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		// Background & widgets
 		super.render(graphics, mx, my, partial);

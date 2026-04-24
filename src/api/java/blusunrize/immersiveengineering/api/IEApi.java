@@ -13,7 +13,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -70,11 +70,11 @@ public class IEApi
 		return getPreferredElementbyMod(list, registry::getKey);
 	}
 
-	public static <T> Optional<T> getPreferredElementbyMod(Stream<T> list, Function<T, ResourceLocation> getName)
+	public static <T> Optional<T> getPreferredElementbyMod(Stream<T> list, Function<T, Identifier> getName)
 	{
 		return list.min(
 			Comparator.<T>comparingInt(t -> {
-				ResourceLocation name = getName.apply(t);
+				Identifier name = getName.apply(t);
 				String modId = name.getNamespace();
 				int idx = modPreference.indexOf(modId);
 				if(idx < 0)
@@ -103,8 +103,8 @@ public class IEApi
 		return ModList.get().getModFileById(MODID).versionString();
 	}
 
-	public static ResourceLocation ieLoc(String path)
+	public static Identifier ieLoc(String path)
 	{
-		return ResourceLocation.fromNamespaceAndPath(MODID, path);
+		return Identifier.fromNamespaceAndPath(MODID, path);
 	}
 }

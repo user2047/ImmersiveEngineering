@@ -47,7 +47,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.phys.Vec3;
@@ -89,13 +89,13 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 	};
 
 	// register additional conditions for machine interface
-	public static ResourceLocation[] MIF_CONDITION_TANKS = IntStream.range(0, NUM_TANKS)
+	public static Identifier[] MIF_CONDITION_TANKS = IntStream.range(0, NUM_TANKS)
 			.mapToObj(i -> ieLoc("assembler/tank_"+i))
-			.toArray(ResourceLocation[]::new);
+			.toArray(Identifier[]::new);
 
 	static
 	{
-		for(ResourceLocation tank_cond : MIF_CONDITION_TANKS)
+		for(Identifier tank_cond : MIF_CONDITION_TANKS)
 			MachineInterfaceHandler.copyOptions(tank_cond, MachineInterfaceHandler.BASIC_FLUID_IN);
 	}
 

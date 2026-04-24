@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.client.gui.elements;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 
@@ -46,7 +46,7 @@ public class GuiButtonDyeColor extends GuiButtonState<DyeColor>
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 		GuiHelper.drawColouredRect(graphics, getX()+2, getY()+2, width-4, height-4, getState());

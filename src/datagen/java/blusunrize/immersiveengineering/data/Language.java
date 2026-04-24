@@ -30,7 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.GsonHelper;
@@ -51,7 +51,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 public class Language extends LanguageProvider
 {
 	final ExistingFileHelper existingFileHelper;
-	private final ResourceLocation baseLangFile;
+	private final Identifier baseLangFile;
 
 	public Language(PackOutput output, ExistingFileHelper existingFileHelper, String locale)
 	{
@@ -208,7 +208,7 @@ public class Language extends LanguageProvider
 		addBullet(IEBullets.WOLFPACK, "Wolfpack Cartridge");
 	}
 
-	private void addBullet(ResourceLocation bullet, String name)
+	private void addBullet(Identifier bullet, String name)
 	{
 		addItem(Weapons.BULLETS.get(BulletHandler.getBullet(bullet)), name);
 	}

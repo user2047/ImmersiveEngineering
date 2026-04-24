@@ -17,7 +17,7 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 public class IEBlockEntitySound implements TickableSoundInstance
 {
 	protected Sound sound;
-	private final ResourceLocation resource;
+	private final Identifier resource;
 	private final float volume;
 	private final float pitch;
 
@@ -52,7 +52,7 @@ public class IEBlockEntitySound implements TickableSoundInstance
 	}
 
 	@Override
-	public ResourceLocation getLocation()
+	public Identifier getLocation()
 	{
 		return resource;
 	}

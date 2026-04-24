@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -43,7 +43,7 @@ public class FluorescentTubeRenderer extends EntityRenderer<FluorescentTubeEntit
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(FluorescentTubeEntity entity)
+	public Identifier getTextureLocation(FluorescentTubeEntity entity)
 	{
 		return null;
 	}
@@ -63,7 +63,7 @@ public class FluorescentTubeRenderer extends EntityRenderer<FluorescentTubeEntit
 		matrixStackIn.translate(-0.25, -1, 0);
 		if(tex==null)
 			tex = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-					.apply(ResourceLocation.withDefaultNamespace("block/iron_block"));
+					.apply(Identifier.withDefaultNamespace("block/iron_block"));
 
 		VertexConsumer builder = bufferIn.getBuffer(RenderType.solid());
 		RenderUtils.renderTexturedBox(builder, matrixStackIn,

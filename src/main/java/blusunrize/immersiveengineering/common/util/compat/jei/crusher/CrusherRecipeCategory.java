@@ -21,7 +21,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public class CrusherRecipeCategory extends IERecipeCategory<CrusherRecipe>
 	}
 
 	@Override
-	public void draw(CrusherRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(CrusherRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		List<StackWithChance> validSecondaries = getValidSecondaryOutputs(recipe);
 		int yBase = validSecondaries.isEmpty()?36: validSecondaries.size() < 2?27: 18;

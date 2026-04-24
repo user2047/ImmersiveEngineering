@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.util.compat.computers.generic.Call
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.PeripheralCapability;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
@@ -70,7 +70,7 @@ public class ComputerCraftCompatModule extends EarlyIECompatModule
 
 	private static void registerCapabilities(RegisterCapabilitiesEvent event)
 	{
-		for(Entry<ResourceLocation, CallbackOwner<?>> entry : Callbacks.getCallbacks().entrySet())
+		for(Entry<Identifier, CallbackOwner<?>> entry : Callbacks.getCallbacks().entrySet())
 		{
 
 			PeripheralCreator<?> creator;

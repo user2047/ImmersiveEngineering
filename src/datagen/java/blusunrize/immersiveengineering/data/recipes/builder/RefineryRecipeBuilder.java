@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.data.recipes.builder;
 
 import blusunrize.immersiveengineering.api.crafting.RefineryRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -72,7 +72,7 @@ public class RefineryRecipeBuilder extends IERecipeBuilder<RefineryRecipeBuilder
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		RefineryRecipe recipe = new RefineryRecipe(output, input0, input1, catalyst, energy);
 		out.accept(name, recipe, null, getConditions());

@@ -17,7 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
@@ -40,7 +40,7 @@ public record RenderedItemModelDataProvider(
         {
             Set<String> domainsToRender = Set.of("minecraft", Lib.MODID);
             BuiltInRegistries.ITEM.stream().forEach(item -> {
-                ResourceLocation name = BuiltInRegistries.ITEM.getKey(item);
+                Identifier name = BuiltInRegistries.ITEM.getKey(item);
                 if(!domainsToRender.contains(name.getNamespace()))
                     return;
                 ModelResourceLocation modelLocation = new ModelResourceLocation(name, "inventory");

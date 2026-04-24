@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -67,13 +67,13 @@ public class MineralMix extends IESerializableRecipe
 		return ItemStack.EMPTY;
 	}
 
-	public static String getPlainName(ResourceLocation id)
+	public static String getPlainName(Identifier id)
 	{
 		String path = id.getPath();
 		return path.substring(path.lastIndexOf("/")+1);
 	}
 
-	public static String getTranslationKey(ResourceLocation id)
+	public static String getTranslationKey(Identifier id)
 	{
 		return Lib.DESC_INFO+"mineral."+getPlainName(id);
 	}

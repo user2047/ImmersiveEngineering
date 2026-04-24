@@ -18,7 +18,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.Arrays;
 
@@ -48,7 +48,7 @@ public class MetalPressRecipeCategory extends IERecipeCategory<MetalPressRecipe>
 	}
 
 	@Override
-	public void draw(MetalPressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(MetalPressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		graphics.pose().pushPose();
 		graphics.pose().scale(3, 3, 1);

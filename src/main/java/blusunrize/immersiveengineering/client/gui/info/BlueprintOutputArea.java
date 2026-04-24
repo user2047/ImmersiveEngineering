@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import blusunrize.immersiveengineering.common.gui.IESlot;
 import blusunrize.immersiveengineering.common.gui.IESlot.BlueprintOutput;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
@@ -72,7 +72,7 @@ public class BlueprintOutputArea extends InfoArea
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics)
+	public void draw(GuiGraphicsExtractor graphics)
 	{
 		if(!slot.isOnPage())
 			return;

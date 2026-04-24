@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutputList;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.UnsizedItemInput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -85,7 +85,7 @@ public class SawmillRecipeBuilder extends IERecipeBuilder<SawmillRecipeBuilder>
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		SawmillRecipe recipe = new SawmillRecipe(
 				output, stripped, input, energy,

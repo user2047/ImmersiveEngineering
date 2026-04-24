@@ -38,7 +38,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -253,7 +253,7 @@ public class SpecificIEOBJModel<T> implements BakedModel
 							group, baseModel.getOwner(), quads::add, spriteGetter, colorGetter,
 							coordinateRemapper, state.transform().compose(optionalTransform.blockCenterToCorner())
 					);
-					ShaderLayer layer = shader!=null?shader.getLayers()[pass]: new ShaderLayer(ResourceLocation.withDefaultNamespace("missing/no"), -1)
+					ShaderLayer layer = shader!=null?shader.getLayers()[pass]: new ShaderLayer(Identifier.withDefaultNamespace("missing/no"), -1)
 					{
 						@Override
 						public RenderType getRenderType(RenderType baseType)

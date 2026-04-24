@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.client.gui.info.TooltipArea;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.gui.TurretMenu.GunTurretMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -50,7 +50,7 @@ public class GunTurretScreen extends TurretScreen<GunTurretMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		super.drawContainerBackgroundPre(graphics, f, mx, my);
 		GuiHelper.drawDarkSlot(graphics, leftPos+134, topPos+13, 16, 16);

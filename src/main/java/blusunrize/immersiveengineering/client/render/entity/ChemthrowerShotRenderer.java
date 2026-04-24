@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -87,7 +87,7 @@ public class ChemthrowerShotRenderer extends EntityRenderer<ChemthrowerShotEntit
 
 	@Override
 	@Nonnull
-	public ResourceLocation getTextureLocation(@Nonnull ChemthrowerShotEntity chemthrowerShotEntity)
+	public Identifier getTextureLocation(@Nonnull ChemthrowerShotEntity chemthrowerShotEntity)
 	{
 		return IEApi.ieLoc("textures/models/bullet.png");
 	}

@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.api;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -35,16 +35,16 @@ public class IEApiTest
 		assertTrue(IEApi.getPreferredElementbyMod(Stream.empty(), Function.identity()).isEmpty());
 	}
 
-	private void testGetPreferredElementByMod(ResourceLocation expected, ResourceLocation... input)
+	private void testGetPreferredElementByMod(Identifier expected, Identifier... input)
 	{
-		List<ResourceLocation> baseList = Arrays.asList(input);
+		List<Identifier> baseList = Arrays.asList(input);
 		// Basic check to make sure order does not matter
 		assertEquals(Optional.of(expected), IEApi.getPreferredElementbyMod(baseList.stream(), Function.identity()));
 		assertEquals(Optional.of(expected), IEApi.getPreferredElementbyMod(Lists.reverse(baseList).stream(), Function.identity()));
 	}
 
-	private ResourceLocation rl(String namespace, String path)
+	private Identifier rl(String namespace, String path)
 	{
-		return ResourceLocation.fromNamespaceAndPath(namespace, path);
+		return Identifier.fromNamespaceAndPath(namespace, path);
 	}
 }

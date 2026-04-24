@@ -10,7 +10,7 @@
 package blusunrize.immersiveengineering.data;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -29,7 +29,7 @@ public class DataGenUtils
 	private static final Pattern NEWMTL = Pattern.compile("^newmtl\\s+(.*)$", Pattern.MULTILINE);
 	private static final Pattern MAP_KD = Pattern.compile("^map_Kd\\s+(.*)$", Pattern.MULTILINE);
 
-	public static String getTextureFromObj(ResourceLocation obj, ExistingFileHelper helper)
+	public static String getTextureFromObj(Identifier obj, ExistingFileHelper helper)
 	{
 		try
 		{
@@ -41,7 +41,7 @@ public class DataGenUtils
 			String fullObj = IOUtils.toString(objStream, StandardCharsets.US_ASCII);
 			String libLoc = findFirstOccurrenceGroup(MTLLIB, fullObj);
 			String libName = findFirstOccurrenceGroup(USEMTL, fullObj);
-			ResourceLocation libRL = relative(obj, libLoc);
+			Identifier libRL = relative(obj, libLoc);
 			return getMTLTexture(libRL, libName, helper);
 		} catch(IOException e)
 		{
@@ -49,7 +49,7 @@ public class DataGenUtils
 		}
 	}
 
-	public static String getMTLTexture(ResourceLocation mtl, String materialName, ExistingFileHelper helper)
+	public static String getMTLTexture(Identifier mtl, String materialName, ExistingFileHelper helper)
 	{
 		try
 		{
@@ -78,7 +78,7 @@ public class DataGenUtils
 		return matcher.group(1);
 	}
 
-	private static ResourceLocation relative(ResourceLocation base, String relativePath)
+	private static Identifier relative(Identifier base, String relativePath)
 	{
 		String basePath = base.getPath();
 		String lastDir = basePath.substring(0, basePath.lastIndexOf('/')+1);

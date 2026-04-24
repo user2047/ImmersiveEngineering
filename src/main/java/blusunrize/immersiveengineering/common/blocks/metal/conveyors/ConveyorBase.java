@@ -22,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -49,8 +49,8 @@ import java.util.function.Predicate;
  */
 public abstract class ConveyorBase implements IConveyorBelt
 {
-	public static ResourceLocation texture_on = IEApi.ieLoc("block/conveyor/conveyor");
-	public static ResourceLocation texture_off = IEApi.ieLoc("block/conveyor/off");
+	public static Identifier texture_on = IEApi.ieLoc("block/conveyor/conveyor");
+	public static Identifier texture_off = IEApi.ieLoc("block/conveyor/off");
 
 	private Block cover = Blocks.AIR;
 
@@ -150,7 +150,7 @@ public abstract class ConveyorBase implements IConveyorBelt
 		else
 			dyeColour = null;
 		if(nbt.contains("cover", Tag.TAG_STRING))
-			cover = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(nbt.getString("cover")));
+			cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getString("cover")));
 	}
 
 	/* ============ RENDERING ============ */

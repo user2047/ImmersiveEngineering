@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderType.CompositeState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
@@ -58,9 +58,9 @@ public class IERenderTypes extends RenderStateShard
 	public static final RenderType POSITION_COLOR_LIGHTMAP;
 	public static final RenderType ITEM_DAMAGE_BAR;
 	public static final RenderType PARTICLES;
-	private static final Function<ResourceLocation, RenderType> GUI_CUTOUT;
-	private static final Function<ResourceLocation, RenderType> GUI_TRANSLUCENT;
-	private static final Function<ResourceLocation, RenderType> FULLBRIGHT_TRANSLUCENT;
+	private static final Function<Identifier, RenderType> GUI_CUTOUT;
+	private static final Function<Identifier, RenderType> GUI_TRANSLUCENT;
+	private static final Function<Identifier, RenderType> FULLBRIGHT_TRANSLUCENT;
 	private static final ShaderStateShard RENDERTYPE_POSITION_COLOR = RENDERTYPE_LIGHTNING_SHADER;
 	protected static final RenderStateShard.TextureStateShard BLOCK_SHEET_MIPPED = new RenderStateShard.TextureStateShard(TextureAtlas.LOCATION_BLOCKS, false, true);
 	protected static final RenderStateShard.LightmapStateShard LIGHTMAP_DISABLED = new RenderStateShard.LightmapStateShard(false);
@@ -234,17 +234,17 @@ public class IERenderTypes extends RenderStateShard
 		super(p_110161_, p_110162_, p_110163_);
 	}
 
-	public static RenderType getGui(ResourceLocation texture)
+	public static RenderType getGui(Identifier texture)
 	{
 		return GUI_CUTOUT.apply(texture);
 	}
 
-	public static RenderType getGuiTranslucent(ResourceLocation texture)
+	public static RenderType getGuiTranslucent(Identifier texture)
 	{
 		return GUI_TRANSLUCENT.apply(texture);
 	}
 
-	private static CompositeState.CompositeStateBuilder makeGuiState(ResourceLocation texture)
+	private static CompositeState.CompositeStateBuilder makeGuiState(Identifier texture)
 	{
 		return RenderType.CompositeState.builder()
 				.setTextureState(new TextureStateShard(texture, false, false))
@@ -275,7 +275,7 @@ public class IERenderTypes extends RenderStateShard
 		);
 	}
 
-	public static RenderType getPositionTex(ResourceLocation texture)
+	public static RenderType getPositionTex(Identifier texture)
 	{
 		return createDefault(
 				ImmersiveEngineering.MODID+":pos_tex_"+texture,
@@ -293,7 +293,7 @@ public class IERenderTypes extends RenderStateShard
 		return RenderType.create(name, format, mode, 256, false, false, state);
 	}
 
-	public static RenderType getFullbrightTranslucent(ResourceLocation texture)
+	public static RenderType getFullbrightTranslucent(Identifier texture)
 	{
 		return FULLBRIGHT_TRANSLUCENT.apply(texture);
 	}
@@ -385,7 +385,7 @@ public class IERenderTypes extends RenderStateShard
 
 		@Nonnull
 		@Override
-		protected Optional<ResourceLocation> cutoutTexture()
+		protected Optional<Identifier> cutoutTexture()
 		{
 			return Optional.of(WhiteTexture.INSTANCE.get().getTextureLocation());
 		}

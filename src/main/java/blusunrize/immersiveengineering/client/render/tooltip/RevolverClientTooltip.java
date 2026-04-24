@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.client.render.tooltip;
 
 import blusunrize.immersiveengineering.client.gui.RevolverScreen;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 
 public record RevolverClientTooltip(RevolverServerTooltip data) implements ClientTooltipComponent
@@ -29,7 +29,7 @@ public record RevolverClientTooltip(RevolverServerTooltip data) implements Clien
 	}
 
 	@Override
-	public void renderImage(Font font, int mouseX, int mouseY, GuiGraphics graphics)
+	public void renderImage(Font font, int mouseX, int mouseY, GuiGraphicsExtractor graphics)
 	{
 		graphics.pose().pushPose();
 		graphics.pose().translate(mouseX, mouseY, 0);

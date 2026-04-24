@@ -22,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -36,9 +36,9 @@ import java.util.List;
  */
 public class SplitConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = ImmersiveEngineering.rl("splitter");
-	public static final ResourceLocation texture_on = ImmersiveEngineering.rl("block/conveyor/split");
-	public static final ResourceLocation texture_off = ImmersiveEngineering.rl("block/conveyor/split_off");
+	public static final Identifier NAME = ImmersiveEngineering.rl("splitter");
+	public static final Identifier texture_on = ImmersiveEngineering.rl("block/conveyor/split");
+	public static final Identifier texture_off = ImmersiveEngineering.rl("block/conveyor/split_off");
 	public static final IConveyorType<SplitConveyor> TYPE = new BasicConveyorType<>(
 			NAME, false, true, SplitConveyor::new, () -> new SplitConveyorRender(texture_on, texture_off)
 	);

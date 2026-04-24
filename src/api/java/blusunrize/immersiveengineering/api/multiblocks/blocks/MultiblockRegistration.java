@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.Multibloc
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -44,15 +44,15 @@ public record MultiblockRegistration<State extends IMultiblockState>(
 		Function<Level, Vec3i> getSize,
 		Disassembler disassemble,
 		Function<Level, List<StructureBlockInfo>> getStructure,
-		ResourceLocation id
+		Identifier id
 )
 {
 	public static <State extends IMultiblockState>
-	MultiblockRegistrationBuilder<State, ?> builder(IMultiblockLogic<State> logic, ResourceLocation name)
+	MultiblockRegistrationBuilder<State, ?> builder(IMultiblockLogic<State> logic, Identifier name)
 	{
 		class Impl extends MultiblockRegistrationBuilder<State, Impl>
 		{
-			public Impl(IMultiblockLogic<State> logic, ResourceLocation name)
+			public Impl(IMultiblockLogic<State> logic, Identifier name)
 			{
 				super(logic, name);
 			}

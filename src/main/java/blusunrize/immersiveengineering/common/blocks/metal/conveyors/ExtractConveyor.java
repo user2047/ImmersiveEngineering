@@ -20,7 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -44,7 +44,7 @@ import java.util.OptionalDouble;
  */
 public class ExtractConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = IEApi.ieLoc("extract");
+	public static final Identifier NAME = IEApi.ieLoc("extract");
 	public static final IConveyorType<ExtractConveyor> TYPE = new BasicConveyorType<>(
 			NAME, true, true, ExtractConveyor::new, () -> new ExtractConveyorRender(texture_on, texture_off)
 	);

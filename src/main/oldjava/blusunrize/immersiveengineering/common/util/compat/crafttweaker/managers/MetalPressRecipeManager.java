@@ -20,7 +20,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
@@ -61,12 +61,12 @@ public class MetalPressRecipeManager implements IRecipeManager<MetalPressRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount input, IItemStack mold, int energy, IItemStack output)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize ingredient = CrTIngredientUtil.getIngredientWithSize(input);
 		final ItemStack outputStack = output.getInternal();
 
 		final MetalPressRecipe recipe = IEServerConfig.MACHINES.metalPressConfig.apply(
-				new MetalPressRecipe(resourceLocation, IESerializableRecipe.of(outputStack), ingredient, mold.getDefinition(), energy)
+				new MetalPressRecipe(Identifier, IESerializableRecipe.of(outputStack), ingredient, mold.getDefinition(), energy)
 		);
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));
 	}

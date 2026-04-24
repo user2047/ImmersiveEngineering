@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class BlueprintCraftingRecipeBuilder extends IERecipeBuilder<BlueprintCra
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		BlueprintCraftingRecipe recipe = new BlueprintCraftingRecipe(blueprintCategory, output, inputs);
 		out.accept(name, recipe, null, getConditions());

@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.client.gui;
 
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.gui.ToolboxMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -44,7 +44,7 @@ public class ToolboxScreen extends IEContainerScreen<ToolboxMenu>
 	}
 
 	@Override
-	protected void drawBackgroundTexture(GuiGraphics graphics)
+	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(background, leftPos, topPos-17, 0, 0, 176, imageHeight+17);
 	}

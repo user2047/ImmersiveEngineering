@@ -19,7 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -33,10 +33,10 @@ public class LocalWireNetwork implements IWorldTickable
 	private final Map<ConnectionPoint, Collection<Connection>> connections = new HashMap<>();
 	private final Map<BlockPos, IImmersiveConnectable> connectors = new HashMap<>();
 	//This is an array map since it will generally be tiny, and needs to be fast at those sizes
-	private final Map<ResourceLocation, LocalNetworkHandler> handlers = new Object2ObjectArrayMap<>();
+	private final Map<Identifier, LocalNetworkHandler> handlers = new Object2ObjectArrayMap<>();
 	//package private to allow GlobalWireNetwork#validate to read this
 	//One user is either one ConnectionPoint in the net (NOT a BlockPos) or one connection
-	final Map<ResourceLocation, Multiset<ILocalHandlerProvider>> handlerUsers = new HashMap<>();
+	final Map<Identifier, Multiset<ILocalHandlerProvider>> handlerUsers = new HashMap<>();
 	private List<Runnable> runNextTick = new ArrayList<>();
 	private boolean isValid = true;
 	private int version = 0;
@@ -236,7 +236,7 @@ public class LocalWireNetwork implements IWorldTickable
 		}
 		result.handlers.putAll(other.handlers);
 		other.handlerUsers.forEach((rl, h) -> result.handlerUsers.put(rl, HashMultiset.create(h)));
-		for(Entry<ResourceLocation, LocalNetworkHandler> loc : handlers.entrySet())
+		for(Entry<Identifier, LocalNetworkHandler> loc : handlers.entrySet())
 		{
 			result.handlers.merge(loc.getKey(), loc.getValue(), LocalNetworkHandler::merge);
 			result.handlerUsers.merge(loc.getKey(), HashMultiset.create(handlerUsers.get(loc.getKey())), (a, b) -> {
@@ -244,7 +244,7 @@ public class LocalWireNetwork implements IWorldTickable
 				return a;
 			});
 		}
-		for(Entry<ResourceLocation, LocalNetworkHandler> loc : result.handlers.entrySet())
+		for(Entry<Identifier, LocalNetworkHandler> loc : result.handlers.entrySet())
 			loc.getValue().setLocalNet(result);
 		return result;
 	}
@@ -327,7 +327,7 @@ public class LocalWireNetwork implements IWorldTickable
 
 	private void removeHandlersFor(ILocalHandlerProvider iic)
 	{
-		for(ResourceLocation loc : iic.getRequestedHandlers())
+		for(Identifier loc : iic.getRequestedHandlers())
 		{
 			Preconditions.checkState(
 					handlers.containsKey(loc),
@@ -353,7 +353,7 @@ public class LocalWireNetwork implements IWorldTickable
 
 	private void addRequestedHandlers(ILocalHandlerProvider provider, GlobalWireNetwork global)
 	{
-		for(ResourceLocation loc : provider.getRequestedHandlers())
+		for(Identifier loc : provider.getRequestedHandlers())
 		{
 			getProvidersFor(loc).add(provider);
 			if(!handlers.containsKey(loc))
@@ -362,7 +362,7 @@ public class LocalWireNetwork implements IWorldTickable
 		}
 	}
 
-	private Multiset<ILocalHandlerProvider> getProvidersFor(ResourceLocation rl)
+	private Multiset<ILocalHandlerProvider> getProvidersFor(Identifier rl)
 	{
 		return handlerUsers.computeIfAbsent(rl, rl_ -> HashMultiset.create());
 	}
@@ -447,7 +447,7 @@ public class LocalWireNetwork implements IWorldTickable
 	}
 
 	@Nullable
-	public <T extends LocalNetworkHandler> T getHandler(ResourceLocation name, Class<T> type)
+	public <T extends LocalNetworkHandler> T getHandler(Identifier name, Class<T> type)
 	{
 		LocalNetworkHandler p = handlers.get(name);
 		if(p==null)

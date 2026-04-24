@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.util.IESounds;
 import malte0811.dualcodecs.DualCodec;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class FireworkBullet implements BulletHandler.IBullet<Fireworks>
 {
-	static ResourceLocation[] textures = {IEApi.ieLoc("item/bullet_firework")};
+	static Identifier[] textures = {IEApi.ieLoc("item/bullet_firework")};
 	private static final CodecsAndDefault<Fireworks> CODEC = new CodecsAndDefault<>(
 			new DualCodec<>(Fireworks.CODEC, Fireworks.STREAM_CODEC), new Fireworks(1, List.of()), DataComponents.FIREWORKS
 	);
@@ -78,7 +78,7 @@ public class FireworkBullet implements BulletHandler.IBullet<Fireworks>
 	}
 
 	@Override
-	public ResourceLocation[] getTextures()
+	public Identifier[] getTextures()
 	{
 		return textures;
 	}

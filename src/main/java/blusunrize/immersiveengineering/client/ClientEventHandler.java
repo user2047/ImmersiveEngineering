@@ -53,7 +53,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.PlayerModel;
@@ -345,7 +345,7 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 		// cancel default crosshair
 		event.setCanceled(true);
 
-		GuiGraphics graphics = event.getGuiGraphics();
+		GuiGraphicsExtractor graphics = event.getGuiGraphics();
 		PoseStack transform = graphics.pose();
 		transform.pushPose();
 		int width = ClientUtils.mc().getWindow().getGuiScaledWidth();

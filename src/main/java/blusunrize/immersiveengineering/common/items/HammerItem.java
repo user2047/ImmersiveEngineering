@@ -36,7 +36,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -82,7 +82,7 @@ public class HammerItem extends IEBaseItem
 		addInfo(tooltip, Lib.DESC_INFO+"multiblockForbidden", permissions.forbidden);
 	}
 
-	private void addInfo(List<Component> tooltip, String titleKey, Optional<List<ResourceLocation>> list)
+	private void addInfo(List<Component> tooltip, String titleKey, Optional<List<Identifier>> list)
 	{
 		if(list.isEmpty())
 			return;
@@ -92,7 +92,7 @@ public class HammerItem extends IEBaseItem
 		else
 		{
 			tooltip.add(title);
-			for(ResourceLocation mbName : list.get())
+			for(Identifier mbName : list.get())
 			{
 				IMultiblock multiblock = MultiblockHandler.getByUniqueName(mbName);
 				if(multiblock!=null)
@@ -174,13 +174,13 @@ public class HammerItem extends IEBaseItem
 	}
 
 	@Nullable
-	private static List<ResourceLocation> parseMultiblockNames(ListTag data, @Nullable Player player, String prefix)
+	private static List<Identifier> parseMultiblockNames(ListTag data, @Nullable Player player, String prefix)
 	{
-		List<ResourceLocation> result = new ArrayList<>();
+		List<Identifier> result = new ArrayList<>();
 		for(int i = 0; i < data.size(); ++i)
 		{
 			String listEntry = data.getString(i);
-			ResourceLocation asRL = ResourceLocation.tryParse(listEntry);
+			Identifier asRL = Identifier.tryParse(listEntry);
 			if(asRL==null||MultiblockHandler.getByUniqueName(asRL)==null)
 			{
 				if(player!=null&&!player.getCommandSenderWorld().isClientSide)
@@ -266,8 +266,8 @@ public class HammerItem extends IEBaseItem
 	}
 
 	public record MultiblockRestriction(
-			Optional<List<ResourceLocation>> allowed,
-			Optional<List<ResourceLocation>> forbidden
+			Optional<List<Identifier>> allowed,
+			Optional<List<Identifier>> forbidden
 	)
 	{
 		public static final DualCodec<ByteBuf, MultiblockRestriction> CODECS = DualCompositeCodecs.composite(

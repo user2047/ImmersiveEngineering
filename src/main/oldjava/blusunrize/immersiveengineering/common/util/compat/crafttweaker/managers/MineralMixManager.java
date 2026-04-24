@@ -22,7 +22,7 @@ import com.blamejared.crafttweaker_annotations.annotations.Document;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -69,13 +69,13 @@ public class MineralMixManager implements IRecipeManager<MineralMix>
 	 * @docParam background <block:minecraft:white_wool>
 	 */
 	@ZenCodeType.Method
-	public void addRecipe(String recipePath, List<Percentaged<IItemStack>> outputs, List<Percentaged<IItemStack>> spoils, int weight, float failChance, ResourceLocation[] dimensions, Block background)
+	public void addRecipe(String recipePath, List<Percentaged<IItemStack>> outputs, List<Percentaged<IItemStack>> spoils, int weight, float failChance, Identifier[] dimensions, Block background)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final StackWithChance[] stacksWithChances = outputs.stream().map(CrTIngredientUtil::getStackWithChance).toArray(StackWithChance[]::new);
 		final StackWithChance[] spoilsWithChances = spoils.stream().map(CrTIngredientUtil::getStackWithChance).toArray(StackWithChance[]::new);
 		final List<ResourceKey<Level>> dimensionKeys = Arrays.stream(dimensions).map(resourceLocation1 -> ResourceKey.create(Registries.DIMENSION, resourceLocation1)).collect(Collectors.toList());
-		final MineralMix mix = new MineralMix(resourceLocation, stacksWithChances, spoilsWithChances, weight, failChance, dimensionKeys, background);
+		final MineralMix mix = new MineralMix(Identifier, stacksWithChances, spoilsWithChances, weight, failChance, dimensionKeys, background);
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, mix, null));
 	}
 

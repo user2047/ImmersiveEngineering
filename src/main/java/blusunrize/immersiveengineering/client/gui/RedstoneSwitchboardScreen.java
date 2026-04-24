@@ -17,14 +17,14 @@ import blusunrize.immersiveengineering.common.blocks.metal.RedstoneSwitchboardBl
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -40,11 +40,11 @@ import static blusunrize.immersiveengineering.client.gui.IEContainerScreen.makeT
 
 public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneSwitchboardBlockEntity>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("switchboard");
+	private static final Identifier TEXTURE = makeTextureLocation("switchboard");
 	public static final ButtonTexture IDENT = new ButtonTexture(ieLoc("switchboard/ident"));
 	public static final ButtonTexture INVERT = new ButtonTexture(ieLoc("switchboard/invert"));
 	public static final ButtonTexture EMPTY = new ButtonTexture(ieLoc("switchboard/empty"));
-	public static final ResourceLocation PLUG = ieLoc("switchboard/plug");
+	public static final Identifier PLUG = ieLoc("switchboard/plug");
 
 	public RedstoneSwitchboardScreen(RedstoneSwitchboardBlockEntity tileEntity, Component title)
 	{
@@ -161,7 +161,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 
 
 	@Override
-	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderBackground(graphics, mouseX, mouseY, partialTicks);
 		graphics.blit(TEXTURE, guiLeft, guiTop, 0, 0, xSize, ySize);
@@ -187,7 +187,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.input"), guiLeft+8, guiTop+4, DyeColor.GRAY.getTextColor());
 		graphics.drawString(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.output"), guiLeft+8, guiTop+74, DyeColor.GRAY.getTextColor());
@@ -240,7 +240,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 			return build(screen, input, new Vec2(screen.guiLeft+17.5f+output.getId()*14, screen.guiTop+100));
 		}
 
-		public void draw(GuiGraphics graphics)
+		public void draw(GuiGraphicsExtractor graphics)
 		{
 			Matrix4f matrix4f = graphics.pose().last().pose();
 			// Quad
@@ -272,7 +272,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		}
 
 		@Override
-		protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+		protected void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			// input plug
 			graphics.blitSprite(PLUG, getX()+7+setting.input().getId()*14, getY()+31, 16, 16);

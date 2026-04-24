@@ -21,7 +21,7 @@ import blusunrize.immersiveengineering.api.wires.localhandlers.EnergyTransferHan
 import blusunrize.immersiveengineering.api.wires.utils.IElectricDamageSource;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 
 public class WireDamageHandler extends LocalNetworkHandler implements ICollisionHandler
 {
-	public static final ResourceLocation ID = IEApi.ieLoc("wire_damage");
+	public static final Identifier ID = IEApi.ieLoc("wire_damage");
 	public static final SetRestrictedField<WireDamageGetter> GET_WIRE_DAMAGE = SetRestrictedField.common();
 
 	private static final double KNOCKBACK_PER_DAMAGE = 10;

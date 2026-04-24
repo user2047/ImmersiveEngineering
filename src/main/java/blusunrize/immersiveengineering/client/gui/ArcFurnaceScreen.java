@@ -16,10 +16,10 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.gui.ArcFurnaceMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
@@ -33,11 +33,11 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("arc_furnace");
+	private static final Identifier TEXTURE = makeTextureLocation("arc_furnace");
 	private static final ButtonTexture DISTRIBUTE = new ButtonTexture(
 			ieLoc("arc_furnace/distribute"), ieLoc("arc_furnace/distribute_hover")
 	);
-	private static final ResourceLocation PROGRESS = ieLoc("arc_furnace/progress");
+	private static final Identifier PROGRESS = ieLoc("arc_furnace/progress");
 	private GuiButtonIE distributeButton;
 
 	public ArcFurnaceScreen(ArcFurnaceMenu container, Inventory inventoryPlayer, Component title)
@@ -63,7 +63,7 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(var process : menu.processes.get())
 		{

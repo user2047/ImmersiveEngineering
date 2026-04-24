@@ -13,7 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 public class MultiblockHandler
 {
 	static List<IMultiblock> multiblocks = new ArrayList<>();
-	static Map<ResourceLocation, IMultiblock> byUniqueName = new HashMap<>();
+	static Map<Identifier, IMultiblock> byUniqueName = new HashMap<>();
 
 	public static synchronized void registerMultiblock(IMultiblock multiblock)
 	{
@@ -55,7 +55,7 @@ public class MultiblockHandler
 	}
 
 	@Nullable
-	public static IMultiblock getByUniqueName(ResourceLocation name)
+	public static IMultiblock getByUniqueName(Identifier name)
 	{
 		return byUniqueName.get(name);
 	}
@@ -65,7 +65,7 @@ public class MultiblockHandler
 		/**
 		 * @return name of the Multiblock. This is used for the interdiction NBT system on the hammer, so this name /must/ be unique.
 		 */
-		ResourceLocation getUniqueName();
+		Identifier getUniqueName();
 
 		/**
 		 * Check whether the given block can be used to trigger the structure creation of the multiblock.<br>

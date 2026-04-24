@@ -30,7 +30,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -186,7 +186,7 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 	}
 
 	@Override
-	public Collection<ResourceLocation> getRequestedHandlers()
+	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(RedstoneNetworkHandler.ID);
 	}

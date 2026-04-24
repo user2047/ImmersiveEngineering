@@ -24,7 +24,7 @@ import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.item.MCItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
@@ -68,13 +68,13 @@ public class FermenterRecipeManager implements IRecipeManager<FermenterRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount input, int energy, IItemStack itemOutput, IFluidStack fluidOutput)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize ingredient = CrTIngredientUtil.getIngredientWithSize(input);
 		final FluidStack fluidStack = fluidOutput.getInternal();
 		final ItemStack outputItem = itemOutput.getInternal();
 
 		final FermenterRecipe recipe = IEServerConfig.MACHINES.fermenterConfig.apply(
-				new FermenterRecipe(resourceLocation, fluidStack, IESerializableRecipe.of(outputItem), ingredient, energy)
+				new FermenterRecipe(Identifier, fluidStack, IESerializableRecipe.of(outputItem), ingredient, energy)
 		);
 		final String outputDescription = String.format("%s and %s", itemOutput.getCommandString(), fluidOutput.getCommandString());
 		CraftTweakerAPI.apply(new ActionAddRecipeCustomOutput<>(this, recipe, outputDescription));

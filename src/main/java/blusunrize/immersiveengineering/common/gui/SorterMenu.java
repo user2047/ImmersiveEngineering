@@ -18,7 +18,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
@@ -44,9 +44,9 @@ public class SorterMenu extends IEContainerMenu
 		final Map<Direction, GetterAndSetter<FilterConfig>> filters = Arrays.stream(Direction.values())
 				.map(d -> Pair.of(d, new GetterAndSetter<>(() -> be.sideFilter.get(d), f -> be.sideFilter.put(d, f))))
 				.collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-		List<GetterAndSetter<Optional<ResourceLocation>>> selectedTag = IntStream.range(0, SorterBlockEntity.TOTAL_SLOTS).mapToObj(slot -> new GetterAndSetter<>(
+		List<GetterAndSetter<Optional<Identifier>>> selectedTag = IntStream.range(0, SorterBlockEntity.TOTAL_SLOTS).mapToObj(slot -> new GetterAndSetter<>(
 				() -> Optional.ofNullable(be.filter.getSelectedTag(slot)),
-				resourceLocation -> be.filter.setSelectedTag(slot, resourceLocation.orElse(null))
+				Identifier -> be.filter.setSelectedTag(slot, Identifier.orElse(null))
 		)).toList();
 		return new SorterMenu(blockCtx(type, id, be), invPlayer, be.filter, filters, selectedTag);
 	}
@@ -56,18 +56,18 @@ public class SorterMenu extends IEContainerMenu
 		final Map<Direction, GetterAndSetter<FilterConfig>> filters = Arrays.stream(Direction.values())
 				.map(d -> Pair.of(d, GetterAndSetter.standalone(FilterConfig.DEFAULT)))
 				.collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-		List<GetterAndSetter<Optional<ResourceLocation>>> selectedTag = IntStream.range(0, SorterBlockEntity.TOTAL_SLOTS)
-				.mapToObj(slot -> GetterAndSetter.standalone(Optional.ofNullable((ResourceLocation)null)))
+		List<GetterAndSetter<Optional<Identifier>>> selectedTag = IntStream.range(0, SorterBlockEntity.TOTAL_SLOTS)
+				.mapToObj(slot -> GetterAndSetter.standalone(Optional.ofNullable((Identifier)null)))
 				.toList();
 		return new SorterMenu(clientCtx(type, id), invPlayer, new ItemStackHandler(SorterBlockEntity.TOTAL_SLOTS), filters, selectedTag);
 	}
 
 	public final Map<Direction, GetterAndSetter<FilterConfig>> filterMasks;
-	public final List<GetterAndSetter<Optional<ResourceLocation>>> selectedTags;
+	public final List<GetterAndSetter<Optional<Identifier>>> selectedTags;
 
 	private SorterMenu(
 			MenuContext ctx, Inventory inventoryPlayer, IItemHandler filter, Map<Direction, GetterAndSetter<FilterConfig>> filterMasks,
-			List<GetterAndSetter<Optional<ResourceLocation>>> selectedTags
+			List<GetterAndSetter<Optional<Identifier>>> selectedTags
 	)
 	{
 		super(ctx);
@@ -89,7 +89,7 @@ public class SorterMenu extends IEContainerMenu
 			addSlot(new Slot(inventoryPlayer, i, 8+i*18, 221));
 		for(Direction d : Direction.values())
 			addGenericData(new GenericContainerData<>(GenericDataSerializers.FILTER_CONFIG, filterMasks.get(d)));
-		for(GetterAndSetter<Optional<ResourceLocation>> selTag : selectedTags)
+		for(GetterAndSetter<Optional<Identifier>> selTag : selectedTags)
 			addGenericData(new GenericContainerData<>(GenericDataSerializers.OPTIONAL_RESOURCE_LOCATION, selTag));
 	}
 
@@ -110,7 +110,7 @@ public class SorterMenu extends IEContainerMenu
 		}
 		else if(message.contains("tagSlot", Tag.TAG_INT))
 		{
-			var selected = ResourceLocation.parse(message.getString("selectedTag"));
+			var selected = Identifier.parse(message.getString("selectedTag"));
 			selectedTags.get(message.getInt("tagSlot")).set(Optional.of(selected));
 		}
 	}

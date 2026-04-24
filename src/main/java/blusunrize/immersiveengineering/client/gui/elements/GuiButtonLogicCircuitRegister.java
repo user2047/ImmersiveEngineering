@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressa
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -66,7 +66,7 @@ public class GuiButtonLogicCircuitRegister extends GuiButtonState<LogicCircuitRe
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 		LogicCircuitRegister state = getState();

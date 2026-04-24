@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.items;
 import blusunrize.immersiveengineering.ImmersiveEngineering;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -30,9 +30,9 @@ public class SawbladeItem extends IEBaseItem
 	);
 	private final float sawbladeSpeed;
 	private final float sawbladeDamage;
-	private final ResourceLocation texture;
+	private final Identifier texture;
 
-	public SawbladeItem(int maxDamage, float sawbladeSpeed, float sawbladeDamage, ResourceLocation texture)
+	public SawbladeItem(int maxDamage, float sawbladeSpeed, float sawbladeDamage, Identifier texture)
 	{
 		super(new Properties().durability(maxDamage).setNoRepair());
 		this.sawbladeSpeed = sawbladeSpeed;
@@ -58,7 +58,7 @@ public class SawbladeItem extends IEBaseItem
 		return false;
 	}
 
-	public final ResourceLocation getSawbladeTexture()
+	public final Identifier getSawbladeTexture()
 	{
 		return texture;
 	}

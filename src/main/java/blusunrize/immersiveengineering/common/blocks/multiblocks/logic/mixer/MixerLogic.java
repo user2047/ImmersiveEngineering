@@ -47,7 +47,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -85,7 +85,7 @@ public class MixerLogic
 	public static final int NUM_SLOTS = 8;
 	public static final int ENERGY_CAPACITY = 16000;
 	public static final int TANK_VOLUME = 8*FluidType.BUCKET_VOLUME;
-	public static ResourceLocation MIF_CONDITION_TANK = ieLoc("mixer/tank");
+	public static Identifier MIF_CONDITION_TANK = ieLoc("mixer/tank");
 
 	static
 	{

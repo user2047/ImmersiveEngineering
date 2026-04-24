@@ -56,7 +56,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
@@ -78,13 +78,13 @@ import java.util.stream.Stream;
 @JeiPlugin
 public class JEIHelper implements IModPlugin
 {
-	private static final ResourceLocation UID = IEApi.ieLoc("main");
-	public static final ResourceLocation JEI_GUI = IEApi.ieLoc("textures/gui/jei_elements.png");
+	private static final Identifier UID = IEApi.ieLoc("main");
+	public static final Identifier JEI_GUI = IEApi.ieLoc("textures/gui/jei_elements.png");
 	public static IDrawableStatic slotDrawable;
 	public static IRecipeSlotRichTooltipCallback fluidTooltipCallback = new IEFluidTooltipCallback();
 
 	@Override
-	public ResourceLocation getPluginUid()
+	public Identifier getPluginUid()
 	{
 		return UID;
 	}
@@ -287,7 +287,7 @@ public class JEIHelper implements IModPlugin
 				.filter(holder -> !holder.value().getBucket().getDefaultInstance().isEmpty())
 				.map(holder -> {
 					ItemStack bucket = holder.value().getBucket().getDefaultInstance();
-					ResourceLocation key = holder.key().location();
+					Identifier key = holder.key().location();
 					return new RecipeHolder<>(
 							IEApi.ieLoc("jei_bucket_"+key.getNamespace()+"_"+key.getPath()),
 							new BottlingMachineRecipe(

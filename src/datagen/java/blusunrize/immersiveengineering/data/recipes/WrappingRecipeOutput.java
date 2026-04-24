@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.mixin.accessors.ShapedRecipeAccess;
 import net.minecraft.advancements.Advancement.Builder;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -38,7 +38,7 @@ public record WrappingRecipeOutput<R extends Recipe<?>>(RecipeOutput wrapped,
 	}
 
 	@Override
-	public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions)
+	public void accept(Identifier id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions)
 	{
 		wrapped.accept(id, transform.apply((R)recipe), advancement, conditions);
 	}

@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.ShelfLogi
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -45,7 +45,7 @@ public class ShelfCallbacks implements BlockCallback<Key>
 
 	public Key extractKey(ShelfLogic.State state)
 	{
-		Function<ResourceLocation, TextureAtlasSprite> atlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+		Function<Identifier, TextureAtlasSprite> atlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
 		Map<String, TextureAtlasSprite> texMap = new HashMap<>();
 		for(int i = 0; i < state.renderCrates.length; i++)
 			if(state.renderCrates[i]!=null)

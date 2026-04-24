@@ -14,10 +14,10 @@ import blusunrize.immersiveengineering.client.gui.info.FluidInfoArea;
 import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.gui.ClocheMenu;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -27,9 +27,9 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class ClocheScreen extends IEContainerScreen<ClocheMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("cloche");
-	private static final ResourceLocation TANK_OVERLAY = ieLoc("cloche/tank_overlay");
-	private static final ResourceLocation PROGRESS = ieLoc("cloche/progress");
+	private static final Identifier TEXTURE = makeTextureLocation("cloche");
+	private static final Identifier TANK_OVERLAY = ieLoc("cloche/tank_overlay");
+	private static final Identifier PROGRESS = ieLoc("cloche/progress");
 
 	public ClocheScreen(ClocheMenu container, Inventory inventoryPlayer, Component title)
 	{
@@ -48,7 +48,7 @@ public class ClocheScreen extends IEContainerScreen<ClocheMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		float process = menu.guiProgress.get();
 		if(process > 0)

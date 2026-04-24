@@ -25,7 +25,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -179,19 +179,19 @@ public class ModelUtils
 		return builder.bake(-1, facing, sprite, true);
 	}
 
-	public static ResourceLocation getSideTexture(@Nonnull ItemStack stack, Direction side)
+	public static Identifier getSideTexture(@Nonnull ItemStack stack, Direction side)
 	{
 		BakedModel model = mc().getItemRenderer().getModel(stack, null, null, 0);
 		return getSideTexture(model, side, null);
 	}
 
-	public static ResourceLocation getSideTexture(@Nonnull BlockState state, Direction side)
+	public static Identifier getSideTexture(@Nonnull BlockState state, Direction side)
 	{
 		BakedModel model = mc().getBlockRenderer().getBlockModel(state);
 		return getSideTexture(model, side, state);
 	}
 
-	public static ResourceLocation getSideTexture(@Nonnull BakedModel model, Direction side, @Nullable BlockState state)
+	public static Identifier getSideTexture(@Nonnull BakedModel model, Direction side, @Nullable BlockState state)
 	{
 		List<BakedQuad> quads = model.getQuads(state, side, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, null);
 		if(quads.isEmpty())//no quads for the specified side D:

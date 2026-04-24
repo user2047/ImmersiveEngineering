@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 public abstract class ModelIEArmorBase extends HumanoidModel<LivingEntity>
 {
-	public ModelIEArmorBase(ModelPart p_170679_, Function<ResourceLocation, RenderType> p_170680_)
+	public ModelIEArmorBase(ModelPart p_170679_, Function<Identifier, RenderType> p_170680_)
 	{
 		super(p_170679_, p_170680_);
 	}

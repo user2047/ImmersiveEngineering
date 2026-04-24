@@ -27,13 +27,13 @@ import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import blusunrize.immersiveengineering.common.register.IEItems;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -50,7 +50,7 @@ import static blusunrize.immersiveengineering.common.blocks.wooden.CircuitTableB
 
 public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 {
-	private static final ResourceLocation TEXTURE = IEContainerScreen.makeTextureLocation("circuit_table");
+	private static final Identifier TEXTURE = IEContainerScreen.makeTextureLocation("circuit_table");
 
 	// Buttons
 	private EditBox name;
@@ -228,7 +228,7 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.operator"), 76, 4, DyeColor.LIGHT_GRAY.getTextColor());
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.inputs"), 130, 8, DyeColor.LIGHT_GRAY.getTextColor());

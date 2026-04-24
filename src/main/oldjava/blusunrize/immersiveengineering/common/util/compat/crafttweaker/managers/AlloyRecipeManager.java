@@ -18,7 +18,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
 
@@ -60,7 +60,7 @@ public class AlloyRecipeManager implements IRecipeManager<AlloyRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount inputA, IIngredientWithAmount inputB, int time, IItemStack output)
 	{
-		final ResourceLocation id = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier id = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize input0 = CrTIngredientUtil.getIngredientWithSize(inputA);
 		final IngredientWithSize input1 = CrTIngredientUtil.getIngredientWithSize(inputB);
 		final AlloyRecipe alloyRecipe = new AlloyRecipe(id, of(output.getInternal()), input0, input1, time);

@@ -40,7 +40,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
@@ -137,7 +137,7 @@ public class IEDataComponents
 	public static void init(IEventBus bus)
 	{
 		REGISTER.register(bus);
-		for(ResourceLocation name : BulletHandler.getAllKeys())
+		for(Identifier name : BulletHandler.getAllKeys())
 		{
 			var bullet = BulletHandler.getBullet(name);
 			var codecs = bullet.getCodec();

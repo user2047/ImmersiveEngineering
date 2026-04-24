@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.crafting.*;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -90,7 +90,7 @@ public class ArcFurnaceRecipeBuilder extends IERecipeBuilder<ArcFurnaceRecipeBui
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		ArcFurnaceRecipe recipe = new ArcFurnaceRecipe(
 				new TagOutputList(output), slag, secondaries, time, energy, input, additives

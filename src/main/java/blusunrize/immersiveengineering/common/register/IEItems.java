@@ -22,7 +22,7 @@ import blusunrize.immersiveengineering.common.items.upgrades.ToolUpgradeItem;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.*;
@@ -236,7 +236,7 @@ public final class IEItems
 
 		private static void init()
 		{
-			for(ResourceLocation bulletType : BulletHandler.getAllKeys())
+			for(Identifier bulletType : BulletHandler.getAllKeys())
 			{
 				IBullet<?> bullet = BulletHandler.getBullet(bulletType);
 				if(bullet.isProperCartridge())
@@ -246,7 +246,7 @@ public final class IEItems
 
 		private static String nameFor(IBullet<?> bullet)
 		{
-			ResourceLocation name = BulletHandler.findRegistryName(bullet);
+			Identifier name = BulletHandler.findRegistryName(bullet);
 			if(name.getNamespace().equals(ImmersiveEngineering.MODID))
 				return "bullet_"+name.getPath();
 			else
@@ -285,7 +285,7 @@ public final class IEItems
 		public static final ItemRegObject<JerrycanItem> JERRYCAN = register("jerrycan", JerrycanItem::new);
 		public static final ItemRegObject<EngineersBlueprintItem> BLUEPRINT = register("blueprint", EngineersBlueprintItem::new);
 		public static final ItemRegObject<SkyhookItem> SKYHOOK = register("skyhook", SkyhookItem::new);
-		public static final Map<ResourceLocation, ItemRegObject<ShaderItem>> SHADERS = new HashMap<>();
+		public static final Map<Identifier, ItemRegObject<ShaderItem>> SHADERS = new HashMap<>();
 		// We can't use an EnumMap here, since Rarity is an "extensible enum" (Forge), so people may add to it later on.
 		// And since this map is created during static class init, it may be initialized before another mod has any
 		// chance of adding the rarity.
@@ -336,7 +336,7 @@ public final class IEItems
 					));
 			for(var shader : ShaderRegistry.shaderRegistry.entrySet())
 			{
-				ResourceLocation shaderLoc = shader.getKey();
+				Identifier shaderLoc = shader.getKey();
 				String path = shaderLoc.getNamespace().equals(Lib.MODID)?
 						shaderLoc.getPath():
 						(shaderLoc.getNamespace()+'_'+shaderLoc.getPath());
@@ -368,7 +368,7 @@ public final class IEItems
 				DeferredHolder<EntityType<?>, ? extends EntityType<? extends Mob>> type, int col1, int col2
 		)
 		{
-			ResourceLocation id = type.unwrapKey().get().location();
+			Identifier id = type.unwrapKey().get().location();
 			return register(id.getPath()+"_spawn_egg", () -> new DeferredSpawnEggItem(type::value, col1, col2, new Item.Properties()));
 		}
 	}
@@ -444,7 +444,7 @@ public final class IEItems
 			return regObject.get();
 		}
 
-		public ResourceLocation getId()
+		public Identifier getId()
 		{
 			return regObject.getId();
 		}

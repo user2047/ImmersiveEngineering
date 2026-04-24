@@ -21,7 +21,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.common.util.Lazy;
@@ -73,13 +73,13 @@ public class ArcFurnaceRecipeManager implements IRecipeManager<ArcFurnaceRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount mainIngredient, IIngredientWithAmount[] additives, int time, int energy, IItemStack[] outputs, @ZenCodeType.Optional("<item:minecraft:air>") IItemStack slag)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final List<Lazy<ItemStack>> outputList = CrTIngredientUtil.getNonNullList(outputs);
 		final IngredientWithSize main = CrTIngredientUtil.getIngredientWithSize(mainIngredient);
 		final IngredientWithSize[] additivesWithSize = CrTIngredientUtil.getIngredientsWithSize(additives);
 
 		final ArcFurnaceRecipe recipe = IEServerConfig.MACHINES.arcFurnaceConfig.apply(
-				new ArcFurnaceRecipe(resourceLocation, outputList, of(slag.getInternal()), List.of(), time, energy, main, additivesWithSize)
+				new ArcFurnaceRecipe(Identifier, outputList, of(slag.getInternal()), List.of(), time, energy, main, additivesWithSize)
 		);
 
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));

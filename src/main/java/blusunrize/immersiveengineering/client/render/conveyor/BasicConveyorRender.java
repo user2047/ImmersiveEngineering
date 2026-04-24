@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,23 +39,23 @@ import java.util.function.Function;
 
 public class BasicConveyorRender<T extends ConveyorBase> implements IConveyorModelRender<T>
 {
-	private final ResourceLocation active;
-	private final ResourceLocation inactive;
+	private final Identifier active;
+	private final Identifier inactive;
 
-	public BasicConveyorRender(ResourceLocation active, ResourceLocation inactive)
+	public BasicConveyorRender(Identifier active, Identifier inactive)
 	{
 		this.active = active;
 		this.inactive = inactive;
 	}
 
 	@Override
-	public ResourceLocation getActiveTexture()
+	public Identifier getActiveTexture()
 	{
 		return active;
 	}
 
 	@Override
-	public ResourceLocation getInactiveTexture()
+	public Identifier getInactiveTexture()
 	{
 		return inactive;
 	}

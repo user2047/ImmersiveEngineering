@@ -28,7 +28,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -474,8 +474,8 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 		validating = true;
 		localNetsByPos.values().stream().distinct().forEach(
 				(local) -> {
-					Map<ResourceLocation, Multiset<ILocalHandlerProvider>> handlerUsers = new HashMap<>();
-					Function<ResourceLocation, Multiset<ILocalHandlerProvider>> getHandler = rl ->
+					Map<Identifier, Multiset<ILocalHandlerProvider>> handlerUsers = new HashMap<>();
+					Function<Identifier, Multiset<ILocalHandlerProvider>> getHandler = rl ->
 							handlerUsers.computeIfAbsent(rl, r -> HashMultiset.create());
 					for(ConnectionPoint cp : local.getConnectionPoints())
 					{
@@ -485,7 +485,7 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 							WireLogger.logger.warn("Connection point {} does not exist on {}", cp, iic);
 							continue;
 						}
-						for(ResourceLocation rl : iic.getRequestedHandlers())
+						for(Identifier rl : iic.getRequestedHandlers())
 							getHandler.apply(rl).add(iic);
 						if(localNetsByPos.get(cp)!=local)
 							WireLogger.logger.warn("{} has net {}, but is in net {}", cp, localNetsByPos.get(cp), local);
@@ -499,18 +499,18 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 									WireLogger.logger.warn("Connection {} from {} to {} is a diode!", c, cp,
 											c.getOtherEnd(cp));
 								if(c.isPositiveEnd(cp))
-									for(ResourceLocation rl : c.type.getRequestedHandlers())
+									for(Identifier rl : c.type.getRequestedHandlers())
 										getHandler.apply(rl).add(c.type);
 							}
 					}
-					for(ResourceLocation rl : handlerUsers.keySet())
+					for(Identifier rl : handlerUsers.keySet())
 					{
 						Multiset<ILocalHandlerProvider> actual = local.handlerUsers.get(rl);
 						Multiset<ILocalHandlerProvider> expected = handlerUsers.get(rl);
 						if(!actual.equals(expected))
 							WireLogger.logger.warn("Expected users for {}: {}, but found {}", rl, expected, actual);
 					}
-					for(ResourceLocation rl : local.handlerUsers.keySet())
+					for(Identifier rl : local.handlerUsers.keySet())
 						if(!handlerUsers.containsKey(rl))
 							WireLogger.logger.warn("Found no users for {}, but net expects {}", rl, local.handlerUsers.get(rl));
 					for(BlockPos p : local.getConnectors())

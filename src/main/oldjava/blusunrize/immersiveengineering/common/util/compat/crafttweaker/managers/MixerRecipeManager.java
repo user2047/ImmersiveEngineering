@@ -23,7 +23,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.tag.MCTag;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -119,14 +119,14 @@ public class MixerRecipeManager implements IRecipeManager<MixerRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, MCTag fluidInput, IIngredientWithAmount[] inputItems, int energy, Fluid output, int amount)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 
 		final FluidTagInput fluidTagInput = CrTIngredientUtil.getFluidTagInput(fluidInput, amount);
 		final IngredientWithSize[] ingredientsWithSize = CrTIngredientUtil.getIngredientsWithSize(inputItems);
 		final FluidStack outputFluidStack = new FluidStack(output, amount);
 
 		final MixerRecipe recipe = IEServerConfig.MACHINES.mixerConfig.apply(
-				new MixerRecipe(resourceLocation, outputFluidStack, fluidTagInput, ingredientsWithSize, energy)
+				new MixerRecipe(Identifier, outputFluidStack, fluidTagInput, ingredientsWithSize, energy)
 		);
 		CraftTweakerAPI.apply(new ActionAddRecipeCustomOutput<>(this, recipe, outputFluidStack));
 	}

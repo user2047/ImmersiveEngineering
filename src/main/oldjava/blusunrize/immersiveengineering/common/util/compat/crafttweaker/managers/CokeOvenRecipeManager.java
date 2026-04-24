@@ -18,7 +18,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
@@ -61,12 +61,12 @@ public class CokeOvenRecipeManager implements IRecipeManager<CokeOvenRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount ingredient, int time, IItemStack output, @ZenCodeType.OptionalInt int creosoteProduced)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize ingredientWithSize = CrTIngredientUtil.getIngredientWithSize(ingredient);
 		final ItemStack result = output.getInternal();
 
 		final CokeOvenRecipe recipe = new CokeOvenRecipe(
-				resourceLocation, of(result), ingredientWithSize, time, creosoteProduced
+				Identifier, of(result), ingredientWithSize, time, creosoteProduced
 		);
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));
 	}

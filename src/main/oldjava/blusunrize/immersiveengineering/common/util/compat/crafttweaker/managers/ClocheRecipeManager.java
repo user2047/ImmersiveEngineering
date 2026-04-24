@@ -20,7 +20,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -106,7 +106,7 @@ public class ClocheRecipeManager implements IRecipeManager<ClocheRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredient seed, IIngredient soil, int time, IItemStack[] outputs, Block renderBlock, @ZenCodeType.OptionalString("\"generic\"") String renderType)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final List<Lazy<ItemStack>> outputList = CrTIngredientUtil.getNonNullList(outputs);
 		final Ingredient seedIngredient = seed.asVanillaIngredient();
 		final Ingredient soilIngredient = soil.asVanillaIngredient();
@@ -117,7 +117,7 @@ public class ClocheRecipeManager implements IRecipeManager<ClocheRecipe>
 		try
 		{
 			final ClocheRecipe recipe = new ClocheRecipe(
-					resourceLocation, outputList, seedIngredient, soilIngredient, time, renderReference
+					Identifier, outputList, seedIngredient, soilIngredient, time, renderReference
 			);
 			CraftTweakerAPI.apply(new ActionAddRecipe<>(this, recipe, null));
 		} catch(Exception ex)

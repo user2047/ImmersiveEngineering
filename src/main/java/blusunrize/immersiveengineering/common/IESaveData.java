@@ -18,7 +18,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -46,7 +46,7 @@ public class IESaveData extends SavedData
 			for(int i = 0; i < dimensionList.size(); i++)
 			{
 				CompoundTag dimTag = dimensionList.getCompound(i);
-				ResourceLocation rl = ResourceLocation.parse(dimTag.getString("dimension"));
+				Identifier rl = Identifier.parse(dimTag.getString("dimension"));
 				ResourceKey<Level> dimensionType = ResourceKey.create(Registries.DIMENSION, rl);
 				ListTag mineralList = dimTag.getList("veins", Tag.TAG_COMPOUND);
 
@@ -70,7 +70,7 @@ public class IESaveData extends SavedData
 			{
 				String s = playerReceived.getString(j);
 				if(!s.isEmpty())
-					ShaderRegistry.receivedShaders.put(player, ResourceLocation.parse(s));
+					ShaderRegistry.receivedShaders.put(player, Identifier.parse(s));
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class IESaveData extends SavedData
 			CompoundTag tag = new CompoundTag();
 			tag.putUUID("player", player);
 			ListTag playerReceived = new ListTag();
-			for(ResourceLocation shader : ShaderRegistry.receivedShaders.get(player))
+			for(Identifier shader : ShaderRegistry.receivedShaders.get(player))
 				if(shader!=null)
 					playerReceived.add(StringTag.valueOf(shader.toString()));
 			tag.put("received", playerReceived);

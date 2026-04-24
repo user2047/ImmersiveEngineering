@@ -21,7 +21,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.sawmill.S
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.util.compat.computers.generic.owners.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -34,7 +34,7 @@ import static blusunrize.immersiveengineering.common.register.IEMultiblockLogic.
 
 public class Callbacks
 {
-	private static final Map<ResourceLocation, CallbackOwner<?>> CALLBACKS = new HashMap<>();
+	private static final Map<Identifier, CallbackOwner<?>> CALLBACKS = new HashMap<>();
 	private static boolean initialized = false;
 
 	private static <T extends BlockEntity & IGeneralMultiblock>
@@ -88,7 +88,7 @@ public class Callbacks
 		initialized = true;
 	}
 
-	public static Map<ResourceLocation, CallbackOwner<?>> getCallbacks()
+	public static Map<Identifier, CallbackOwner<?>> getCallbacks()
 	{
 		ensureInitialized();
 		return Collections.unmodifiableMap(CALLBACKS);

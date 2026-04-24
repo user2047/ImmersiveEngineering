@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.api.tool.conveyor;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record BasicConveyorType<T extends IConveyorBelt>(
-		ResourceLocation id,
+		Identifier id,
 		boolean ticking,
 		boolean dyeable,
 		Function<BlockEntity, T> makeBelt,
@@ -25,7 +25,7 @@ public record BasicConveyorType<T extends IConveyorBelt>(
 ) implements IConveyorType<T>
 {
 	public BasicConveyorType(
-			ResourceLocation id,
+			Identifier id,
 			boolean ticking,
 			boolean dyeable,
 			Function<BlockEntity, T> makeBelt,
@@ -48,7 +48,7 @@ public record BasicConveyorType<T extends IConveyorBelt>(
 	}
 
 	@Override
-	public ResourceLocation getId()
+	public Identifier getId()
 	{
 		return id;
 	}

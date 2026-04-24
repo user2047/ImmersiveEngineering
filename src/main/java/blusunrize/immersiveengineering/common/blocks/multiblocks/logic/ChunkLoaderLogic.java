@@ -35,7 +35,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -59,7 +59,7 @@ public class ChunkLoaderLogic
 		implements IMultiblockLogic<State>, IServerTickableComponent<State>, IClientTickableComponent<State>
 {
 	public static final TicketController TICKET_CONTROLLER = new TicketController(
-			ResourceLocation.fromNamespaceAndPath(Lib.MODID, "resonanz_observer"),
+			Identifier.fromNamespaceAndPath(Lib.MODID, "resonanz_observer"),
 			(serverLevel, ticketHelper) -> {
 				for(Entry<BlockPos, TicketSet> check : ticketHelper.getBlockTickets().entrySet())
 				{

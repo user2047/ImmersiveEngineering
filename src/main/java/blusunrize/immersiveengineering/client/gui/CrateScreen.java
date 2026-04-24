@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.gui.CrateEntityContainer;
 import blusunrize.immersiveengineering.common.gui.CrateMenu;
 import blusunrize.immersiveengineering.common.network.MessageContainerUpdate;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -54,14 +54,14 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 	}
 
 	@Override
-	public void render(@Nonnull GuiGraphics graphics, int mx, int my, float partial)
+	public void render(@Nonnull GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		super.render(graphics, mx, my, partial);
 		this.nameField.render(graphics, mx, my, partial);
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}

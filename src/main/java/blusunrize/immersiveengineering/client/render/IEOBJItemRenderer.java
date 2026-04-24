@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -111,7 +111,7 @@ public class IEOBJItemRenderer extends BlockEntityWithoutLevelRenderer
 		{
 			boolean bright = callback.areGroupsFullbright(stack, groups);
 			RenderType baseType;
-			ResourceLocation atlas = InventoryMenu.BLOCK_ATLAS;
+			Identifier atlas = InventoryMenu.BLOCK_ATLAS;
 			Color4 color = quadsForLayer.layer().getColor();
 			List<RenderType> renderTypes = model.getRenderTypes(stack, Minecraft.useFancyGraphics());
 			if(bright)

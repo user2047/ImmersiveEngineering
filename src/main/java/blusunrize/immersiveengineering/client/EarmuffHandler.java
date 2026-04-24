@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.items.EarmuffsItem.EarmuffData;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class EarmuffHandler
 {
 	private static final Map<SoundSource, Float> LAST_MULTIPLIERS = makeDefaultMultipliers();
-	private static Set<ResourceLocation> IGNORED_SOUNDS = Set.of();
+	private static Set<Identifier> IGNORED_SOUNDS = Set.of();
 
 	/**
 	 * Only the volume multiplier for ticking sounds is updated tick-by-tick. For non-ticking sounds (e.g. records) we
@@ -80,7 +80,7 @@ public class EarmuffHandler
 	public static void onConfigUpdate()
 	{
 		IGNORED_SOUNDS = IEClientConfig.earDefenders_SoundBlacklist.get().stream()
-				.map(ResourceLocation::tryParse)
+				.map(Identifier::tryParse)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 	}

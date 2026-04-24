@@ -16,7 +16,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -57,10 +57,10 @@ public class TemplateWorld extends Level
 {
 	private static final DimensionType DIMENSION_TYPE = new DimensionType(
 			OptionalLong.empty(), false, false, false, false, 1, false, false, 0, 256, 256,
-			BlockTags.INFINIBURN_OVERWORLD, ResourceLocation.withDefaultNamespace("missingno"), 0,
+			BlockTags.INFINIBURN_OVERWORLD, Identifier.withDefaultNamespace("missingno"), 0,
 			new DimensionType.MonsterSettings(true, false, ConstantInt.ZERO, 0)
 	);
-	private static final ResourceLocation DIMENSION_TYPE_ID = ImmersiveEngineering.rl("multiblock_preview");
+	private static final Identifier DIMENSION_TYPE_ID = ImmersiveEngineering.rl("multiblock_preview");
 
 	private static final Holder<DimensionType> STRUCTURE_DIMENSION = new FakeRegisteredHolder<>(
 			DIMENSION_TYPE, ResourceKey.create(Registries.DIMENSION_TYPE, DIMENSION_TYPE_ID)

@@ -15,10 +15,10 @@ import blusunrize.lib.manual.Tree.AbstractNode;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -27,27 +27,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class ClickableList extends Button
 {
 	private String[] headers;
 	private boolean[] isCategory;
 	@Nonnull
-	private List<Tree.AbstractNode<ResourceLocation, ManualEntry>> nodes = new ArrayList<>();
+	private List<Tree.AbstractNode<Identifier, ManualEntry>> nodes = new ArrayList<>();
 	private float textScale;
-	private final Consumer<AbstractNode<ResourceLocation, ManualEntry>> handler;
+	private final Consumer<AbstractNode<Identifier, ManualEntry>> handler;
 	private int offset;
 	private int maxOffset;
 	private final int perPage;
 	private ManualScreen gui;
 
 	ClickableList(ManualScreen gui, int x, int y, int w, int h, float textScale,
-				  @Nonnull List<Tree.AbstractNode<ResourceLocation, ManualEntry>> nodes,
-				  Consumer<Tree.AbstractNode<ResourceLocation, ManualEntry>> handler)
+				  @Nonnull List<Tree.AbstractNode<Identifier, ManualEntry>> nodes,
+				  Consumer<Tree.AbstractNode<Identifier, ManualEntry>> handler)
 	{
 		super(x, y, w, h, Component.empty(), btn -> {
 		}, DEFAULT_NARRATION);
@@ -64,7 +64,7 @@ public class ClickableList extends Button
 	}
 
 	@Override
-	public void renderWidget(@NotNull GuiGraphics graphics, int mx, int my, float partialTicks)
+	public void renderWidget(@NotNull GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		PoseStack transform = graphics.pose();
 		if(!visible)
@@ -130,7 +130,7 @@ public class ClickableList extends Button
 
 
 	@Nullable
-	public AbstractNode<ResourceLocation, ManualEntry> getSelected(double mx, double my)
+	public AbstractNode<Identifier, ManualEntry> getSelected(double mx, double my)
 	{
 		if(!super.clicked(mx, my))
 			return null;
@@ -153,7 +153,7 @@ public class ClickableList extends Button
 		return getSelected(mx, my)!=null;
 	}
 
-	public void setEntries(List<AbstractNode<ResourceLocation, ManualEntry>> nodes)
+	public void setEntries(List<AbstractNode<Identifier, ManualEntry>> nodes)
 	{
 		this.nodes = nodes;
 		headers = new String[nodes.size()];

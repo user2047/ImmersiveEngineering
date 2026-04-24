@@ -22,7 +22,7 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.tag.MCTag;
 import com.blamejared.crafttweaker.api.util.Many;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -114,13 +114,13 @@ public class RefineryRecipeManager implements IRecipeManager<RefineryRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, Many<MCTag> fluidInput1, Many<MCTag> fluidInput2, IIngredient catalyst, int energy, IFluidStack output)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final FluidStack outputStack = output.getInternal();
 
 		final FluidTagInput tagInput1 = CrTIngredientUtil.getFluidTagInput(fluidInput1);
 		final FluidTagInput tagInput2 = CrTIngredientUtil.getFluidTagInput(fluidInput2);
 
-		final RefineryRecipe recipe = new RefineryRecipe(resourceLocation, outputStack, tagInput1, tagInput2, catalyst.asVanillaIngredient(), energy);
+		final RefineryRecipe recipe = new RefineryRecipe(Identifier, outputStack, tagInput1, tagInput2, catalyst.asVanillaIngredient(), energy);
 		recipe.modifyTimeAndEnergy(() -> 1, IEServerConfig.MACHINES.refineryConfig::get);
 		CraftTweakerAPI.apply(new ActionAddRecipeCustomOutput<>(this, recipe, output));
 	}

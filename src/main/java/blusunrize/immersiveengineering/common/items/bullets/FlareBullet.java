@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.api.utils.Color4;
 import blusunrize.immersiveengineering.client.utils.FontUtils;
 import blusunrize.immersiveengineering.common.entities.RevolvershotFlareEntity;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
@@ -30,7 +30,7 @@ import java.util.UUID;
 
 public class FlareBullet implements BulletHandler.IBullet<Color4>
 {
-	static ResourceLocation[] textures = {IEApi.ieLoc("item/bullet_flare"), IEApi.ieLoc("item/bullet_flare_layer")};
+	static Identifier[] textures = {IEApi.ieLoc("item/bullet_flare"), IEApi.ieLoc("item/bullet_flare_layer")};
 	private static final CodecsAndDefault<Color4> CODEC = new CodecsAndDefault<>(Color4.CODECS, Color4.fromRGB(0xcc2e06));
 
 	public FlareBullet()
@@ -68,7 +68,7 @@ public class FlareBullet implements BulletHandler.IBullet<Color4>
 	}
 
 	@Override
-	public ResourceLocation[] getTextures()
+	public Identifier[] getTextures()
 	{
 		return textures;
 	}

@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.CokeOvenL
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SheetmetalTankLogic;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.ProcessContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +60,7 @@ public class MultiblockTankDataProvider<T extends IMultiblockState> implements I
 	}
 
 	@Override
-	public ResourceLocation getUid()
+	public Identifier getUid()
 	{
 		return ImmersiveEngineering.rl("multiblock_tank");
 	}

@@ -15,7 +15,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,7 +28,7 @@ public class TeslaCoilProvider implements IProbeInfoProvider
 {
 
 	@Override
-	public ResourceLocation getID()
+	public Identifier getID()
 	{
 		return ImmersiveEngineering.rl("teslacoil_info");
 	}

@@ -33,7 +33,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -61,7 +61,7 @@ import java.util.function.Function;
 @SuppressWarnings("deprecation")
 public class ModelCoresample extends BakedIEModel
 {
-	private static final Cache<List<ResourceLocation>, ModelCoresample> modelCache = CacheBuilder.newBuilder()
+	private static final Cache<List<Identifier>, ModelCoresample> modelCache = CacheBuilder.newBuilder()
 			.expireAfterAccess(60, TimeUnit.SECONDS)
 			.build();
 	@Nullable
@@ -128,7 +128,7 @@ public class ModelCoresample extends BakedIEModel
 				else
 				{
 					pixelLength = 16;
-					textureStone = ClientUtils.getSprite(ResourceLocation.withDefaultNamespace("block/stone"));
+					textureStone = ClientUtils.getSprite(Identifier.withDefaultNamespace("block/stone"));
 				}
 
 				double[] stoneUVs = {
@@ -294,7 +294,7 @@ public class ModelCoresample extends BakedIEModel
 			{
 				try
 				{
-					List<ResourceLocation> cacheKey = minerals.stream()
+					List<Identifier> cacheKey = minerals.stream()
 							.map(RecipeHolder::id)
 							.toList();
 					return modelCache.get(cacheKey, () -> new ModelCoresample(
@@ -339,7 +339,7 @@ public class ModelCoresample extends BakedIEModel
 
 	public static class CoresampleLoader implements IGeometryLoader<RawCoresampleModel>
 	{
-		public static final ResourceLocation LOCATION = IEApi.ieLoc("models/coresample");
+		public static final Identifier LOCATION = IEApi.ieLoc("models/coresample");
 
 		@Override
 		public RawCoresampleModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext)

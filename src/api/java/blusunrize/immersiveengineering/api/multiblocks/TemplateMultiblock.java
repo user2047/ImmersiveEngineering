@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
@@ -48,10 +48,10 @@ public abstract class TemplateMultiblock implements IMultiblock
 	private static final SetRestrictedField<Function<BlockState, ItemStack>> PICK_BLOCK = SetRestrictedField.common();
 	private static final SetRestrictedField<Function<StructureTemplate, List<Palette>>>
 			GET_PALETTES = SetRestrictedField.common();
-	public static final Map<ResourceLocation, StructureTemplate> SYNCED_CLIENT_TEMPLATES = new HashMap<>();
+	public static final Map<Identifier, StructureTemplate> SYNCED_CLIENT_TEMPLATES = new HashMap<>();
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private final ResourceLocation loc;
+	private final Identifier loc;
 	protected final BlockPos masterFromOrigin;
 	protected final BlockPos triggerFromOrigin;
 	protected final BlockPos size;
@@ -59,7 +59,7 @@ public abstract class TemplateMultiblock implements IMultiblock
 	@Nullable
 	private TemplateData template;
 
-	public TemplateMultiblock(ResourceLocation loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
+	public TemplateMultiblock(Identifier loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
 							  List<MatcherPredicate> additionalPredicates)
 	{
 		this.loc = loc;
@@ -69,12 +69,12 @@ public abstract class TemplateMultiblock implements IMultiblock
 		this.additionalPredicates = additionalPredicates;
 	}
 
-	public TemplateMultiblock(ResourceLocation loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size)
+	public TemplateMultiblock(Identifier loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size)
 	{
 		this(loc, masterFromOrigin, triggerFromOrigin, size, ImmutableMap.of());
 	}
 
-	public TemplateMultiblock(ResourceLocation loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size, Map<Block, TagKey<Block>> tags)
+	public TemplateMultiblock(Identifier loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size, Map<Block, TagKey<Block>> tags)
 	{
 		this(loc, masterFromOrigin, triggerFromOrigin, size, ImmutableList.of(
 				(expected, found, world, pos) -> {
@@ -92,7 +92,7 @@ public abstract class TemplateMultiblock implements IMultiblock
 		));
 	}
 
-	public ResourceLocation getTemplateLocation()
+	public Identifier getTemplateLocation()
 	{
 		return loc;
 	}
@@ -139,7 +139,7 @@ public abstract class TemplateMultiblock implements IMultiblock
 	}
 
 	@Override
-	public ResourceLocation getUniqueName()
+	public Identifier getUniqueName()
 	{
 		return loc;
 	}

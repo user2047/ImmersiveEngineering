@@ -12,12 +12,12 @@ import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.tool.conveyor.BasicConveyorType;
 import blusunrize.immersiveengineering.api.tool.conveyor.IConveyorType;
 import blusunrize.immersiveengineering.client.render.conveyor.BasicConveyorRender;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class BasicConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = IEApi.ieLoc("basic");
+	public static final Identifier NAME = IEApi.ieLoc("basic");
 	public static final IConveyorType<BasicConveyor> TYPE = new BasicConveyorType<>(
 			NAME, false, true, BasicConveyor::new, () -> new BasicConveyorRender<>(texture_on, texture_off)
 	);

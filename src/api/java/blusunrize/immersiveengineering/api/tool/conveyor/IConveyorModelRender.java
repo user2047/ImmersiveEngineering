@@ -17,7 +17,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 
@@ -58,11 +58,11 @@ public interface IConveyorModelRender<T extends IConveyorBelt>
 		return matrix;
 	}
 
-	ResourceLocation getActiveTexture();
+	Identifier getActiveTexture();
 
-	ResourceLocation getInactiveTexture();
+	Identifier getInactiveTexture();
 
-	default ResourceLocation getColouredStripesTexture()
+	default Identifier getColouredStripesTexture()
 	{
 		return ConveyorHandler.textureConveyorColour;
 	}

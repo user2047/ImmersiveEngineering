@@ -33,7 +33,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -78,7 +78,7 @@ public class ItemOverlayUtils
 			new SubtitleOffset(s -> s.getItem() instanceof RailgunItem, 90f)
 	);
 
-	public static void handleTooltipOffset(GuiGraphics guiGraphics, boolean pre)
+	public static void handleTooltipOffset(GuiGraphicsExtractor GuiGraphicsExtractor, boolean pre)
 	{
 		Player player = ClientUtils.mc().player;
 		if(player==null)
@@ -86,7 +86,7 @@ public class ItemOverlayUtils
 		ItemStack rightHandItem = HumanoidArm.RIGHT==player.getMainArm()?player.getMainHandItem(): player.getOffhandItem();
 		SUBTITLE_OFFSETS.forEach(c -> {
 			if(c.cond.test(rightHandItem))
-				guiGraphics.pose().translate(pre?-c.offset: c.offset, 0, 0);
+				GuiGraphicsExtractor.pose().translate(pre?-c.offset: c.offset, 0, 0);
 		});
 	}
 
@@ -100,7 +100,7 @@ public class ItemOverlayUtils
 		);
 	}
 
-	public static void renderItemOverlays(GuiGraphics graphics, DeltaTracker delta)
+	public static void renderItemOverlays(GuiGraphicsExtractor graphics, DeltaTracker delta)
 	{
 		Player player = ClientUtils.mc().player;
 		if(player==null)
@@ -134,7 +134,7 @@ public class ItemOverlayUtils
 	}
 
 	private static void renderWireCoilOverlay(
-			GuiGraphics graphics, ItemStack equipped, Player player, int scaledWidth, int scaledHeight
+			GuiGraphicsExtractor graphics, ItemStack equipped, Player player, int scaledWidth, int scaledHeight
 	)
 	{
 		if(!equipped.has(IEApiDataComponents.WIRE_LINK))
@@ -160,7 +160,7 @@ public class ItemOverlayUtils
 	}
 
 	private static void renderFluorescentTubeOverlay(
-			GuiGraphics graphics, ItemStack equipped, int scaledWidth, int scaledHeight
+			GuiGraphicsExtractor graphics, ItemStack equipped, int scaledWidth, int scaledHeight
 	)
 	{
 		int color = FluorescentTubeItem.getRGBInt(equipped, 1);
@@ -170,7 +170,7 @@ public class ItemOverlayUtils
 		);
 	}
 
-	public static void renderRevolverOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderRevolverOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 											 Player player, InteractionHand hand, ItemStack equipped)
 	{
 		NonNullList<ItemStack> bullets = ((IBulletContainer)equipped.getItem()).getBullets(equipped);
@@ -189,7 +189,7 @@ public class ItemOverlayUtils
 		}
 	}
 
-	public static void renderRailgunOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderRailgunOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 											Player player, InteractionHand hand, ItemStack equipped)
 	{
 		int duration = 72000-(player.isUsingItem()&&player.getUsedItemHand()==hand?player.getUseItemRemainingTicks(): 0);
@@ -218,9 +218,9 @@ public class ItemOverlayUtils
 		transform.popPose();
 	}
 
-	public static void renderFluidTankOverlay(GuiGraphics graphics, int xStart, int scaledHeight,
+	public static void renderFluidTankOverlay(GuiGraphicsExtractor graphics, int xStart, int scaledHeight,
 											  Player player, InteractionHand hand, ItemStack equipped, boolean renderFluidUse,
-											  BiConsumer<GuiGraphics, IFluidHandlerItem> additionalRender)
+											  BiConsumer<GuiGraphicsExtractor, IFluidHandlerItem> additionalRender)
 	{
 		var transform = graphics.pose();
 		float dx = xStart;
@@ -260,7 +260,7 @@ public class ItemOverlayUtils
 	}
 
 
-	public static void renderDrillOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderDrillOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 										  Player player, InteractionHand hand, ItemStack equipped)
 	{
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
@@ -273,7 +273,7 @@ public class ItemOverlayUtils
 		});
 	}
 
-	public static void renderBuzzsawOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderBuzzsawOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 											Player player, InteractionHand hand, ItemStack equipped)
 	{
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
@@ -286,7 +286,7 @@ public class ItemOverlayUtils
 		});
 	}
 
-	public static void renderChemthrowerOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderChemthrowerOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 												Player player, InteractionHand hand, ItemStack equipped)
 	{
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
@@ -306,7 +306,7 @@ public class ItemOverlayUtils
 		});
 	}
 
-	public static void renderShieldOverlay(GuiGraphics graphics, int scaledWidth, int scaledHeight,
+	public static void renderShieldOverlay(GuiGraphicsExtractor graphics, int scaledWidth, int scaledHeight,
 										   Player player, InteractionHand hand, ItemStack equipped)
 	{
 		var upgrades = ((IEShieldItem)equipped.getItem()).getUpgrades(equipped);
@@ -347,7 +347,7 @@ public class ItemOverlayUtils
 		transform.popPose();
 	}
 
-	private static void renderVoltmeterOverlay(GuiGraphics graphics, Player player, int scaledWidth, int scaledHeight)
+	private static void renderVoltmeterOverlay(GuiGraphicsExtractor graphics, Player player, int scaledWidth, int scaledHeight)
 	{
 		HitResult rrt = ClientUtils.mc().hitResult;
 		Either<BlockPos, Integer> pos = null;

@@ -20,7 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -37,8 +37,8 @@ public class GenericDataSerializers
 	);
 	public static final DataSerializer<Boolean> BOOLEAN = register(ByteBufCodecs.BOOL);
 	public static final DataSerializer<Float> FLOAT = register(ByteBufCodecs.FLOAT);
-	public static final DataSerializer<Optional<ResourceLocation>> OPTIONAL_RESOURCE_LOCATION = register(
-			ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC)
+	public static final DataSerializer<Optional<Identifier>> OPTIONAL_RESOURCE_LOCATION = register(
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC)
 	);
 	public static final DataSerializer<List<ProcessSlot>> ARC_PROCESS_SLOTS = register(
 			ProcessSlot.STREAM_CODEC.apply(ByteBufCodecs.list())

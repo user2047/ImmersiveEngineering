@@ -10,14 +10,14 @@ package blusunrize.lib.manual.gui;
 
 import blusunrize.lib.manual.ManualUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class GuiButtonManual extends Button
 {
@@ -44,7 +44,7 @@ public class GuiButtonManual extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mx, int my, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		if(this.visible)
 		{

@@ -38,7 +38,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -68,7 +68,7 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 {
 	public static final Map<Pair<String, Boolean>, Supplier<BlockEntityType<EnergyConnectorBlockEntity>>>
 			SPEC_TO_TYPE = new HashMap<>();
-	public static final Map<ResourceLocation, Pair<String, Boolean>> NAME_TO_SPEC = new HashMap<>();
+	public static final Map<Identifier, Pair<String, Boolean>> NAME_TO_SPEC = new HashMap<>();
 
 	public static void registerConnectorTEs(DeferredRegister<BlockEntityType<?>> event)
 	{
@@ -302,7 +302,7 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 	}
 
 	@Override
-	public Collection<ResourceLocation> getRequestedHandlers()
+	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(EnergyTransferHandler.ID);
 	}

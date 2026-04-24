@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.register.IEItems.Weapons;
 import blusunrize.immersiveengineering.common.register.IEPotions;
 import blusunrize.immersiveengineering.common.register.IEPotions.IEPotion;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -72,13 +72,13 @@ public class ClientExtensions
 				new IClientFluidTypeExtensions()
 				{
 					@Override
-					public ResourceLocation getStillTexture()
+					public Identifier getStillTexture()
 					{
 						return TEXTURE_STILL;
 					}
 
 					@Override
-					public ResourceLocation getFlowingTexture()
+					public Identifier getFlowingTexture()
 					{
 						return TEXTURE_FLOW;
 					}
@@ -99,13 +99,13 @@ public class ClientExtensions
 					new IClientFluidTypeExtensions()
 					{
 						@Override
-						public ResourceLocation getStillTexture()
+						public Identifier getStillTexture()
 						{
 							return fluid.stillTexture();
 						}
 
 						@Override
-						public ResourceLocation getFlowingTexture()
+						public Identifier getFlowingTexture()
 						{
 							return fluid.flowingTexture();
 						}

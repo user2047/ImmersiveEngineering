@@ -18,7 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -29,7 +29,7 @@ import java.util.function.Function;
 public abstract class ToolModificationScreen<C extends AbstractContainerMenu> extends IEContainerScreen<C>
 {
 	public ToolModificationScreen(
-			C inventorySlotsIn, Inventory inv, Component title, ResourceLocation background
+			C inventorySlotsIn, Inventory inv, Component title, Identifier background
 	)
 	{
 		super(inventorySlotsIn, inv, title, background);

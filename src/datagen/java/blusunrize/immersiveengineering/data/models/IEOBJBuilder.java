@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -34,7 +34,7 @@ public class IEOBJBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder
 	}
 
 	private boolean dynamic = false;
-	private ResourceLocation modelLocation = null;
+	private Identifier modelLocation = null;
 	private IEOBJCallback<?> callback;
 	private List<RenderType> layers;
 
@@ -43,7 +43,7 @@ public class IEOBJBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder
 		super(IEOBJLoader.LOADER_NAME, parent, existingFileHelper, false);
 	}
 
-	public IEOBJBuilder<T> modelLocation(ResourceLocation modelLocation)
+	public IEOBJBuilder<T> modelLocation(Identifier modelLocation)
 	{
 		this.modelLocation = modelLocation;
 		return this;

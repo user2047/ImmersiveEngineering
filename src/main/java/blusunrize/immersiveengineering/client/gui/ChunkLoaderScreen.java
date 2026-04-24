@@ -14,12 +14,12 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.gui.ChunkLoaderMenu;
 import blusunrize.immersiveengineering.common.gui.ChunkLoaderMenu.NearbyBlockEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Items;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("chunk_loader");
+	private static final Identifier TEXTURE = makeTextureLocation("chunk_loader");
 
 	public ChunkLoaderScreen(ChunkLoaderMenu container, Inventory inventoryPlayer, Component component)
 	{
@@ -98,7 +98,7 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 		}
 
 		@Override
-		public void draw(GuiGraphics graphics)
+		public void draw(GuiGraphicsExtractor graphics)
 		{
 			final int height = area.getHeight();
 			int stored = (int)(height*(refreshTimer.get()/(float)(60*20)));

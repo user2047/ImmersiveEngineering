@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.metal.RedstoneTimerBlockEnt
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -92,7 +92,7 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_control").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());

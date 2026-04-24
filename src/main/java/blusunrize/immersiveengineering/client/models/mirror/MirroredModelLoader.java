@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer;
@@ -35,7 +35,7 @@ import java.util.List;
 public class MirroredModelLoader implements IGeometryLoader<MirroredGeometry>
 {
 	public static final String INNER_MODEL = "inner_model";
-	public static final ResourceLocation ID = ImmersiveEngineering.rl("mirror");
+	public static final Identifier ID = ImmersiveEngineering.rl("mirror");
 
 	@Override
 	public MirroredGeometry read(

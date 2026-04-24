@@ -24,7 +24,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -43,9 +43,9 @@ import java.util.List;
  */
 public class VerticalConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = IEApi.ieLoc("vertical");
-	public static ResourceLocation texture_on = IEApi.ieLoc("block/conveyor/vertical");
-	public static ResourceLocation texture_off = IEApi.ieLoc("block/conveyor/vertical_off");
+	public static final Identifier NAME = IEApi.ieLoc("vertical");
+	public static Identifier texture_on = IEApi.ieLoc("block/conveyor/vertical");
+	public static Identifier texture_off = IEApi.ieLoc("block/conveyor/vertical_off");
 	public static IConveyorType<VerticalConveyor> TYPE = new BasicConveyorType<>(
 			NAME, false, true, VerticalConveyor::new, () -> new VerticalConveyorRender(texture_on, texture_off)
 	);

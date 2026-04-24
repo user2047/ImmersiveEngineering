@@ -23,11 +23,11 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
@@ -43,8 +43,8 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 {
-	private static final ResourceLocation BACKGROUND = makeTextureLocation("assembler");
-	private static final ResourceLocation TANK = ieLoc("assembler/tank_overlay");
+	private static final Identifier BACKGROUND = makeTextureLocation("assembler");
+	private static final Identifier TANK = ieLoc("assembler/tank_overlay");
 	private static final ButtonTexture NO_RECURSIVE = new ButtonTexture(ieLoc("assembler/no_recursive"));
 	private static final ButtonTexture RECURSIVE = new ButtonTexture(ieLoc("assembler/recursive"));
 	private static final ButtonTexture CLEAR = new ButtonTexture(ieLoc("assembler/clear"), ieLoc("assembler/clear_hovered"));
@@ -128,7 +128,7 @@ public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int i = 0; i < AssemblerLogic.NUM_PATTERNS; i++)
 			if(menu.inv.getStackInSlot(18+i).isEmpty()&&!menu.patterns.get(i).getStackInSlot(9).isEmpty())

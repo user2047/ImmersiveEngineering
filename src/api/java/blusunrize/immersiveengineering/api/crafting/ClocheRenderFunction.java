@@ -17,7 +17,7 @@ import malte0811.dualcodecs.DualCodec;
 import malte0811.dualcodecs.DualCodecs;
 import malte0811.dualcodecs.DualMapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -58,7 +58,7 @@ public interface ClocheRenderFunction
 	 * "stem", builds a render function for stem-grown plants like melon or pumpkin
 	 * "generic", builds a render function for any block, making it grow in size, like mushrooms
 	 */
-	BiMap<ResourceLocation, DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction>> RENDER_FUNCTION_FACTORIES = HashBiMap.create();
+	BiMap<Identifier, DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction>> RENDER_FUNCTION_FACTORIES = HashBiMap.create();
 
 	DualCodec<RegistryFriendlyByteBuf, ClocheRenderFunction> CODECS = DualCodecs.RESOURCE_LOCATION.<RegistryFriendlyByteBuf>castStream().dispatch(
 			f -> RENDER_FUNCTION_FACTORIES.inverse().get(f.codec()), RENDER_FUNCTION_FACTORIES::get

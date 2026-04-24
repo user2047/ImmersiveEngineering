@@ -38,7 +38,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -87,8 +87,8 @@ public class RefineryLogic
 	private static final int SLOT_CONTAINER_OUT = 2;
 	public static final int NUM_SLOTS = 3;
 	public static final int ENERGY_CAPACITY = 16000;
-	public static ResourceLocation MIF_CONDITION_FLUID_IN_L = ieLoc("refinery/tank_left");
-	public static ResourceLocation MIF_CONDITION_FLUID_IN_R = ieLoc("refinery/tank_right");
+	public static Identifier MIF_CONDITION_FLUID_IN_L = ieLoc("refinery/tank_left");
+	public static Identifier MIF_CONDITION_FLUID_IN_R = ieLoc("refinery/tank_right");
 
 	static
 	{

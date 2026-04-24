@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -64,12 +64,12 @@ public class BlueprintRenderer
 		try
 		{
 			BakedModel ibakedmodel = ClientUtils.mc().getItemRenderer().getModel(stack, world, player, 0);
-			Set<ResourceLocation> textures = new HashSet<>();
+			Set<Identifier> textures = new HashSet<>();
 			Collection<BakedQuad> quads = ibakedmodel.getQuads(null, null, world.random, ModelData.EMPTY, null);
-			final Function<ResourceLocation, TextureAtlasSprite> blockAtlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+			final Function<Identifier, TextureAtlasSprite> blockAtlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
 			for(BakedQuad quad : quads)
 			{
-				final ResourceLocation texture = quad.getSprite().contents().name();
+				final Identifier texture = quad.getSprite().contents().name();
 				if(textures.add(texture))
 					images.add(blockAtlas.apply(texture));
 			}

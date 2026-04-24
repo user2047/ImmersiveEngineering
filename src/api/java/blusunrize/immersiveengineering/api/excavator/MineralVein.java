@@ -12,7 +12,7 @@ package blusunrize.immersiveengineering.api.excavator;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -22,13 +22,13 @@ import javax.annotation.Nullable;
 public class MineralVein
 {
 	private final ColumnPos pos;
-	private final ResourceLocation mineralName;
+	private final Identifier mineralName;
 	@Nullable
 	private MineralMix mineral;
 	private final int radius;
 	private int depletion;
 
-	public MineralVein(ColumnPos pos, ResourceLocation mineral, int radius)
+	public MineralVein(ColumnPos pos, Identifier mineral, int radius)
 	{
 		this.pos = pos;
 		this.mineralName = mineral;
@@ -110,7 +110,7 @@ public class MineralVein
 		try
 		{
 			ColumnPos pos = new ColumnPos(tag.getInt("x"), tag.getInt("z"));
-			ResourceLocation id = ResourceLocation.parse(tag.getString("mineral"));
+			Identifier id = Identifier.parse(tag.getString("mineral"));
 			int radius = tag.getInt("radius");
 			MineralVein info = new MineralVein(pos, id, radius);
 			info.depletion = tag.getInt("depletion");
@@ -121,7 +121,7 @@ public class MineralVein
 		}
 	}
 
-	public ResourceLocation getMineralName()
+	public Identifier getMineralName()
 	{
 		return mineralName;
 	}

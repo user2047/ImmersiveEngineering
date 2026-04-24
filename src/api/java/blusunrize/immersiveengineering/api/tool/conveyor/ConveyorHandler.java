@@ -16,7 +16,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
@@ -38,14 +38,14 @@ import java.util.function.Function;
  */
 public class ConveyorHandler
 {
-	private static final Map<ResourceLocation, IConveyorType<?>> typeRegistry = new LinkedHashMap<>();
+	private static final Map<Identifier, IConveyorType<?>> typeRegistry = new LinkedHashMap<>();
 	private static final Set<BiConsumer<Entity, IConveyorBlockEntity<?>>> magnetSuppressionFunctions = new HashSet<>();
 	private static final Set<BiConsumer<Entity, IConveyorBlockEntity<?>>> magnetSuppressionReverse = new HashSet<>();
 	public static final SetRestrictedField<ItemAgeAccessor> ITEM_AGE_ACCESS = SetRestrictedField.common();
 
 	public static final SetRestrictedField<Function<IConveyorType<?>, Block>> CONVEYOR_BLOCKS = SetRestrictedField.common();
 	public static final SetRestrictedField<Function<IConveyorType<?>, BlockEntityType<?>>> BLOCK_ENTITY_TYPES = SetRestrictedField.common();
-	public static final ResourceLocation textureConveyorColour = IEApi.ieLoc("block/conveyor/colour");
+	public static final Identifier textureConveyorColour = IEApi.ieLoc("block/conveyor/colour");
 
 	// Should work for multiple dimensions since the calls aren't "interleaved" for multiple dimensions
 	private static final IntSet entitiesHandledInCurrentTickClient = new IntOpenHashSet();
@@ -79,7 +79,7 @@ public class ConveyorHandler
 
 	public static boolean registerConveyorType(IConveyorType<?> type)
 	{
-		ResourceLocation key = type.getId();
+		Identifier key = type.getId();
 		if(typeRegistry.containsKey(key))
 			return false;
 		typeRegistry.put(key, type);
@@ -101,7 +101,7 @@ public class ConveyorHandler
 		return type.makeInstance(tile);
 	}
 
-	public static IConveyorType<?> getConveyorType(ResourceLocation key)
+	public static IConveyorType<?> getConveyorType(Identifier key)
 	{
 		return typeRegistry.get(key);
 	}
@@ -116,7 +116,7 @@ public class ConveyorHandler
 		return BLOCK_ENTITY_TYPES.get().apply(type);
 	}
 
-	public static ResourceLocation getRegistryNameFor(ResourceLocation conveyorLoc)
+	public static Identifier getRegistryNameFor(Identifier conveyorLoc)
 	{
 		String path;
 		if(Lib.MODID.equals(conveyorLoc.getNamespace()))

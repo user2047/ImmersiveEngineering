@@ -33,7 +33,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Component.Serializer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -168,7 +168,7 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 	{
 		public final NonNullList<ItemStack> crates = NonNullList.withSize(NUM_CRATES, ItemStack.EMPTY);
 
-		public ResourceLocation[] renderCrates = new ResourceLocation[NUM_CRATES];
+		public Identifier[] renderCrates = new Identifier[NUM_CRATES];
 		public Component[] names = new Component[NUM_CRATES];
 		private final Runnable doUpdate;
 
@@ -281,7 +281,7 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			for(int i = 0; i < NUM_CRATES; i++)
 			{
 				CompoundTag tag = names.getCompound(i);
-				Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(tag.getString("id")));
+				Item item = BuiltInRegistries.ITEM.get(Identifier.parse(tag.getString("id")));
 				CrateVariant variant = CRATE_VARIANTS.get().get(item);
 				this.renderCrates[i] = variant!=null?variant.crateTexture(): null;
 				this.names[i] = Serializer.fromJson(tag.getString("name"), provider);
@@ -290,7 +290,7 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 		}
 	}
 
-	public record CrateVariant(ResourceLocation crateTexture, int screenVOffset, int color)
+	public record CrateVariant(Identifier crateTexture, int screenVOffset, int color)
 	{
 		public CrateVariant(String crateTexture)
 		{
@@ -299,7 +299,7 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 
 		public CrateVariant(String crateTexture, int color)
 		{
-			this(ResourceLocation.withDefaultNamespace(crateTexture), ShelfMenu.CRATE_SEGMENT, color);
+			this(Identifier.withDefaultNamespace(crateTexture), ShelfMenu.CRATE_SEGMENT, color);
 		}
 	}
 

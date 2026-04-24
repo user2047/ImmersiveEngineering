@@ -19,7 +19,7 @@ import blusunrize.immersiveengineering.common.entities.RevolvershotEntity;
 import blusunrize.immersiveengineering.common.util.IEDamageSources;
 import blusunrize.immersiveengineering.common.util.IESounds;
 import com.mojang.datafixers.util.Unit;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -36,18 +36,18 @@ import java.util.UUID;
 
 public class IEBullets
 {
-	public static final ResourceLocation CASULL = IEApi.ieLoc("casull");
-	public static final ResourceLocation ARMOR_PIERCING = IEApi.ieLoc("armor_piercing");
-	public static final ResourceLocation BUCKSHOT = IEApi.ieLoc("buckshot");
-	public static final ResourceLocation HIGH_EXPLOSIVE = IEApi.ieLoc("he");
-	public static final ResourceLocation SILVER = IEApi.ieLoc("silver");
-	public static final ResourceLocation DRAGONS_BREATH = IEApi.ieLoc("dragons_breath");
-	public static final ResourceLocation POTION = IEApi.ieLoc("potion");
-	public static final ResourceLocation FLARE = IEApi.ieLoc("flare");
-	public static final ResourceLocation FIREWORK = IEApi.ieLoc("firework");
-	public static final ResourceLocation HOMING = IEApi.ieLoc("homing");
-	public static final ResourceLocation WOLFPACK = IEApi.ieLoc("wolfpack");
-	public static final ResourceLocation WOLFPACK_PART = IEApi.ieLoc("wolfpack_part");
+	public static final Identifier CASULL = IEApi.ieLoc("casull");
+	public static final Identifier ARMOR_PIERCING = IEApi.ieLoc("armor_piercing");
+	public static final Identifier BUCKSHOT = IEApi.ieLoc("buckshot");
+	public static final Identifier HIGH_EXPLOSIVE = IEApi.ieLoc("he");
+	public static final Identifier SILVER = IEApi.ieLoc("silver");
+	public static final Identifier DRAGONS_BREATH = IEApi.ieLoc("dragons_breath");
+	public static final Identifier POTION = IEApi.ieLoc("potion");
+	public static final Identifier FLARE = IEApi.ieLoc("flare");
+	public static final Identifier FIREWORK = IEApi.ieLoc("firework");
+	public static final Identifier HOMING = IEApi.ieLoc("homing");
+	public static final Identifier WOLFPACK = IEApi.ieLoc("wolfpack");
+	public static final Identifier WOLFPACK_PART = IEApi.ieLoc("wolfpack_part");
 
 	public static final IBullet<Color4> FLARE_TYPE = new FlareBullet();
 

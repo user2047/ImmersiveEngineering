@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiButtonBoolean;
 import blusunrize.immersiveengineering.common.blocks.metal.RedstoneStateCellBlockEntity;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -77,7 +77,7 @@ public class RedstoneStateCellScreen extends ClientBlockEntityScreen<RedstoneSta
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_set").getString(), guiLeft+20, guiTop, DyeColor.WHITE.getTextColor());
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_reset").getString(), guiLeft+156, guiTop, DyeColor.WHITE.getTextColor());

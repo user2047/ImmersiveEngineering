@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.client.gui.info;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 
@@ -47,7 +47,7 @@ public class TooltipArea extends InfoArea
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics)
+	public void draw(GuiGraphicsExtractor graphics)
 	{
 	}
 }

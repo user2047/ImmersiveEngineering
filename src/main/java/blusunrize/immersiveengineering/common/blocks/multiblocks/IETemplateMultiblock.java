@@ -28,7 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
@@ -49,7 +49,7 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 	private final MultiblockRegistration<?> logic;
 
 	public IETemplateMultiblock(
-			ResourceLocation loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
+			Identifier loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
 			MultiblockRegistration<?> logic
 	)
 	{
@@ -58,7 +58,7 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 	}
 
 	public IETemplateMultiblock(
-			ResourceLocation loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
+			Identifier loc, BlockPos masterFromOrigin, BlockPos triggerFromOrigin, BlockPos size,
 			MultiblockRegistration<?> logic, List<MatcherPredicate> additionalPredicates
 	)
 	{
@@ -154,7 +154,7 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		consumer.accept(new BasicClientProperties(this));
 	}
 
-	public ResourceLocation getBlockName()
+	public Identifier getBlockName()
 	{
 		return logic.id();
 	}

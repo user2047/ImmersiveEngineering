@@ -10,7 +10,7 @@
 package blusunrize.immersiveengineering.common.util.compat.jade;
 
 import blusunrize.immersiveengineering.ImmersiveEngineering;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 
 public class MultiblockIconProvider implements IBlockComponentProvider
 {
-	public static final ResourceLocation ID = ImmersiveEngineering.rl("multiblock_icon");
+	public static final Identifier ID = ImmersiveEngineering.rl("multiblock_icon");
 
 	@Override
 	public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig)
@@ -38,7 +38,7 @@ public class MultiblockIconProvider implements IBlockComponentProvider
 	}
 
 	@Override
-	public ResourceLocation getUid()
+	public Identifier getUid()
 	{
 		return ID;
 	}

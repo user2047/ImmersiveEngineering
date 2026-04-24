@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public class GuiSelectingList extends GuiReactiveList<String>
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mx, int my, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		super.renderWidget(graphics, mx, my, partialTicks);
 		if(selectedOption >= offset&&selectedOption-offset < perPage)

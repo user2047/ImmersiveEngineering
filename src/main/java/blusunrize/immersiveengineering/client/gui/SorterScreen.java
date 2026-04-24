@@ -22,14 +22,14 @@ import blusunrize.immersiveengineering.common.gui.sync.GetterAndSetter;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -44,7 +44,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class SorterScreen extends IEContainerScreen<SorterMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("sorter");
+	private static final Identifier TEXTURE = makeTextureLocation("sorter");
 
 	public static final Map<FilterBit, ButtonTexture> BUTTON_TEXTURE_TRUE = Map.of(
 			FilterBit.DAMAGE, new ButtonTexture(ieLoc("sorter/damage")),
@@ -65,7 +65,7 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int side = 0; side < 6; side++)
 		{
@@ -114,7 +114,7 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 	}
 
 	@Override
-	protected void renderTooltip(GuiGraphics guiGraphics, int x, int y)
+	protected void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y)
 	{
 		if(!this.menu.getCarried().isEmpty())
 			return;
@@ -132,13 +132,13 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 				tagTooltip.add(name);
 
 				// Add tags
-				List<ResourceLocation> available = FilterTag.getAvailableForItem(item);
+				List<Identifier> available = FilterTag.getAvailableForItem(item);
 				if(available.isEmpty())
 					tagTooltip.add(Component.translatable(Lib.DESC_INFO+"filter.tag.none_available"));
 				else
 				{
 					tagTooltip.add(Component.translatable(Lib.DESC_INFO+"filter.tag.selected_scroll"));
-					Optional<ResourceLocation> selected = this.menu.selectedTags.get(ghostSlot.getSlotIndex()).get();
+					Optional<Identifier> selected = this.menu.selectedTags.get(ghostSlot.getSlotIndex()).get();
 					available.forEach(location -> {
 						boolean isSelected = selected.isPresent()&&selected.get().equals(location);
 						FilterTag filterTag = FilterTag.deserialize(item, location);
@@ -148,11 +148,11 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 						);
 					});
 				}
-				guiGraphics.renderTooltip(this.font, tagTooltip, item.getTooltipImage(), item, x, y);
+				GuiGraphicsExtractor.renderTooltip(this.font, tagTooltip, item.getTooltipImage(), item, x, y);
 				return;
 			}
 		}
-		super.renderTooltip(guiGraphics, x, y);
+		super.renderTooltip(GuiGraphicsExtractor, x, y);
 	}
 
 
@@ -165,14 +165,14 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 			if(menu.filterMasks.get(Direction.from3DDataValue(side)).get().allowTags())
 			{
 				ItemStack item = ghostSlot.getItem();
-				List<ResourceLocation> tags = FilterTag.getAvailableForItem(item);
+				List<Identifier> tags = FilterTag.getAvailableForItem(item);
 				if(tags.isEmpty())
 					return false;
 				// get current selected tag
-				GetterAndSetter<Optional<ResourceLocation>> selected = this.menu.selectedTags.get(ghostSlot.getSlotIndex());
+				GetterAndSetter<Optional<Identifier>> selected = this.menu.selectedTags.get(ghostSlot.getSlotIndex());
 				int index = selected.get().map(tags::indexOf).orElse(scrollY < 0?-1: 0);
 				// scroll and wrap around with modulo, fetching the new tag
-				ResourceLocation newTag = tags.get(
+				Identifier newTag = tags.get(
 						Math.floorMod(index+(scrollY < 0?1: -1), tags.size())
 				);
 				// write newly selected tag & sync to server

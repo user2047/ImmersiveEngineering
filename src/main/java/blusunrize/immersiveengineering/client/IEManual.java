@@ -40,7 +40,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -103,7 +103,7 @@ public class IEManual
 				s -> new ManualElementMixer(ieMan, collectRecipeFluidsFromJSON(s)));
 		ieMan.registerSpecialElement(IEApi.ieLoc("multiblock"),
 				s -> {
-					ResourceLocation name = ManualUtils.getLocationForManual(
+					Identifier name = ManualUtils.getLocationForManual(
 							GsonHelper.getAsString(s, "name"),
 							ieMan
 					);
@@ -123,8 +123,8 @@ public class IEManual
 	public static void addIEManualEntries()
 	{
 		IEManualInstance ieMan = (IEManualInstance)ManualHelper.getManual();
-		InnerNode<ResourceLocation, ManualEntry> resourcesCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(ManualHelper.CAT_RESOURCES), 0);
-		InnerNode<ResourceLocation, ManualEntry> toolsCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(ManualHelper.CAT_TOOLS), 50);
+		InnerNode<Identifier, ManualEntry> resourcesCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(ManualHelper.CAT_RESOURCES), 0);
+		InnerNode<Identifier, ManualEntry> toolsCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(ManualHelper.CAT_TOOLS), 50);
 
 		{
 			ManualEntry.ManualEntryBuilder builder = new ManualEntry.ManualEntryBuilder(ManualHelper.getManual());
@@ -284,7 +284,7 @@ public class IEManual
 					allChanges.put(e.getKey(), addVersionToManual(currIEVer, e.getKey(), e.getValue(), true));
 
 		ManualInstance ieMan = ManualHelper.getManual();
-		InnerNode<ResourceLocation, ManualEntry> updateCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(
+		InnerNode<Identifier, ManualEntry> updateCat = ieMan.getRoot().getOrCreateSubnode(IEApi.ieLoc(
 				ManualHelper.CAT_UPDATE), -2);
 		for(ManualEntry entry : allChanges.values())
 			ManualHelper.getManual().addEntry(updateCat, entry);
@@ -354,7 +354,7 @@ public class IEManual
 			stacks = new Fluid[arr.size()];
 			for(int i = 0; i < stacks.length; ++i)
 				stacks[i] = BuiltInRegistries.FLUID.get(
-						ResourceLocation.parse(GsonHelper.getAsString(arr.get(i).getAsJsonObject(), "fluid"))
+						Identifier.parse(GsonHelper.getAsString(arr.get(i).getAsJsonObject(), "fluid"))
 				);
 		}
 		else
@@ -362,7 +362,7 @@ public class IEManual
 			JsonElement recipe = json.get("recipe");
 			Preconditions.checkArgument(recipe.isJsonObject());
 			stacks = new Fluid[]{BuiltInRegistries.FLUID.get(
-					ResourceLocation.parse(GsonHelper.getAsString(recipe.getAsJsonObject(), "fluid"))
+					Identifier.parse(GsonHelper.getAsString(recipe.getAsJsonObject(), "fluid"))
 			)};
 		}
 		return stacks;

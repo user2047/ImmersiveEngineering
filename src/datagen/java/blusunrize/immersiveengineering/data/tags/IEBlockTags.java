@@ -33,7 +33,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -233,8 +233,8 @@ public class IEBlockTags extends BlockTagsProvider
 				.addTag(BlockTags.MINEABLE_WITH_SHOVEL)
 				.addTag(BlockTags.MINEABLE_WITH_PICKAXE);
 		tag(IETags.buzzsawTreeBlacklist)
-				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("dynamictrees", "branches"))
-				.addOptionalTag(ResourceLocation.fromNamespaceAndPath("dynamictrees", "leaves"));
+				.addOptionalTag(Identifier.fromNamespaceAndPath("dynamictrees", "branches"))
+				.addOptionalTag(Identifier.fromNamespaceAndPath("dynamictrees", "leaves"));
 		tag(IETags.surveyToolTargets)
 				//Overworld stones
 				.addTag(Tags.Blocks.STONES)
@@ -286,9 +286,9 @@ public class IEBlockTags extends BlockTagsProvider
 		/* MOD COMPAT STARTS HERE */
 
 		// TConstruct
-		tag(TagUtils.createBlockWrapper(ResourceLocation.fromNamespaceAndPath("tconstruct", "harvestable/stackable")))
+		tag(TagUtils.createBlockWrapper(Identifier.fromNamespaceAndPath("tconstruct", "harvestable/stackable")))
 				.add(Misc.HEMP_PLANT.get());
-		tag(TagUtils.createBlockWrapper(ResourceLocation.fromNamespaceAndPath("chiselsandbits", "chiselable/forced")))
+		tag(TagUtils.createBlockWrapper(Identifier.fromNamespaceAndPath("chiselsandbits", "chiselable/forced")))
 				.add(StoneDecoration.INSULATING_GLASS.get())
 				.add(WoodenDevices.WOODEN_BARREL.get())
 				.add(WoodenDevices.TURNTABLE.get())
@@ -716,26 +716,26 @@ public class IEBlockTags extends BlockTagsProvider
 				IETags.wirecutterHarvestable,
 				IETags.hammerHarvestable
 		);
-		Set<ResourceLocation> harvestable = knownHarvestTags.stream()
+		Set<Identifier> harvestable = knownHarvestTags.stream()
 				.map(this::tag)
 				.map(TagAppender::getInternalBuilder)
 				.flatMap(b -> b.build().stream())
 				.map(Object::toString)
-				.map(ResourceLocation::tryParse)
+				.map(Identifier::tryParse)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
-		Set<ResourceLocation> knownNonHarvestable = Stream.of(
+		Set<Identifier> knownNonHarvestable = Stream.of(
 						Cloth.BALLOON, Cloth.CUSHION, Misc.FAKE_LIGHT, Misc.POTTED_HEMP, Misc.HEMP_PLANT
 				)
 				.map(BlockEntry::getId)
 				.collect(Collectors.toSet());
-		Set<ResourceLocation> registered = IEBlocks.REGISTER.getEntries().stream()
+		Set<Identifier> registered = IEBlocks.REGISTER.getEntries().stream()
 				.map(Holder::value)
 				.filter(b -> !(b instanceof IEFluidBlock))
 				.map(BuiltInRegistries.BLOCK::getKey)
 				.filter(name -> !knownNonHarvestable.contains(name))
 				.collect(Collectors.toSet());
-		Set<ResourceLocation> notHarvestable = Sets.difference(registered, harvestable);
+		Set<Identifier> notHarvestable = Sets.difference(registered, harvestable);
 		if(!notHarvestable.isEmpty())
 		{
 			notHarvestable.forEach(rl -> IELogger.logger.error("Not harvestable: {}", rl));

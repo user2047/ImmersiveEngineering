@@ -32,7 +32,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -50,7 +50,7 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 			MetalDevices.TURRET_CHEM, "block/metal_device/chem_turret.obj.ie",
 			MetalDevices.TURRET_GUN, "block/metal_device/gun_turret.obj.ie"
 	);
-	private static final Map<ResourceLocation, DynamicModel> MODELS_BY_BLOCK = new HashMap<>();
+	private static final Map<Identifier, DynamicModel> MODELS_BY_BLOCK = new HashMap<>();
 
 	@Override
 	public void render(TurretBlockEntity<?> tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)

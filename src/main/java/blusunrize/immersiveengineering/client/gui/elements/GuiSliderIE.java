@@ -12,9 +12,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.gui.widget.ExtendedSlider;
 
 import javax.annotation.Nonnull;
@@ -23,10 +23,10 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class GuiSliderIE extends ExtendedSlider
 {
-	private static final ResourceLocation LEFT = ieLoc("slider_horizontal/left");
-	private static final ResourceLocation CENTER = ieLoc("slider_horizontal/center");
-	private static final ResourceLocation RIGHT = ieLoc("slider_horizontal/right");
-	private static final ResourceLocation BUTTON = ieLoc("slider_horizontal/slider");
+	private static final Identifier LEFT = ieLoc("slider_horizontal/left");
+	private static final Identifier CENTER = ieLoc("slider_horizontal/center");
+	private static final Identifier RIGHT = ieLoc("slider_horizontal/right");
+	private static final Identifier BUTTON = ieLoc("slider_horizontal/slider");
 
 	private final FloatConsumer handler;
 
@@ -49,7 +49,7 @@ public class GuiSliderIE extends ExtendedSlider
 	}
 
 	@Override
-	public void renderWidget(@Nonnull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick)
+	public void renderWidget(@Nonnull GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick)
 	{
 		Font fontrenderer = Minecraft.getInstance().font;
 		RenderSystem.enableBlend();

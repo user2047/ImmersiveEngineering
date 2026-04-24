@@ -14,9 +14,9 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressa
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -28,8 +28,8 @@ import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
 public class GuiSelectBox<E> extends GuiButtonState<E>
 {
-	private static final ResourceLocation TEXTURE = ieLoc("machine_interface/select_box");
-	private static final ResourceLocation BUTTON = ieLoc("machine_interface/select_button");
+	private static final Identifier TEXTURE = ieLoc("machine_interface/select_box");
+	private static final Identifier BUTTON = ieLoc("machine_interface/select_button");
 
 	private static final int WIDTH_LEFT = 8;
 	private static final int WIDTH_MIDDLE = 4;
@@ -123,7 +123,7 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();
 		if(this.visible)

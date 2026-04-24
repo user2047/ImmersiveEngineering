@@ -9,7 +9,7 @@
 
 package blusunrize.immersiveengineering.mixin.accessors;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ import java.util.Map;
 public interface HeroGiftsTaskAccess
 {
 	@Accessor("GIFTS")
-	static Map<VillagerProfession, ResourceLocation> getGifts()
+	static Map<VillagerProfession, Identifier> getGifts()
 	{
 		throw new UnsupportedOperationException("Replaced by Mixin");
 	}

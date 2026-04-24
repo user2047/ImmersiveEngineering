@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.gui.SqueezerMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -25,8 +25,8 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class SqueezerScreen extends IEContainerScreen<SqueezerMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("squeezer");
-	private static final ResourceLocation TANK = ieLoc("squeezer/tank_overlay");
+	private static final Identifier TEXTURE = makeTextureLocation("squeezer");
+	private static final Identifier TANK = ieLoc("squeezer/tank_overlay");
 
 	public SqueezerScreen(SqueezerMenu container, Inventory inventoryPlayer, Component title)
 	{

@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.wires.localhandlers.IWorldTickable;
 import blusunrize.immersiveengineering.api.wires.localhandlers.LocalNetworkHandler;
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class RedstoneNetworkHandler extends LocalNetworkHandler implements IWorldTickable
 {
-	public static final ResourceLocation ID = IEApi.ieLoc("redstone");
+	public static final Identifier ID = IEApi.ieLoc("redstone");
 	private byte[] totalValues = new byte[16];
 	private final Map<ConnectionPoint, byte[]> emittedValues = new HashMap<>();
 	private boolean updateNextTick = false;

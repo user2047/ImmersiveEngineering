@@ -12,9 +12,9 @@ import blusunrize.lib.manual.gui.ManualScreen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.FontContext;
@@ -63,7 +63,7 @@ public abstract class SpecialManualElements extends SpecialManualElement
 	{
 	}
 
-	protected void renderHighlightedTooltip(GuiGraphics graphics, int mx, int my)
+	protected void renderHighlightedTooltip(GuiGraphicsExtractor graphics, int mx, int my)
 	{
 		if(!highlighted.isEmpty())
 			graphics.renderTooltip(manual.fontRenderer(), highlighted, mx, my);

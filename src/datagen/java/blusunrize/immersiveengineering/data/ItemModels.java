@@ -39,7 +39,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -70,9 +70,9 @@ public class ItemModels extends TRSRItemModelProvider
 		this.blockStates = blockStates;
 	}
 
-	private ResourceLocation forgeLoc(String s)
+	private Identifier forgeLoc(String s)
 	{
-		return ResourceLocation.fromNamespaceAndPath("neoforge", s);
+		return Identifier.fromNamespaceAndPath("neoforge", s);
 	}
 
 	@Override
@@ -311,9 +311,9 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModels("", IEItems.Misc.ICON_BIRTHDAY, IEItems.Misc.ICON_LUCKY, IEItems.Misc.ICON_ACHTUNG, IEItems.Misc.ICON_SNAKE,
 				IEItems.Misc.ICON_DRILLBREAK, IEItems.Misc.ICON_RAVENHOLM, IEItems.Misc.ICON_FRIED, IEItems.Misc.ICON_BTTF);
 
-		withExistingParent(name(SpawnEggs.EGG_FUSILIER), ResourceLocation.withDefaultNamespace("item/template_spawn_egg"));
-		withExistingParent(name(SpawnEggs.EGG_COMMANDO), ResourceLocation.withDefaultNamespace("item/template_spawn_egg"));
-		withExistingParent(name(SpawnEggs.EGG_BULWARK), ResourceLocation.withDefaultNamespace("item/template_spawn_egg"));
+		withExistingParent(name(SpawnEggs.EGG_FUSILIER), Identifier.withDefaultNamespace("item/template_spawn_egg"));
+		withExistingParent(name(SpawnEggs.EGG_COMMANDO), Identifier.withDefaultNamespace("item/template_spawn_egg"));
+		withExistingParent(name(SpawnEggs.EGG_BULWARK), Identifier.withDefaultNamespace("item/template_spawn_egg"));
 		addItemModels("", IEItems.SpawnEggs.ROBOT_WOLF);
 
 		obj(Tools.VOLTMETER, rl("item/voltmeter.obj"))
@@ -463,7 +463,7 @@ public class ItemModels extends TRSRItemModelProvider
 				.customLoader(SpecialModelBuilder.forLoader(FeedthroughLoader.LOCATION));
 	}
 
-	private TRSRModelBuilder obj(ItemLike item, ResourceLocation model)
+	private TRSRModelBuilder obj(ItemLike item, Identifier model)
 	{
 		Preconditions.checkArgument(existingFileHelper.exists(model, PackType.CLIENT_RESOURCES, "", "models"));
 		return getBuilder(item)
@@ -473,7 +473,7 @@ public class ItemModels extends TRSRItemModelProvider
 				.end();
 	}
 
-	private IEOBJBuilder<TRSRModelBuilder> ieObjBuilder(ItemLike item, ResourceLocation model)
+	private IEOBJBuilder<TRSRModelBuilder> ieObjBuilder(ItemLike item, Identifier model)
 	{
 		Preconditions.checkArgument(existingFileHelper.exists(model, PackType.CLIENT_RESOURCES, "", "models"));
 		return getBuilder(item)
@@ -508,17 +508,17 @@ public class ItemModels extends TRSRItemModelProvider
 		}
 		if(!metal.isVanillaMetal())
 		{
-			ResourceLocation defaultName = rl("block/metal/storage_"+name);
+			Identifier defaultName = rl("block/metal/storage_"+name);
 			if(metal==EnumMetals.URANIUM)
 			{
-				ResourceLocation side = rl("block/metal/storage_"+name+"_side");
-				ResourceLocation top = rl("block/metal/storage_"+name+"_top");
+				Identifier side = rl("block/metal/storage_"+name+"_side");
+				Identifier top = rl("block/metal/storage_"+name+"_top");
 				cubeBottomTop(name(Metals.STORAGE.get(metal)), side, top, top);
 			}
 			else
 				cubeAll(name(Metals.STORAGE.get(metal)), defaultName);
 		}
-		ResourceLocation sheetmetalName = rl("block/metal/sheetmetal_"+name);
+		Identifier sheetmetalName = rl("block/metal/sheetmetal_"+name);
 		cubeAll(name(Metals.SHEETMETAL.get(metal)), sheetmetalName);
 
 	}
@@ -528,7 +528,7 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModels(texturePrefix, Arrays.asList(items));
 	}
 
-	private void addItemModels(String texturePrefix, ResourceLocation parent, ItemLike... items)
+	private void addItemModels(String texturePrefix, Identifier parent, ItemLike... items)
 	{
 		addItemModels(texturePrefix, parent, Arrays.asList(items));
 	}
@@ -538,7 +538,7 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModels(texturePrefix, mcLoc("item/generated"), items);
 	}
 
-	private void addItemModels(String texturePrefix, ResourceLocation parent, Collection<? extends ItemLike> items)
+	private void addItemModels(String texturePrefix, Identifier parent, Collection<? extends ItemLike> items)
 	{
 		for(ItemLike item : items)
 			addItemModel(texturePrefix==null?null: (texturePrefix+BuiltInRegistries.ITEM.getKey(item.asItem()).getPath()), item, parent);
@@ -549,7 +549,7 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModel(texture, item, mcLoc("item/generated"));
 	}
 
-	private void addItemModel(String texture, ItemLike item, ResourceLocation parent)
+	private void addItemModel(String texture, ItemLike item, Identifier parent)
 	{
 		String path = name(item);
 		String textureLoc = texture==null?path: ("item/"+texture);
@@ -557,32 +557,32 @@ public class ItemModels extends TRSRItemModelProvider
 				.texture("layer0", modLoc(textureLoc));
 	}
 
-	private void addLayeredItemModel(Item item, ResourceLocation... layers)
+	private void addLayeredItemModel(Item item, Identifier... layers)
 	{
 		String path = name(item);
 		TRSRModelBuilder modelBuilder = withExistingParent(path, mcLoc("item/generated"));
 		int layerIdx = 0;
-		for(ResourceLocation layer : layers)
+		for(Identifier layer : layers)
 			modelBuilder.texture("layer"+(layerIdx++), layer);
 	}
 
 	private void addTrimmedArmorModel(ArmorItem item)
 	{
 		String path = name(item);
-		ResourceLocation baseTexture = modLoc("item/"+path);
+		Identifier baseTexture = modLoc("item/"+path);
 		TRSRModelBuilder modelBuilder = withExistingParent(path, mcLoc("item/generated"))
 				.texture("layer0", baseTexture);
 		for(TrimModelDataAccess trim : ItemModelGeneratorsAccess.getGeneratedTrimModels())
 		{
 			String material = trim.getName();
 			String name = path+"_"+material+"_trim";
-			ResourceLocation trimTexture = mcLoc("trims/items/"+item.getType().getName()+"_trim_"+material);
+			Identifier trimTexture = mcLoc("trims/items/"+item.getType().getName()+"_trim_"+material);
 			// hacky workaround to avoid complaints about missing textures
 			existingFileHelper.trackGenerated(trimTexture, ModelProvider.TEXTURE);
 			TRSRModelBuilder trimModel = this.withExistingParent(name, mcLoc("item/generated"))
 					.texture("layer0", baseTexture)
 					.texture("layer1", trimTexture);
-			modelBuilder.override(trimModel, ResourceLocation.withDefaultNamespace("trim_type"), trim.getItemModelIndex());
+			modelBuilder.override(trimModel, Identifier.withDefaultNamespace("trim_type"), trim.getItemModelIndex());
 		}
 	}
 }

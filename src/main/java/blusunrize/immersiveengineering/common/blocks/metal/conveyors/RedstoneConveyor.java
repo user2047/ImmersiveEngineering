@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class RedstoneConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = IEApi.ieLoc("redstone");
+	public static final Identifier NAME = IEApi.ieLoc("redstone");
 	public static final IConveyorType<RedstoneConveyor> TYPE = new BasicConveyorType<>(
 			NAME, false, true, RedstoneConveyor::new, () -> new RedstoneConveyorRender(texture_on, texture_off), false
 	);

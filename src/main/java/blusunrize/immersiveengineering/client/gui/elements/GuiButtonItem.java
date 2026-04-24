@@ -10,18 +10,18 @@ package blusunrize.immersiveengineering.client.gui.elements;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class GuiButtonItem extends Button
 {
-	private static final ResourceLocation FALSE_TEXTURE = ieLoc("hud/square_out");
-	private static final ResourceLocation TRUE_TEXTURE = ieLoc("hud/square_in");
+	private static final Identifier FALSE_TEXTURE = ieLoc("hud/square_out");
+	private static final Identifier TRUE_TEXTURE = ieLoc("hud/square_in");
 	public boolean state;
 	private final ItemStack item;
 
@@ -33,7 +33,7 @@ public class GuiButtonItem extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		if(this.visible)
 		{

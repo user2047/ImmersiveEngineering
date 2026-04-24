@@ -49,7 +49,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -74,9 +74,9 @@ import static net.minecraft.client.renderer.RenderType.*;
 
 public class BlockStates extends ExtendedBlockstateProvider
 {
-	private static final ResourceLocation ALU_FENCE_TEXTURE = rl("block/metal/storage_aluminum");
-	private static final ResourceLocation STEEL_FENCE_TEXTURE = rl("block/metal/storage_steel");
-	private static final ResourceLocation TREATED_FENCE_TEXTURE = rl("block/wooden_decoration/treated_wood_horizontal");
+	private static final Identifier ALU_FENCE_TEXTURE = rl("block/metal/storage_aluminum");
+	private static final Identifier STEEL_FENCE_TEXTURE = rl("block/metal/storage_steel");
+	private static final Identifier TREATED_FENCE_TEXTURE = rl("block/wooden_decoration/treated_wood_horizontal");
 	private final ConfiguredModel EMPTY_MODEL;
 
 	public BlockStates(PackOutput output, ExistingFileHelper exHelper)
@@ -87,9 +87,9 @@ public class BlockStates extends ExtendedBlockstateProvider
 		);
 	}
 
-	private void postBlock(Supplier<? extends Block> b, ResourceLocation texture)
+	private void postBlock(Supplier<? extends Block> b, Identifier texture)
 	{
-		ResourceLocation model = rl("block/wooden_device/wooden_post.obj.ie");
+		Identifier model = rl("block/wooden_device/wooden_post.obj.ie");
 		Builder<Vec3i> parts = ImmutableList.builder();
 		parts.add(new Vec3i(0, 0, 0))
 				.add(new Vec3i(0, 1, 0))
@@ -123,14 +123,14 @@ public class BlockStates extends ExtendedBlockstateProvider
 					cubeAll(Metals.DEEPSLATE_ORES.get(m), modLoc("block/metal/deepslate_ore_"+name));
 					cubeAll(Metals.RAW_ORES.get(m), modLoc("block/metal/raw_"+name));
 				}
-				ResourceLocation defaultStorageTexture = modLoc("block/metal/storage_"+name);
+				Identifier defaultStorageTexture = modLoc("block/metal/storage_"+name);
 				BlockEntry<Block> storage = Metals.STORAGE.get(m);
 				String storageName = name(storage);
 				BlockModelBuilder storageModel;
 				if(m==EnumMetals.URANIUM)
 				{
-					ResourceLocation side = modLoc("block/metal/storage_"+name+"_side");
-					ResourceLocation top = modLoc("block/metal/storage_"+name+"_top");
+					Identifier side = modLoc("block/metal/storage_"+name+"_side");
+					Identifier top = modLoc("block/metal/storage_"+name+"_top");
 					storageModel = models().cubeBottomTop(storageName, side, top, top);
 					slabFor(storage, side, top, top);
 				}
@@ -141,13 +141,13 @@ public class BlockStates extends ExtendedBlockstateProvider
 				}
 				simpleBlockAndItem(storage, storageModel);
 			}
-			ResourceLocation sheetmetalName = modLoc("block/metal/sheetmetal_"+name);
+			Identifier sheetmetalName = modLoc("block/metal/sheetmetal_"+name);
 			cubeAll(Metals.SHEETMETAL.get(m), sheetmetalName);
 			slabFor(Metals.SHEETMETAL.get(m), sheetmetalName);
 		}
 		for(DyeColor dye : DyeColor.values())
 		{
-			ResourceLocation sheetmetalName = modLoc("block/metal/sheetmetal_"+dye.getName());
+			Identifier sheetmetalName = modLoc("block/metal/sheetmetal_"+dye.getName());
 			cubeAll(MetalDecoration.COLORED_SHEETMETAL.get(dye), sheetmetalName);
 			slabFor(MetalDecoration.COLORED_SHEETMETAL.get(dye), sheetmetalName);
 		}
@@ -215,13 +215,13 @@ public class BlockStates extends ExtendedBlockstateProvider
 
 		scaffold(WoodenDecoration.TREATED_SCAFFOLDING, rl("block/wooden_decoration/scaffolding"), rl("block/wooden_decoration/scaffolding_top"));
 
-		ResourceLocation aluSide = rl("block/metal_decoration/aluminum_scaffolding");
-		ResourceLocation steelSide = rl("block/metal_decoration/steel_scaffolding");
+		Identifier aluSide = rl("block/metal_decoration/aluminum_scaffolding");
+		Identifier steelSide = rl("block/metal_decoration/steel_scaffolding");
 		for(MetalScaffoldingType type : MetalScaffoldingType.values())
 		{
 			String suffix = "_"+type.name().toLowerCase(Locale.ENGLISH);
-			ResourceLocation aluTop = rl("block/metal_decoration/aluminum_scaffolding_top"+suffix);
-			ResourceLocation steelTop = rl("block/metal_decoration/steel_scaffolding_top"+suffix);
+			Identifier aluTop = rl("block/metal_decoration/aluminum_scaffolding_top"+suffix);
+			Identifier steelTop = rl("block/metal_decoration/steel_scaffolding_top"+suffix);
 			scaffold(MetalDecoration.ALU_SCAFFOLDING.get(type), aluSide, aluTop);
 			scaffold(MetalDecoration.STEEL_SCAFFOLDING.get(type), steelSide, steelTop);
 			slabFor(MetalDecoration.ALU_SCAFFOLDING.get(type), aluSide, aluTop, aluSide, cutout());
@@ -486,7 +486,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		}
 
 		createHorizontalRotatedBlock(StoneDecoration.CORESAMPLE, obj("block/coresample.obj"));
-		ResourceLocation concreteTexture = rl("block/stone_decoration/concrete/concrete0");
+		Identifier concreteTexture = rl("block/stone_decoration/concrete/concrete0");
 		simpleBlockAndItem(StoneDecoration.CONCRETE_SHEET, models().carpet("concrete_sheet", concreteTexture));
 		simpleBlockAndItem(StoneDecoration.CONCRETE_QUARTER, quarter("concrete_quarter", concreteTexture));
 		simpleBlockAndItem(StoneDecoration.CONCRETE_THREE_QUARTER, threeQuarter("concrete_three_quarter", concreteTexture));
@@ -697,8 +697,8 @@ public class BlockStates extends ExtendedBlockstateProvider
 
 	public void createStructuralArm(String texture, Supplier<? extends Block> block)
 	{
-		ResourceLocation objFile = modLoc("block/slope.obj.ie");
-		ResourceLocation textureRL = modLoc(texture);
+		Identifier objFile = modLoc("block/slope.obj.ie");
+		Identifier textureRL = modLoc(texture);
 		ModelFile steelModel = ieObjBuilder(name(block), objFile)
 				.callback(StructuralArmCallbacks.INSTANCE)
 				.layer(cutout())
@@ -727,7 +727,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		);
 	}
 
-	public void fenceBlock(Supplier<? extends FenceBlock> b, ResourceLocation texture)
+	public void fenceBlock(Supplier<? extends FenceBlock> b, Identifier texture)
 	{
 		super.fenceBlock(b.get(), texture);
 		itemModel(b,
@@ -735,7 +735,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 						.texture("texture", texture));
 	}
 
-	public void fenceGateBlock(Supplier<? extends FenceGateBlock> b, ResourceLocation texture)
+	public void fenceGateBlock(Supplier<? extends FenceGateBlock> b, Identifier texture)
 	{
 		super.fenceGateBlock(b.get(), texture);
 		itemModel(b, models().getExistingFile(rl("block/"+BuiltInRegistries.BLOCK.getKey(b.get()).getPath())));
@@ -764,10 +764,10 @@ public class BlockStates extends ExtendedBlockstateProvider
 				));
 	}
 
-	public ModelFile createMetalLadder(String name, @Nullable ResourceLocation bottomTop, @Nullable ResourceLocation sides, @Nullable ResourceLocation front)
+	public ModelFile createMetalLadder(String name, @Nullable Identifier bottomTop, @Nullable Identifier sides, @Nullable Identifier front)
 	{
-		Map<String, ResourceLocation> textures = new HashMap<>();
-		ResourceLocation parent;
+		Map<String, Identifier> textures = new HashMap<>();
+		Identifier parent;
 		if(bottomTop!=null)
 		{
 			Preconditions.checkNotNull(sides);
@@ -786,7 +786,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 			parent = ieLoc("block/ie_ladder");
 		textures.put("ladder", rl("block/metal_decoration/metal_ladder"));
 		BlockModelBuilder ret = models().withExistingParent(name, parent);
-		for(Entry<String, ResourceLocation> e : textures.entrySet())
+		for(Entry<String, Identifier> e : textures.entrySet())
 			ret.texture(e.getKey(), e.getValue());
 		ret.renderType(ModelProviderUtils.getName(cutout()));
 		return ret;
@@ -817,7 +817,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		}
 	}
 
-	private void createWallmount(Supplier<? extends Block> b, ResourceLocation texture)
+	private void createWallmount(Supplier<? extends Block> b, Identifier texture)
 	{
 		VariantBlockStateBuilder stateBuilder = getVariantBuilder(b.get());
 		for(Direction d : DirectionUtils.BY_HORIZONTAL_INDEX)
@@ -825,7 +825,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 			int rotation = getAngle(d, 0);
 			for(Orientation or : Orientation.values())
 			{
-				ResourceLocation modelLoc = rl("block/wooden_device/wallmount"+or.modelSuffix()+".obj");
+				Identifier modelLoc = rl("block/wooden_device/wallmount"+or.modelSuffix()+".obj");
 				ModelFile model = obj(BuiltInRegistries.BLOCK.getKey(b.get()).getPath()+or.modelSuffix(), modelLoc,
 						ImmutableMap.of("texture", texture), models());
 				stateBuilder.partialState()
@@ -900,14 +900,14 @@ public class BlockStates extends ExtendedBlockstateProvider
 		itemModel(block, base);
 	}
 
-	protected ModelFile createMultiLayer(String path, Map<RenderType, ResourceLocation> modelGetter, ResourceLocation particle)
+	protected ModelFile createMultiLayer(String path, Map<RenderType, Identifier> modelGetter, Identifier particle)
 	{
 		CompositeModelBuilder<BlockModelBuilder> modelBuilder = models().getBuilder(path)
 				.customLoader(CompositeModelBuilder::begin);
 
-		for(Entry<RenderType, ResourceLocation> entry : modelGetter.entrySet())
+		for(Entry<RenderType, Identifier> entry : modelGetter.entrySet())
 		{
-			ResourceLocation rl = entry.getValue();
+			Identifier rl = entry.getValue();
 			String layer = ModelProviderUtils.getName(entry.getKey());
 			modelBuilder.child(
 					layer,
@@ -919,13 +919,13 @@ public class BlockStates extends ExtendedBlockstateProvider
 				.texture("particle", DataGenUtils.getTextureFromObj(particle, existingFileHelper));
 	}
 
-	private ModelFile quarter(String out, ResourceLocation texture)
+	private ModelFile quarter(String out, Identifier texture)
 	{
 		return models().withExistingParent(out, modLoc("block/ie_quarter_block"))
 				.texture("texture", texture);
 	}
 
-	private ModelFile threeQuarter(String out, ResourceLocation texture)
+	private ModelFile threeQuarter(String out, Identifier texture)
 	{
 		return models().withExistingParent(out, modLoc("block/ie_three_quarter_block"))
 				.texture("texture", texture);
@@ -954,7 +954,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		VariantBlockStateBuilder builder = getVariantBuilder(Misc.HEMP_PLANT.get());
 		// Top
 		ModelFile model = models()
-				.withExistingParent("block/hemp/top", ResourceLocation.withDefaultNamespace("block/crop"))
+				.withExistingParent("block/hemp/top", Identifier.withDefaultNamespace("block/crop"))
 				.texture("crop", ieLoc("block/hemp/top0"))
 				.renderType(ModelProviderUtils.getName(cutout()));
 		builder.partialState().with(HempBlock.HALF, DoubleBlockHalf.UPPER).setModels(new ConfiguredModel(model));
@@ -963,7 +963,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		for(int i = 0; i <= 4; i++)
 		{
 			model = models()
-					.withExistingParent("block/hemp/bottom"+i, ResourceLocation.withDefaultNamespace("block/crop"))
+					.withExistingParent("block/hemp/bottom"+i, Identifier.withDefaultNamespace("block/crop"))
 					.texture("crop", ieLoc("block/hemp/bottom"+i))
 					.renderType(ModelProviderUtils.getName(cutout()));
 			builder.partialState().with(HempBlock.HALF, DoubleBlockHalf.LOWER).with(HempBlock.AGE, i).setModels(new ConfiguredModel(model));
@@ -973,7 +973,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 	private void createSawdust()
 	{
 		VariantBlockStateBuilder builder = getVariantBuilder(WoodenDecoration.SAWDUST.get());
-		ResourceLocation sawdustTexture = ieLoc("block/wooden_decoration/sawdust");
+		Identifier sawdustTexture = ieLoc("block/wooden_decoration/sawdust");
 		ModelFile singleModel = null;
 		for(int layer : SawdustBlock.LAYERS.getPossibleValues())
 		{
@@ -984,7 +984,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 			else
 			{
 				int height = layer*2-1;
-				model = models().withExistingParent(name, ResourceLocation.withDefaultNamespace("block/thin_block"))
+				model = models().withExistingParent(name, Identifier.withDefaultNamespace("block/thin_block"))
 						.texture("particle", sawdustTexture)
 						.texture("texture", sawdustTexture)
 						.element().from(0, 0, 0).to(16, height, 16).allFaces((direction, faceBuilder) -> {
@@ -1006,7 +1006,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		itemModel(WoodenDecoration.SAWDUST, singleModel);
 	}
 
-	private ModelFile createRouterModel(ResourceLocation baseTexName, String outName)
+	private ModelFile createRouterModel(Identifier baseTexName, String outName)
 	{
 		BlockModelBuilder builder = models().withExistingParent(outName, modLoc("block/ie_six_sides"));
 		for(Direction d : DirectionUtils.VALUES)

@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.common.crafting.LazyShapelessRecipe;
 import blusunrize.immersiveengineering.common.util.RecipeSerializers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -38,7 +38,7 @@ public class HammerCrushingRecipeBuilder extends IERecipeBuilder<HammerCrushingR
 		return new HammerCrushingRecipeBuilder(input, output);
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		LazyShapelessRecipe recipe = new LazyShapelessRecipe(
 				"misc",

@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.common.util.IELogger;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -27,10 +27,10 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 	/**
 	 * The location of the texture.
 	 */
-	private final ResourceLocation canvasTexture;
+	private final Identifier canvasTexture;
 	private final ShaderLayer[] layers;
 
-	public IEShaderLayerCompositeTexture(ResourceLocation canvasTexture, ShaderLayer[] layers)
+	public IEShaderLayerCompositeTexture(Identifier canvasTexture, ShaderLayer[] layers)
 	{
 		this.canvasTexture = canvasTexture;
 		this.layers = layers;
@@ -66,7 +66,7 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 				String texture = this.layers[layer].getTexture().getNamespace()+":"+texPath;
 				var colour = this.layers[layer].getColor();
 
-				Resource iresource1 = resourceManager.getResource(ResourceLocation.parse(texture)).orElseThrow();
+				Resource iresource1 = resourceManager.getResource(Identifier.parse(texture)).orElseThrow();
 				try(
 						InputStream texStream = iresource1.open();
 						NativeImage texureImage = NativeImage.read(texStream);

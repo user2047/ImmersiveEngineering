@@ -24,7 +24,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -58,7 +58,7 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 	private final BooleanSupplier allowPartialFill;
 
 	public BottlingProcess(
-			BiFunction<Level, ResourceLocation, BottlingMachineRecipe> getRecipe,
+			BiFunction<Level, Identifier, BottlingMachineRecipe> getRecipe,
 			Provider provider,
 			CompoundTag nbt,
 			State state
@@ -97,7 +97,7 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 	{
 		return (getRecipe, tag, provider) -> {
 			if(tag.getBoolean("isFilling"))
-				return new BottlingProcess((level, resourceLocation) -> DUMMY_RECIPE.value(), provider, tag, state);
+				return new BottlingProcess((level, Identifier) -> DUMMY_RECIPE.value(), provider, tag, state);
 			return new BottlingProcess(getRecipe, provider, tag, state);
 		};
 	}

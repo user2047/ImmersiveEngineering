@@ -10,7 +10,7 @@ package blusunrize.lib.manual;
 
 import blusunrize.lib.manual.gui.ManualScreen;
 import com.google.common.base.Preconditions;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -62,7 +62,7 @@ public class ManualElementTable extends SpecialManualElements
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mx, int my)
+	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mx, int my)
 	{
 		if(table!=null)
 		{

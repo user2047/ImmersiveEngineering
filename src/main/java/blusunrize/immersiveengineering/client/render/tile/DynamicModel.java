@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -65,7 +65,7 @@ public class DynamicModel
 		return get().getQuads(null, null, ApiUtils.RANDOM_SOURCE, data, null);
 	}
 
-	public ResourceLocation getName()
+	public Identifier getName()
 	{
 		return name.id();
 	}

@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -34,7 +34,7 @@ public class MultiblockProcessInWorld<R extends MultiblockRecipe>
 	protected float transformationPoint;
 
 	public MultiblockProcessInWorld(
-			ResourceLocation recipeId, BiFunction<Level, ResourceLocation, R> getRecipe,
+			Identifier recipeId, BiFunction<Level, Identifier, R> getRecipe,
 			float transformationPoint, NonNullList<ItemStack> inputItem
 	)
 	{
@@ -53,7 +53,7 @@ public class MultiblockProcessInWorld<R extends MultiblockRecipe>
 	}
 
 	public MultiblockProcessInWorld(
-			BiFunction<Level, ResourceLocation, R> getRecipe, CompoundTag data, Provider provider
+			BiFunction<Level, Identifier, R> getRecipe, CompoundTag data, Provider provider
 	)
 	{
 		super(getRecipe, data);

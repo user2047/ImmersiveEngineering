@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.common.gui.RefineryMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
@@ -28,8 +28,8 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class RefineryScreen extends IEContainerScreen<RefineryMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("refinery");
-	private static final ResourceLocation TANK = ieLoc("refinery/tank_overlay");
+	private static final Identifier TEXTURE = makeTextureLocation("refinery");
+	private static final Identifier TANK = ieLoc("refinery/tank_overlay");
 
 	public RefineryScreen(RefineryMenu container, Inventory inventoryPlayer, Component component)
 	{

@@ -23,9 +23,9 @@ import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -45,8 +45,8 @@ public class ManualEntry implements Comparable<ManualEntry>
 
 	private final ManualInstance manual;
 	private final Supplier<EntryData> getContent;
-	private final ResourceLocation location;
-	private final ResourceLocation requiredAdvancement;
+	private final Identifier location;
+	private final Identifier requiredAdvancement;
 
 	// in basic init
 	private String title;
@@ -60,7 +60,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 	private Int2ObjectMap<SpecialManualElement> specials;
 	private Object2IntMap<String> anchorPoints;
 
-	private ManualEntry(ManualInstance m, Supplier<EntryData> getContent, ResourceLocation location, ResourceLocation requiredAdvancement)
+	private ManualEntry(ManualInstance m, Supplier<EntryData> getContent, Identifier location, Identifier requiredAdvancement)
 	{
 		this.manual = m;
 		this.getContent = getContent;
@@ -128,7 +128,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 		initialized = true;
 	}
 
-	public void renderPage(GuiGraphics graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
+	public void renderPage(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		ensureInitialized();
 		int page = gui.page;
@@ -195,12 +195,12 @@ public class ManualEntry implements Comparable<ManualEntry>
 		return pages.size();
 	}
 
-	public ResourceLocation getLocation()
+	public Identifier getLocation()
 	{
 		return location;
 	}
 
-	public Optional<ResourceLocation> getRequiredAdvancement()
+	public Optional<Identifier> getRequiredAdvancement()
 	{
 		return Optional.ofNullable(requiredAdvancement);
 	}
@@ -237,7 +237,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 		return anchors.get().contains(anchor);
 	}
 
-	public Tree.AbstractNode<ResourceLocation, ManualEntry> getTreeNode()
+	public Tree.AbstractNode<Identifier, ManualEntry> getTreeNode()
 	{
 		return manual.getAllEntriesAndCategories()
 				.filter((e) -> e.getLeafData()==this).findAny().orElse(null);
@@ -267,9 +267,9 @@ public class ManualEntry implements Comparable<ManualEntry>
 	{
 		private final ManualInstance manual;
 		private Supplier<EntryData> getContent = null;
-		private ResourceLocation location;
+		private Identifier location;
 		private final List<SpecialElementData> hardcodedSpecials = new ArrayList<>();
-		private ResourceLocation requiredAdvancement;
+		private Identifier requiredAdvancement;
 
 		public ManualEntryBuilder(ManualInstance manual)
 		{
@@ -320,7 +320,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 			});
 		}
 
-		public void readFromFile(ResourceLocation name)
+		public void readFromFile(Identifier name)
 		{
 			location = name;
 
@@ -335,10 +335,10 @@ public class ManualEntry implements Comparable<ManualEntry>
 					() -> "Failed to load manual entry from "+name
 			);
 			if(json.has("require_advancement"))
-				requiredAdvancement = ResourceLocation.parse(json.remove("require_advancement").getAsString());
+				requiredAdvancement = Identifier.parse(json.remove("require_advancement").getAsString());
 
 			getContent = () -> {
-				ResourceLocation langLoc = name.withPath("manual/"+Minecraft.getInstance().getLanguageManager().getSelected()
+				Identifier langLoc = name.withPath("manual/"+Minecraft.getInstance().getLanguageManager().getSelected()
 						+"/"+name.getPath()+".txt");
 				Resource resLang = getResourceNullable(langLoc);
 				if(resLang==null)
@@ -369,7 +369,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 			};
 		}
 
-		public void setLocation(ResourceLocation location)
+		public void setLocation(Identifier location)
 		{
 			this.location = location;
 		}
@@ -382,7 +382,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 			return new ManualEntry(manual, getContent, location, requiredAdvancement);
 		}
 
-		private static Resource getResourceNullable(ResourceLocation rl)
+		private static Resource getResourceNullable(Identifier rl)
 		{
 			return Minecraft.getInstance().getResourceManager().getResource(rl).orElse(null);
 		}
@@ -403,7 +403,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 		}
 
 		@Override
-		public void render(GuiGraphics graphics, ManualScreen m, int x, int y, int mouseX, int mouseY)
+		public void render(GuiGraphicsExtractor graphics, ManualScreen m, int x, int y, int mouseX, int mouseY)
 		{
 		}
 

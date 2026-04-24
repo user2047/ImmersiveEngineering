@@ -23,7 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -127,7 +127,7 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 	}
 
 	@Override
-	public ResourceLocation getDrillTexture(ItemStack drill, ItemStack head)
+	public Identifier getDrillTexture(ItemStack drill, ItemStack head)
 	{
 		return perms.texture;
 	}
@@ -154,9 +154,9 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 		final float drillSpeed;
 		final float drillAttack;
 		final int maxDamage;
-		public final ResourceLocation texture;
+		public final Identifier texture;
 
-		public DrillHeadPerm(String name, TagKey<Item> repairMaterial, int drillSize, int drillDepth, Tier drillLevel, float drillSpeed, int drillAttack, int maxDamage, ResourceLocation texture)
+		public DrillHeadPerm(String name, TagKey<Item> repairMaterial, int drillSize, int drillDepth, Tier drillLevel, float drillSpeed, int drillAttack, int maxDamage, Identifier texture)
 		{
 			this.name = name;
 			this.repairMaterial = repairMaterial;

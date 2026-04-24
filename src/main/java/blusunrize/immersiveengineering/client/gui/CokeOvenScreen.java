@@ -13,10 +13,10 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.CokeOvenLogic;
 import blusunrize.immersiveengineering.common.gui.CokeOvenMenu;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -26,9 +26,9 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class CokeOvenScreen extends IEContainerScreen<CokeOvenMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("coke_oven");
-	private static final ResourceLocation TANK = ieLoc("coke_oven/tank_overlay");
-	private static final ResourceLocation FLAME = ieLoc("coke_oven/flame");
+	private static final Identifier TEXTURE = makeTextureLocation("coke_oven");
+	private static final Identifier TANK = ieLoc("coke_oven/tank_overlay");
+	private static final Identifier FLAME = ieLoc("coke_oven/flame");
 
 	public CokeOvenScreen(CokeOvenMenu container, Inventory inventoryPlayer, Component title)
 	{
@@ -45,7 +45,7 @@ public class CokeOvenScreen extends IEContainerScreen<CokeOvenMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		int processMax = menu.data.get(CokeOvenLogic.State.MAX_BURN_TIME);
 		int process = menu.data.get(CokeOvenLogic.State.BURN_TIME);

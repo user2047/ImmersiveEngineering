@@ -21,7 +21,7 @@ import blusunrize.immersiveengineering.common.util.InventoryCraftingFalse;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -34,9 +34,9 @@ import java.util.Map;
 public class MetalPressPackingRecipes
 {
 	public static final CachedRecipeList<CraftingRecipe> CRAFTING_RECIPE_MAP = new CachedRecipeList<>(() -> RecipeType.CRAFTING);
-	public static final ResourceLocation UNPACK_ID = ImmersiveEngineering.rl("unpacking");
-	public static final ResourceLocation PACK4_ID = ImmersiveEngineering.rl("packing4");
-	public static final ResourceLocation PACK9_ID = ImmersiveEngineering.rl("packing9");
+	public static final Identifier UNPACK_ID = ImmersiveEngineering.rl("unpacking");
+	public static final Identifier PACK4_ID = ImmersiveEngineering.rl("packing4");
+	public static final Identifier PACK9_ID = ImmersiveEngineering.rl("packing9");
 	// TODO clear at recipe reload!
 	private static final HashMap<ComparableItemStack, RecipeHolder<MetalPressRecipe>> UNPACKING_CACHE = new HashMap<>();
 
@@ -83,7 +83,7 @@ public class MetalPressPackingRecipes
 		}
 
 		@Override
-		public RecipeHolder<MetalPressRecipe> getActualRecipe(ResourceLocation ownId, ItemStack mold, ItemStack input, Level world)
+		public RecipeHolder<MetalPressRecipe> getActualRecipe(Identifier ownId, ItemStack mold, ItemStack input, Level world)
 		{
 			return getRecipeFunction(input, world);
 		}
@@ -178,7 +178,7 @@ public class MetalPressPackingRecipes
 
 	@Nullable
 	public static RecipeHolder<MetalPressRecipe> getRecipeDelegate(
-			RecipeHolder<CraftingRecipe> recipeHolder, ResourceLocation id, RegistryAccess access
+			RecipeHolder<CraftingRecipe> recipeHolder, Identifier id, RegistryAccess access
 	)
 	{
 		final CraftingRecipe recipe = recipeHolder.value();

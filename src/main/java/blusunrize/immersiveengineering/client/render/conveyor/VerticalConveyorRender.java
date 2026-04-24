@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -38,7 +38,7 @@ import java.util.function.Function;
 
 public class VerticalConveyorRender extends BasicConveyorRender<VerticalConveyor>
 {
-	public VerticalConveyorRender(ResourceLocation active, ResourceLocation inactive)
+	public VerticalConveyorRender(Identifier active, Identifier inactive)
 	{
 		super(active, inactive);
 	}

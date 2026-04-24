@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
@@ -113,8 +113,8 @@ public class LevelStageRenders
 		final Pair<PoseStack, BufferSource> context = prepare(event);
 		final PoseStack transform = context.getFirst();
 		ResourceKey<Level> dimension = mc().player.getCommandSenderWorld().dimension();
-		List<ResourceLocation> keyList = new ArrayList<>(MineralMix.RECIPES.getRecipeNames(mc().level));
-		keyList.sort(Comparator.comparing(ResourceLocation::toString));
+		List<Identifier> keyList = new ArrayList<>(MineralMix.RECIPES.getRecipeNames(mc().level));
+		keyList.sort(Comparator.comparing(Identifier::toString));
 		BlockPos feetPos = mc().player.blockPosition();
 		final ColumnPos playerCol = new ColumnPos(feetPos.getX(), feetPos.getZ());
 		// 24: very roughly 16 * sqrt(2)

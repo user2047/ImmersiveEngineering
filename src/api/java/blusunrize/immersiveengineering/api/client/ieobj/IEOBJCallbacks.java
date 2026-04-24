@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.api.client.ieobj;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nullable;
@@ -20,17 +20,17 @@ import java.util.Objects;
 
 public class IEOBJCallbacks
 {
-	private static final BiMap<ResourceLocation, IEOBJCallback<?>> CALLBACKS = HashBiMap.create();
+	private static final BiMap<Identifier, IEOBJCallback<?>> CALLBACKS = HashBiMap.create();
 	private static final Map<IEOBJCallback<?>, ModelProperty<?>> MODEL_PROPERTIES = new IdentityHashMap<>();
 
-	public static void register(ResourceLocation name, IEOBJCallback<?> callback)
+	public static void register(Identifier name, IEOBJCallback<?> callback)
 	{
 		CALLBACKS.put(name, callback);
 		MODEL_PROPERTIES.put(callback, new ModelProperty<>());
 	}
 
 	@Nullable
-	public static IEOBJCallback<?> getCallback(ResourceLocation name)
+	public static IEOBJCallback<?> getCallback(Identifier name)
 	{
 		return CALLBACKS.get(name);
 	}
@@ -41,7 +41,7 @@ public class IEOBJCallbacks
 		return (ModelProperty<T>)MODEL_PROPERTIES.get(callback);
 	}
 
-	public static ResourceLocation getName(IEOBJCallback<?> callback)
+	public static Identifier getName(IEOBJCallback<?> callback)
 	{
 		return Objects.requireNonNull(CALLBACKS.inverse().get(callback));
 	}

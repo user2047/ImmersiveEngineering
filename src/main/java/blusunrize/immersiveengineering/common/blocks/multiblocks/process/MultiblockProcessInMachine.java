@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Process
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -39,7 +39,7 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 	protected int[] inputAmounts = null;
 	protected int[] inputTanks = new int[0];
 
-	public MultiblockProcessInMachine(ResourceLocation recipeId, BiFunction<Level, ResourceLocation, R> getRecipe, int... inputSlots)
+	public MultiblockProcessInMachine(Identifier recipeId, BiFunction<Level, Identifier, R> getRecipe, int... inputSlots)
 	{
 		super(recipeId, getRecipe);
 		this.inputSlots = inputSlots;
@@ -51,7 +51,7 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		this.inputSlots = inputSlots;
 	}
 
-	public MultiblockProcessInMachine(BiFunction<Level, ResourceLocation, R> getRecipe, CompoundTag data)
+	public MultiblockProcessInMachine(BiFunction<Level, Identifier, R> getRecipe, CompoundTag data)
 	{
 		super(getRecipe, data);
 		this.inputSlots = data.getIntArray("process_inputSlots");

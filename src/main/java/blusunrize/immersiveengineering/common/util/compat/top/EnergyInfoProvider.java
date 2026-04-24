@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.common.util.compat.top;
 import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.common.blocks.IEBaseBlockEntity;
 import mcjty.theoneprobe.api.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class EnergyInfoProvider implements IProbeInfoProvider, IProbeConfigProvider
 {
 	@Override
-	public ResourceLocation getID()
+	public Identifier getID()
 	{
 		return ImmersiveEngineering.rl("energy_info");
 	}

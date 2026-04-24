@@ -33,7 +33,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -65,7 +65,7 @@ public class DecorationRecipes extends IERecipeProvider
 	@Override
 	protected void buildRecipes(RecipeOutput out)
 	{
-		for(Entry<ResourceLocation, BlockEntry<SlabBlock>> blockSlab : IEBlocks.TO_SLAB.entrySet())
+		for(Entry<Identifier, BlockEntry<SlabBlock>> blockSlab : IEBlocks.TO_SLAB.entrySet())
 		{
 			Block block = BuiltInRegistries.BLOCK.get(blockSlab.getKey());
 			BlockEntry<SlabBlock> slab = blockSlab.getValue();

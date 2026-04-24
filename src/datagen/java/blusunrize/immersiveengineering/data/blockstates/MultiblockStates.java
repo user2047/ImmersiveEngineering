@@ -30,7 +30,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.Block;
@@ -216,11 +216,11 @@ public class MultiblockStates extends ExtendedBlockstateProvider
 		return "Multiblock models/block states";
 	}
 
-	private ModelFile cubeTwo(String name, ResourceLocation top, ResourceLocation bottom,
-							  ResourceLocation side, ResourceLocation front)
+	private ModelFile cubeTwo(String name, Identifier top, Identifier bottom,
+							  Identifier side, Identifier front)
 	{
 		NongeneratedModel baseModel = obj(name, rl("block/stone_multiblocks/cube_two.obj"),
-				ImmutableMap.<String, ResourceLocation>builder()
+				ImmutableMap.<String, Identifier>builder()
 						.put("side", side)
 						.put("top", top)
 						.put("bottom", bottom)
@@ -231,7 +231,7 @@ public class MultiblockStates extends ExtendedBlockstateProvider
 		return splitModel(name+"_split", baseModel, CUBE_TWO, false);
 	}
 
-	private ModelFile cubeThree(String name, ResourceLocation def, ResourceLocation front)
+	private ModelFile cubeThree(String name, Identifier def, Identifier front)
 	{
 		NongeneratedModel baseModel = obj(name, rl("block/stone_multiblocks/cube_three.obj"),
 				ImmutableMap.of("side", def, "front", front), innerModels);
@@ -349,13 +349,13 @@ public class MultiblockStates extends ExtendedBlockstateProvider
 
 	private void loadTemplateFor(TemplateMultiblock multiblock)
 	{
-		final ResourceLocation name = multiblock.getUniqueName();
+		final Identifier name = multiblock.getUniqueName();
 		if(TemplateMultiblock.SYNCED_CLIENT_TEMPLATES.containsKey(name))
 			return;
 		final String filePath = "structure/"+name.getPath()+".nbt";
 		int slash = filePath.indexOf('/');
 		String prefix = filePath.substring(0, slash);
-		ResourceLocation shortLoc = ResourceLocation.fromNamespaceAndPath(
+		Identifier shortLoc = Identifier.fromNamespaceAndPath(
 				name.getNamespace(),
 				filePath.substring(slash+1)
 		);

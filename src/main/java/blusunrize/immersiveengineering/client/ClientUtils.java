@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -51,12 +51,12 @@ public class ClientUtils
 
 	// Should probably be replaced by passing the texture to blit directly in most cases
 	@Deprecated
-	public static void bindTexture(ResourceLocation texture)
+	public static void bindTexture(Identifier texture)
 	{
 		RenderSystem.setShaderTexture(0, texture);
 	}
 
-	public static TextureAtlasSprite getSprite(ResourceLocation rl)
+	public static TextureAtlasSprite getSprite(Identifier rl)
 	{
 		return mc().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(rl);
 	}
@@ -93,7 +93,7 @@ public class ClientUtils
 		if(unicodeRenderer==null)
 			unicodeRenderer = new Font(rl -> {
 				FontManager resourceManager = ((MinecraftAccess)Minecraft.getInstance()).getFontManager();
-				Map<ResourceLocation, FontSet> fonts = ((FontResourceManagerAccess)resourceManager).getFontSets();
+				Map<Identifier, FontSet> fonts = ((FontResourceManagerAccess)resourceManager).getFontSets();
 				return fonts.get(Minecraft.UNIFORM_FONT);
 			}, false);
 		return unicodeRenderer;

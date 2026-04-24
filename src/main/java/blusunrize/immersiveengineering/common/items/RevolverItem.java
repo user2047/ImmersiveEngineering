@@ -40,7 +40,7 @@ import malte0811.dualcodecs.DualCompositeCodecs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -98,8 +98,8 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 		);
 	}
 
-	public static final ResourceLocation speedModUUID = IEApi.ieLoc("speed_modifier");
-	public static final ResourceLocation luckModUUID = IEApi.ieLoc("luck_modifier");
+	public static final Identifier speedModUUID = IEApi.ieLoc("speed_modifier");
+	public static final Identifier luckModUUID = IEApi.ieLoc("luck_modifier");
 
 	/* ------------- CORE ITEM METHODS ------------- */
 

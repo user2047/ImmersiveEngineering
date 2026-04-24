@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Unit;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -33,7 +33,7 @@ import static blusunrize.immersiveengineering.ImmersiveEngineering.rl;
 
 public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableRecipe implements IListRecipe
 {
-	public static Map<ResourceLocation, RecipeListGenerator<?, ?>> LIST_GENERATORS = new HashMap<>();
+	public static Map<Identifier, RecipeListGenerator<?, ?>> LIST_GENERATORS = new HashMap<>();
 	public static Supplier<IERecipeSerializer<GeneratedListRecipe<?, ?>>> SERIALIZER;
 
 	static
@@ -58,30 +58,30 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 	private List<Recipe<?>> cachedRecipes;
 	private final RecipeListGenerator<R, E> generator;
 	private E earlyResult;
-	private final ResourceLocation generatorID;
+	private final Identifier generatorID;
 
-	public static GeneratedListRecipe<?, ?> from(ResourceLocation id)
+	public static GeneratedListRecipe<?, ?> from(Identifier id)
 	{
 		GeneratedListRecipe<?, ?> result = fromInternal(id);
 		result.initEarly();
 		return result;
 	}
 
-	private static GeneratedListRecipe<?, ?> fromInternal(ResourceLocation id)
+	private static GeneratedListRecipe<?, ?> fromInternal(Identifier id)
 	{
 		RecipeListGenerator<?, ?> gen = LIST_GENERATORS.get(id);
 		Preconditions.checkNotNull(gen, id);
 		return new GeneratedListRecipe<>(id, gen);
 	}
 
-	public static GeneratedListRecipe<?, ?> resolved(ResourceLocation id, List<Recipe<?>> recipes)
+	public static GeneratedListRecipe<?, ?> resolved(Identifier id, List<Recipe<?>> recipes)
 	{
 		GeneratedListRecipe<?, ?> result = fromInternal(id);
 		result.cachedRecipes = recipes;
 		return result;
 	}
 
-	private GeneratedListRecipe(ResourceLocation id, RecipeListGenerator<R, E> generator)
+	private GeneratedListRecipe(Identifier id, RecipeListGenerator<R, E> generator)
 	{
 		super(TagOutput.EMPTY, generator.recipeType);
 		this.generator = generator;
@@ -119,7 +119,7 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 		return cachedRecipes;
 	}
 
-	public ResourceLocation getGeneratorID()
+	public Identifier getGeneratorID()
 	{
 		return generatorID;
 	}
@@ -127,7 +127,7 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 	public record RecipeListGenerator<T extends Recipe<?>, EarlyResult>(
 			Supplier<EarlyResult> makeEarlyResult,
 			Function<EarlyResult, List<? extends T>> generator,
-			ResourceLocation serialized,
+			Identifier serialized,
 			IERecipeTypes.TypeWithClass<T> recipeType
 	)
 	{
@@ -138,7 +138,7 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 				IERecipeTypes.TypeWithClass<T> recipeType
 		)
 		{
-			ResourceLocation serializedKey = serialized.unwrapKey().orElseThrow().location();
+			Identifier serializedKey = serialized.unwrapKey().orElseThrow().location();
 			return new RecipeListGenerator<>(makeEarlyResult, generator, serializedKey, recipeType);
 		}
 

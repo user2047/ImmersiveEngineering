@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.api.shader;
 import blusunrize.immersiveengineering.api.IEApi;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
@@ -53,12 +53,12 @@ public class CapabilityShader
 
 	public interface ShaderWrapper
 	{
-		ResourceLocation getShaderType();
+		Identifier getShaderType();
 
-		void setShader(@Nullable ResourceLocation shader);
+		void setShader(@Nullable Identifier shader);
 
 		@Nullable
-		ResourceLocation getShader();
+		Identifier getShader();
 
 		default ShaderCase getCase()
 		{
@@ -73,22 +73,22 @@ public class CapabilityShader
 	public static class ShaderWrapper_Item implements ShaderWrapper
 	{
 		private final ItemStack container;
-		private final ResourceLocation shaderType;
+		private final Identifier shaderType;
 
-		public ShaderWrapper_Item(ResourceLocation type, ItemStack container)
+		public ShaderWrapper_Item(Identifier type, ItemStack container)
 		{
 			this.shaderType = type;
 			this.container = container;
 		}
 
 		@Override
-		public ResourceLocation getShaderType()
+		public Identifier getShaderType()
 		{
 			return shaderType;
 		}
 
 		@Override
-		public void setShader(@Nullable ResourceLocation shader)
+		public void setShader(@Nullable Identifier shader)
 		{
 			if(shader!=null)
 				container.set(ATTACHED_SHADER, shader);
@@ -98,7 +98,7 @@ public class CapabilityShader
 
 		@Override
 		@Nullable
-		public ResourceLocation getShader()
+		public Identifier getShader()
 		{
 			return container.get(ATTACHED_SHADER);
 		}
@@ -109,28 +109,28 @@ public class CapabilityShader
 		public static final IAttachmentSerializer<CompoundTag, ShaderWrapper_Direct> SERIALIZER = new WrapperSerializer();
 
 		@Nullable
-		private ResourceLocation shader = null;
-		private final ResourceLocation type;
+		private Identifier shader = null;
+		private final Identifier type;
 
-		public ShaderWrapper_Direct(ResourceLocation type)
+		public ShaderWrapper_Direct(Identifier type)
 		{
 			this.type = type;
 		}
 
-		public ResourceLocation getShaderType()
+		public Identifier getShaderType()
 		{
 			return type;
 		}
 
 		@Override
-		public void setShader(@Nullable ResourceLocation shader)
+		public void setShader(@Nullable Identifier shader)
 		{
 			this.shader = shader;
 		}
 
 		@Override
 		@Nullable
-		public ResourceLocation getShader()
+		public Identifier getShader()
 		{
 			return this.shader;
 		}
@@ -154,9 +154,9 @@ public class CapabilityShader
 		@Override
 		public ShaderWrapper_Direct read(IAttachmentHolder holder, CompoundTag tag, Provider provider)
 		{
-			ShaderWrapper_Direct wrapper = new ShaderWrapper_Direct(ResourceLocation.parse(tag.getString("IE:ShaderType")));
+			ShaderWrapper_Direct wrapper = new ShaderWrapper_Direct(Identifier.parse(tag.getString("IE:ShaderType")));
 			if(!tag.contains("IE:NoShader"))
-				wrapper.setShader(ResourceLocation.parse(tag.getString("IE:Shader")));
+				wrapper.setShader(Identifier.parse(tag.getString("IE:Shader")));
 			return wrapper;
 		}
 	}

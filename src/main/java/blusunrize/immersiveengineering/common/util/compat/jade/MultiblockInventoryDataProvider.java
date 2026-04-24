@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.FurnaceHa
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SiloLogic;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.ProcessContext;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
@@ -77,7 +77,7 @@ public class MultiblockInventoryDataProvider<T extends IMultiblockState> impleme
 	}
 
 	@Override
-	public ResourceLocation getUid()
+	public Identifier getUid()
 	{
 		return ImmersiveEngineering.rl("multiblock_inventory");
 	}

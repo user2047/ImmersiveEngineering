@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class AlloyRecipeBuilder extends IERecipeBuilder<AlloyRecipeBuilder>
 		implements ItemOutput<AlloyRecipeBuilder>, ItemInput<AlloyRecipeBuilder>
@@ -55,7 +55,7 @@ public class AlloyRecipeBuilder extends IERecipeBuilder<AlloyRecipeBuilder>
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		AlloyRecipe recipe = new AlloyRecipe(output, input0, input1, time);
 		out.accept(name, recipe, null, getConditions());

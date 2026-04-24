@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -49,9 +49,9 @@ public class IEBipedLayerRenderer<E extends LivingEntity, M extends EntityModel<
 			gliderModel = new ModelGlider(models.bakeLayer(IEModelLayers.GLIDER));
 	}
 
-	private static final ResourceLocation EARMUFF_OVERLAY = ImmersiveEngineering.rl("textures/models/earmuffs_overlay.png");
-	private static final ResourceLocation EARMUFF_TEXTURE = ImmersiveEngineering.rl("textures/models/earmuffs.png");
-	private static final ResourceLocation GLIDER_TEXTURE = ImmersiveEngineering.rl("textures/models/glider.png");
+	private static final Identifier EARMUFF_OVERLAY = ImmersiveEngineering.rl("textures/models/earmuffs_overlay.png");
+	private static final Identifier EARMUFF_TEXTURE = ImmersiveEngineering.rl("textures/models/earmuffs.png");
+	private static final Identifier GLIDER_TEXTURE = ImmersiveEngineering.rl("textures/models/glider.png");
 
 	@Override
 	@ParametersAreNonnullByDefault

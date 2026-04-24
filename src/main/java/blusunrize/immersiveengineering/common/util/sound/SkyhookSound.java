@@ -14,7 +14,7 @@ import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 
 import javax.annotation.Nonnull;
@@ -23,12 +23,12 @@ import javax.annotation.Nullable;
 public class SkyhookSound implements TickableSoundInstance
 {
 	private final SkylineHookEntity hook;
-	private final ResourceLocation soundLoc;
+	private final Identifier soundLoc;
 	private Sound sound;
 	private float speed = .01F;
 
 
-	public SkyhookSound(SkylineHookEntity hook, ResourceLocation soundLoc)
+	public SkyhookSound(SkylineHookEntity hook, Identifier soundLoc)
 	{
 		this.hook = hook;
 		this.soundLoc = soundLoc;
@@ -42,7 +42,7 @@ public class SkyhookSound implements TickableSoundInstance
 
 	@Nonnull
 	@Override
-	public ResourceLocation getLocation()
+	public Identifier getLocation()
 	{
 		return soundLoc;
 	}

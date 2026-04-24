@@ -28,12 +28,12 @@ import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -51,10 +51,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static blusunrize.lib.manual.utils.ManualLogger.LOGGER;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class ManualUtils
 {
@@ -63,7 +63,7 @@ public class ManualUtils
 		return ItemStack.isSameItemSameComponents(stack, o);
 	}
 
-	public static String getTitleForNode(AbstractNode<ResourceLocation, ManualEntry> node, ManualInstance inst)
+	public static String getTitleForNode(AbstractNode<Identifier, ManualEntry> node, ManualInstance inst)
 	{
 		if(node.isLeaf())
 			return inst.formatEntryName(node.getLeafData().getTitle());
@@ -71,7 +71,7 @@ public class ManualUtils
 			return inst.formatCategoryName(node.getNodeData());
 	}
 
-	public static void drawTexturedRect(GuiGraphics graphics, ResourceLocation texture, int x, int y, int w, int h, float... uv)
+	public static void drawTexturedRect(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, int w, int h, float... uv)
 	{
 		// TODO replace by graphics.blit?
 		RenderSystem.enableBlend();
@@ -167,7 +167,7 @@ public class ManualUtils
 					int by = lineId.intValue()*manual.fontRenderer().lineHeight;
 					Link link = linkPart.getParent();
 					String linkText = linkPart.getText();
-					ResourceLocation bkey = link.getTarget(entry);
+					Identifier bkey = link.getTarget(entry);
 					int bw = manual.fontRenderer().width(linkText);
 					ManualInstance.ManualLink outputLink;
 					ManualEntry bEntry = manual.getEntry(bkey);
@@ -208,7 +208,7 @@ public class ManualUtils
 		return arg;
 	}
 
-	private static final Map<String, ResourceLocation> resourceMap = new HashMap<>();
+	private static final Map<String, Identifier> resourceMap = new HashMap<>();
 
 	public static Tesselator tes()
 	{
@@ -222,7 +222,7 @@ public class ManualUtils
 
 	//TODO properly fix usages
 	@Deprecated
-	public static void bindTexture(ResourceLocation path)
+	public static void bindTexture(Identifier path)
 	{
 		RenderSystem.setShaderTexture(0, path);
 	}
@@ -230,7 +230,7 @@ public class ManualUtils
 	/**
 	 * Custom implementation of drawing a split string because Mojang's doesn't reset text colour between lines >___>
 	 */
-	public static void drawSplitString(GuiGraphics graphics, Font fontRenderer, List<String> text, int x, int y, int colour)
+	public static void drawSplitString(GuiGraphicsExtractor graphics, Font fontRenderer, List<String> text, int x, int y, int colour)
 	{
 		for(String s : text)
 		{
@@ -245,7 +245,7 @@ public class ManualUtils
 	{
 		String type = GsonHelper.getAsString(obj, "type");
 		int offset = GsonHelper.getAsInt(obj, "offset", 0);
-		ResourceLocation resLoc = getLocationForManual(type, instance);
+		Identifier resLoc = getLocationForManual(type, instance);
 		try
 		{
 			Function<JsonObject, SpecialManualElement> createElement = instance.getElementFactory(resLoc);
@@ -269,12 +269,12 @@ public class ManualUtils
 		}
 	}
 
-	public static ResourceLocation getLocationForManual(String s, ManualInstance instance)
+	public static Identifier getLocationForManual(String s, ManualInstance instance)
 	{
 		if(s.indexOf(':') >= 0)
-			return ResourceLocation.parse(s);
+			return Identifier.parse(s);
 		else
-			return ResourceLocation.fromNamespaceAndPath(instance.getDefaultResourceDomain(), s);
+			return Identifier.fromNamespaceAndPath(instance.getDefaultResourceDomain(), s);
 	}
 
 	public static boolean isNumber(JsonObject main, String name)
@@ -318,7 +318,7 @@ public class ManualUtils
 	{
 		if(jsonEle.isJsonPrimitive())
 		{
-			ResourceLocation itemName = getLocationForManual(jsonEle.getAsString(), m);
+			Identifier itemName = getLocationForManual(jsonEle.getAsString(), m);
 			return new ItemStack(BuiltInRegistries.ITEM.get(itemName));
 		}
 		else
@@ -359,12 +359,12 @@ public class ManualUtils
 		return stack.getHoverName().getString().toLowerCase(Locale.ENGLISH).contains(search);
 	}
 
-	public static void renderItemStack(GuiGraphics graphics, ItemStack stack, int x, int y, boolean overlay)
+	public static void renderItemStack(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, boolean overlay)
 	{
 		renderItemStack(graphics, stack, x, y, overlay, null);
 	}
 
-	public static void renderItemStack(GuiGraphics graphics, ItemStack stack, int x, int y, boolean overlay, String count)
+	public static void renderItemStack(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, boolean overlay, String count)
 	{
 		if(stack.isEmpty())
 			return;

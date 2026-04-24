@@ -17,11 +17,11 @@ import blusunrize.immersiveengineering.common.blocks.wooden.ItemBatcherBlockEnti
 import blusunrize.immersiveengineering.common.gui.ItemBatcherMenu;
 import blusunrize.immersiveengineering.common.gui.sync.GetterAndSetter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.DyeColor;
 
@@ -32,7 +32,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("item_batcher");
+	private static final Identifier TEXTURE = makeTextureLocation("item_batcher");
 	private static final ButtonTexture MODE_SINGLE = new ButtonTexture(ieLoc("item_batcher/mode_single"));
 	private static final ButtonTexture MODE_ALL = new ButtonTexture(ieLoc("item_batcher/mode_all"));
 
@@ -84,7 +84,7 @@ public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(this.font, I18n.get("block.immersiveengineering.item_batcher"), 8, 6,  Lib.COLOUR_I_ImmersiveOrange, true);
 

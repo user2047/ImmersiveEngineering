@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.api.crafting.cache;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.crafting.IERecipeTypes;
 import com.google.common.collect.Streams;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -40,7 +40,7 @@ public class CachedRecipeList<R extends Recipe<?>>
 	private static int reloadCount = 0;
 
 	private final Supplier<RecipeType<R>> type;
-	private Map<ResourceLocation, RecipeHolder<R>> recipes;
+	private Map<Identifier, RecipeHolder<R>> recipes;
 	private List<RecipeHolder<R>> recipeHolders;
 	private boolean cachedDataIsClient;
 	private int cachedAtReloadCount = INVALID_RELOAD_COUNT;
@@ -78,19 +78,19 @@ public class CachedRecipeList<R extends Recipe<?>>
 		return Objects.requireNonNull(recipeHolders);
 	}
 
-	public Collection<ResourceLocation> getRecipeNames(@Nonnull Level level)
+	public Collection<Identifier> getRecipeNames(@Nonnull Level level)
 	{
 		updateCache(level.getRecipeManager(), level.isClientSide());
 		return Objects.requireNonNull(recipes).keySet();
 	}
 
-	public R getById(@Nonnull Level level, ResourceLocation name)
+	public R getById(@Nonnull Level level, Identifier name)
 	{
 		var holder = holderById(level, name);
 		return holder!=null?holder.value(): null;
 	}
 
-	public RecipeHolder<R> holderById(@Nonnull Level level, ResourceLocation name)
+	public RecipeHolder<R> holderById(@Nonnull Level level, Identifier name)
 	{
 		updateCache(level.getRecipeManager(), level.isClientSide());
 		return recipes.get(name);

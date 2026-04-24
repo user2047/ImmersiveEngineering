@@ -9,8 +9,8 @@
 package blusunrize.lib.manual;
 
 import blusunrize.lib.manual.gui.ManualScreen;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 
 public class ManualElementImage extends SpecialManualElements
 {
@@ -28,7 +28,7 @@ public class ManualElementImage extends SpecialManualElements
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, ManualScreen gui, int x, int y, int mx, int my)
+	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mx, int my)
 	{
 		int yOff = 0;
 		for(ManualImage image1 : images)
@@ -64,13 +64,13 @@ public class ManualElementImage extends SpecialManualElements
 
 	public static class ManualImage
 	{
-		ResourceLocation resource;
+		Identifier resource;
 		int uMin;
 		int uSize;
 		int vMin;
 		int vSize;
 
-		public ManualImage(ResourceLocation resource, int uMin, int uSize, int vMin, int vSize)
+		public ManualImage(Identifier resource, int uMin, int uSize, int vMin, int vSize)
 		{
 			this.resource = resource;
 			this.uMin = uMin;

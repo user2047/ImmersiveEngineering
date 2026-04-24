@@ -18,17 +18,17 @@ import malte0811.dualcodecs.DualMapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 
 public class GeneratedListSerializer extends IERecipeSerializer<GeneratedListRecipe<?, ?>>
 {
-	private static final MapCodec<GeneratedListRecipe<?, ?>> CODEC = ResourceLocation.CODEC
+	private static final MapCodec<GeneratedListRecipe<?, ?>> CODEC = Identifier.CODEC
 			.fieldOf("generatorID")
 			.xmap(GeneratedListRecipe::from, GeneratedListRecipe::getGeneratorID);
 	private static final StreamCodec<RegistryFriendlyByteBuf, GeneratedListRecipe<?, ?>> STREAM_CODEC = StreamCodec.composite(
-			ResourceLocation.STREAM_CODEC, GeneratedListRecipe::getGeneratorID,
+			Identifier.STREAM_CODEC, GeneratedListRecipe::getGeneratorID,
 			Recipe.STREAM_CODEC.apply(ByteBufCodecs.list()), GeneratedListRecipe::getSubRecipes,
 			GeneratedListRecipe::resolved
 	);

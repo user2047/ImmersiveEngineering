@@ -11,7 +11,7 @@ package blusunrize.lib.manual.utils;
 import blusunrize.lib.manual.ManualUtils;
 import blusunrize.lib.manual.PositionedItemStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
@@ -22,7 +22,7 @@ public class ManualRecipeRef
 {
 	private final ItemStack output;
 	private final PositionedItemStack[] layout;
-	private final ResourceLocation recipeName;
+	private final Identifier recipeName;
 
 	public ManualRecipeRef(ItemStack output)
 	{
@@ -38,7 +38,7 @@ public class ManualRecipeRef
 		this.recipeName = null;
 	}
 
-	public ManualRecipeRef(ResourceLocation recipeName)
+	public ManualRecipeRef(Identifier recipeName)
 	{
 		this.output = null;
 		this.layout = null;
@@ -70,7 +70,7 @@ public class ManualRecipeRef
 		return recipeName!=null;
 	}
 
-	public ResourceLocation getRecipeName()
+	public Identifier getRecipeName()
 	{
 		return Objects.requireNonNull(recipeName);
 	}

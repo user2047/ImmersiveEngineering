@@ -21,7 +21,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.phys.Vec3;
@@ -32,14 +32,14 @@ import java.util.stream.Collectors;
 
 public class ShaderMinecartRenderer<T extends AbstractMinecart>
 {
-	public static Int2ObjectMap<ResourceLocation> shadedCarts = new Int2ObjectOpenHashMap<>();
+	public static Int2ObjectMap<Identifier> shadedCarts = new Int2ObjectOpenHashMap<>();
 
 	public static void render(
 			MinecartModel<?> baseModel, AbstractMinecart entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn
 	)
 	{
 		ShaderCase sCase = null;
-		ResourceLocation shader = shadedCarts.get(entity.getId());
+		Identifier shader = shadedCarts.get(entity.getId());
 		if(shader!=null)
 			sCase = ShaderRegistry.getShader(shader, IEApi.ieLoc("minecart"));
 		if(sCase==null)

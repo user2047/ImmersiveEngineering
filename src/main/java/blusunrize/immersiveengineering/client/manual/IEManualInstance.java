@@ -28,7 +28,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -41,7 +41,7 @@ import java.util.regex.Matcher;
 
 public class IEManualInstance extends ManualInstance
 {
-	private final Set<ResourceLocation> hiddenEntries = new HashSet<>();
+	private final Set<Identifier> hiddenEntries = new HashSet<>();
 	public final List<Function<String, Object>> configGetters = new ArrayList<>();
 
 	public IEManualInstance()
@@ -109,7 +109,7 @@ public class IEManualInstance extends ManualInstance
 			String[] segment = rep.substring(0, rep.length()-1).split(splitKey);
 			if(segment.length < 2)
 				break;
-			ResourceLocation dimKey = ResourceLocation.parse(segment[1]);
+			Identifier dimKey = Identifier.parse(segment[1]);
 			StringBuilder dimName = new StringBuilder();
 			for(String ss : dimKey.getPath().split("_"))
 				if(!"the".equalsIgnoreCase(ss))
@@ -221,7 +221,7 @@ public class IEManualInstance extends ManualInstance
 	}
 
 	@Override
-	public String formatCategoryName(ResourceLocation s)
+	public String formatCategoryName(Identifier s)
 	{
 		return (improveReadability()?ChatFormatting.BOLD: "")+I18n.get("manual."
 				+s.toString().replace(':', '.'));
@@ -240,19 +240,19 @@ public class IEManualInstance extends ManualInstance
 	}
 
 	//TODO this was changed to snake_case. Where else do I need to change it
-	private static final ResourceLocation SHADER_ENTRY = IEApi.ieLoc("shader_list");
+	private static final Identifier SHADER_ENTRY = IEApi.ieLoc("shader_list");
 
-	public void hideEntry(ResourceLocation name)
+	public void hideEntry(Identifier name)
 	{
 		this.hiddenEntries.add(name);
 	}
 
 	@Override
-	public boolean showNodeInList(Tree.AbstractNode<ResourceLocation, ManualEntry> node)
+	public boolean showNodeInList(Tree.AbstractNode<Identifier, ManualEntry> node)
 	{
 		if(!super.showNodeInList(node))
 			return false;
-		ResourceLocation nodeLoc = node.isLeaf()?node.getLeafData().getLocation(): node.getNodeData();
+		Identifier nodeLoc = node.isLeaf()?node.getLeafData().getLocation(): node.getNodeData();
 		if(ImmersiveEngineering.MODID.equals(nodeLoc.getNamespace())&&
 				nodeLoc.getPath().startsWith(ManualHelper.CAT_UPDATE))
 			return IEClientConfig.showUpdateNews.get();

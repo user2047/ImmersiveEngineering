@@ -27,7 +27,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -49,16 +49,16 @@ import java.util.stream.Collectors;
 
 public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 {
-	private final ResourceLocation shaderName;
+	private final Identifier shaderName;
 
-	public ShaderItem(ResourceLocation shaderName, Rarity rarity)
+	public ShaderItem(Identifier shaderName, Rarity rarity)
 	{
 		super(new Properties().stacksTo(1).rarity(rarity));
 		this.shaderName = shaderName;
 	}
 
 	@Override
-	public ResourceLocation getShaderName()
+	public Identifier getShaderName()
 	{
 		return this.shaderName;
 	}
@@ -69,7 +69,7 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 	{
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
-		ResourceLocation name = getShaderName();
+		Identifier name = getShaderName();
 		if(ShaderRegistry.shaderRegistry.containsKey(name))
 		{
 			BlockState blockState = world.getBlockState(pos);
@@ -126,7 +126,7 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 		else
 		{
 			list.add(Component.translatable(Lib.DESC_INFO+"shader.applyTo").withStyle(ChatFormatting.GRAY));
-			ResourceLocation rl = getShaderName();
+			Identifier rl = getShaderName();
 			if(rl!=null)
 			{
 				List<ShaderCase> array = ShaderRegistry.shaderRegistry.get(rl).getCases();
@@ -155,12 +155,12 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 		return "item.immersiveengineering.shader";
 	}
 
-	public static Component getShaderName(ResourceLocation shader)
+	public static Component getShaderName(Identifier shader)
 	{
 		return Component.translatable(getShaderNameKey(shader));
 	}
 
-	public static String getShaderNameKey(ResourceLocation shader)
+	public static String getShaderNameKey(Identifier shader)
 	{
 		return "item."+shader.getNamespace()+".shader.name."+shader.getPath();
 	}
@@ -168,7 +168,7 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 	@Override
 	public int getColourForIEItem(ItemStack stack, int pass)
 	{
-		ResourceLocation name = getShaderName();
+		Identifier name = getShaderName();
 		if(ShaderRegistry.shaderRegistry.containsKey(name))
 		{
 			ShaderCase sCase = ShaderRegistry.shaderRegistry.get(name).getCase(IEApi.ieLoc("item"));

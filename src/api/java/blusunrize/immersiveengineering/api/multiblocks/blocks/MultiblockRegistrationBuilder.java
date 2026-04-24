@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -69,7 +69,7 @@ public abstract class MultiblockRegistrationBuilder<
 	public static final String MASTER_BE_SUFFIX = "_master";
 
 	private final IMultiblockLogic<State> logic;
-	private final ResourceLocation name;
+	private final Identifier name;
 	private final List<ExtraComponent<State, ?>> extraComponents = new ArrayList<>();
 	private Supplier<BlockEntityType<? extends MultiblockBlockEntityMaster<State>>> masterBE;
 	private Supplier<BlockEntityType<? extends MultiblockBlockEntityDummy<State>>> dummyBE;
@@ -86,7 +86,7 @@ public abstract class MultiblockRegistrationBuilder<
 
 	private MultiblockRegistration<State> result;
 
-	public MultiblockRegistrationBuilder(IMultiblockLogic<State> logic, ResourceLocation name)
+	public MultiblockRegistrationBuilder(IMultiblockLogic<State> logic, Identifier name)
 	{
 		this.logic = logic;
 		this.name = name;

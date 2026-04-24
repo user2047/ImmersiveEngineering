@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
@@ -61,7 +61,7 @@ public class BlastFurnaceRecipeBuilder extends IERecipeBuilder<BlastFurnaceRecip
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		BlastFurnaceRecipe recipe = new BlastFurnaceRecipe(output, input, time, slag);
 		out.accept(name, recipe, null, getConditions());

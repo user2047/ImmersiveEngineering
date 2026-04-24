@@ -44,7 +44,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -94,11 +94,11 @@ import static blusunrize.immersiveengineering.common.register.IEItems.Misc.WIRE_
 @EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
 public class Villages
 {
-	public static final ResourceLocation ENGINEER = rl("engineer");
-	public static final ResourceLocation MACHINIST = rl("machinist");
-	public static final ResourceLocation ELECTRICIAN = rl("electrician");
-	public static final ResourceLocation OUTFITTER = rl("outfitter");
-	public static final ResourceLocation GUNSMITH = rl("gunsmith");
+	public static final Identifier ENGINEER = rl("engineer");
+	public static final Identifier MACHINIST = rl("machinist");
+	public static final Identifier ELECTRICIAN = rl("electrician");
+	public static final Identifier OUTFITTER = rl("outfitter");
+	public static final Identifier GUNSMITH = rl("gunsmith");
 
 	@SubscribeEvent
 	public static void onTagsUpdated(TagsUpdatedEvent ev)
@@ -109,7 +109,7 @@ public class Villages
 		for(String biome : new String[]{"plains", "snowy", "savanna", "desert", "taiga"})
 			for(String type : new String[]{"engineer", "machinist", "electrician", "gunsmith", "outfitter"})
 				addToPool(
-						ResourceLocation.withDefaultNamespace("village/"+biome+"/houses"),
+						Identifier.withDefaultNamespace("village/"+biome+"/houses"),
 						rl("village/houses/"+biome+"_"+type),
 						ev.getRegistryAccess()
 				);
@@ -125,7 +125,7 @@ public class Villages
 		HeroGiftsTaskAccess.getGifts().put(Registers.PROF_GUNSMITH.value(), rl("gameplay/hero_of_the_village/gunsmith"));
 	}
 
-	private static void addToPool(ResourceLocation poolId, ResourceLocation toAdd, RegistryAccess regAccess)
+	private static void addToPool(Identifier poolId, Identifier toAdd, RegistryAccess regAccess)
 	{
 		Registry<StructureTemplatePool> registry = regAccess.registryOrThrow(Registries.TEMPLATE_POOL);
 		StructureTemplatePool pool = Objects.requireNonNull(registry.get(poolId), poolId.getPath());
@@ -184,7 +184,7 @@ public class Villages
 		}
 
 		private static VillagerProfession createProf(
-				ResourceLocation name, Holder<PoiType> poi, SoundEvent sound
+				Identifier name, Holder<PoiType> poi, SoundEvent sound
 		)
 		{
 			ResourceKey<PoiType> poiName = poi.unwrapKey().orElseThrow();
@@ -215,7 +215,7 @@ public class Villages
 		public static void registerTrades(VillagerTradesEvent ev)
 		{
 			Int2ObjectMap<List<ItemListing>> trades = ev.getTrades();
-			final ResourceLocation typeName = ResourceLocation.parse(ev.getType().name());
+			final Identifier typeName = Identifier.parse(ev.getType().name());
 			if(ENGINEER.equals(typeName))
 			{
 				/* Structural Engineer

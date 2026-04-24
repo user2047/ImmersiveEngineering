@@ -13,7 +13,7 @@ import blusunrize.lib.manual.ManualInstance;
 import blusunrize.lib.manual.ManualUtils;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,11 +24,11 @@ public class Link
 	public final static String FORMAT = ChatFormatting.ITALIC.toString()+ChatFormatting.UNDERLINE.toString();
 	private final List<String> parts;
 	@Nullable
-	private final ResourceLocation target;
+	private final Identifier target;
 	private final String targetAnchor;
 	private final int targetOffset;
 
-	public Link(List<String> parts, @Nullable ResourceLocation target, String targetAnchor, int offset)
+	public Link(List<String> parts, @Nullable Identifier target, String targetAnchor, int offset)
 	{
 		this.parts = parts;
 		this.target = target;
@@ -82,7 +82,7 @@ public class Link
 		return targetAnchor;
 	}
 
-	public ResourceLocation getTarget(ManualEntry fromEntry)
+	public Identifier getTarget(ManualEntry fromEntry)
 	{
 		return target==null?fromEntry.getLocation(): target;
 	}
@@ -93,7 +93,7 @@ public class Link
 	}
 
 	@Nullable
-	public ResourceLocation getRawTarget()
+	public Identifier getRawTarget()
 	{
 		return target;
 	}

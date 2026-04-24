@@ -18,13 +18,13 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressa
 import blusunrize.immersiveengineering.common.blocks.wooden.MachineInterfaceBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.wooden.MachineInterfaceBlockEntity.MachineInterfaceConfig;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.DyeColor;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -40,7 +40,7 @@ import static blusunrize.immersiveengineering.client.gui.IEContainerScreen.makeT
 
 public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInterfaceBlockEntity>
 {
-	public static final ResourceLocation TEXTURE = makeTextureLocation("machine_interface");
+	public static final Identifier TEXTURE = makeTextureLocation("machine_interface");
 	private static final ButtonTexture COLOR_BUTTON = new ButtonTexture(ieLoc("machine_interface/color_button"));
 	private static final ButtonTexture ADD_BUTTON = new ButtonTexture(ieLoc("machine_interface/add_button"));
 	private static final ButtonTexture UP = new ButtonTexture(ieLoc("machine_interface/up"), ieLoc("machine_interface/up_hovered"));
@@ -229,7 +229,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		if(availableChecks==null)
 			graphics.blit(TEXTURE, guiLeft, guiTop+(ySize-74)/2, 112, 80, xSize, 106);
@@ -244,7 +244,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		if(availableChecks==null)
 		{

@@ -21,7 +21,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class FermenterRecipeCategory extends IERecipeCategory<FermenterRecipe>
 	public FermenterRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.FERMENTER, "block.immersiveengineering.fermenter");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/fermenter.png");
+		Identifier background = IEApi.ieLoc("textures/gui/fermenter.png");
 		setBackground(helper.createDrawable(background, 6, 12, 126, 59));
 		setIcon(IEMultiblockLogic.FERMENTER.iconStack());
 		tankOverlay = helper.createDrawable(background, 179, 33, 16, 47);

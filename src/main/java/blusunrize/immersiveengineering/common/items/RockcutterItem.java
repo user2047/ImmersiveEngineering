@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.IETags;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +28,7 @@ public class RockcutterItem extends SawbladeItem
 	private static final Set<ItemAbility> TOOL_ACTIONS = ImmutableSet.of(
 			ItemAbilities.PICKAXE_DIG
 	);
-	public static final ResourceLocation TEXTURE = ImmersiveEngineering.rl("item/rockcutter_blade");
+	public static final Identifier TEXTURE = ImmersiveEngineering.rl("item/rockcutter_blade");
 
 	public RockcutterItem(int maxDamage, float sawbladeSpeed, float sawbladeDamage)
 	{

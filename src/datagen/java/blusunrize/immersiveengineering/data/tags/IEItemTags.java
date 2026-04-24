@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -180,9 +180,9 @@ public class IEItemTags extends ItemTagsProvider
 		/* MOD COMPAT STARTS HERE */
 
 		// Curios
-		tag(TagUtils.createItemWrapper(ResourceLocation.fromNamespaceAndPath("curios", "back")))
+		tag(TagUtils.createItemWrapper(Identifier.fromNamespaceAndPath("curios", "back")))
 				.add(Misc.POWERPACK.asItem());
-		tag(TagUtils.createItemWrapper(ResourceLocation.fromNamespaceAndPath("curios", "head")))
+		tag(TagUtils.createItemWrapper(Identifier.fromNamespaceAndPath("curios", "head")))
 				.add(Misc.EARMUFFS.asItem());
 	}
 
@@ -213,7 +213,7 @@ public class IEItemTags extends ItemTagsProvider
 				.add(Items.RECOVERY_COMPASS)
 				.add(Items.GOAT_HORN)
 				.addOptionalTag(Tags.Items.BUCKETS_EMPTY)
-				.addOptionalTag(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "tools/wrenches")))
+				.addOptionalTag(ItemTags.create(Identifier.fromNamespaceAndPath("c", "tools/wrenches")))
 		;
 		for(ItemRegObject<WireCoilItem> wirecoil : Misc.WIRE_COILS.values())
 			tag(IETags.toolboxWiring).add(wirecoil.asItem());

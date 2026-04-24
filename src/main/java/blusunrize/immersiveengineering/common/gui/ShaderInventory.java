@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.gui;
 import blusunrize.immersiveengineering.api.shader.CapabilityShader.ShaderWrapper;
 import blusunrize.immersiveengineering.api.shader.IShaderItem;
 import blusunrize.immersiveengineering.api.shader.ShaderRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -25,7 +25,7 @@ public class ShaderInventory implements Container
 	private AbstractContainerMenu container;
 	@Nonnull
 	public ItemStack shader;
-	private ResourceLocation name;
+	private Identifier name;
 
 	public ShaderInventory(AbstractContainerMenu par1Container, ShaderWrapper wrapper)
 	{

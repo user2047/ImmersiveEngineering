@@ -18,11 +18,11 @@ import blusunrize.immersiveengineering.client.gui.info.TooltipArea;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.mixer.MixerLogic;
 import blusunrize.immersiveengineering.common.gui.MixerMenu;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -32,10 +32,10 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class MixerScreen extends IEContainerScreen<MixerMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("mixer");
+	private static final Identifier TEXTURE = makeTextureLocation("mixer");
 	private static final ButtonTexture OUTPUT_BOTTOM = new ButtonTexture(ieLoc("mixer/output_bottom"));
 	private static final ButtonTexture OUTPUT_ALL = new ButtonTexture(ieLoc("mixer/output_all"));
-	private static final ResourceLocation PROGRESS = ieLoc("mixer/progress");
+	private static final Identifier PROGRESS = ieLoc("mixer/progress");
 
 	public MixerScreen(MixerMenu container, Inventory inventoryPlayer, Component title)
 	{
@@ -75,7 +75,7 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		graphics.pose().pushPose();
 		for(final var slotProgress : menu.progress.get())

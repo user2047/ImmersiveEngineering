@@ -17,7 +17,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
 import org.openzen.zencode.java.ZenCodeType.Method;
@@ -53,8 +53,8 @@ public class BlastFurnaceFuelManager implements IRecipeManager<BlastFurnaceFuel>
 	@ZenCodeType.Method
 	public void addFuel(String recipePath, IIngredient fuel, int burnTime)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
-		final BlastFurnaceFuel recipe = new BlastFurnaceFuel(resourceLocation, fuel.asVanillaIngredient(), burnTime);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
+		final BlastFurnaceFuel recipe = new BlastFurnaceFuel(Identifier, fuel.asVanillaIngredient(), burnTime);
 		CraftTweakerAPI.apply(new ActionAddRecipeCustomOutput<>(this, recipe, fuel));
 	}
 

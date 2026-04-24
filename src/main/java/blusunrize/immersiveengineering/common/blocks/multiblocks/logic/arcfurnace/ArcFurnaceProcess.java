@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Process
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -30,7 +30,7 @@ public class ArcFurnaceProcess extends MultiblockProcessInMachine<ArcFurnaceReci
 {
 	private final long seed;
 
-	public ArcFurnaceProcess(BiFunction<Level, ResourceLocation, ArcFurnaceRecipe> getRecipe, CompoundTag data)
+	public ArcFurnaceProcess(BiFunction<Level, Identifier, ArcFurnaceRecipe> getRecipe, CompoundTag data)
 	{
 		super(getRecipe, data);
 		this.seed = data.getLong("seed");

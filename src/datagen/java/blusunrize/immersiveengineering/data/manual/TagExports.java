@@ -15,7 +15,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.tags.TagLoader;
@@ -58,15 +58,15 @@ public record TagExports(PackOutput output, ExistingFileHelper helper, Path outP
 				PackType.SERVER_DATA, output, helper
 		))
 		{
-			Map<ResourceLocation, Collection<Item>> tags = loader.loadAndBuild(resourceManager);
-			for(Entry<ResourceLocation, Collection<Item>> entry : tags.entrySet())
+			Map<Identifier, Collection<Item>> tags = loader.loadAndBuild(resourceManager);
+			for(Entry<Identifier, Collection<Item>> entry : tags.entrySet())
 			{
 				JsonArray elements = new JsonArray();
 				entry.getValue().stream()
 						.map(item -> BuiltInRegistries.ITEM.getKey(item).toString())
 						.sorted()
 						.forEach(elements::add);
-				ResourceLocation tagName = entry.getKey();
+				Identifier tagName = entry.getKey();
 				Path tagPath = outPath.resolve(tagName.getNamespace()).resolve(tagName.getPath()+".json");
 				Files.createDirectories(tagPath.getParent());
 				try(BufferedWriter writer = Files.newBufferedWriter(tagPath))

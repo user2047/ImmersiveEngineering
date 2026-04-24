@@ -18,7 +18,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.RenderTypeGroup;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public record IEOBJModel(
-		OBJModel<OBJMaterial> base, boolean dynamic, IEOBJCallback<?> callback, @Nullable List<ResourceLocation> layers
+		OBJModel<OBJMaterial> base, boolean dynamic, IEOBJCallback<?> callback, @Nullable List<Identifier> layers
 ) implements IUnbakedGeometry<IEOBJModel>
 {
 
@@ -48,7 +48,7 @@ public record IEOBJModel(
 		List<RenderType> itemTypes = new ArrayList<>();
 		List<RenderType> fabulousItemTypes = new ArrayList<>();
 		if(layers!=null)
-			for(final ResourceLocation name : layers)
+			for(final Identifier name : layers)
 			{
 				final RenderTypeGroup types = context.getRenderType(name);
 				blockTypes.add(types.block());

@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.shader.ShaderRegistry;
 import blusunrize.immersiveengineering.common.items.IEItemInterfaces.IColouredItem;
 import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -47,7 +47,7 @@ public class ShaderBagItem extends IEBaseItem implements IColouredItem
 		if(!world.isClientSide)
 			if(ShaderRegistry.totalWeight.containsKey(rarity))
 			{
-				ResourceLocation shader = ShaderRegistry.getRandomShader(player.getUUID(), player.getRandom(), rarity, true);
+				Identifier shader = ShaderRegistry.getRandomShader(player.getUUID(), player.getRandom(), rarity, true);
 				if(shader==null)
 					return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
 				ItemStack shaderItem = ShaderRegistry.makeShaderStack(shader);

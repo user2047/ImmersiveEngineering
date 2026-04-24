@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.client.gui;
 
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.gui.CraftingTableMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -24,7 +24,7 @@ public class CraftingTableScreen extends IEContainerScreen<CraftingTableMenu>
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		super.renderLabels(graphics, mouseX, mouseY);
 		graphics.drawString(this.font, title, 8, 6, Lib.COLOUR_I_ImmersiveOrange, true);

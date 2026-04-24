@@ -27,9 +27,9 @@ import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -46,7 +46,7 @@ public class CokeOvenRecipeCategory extends IERecipeCategory<CokeOvenRecipe>
 	public CokeOvenRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.COKE_OVEN, "block.immersiveengineering.coke_oven");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/coke_oven.png");
+		Identifier background = IEApi.ieLoc("textures/gui/coke_oven.png");
 		setBackground(helper.createDrawable(background, 26, 16, 123, 55));
 		setIcon(IEMultiblockLogic.COKE_OVEN.iconStack());
 		tankOverlay = helper.createDrawable(background, 178, 33, 16, 47);
@@ -103,7 +103,7 @@ public class CokeOvenRecipeCategory extends IERecipeCategory<CokeOvenRecipe>
 	}
 
 	@Override
-	public void draw(CokeOvenRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(CokeOvenRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 31, 20);
 	}

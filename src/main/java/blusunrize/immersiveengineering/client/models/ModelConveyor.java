@@ -45,7 +45,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
 public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 {
 	private static final ModelProperty<IConveyorBelt> CONVEYOR_MODEL_DATA = new ModelProperty<>();
-	public static final ResourceLocation[] rl_casing = {
+	public static final Identifier[] rl_casing = {
 			IEApi.ieLoc("block/conveyor/casing_top"),
 			IEApi.ieLoc("block/conveyor/casing_side"),
 			IEApi.ieLoc("block/conveyor/casing_walls"),
@@ -436,7 +436,7 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 
 	public static class ConveyorLoader implements IGeometryLoader<RawConveyorModel>
 	{
-		public static final ResourceLocation LOCATION = IEApi.ieLoc("models/conveyor");
+		public static final Identifier LOCATION = IEApi.ieLoc("models/conveyor");
 		public static final String TYPE_KEY = "conveyorType";
 
 		@Nonnull
@@ -444,7 +444,7 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 		public RawConveyorModel read(JsonObject modelContents, @Nonnull JsonDeserializationContext deserializationContext)
 		{
 			String typeName = modelContents.get(TYPE_KEY).getAsString();
-			IConveyorType<?> type = ConveyorHandler.getConveyorType(ResourceLocation.parse(typeName));
+			IConveyorType<?> type = ConveyorHandler.getConveyorType(Identifier.parse(typeName));
 			return new RawConveyorModel(Objects.requireNonNull(type));
 		}
 	}

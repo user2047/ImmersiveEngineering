@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallback;
 import blusunrize.immersiveengineering.api.shader.ShaderCase;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 
 import java.util.function.BiFunction;
@@ -50,19 +50,19 @@ public class MaterialSpriteGetter<T> implements BiFunction<String, Material, Tex
 	}
 
 	@Override
-	public TextureAtlasSprite apply(String material, Material resourceLocation)
+	public TextureAtlasSprite apply(String material, Material Identifier)
 	{
 		TextureAtlasSprite sprite = null;
 		if(callback!=null)
 			sprite = callback.getTextureReplacement(key, groupName, material);
 		if(shaderCase!=null)
 		{
-			ResourceLocation rl = shaderCase.getTextureReplacement(groupName, renderPass);
+			Identifier rl = shaderCase.getTextureReplacement(groupName, renderPass);
 			if(rl!=null)
 				sprite = getter.apply(new Material(InventoryMenu.BLOCK_ATLAS, rl));
 		}
 		if(sprite==null)
-			sprite = getter.apply(resourceLocation);
+			sprite = getter.apply(Identifier);
 		return sprite;
 	}
 }

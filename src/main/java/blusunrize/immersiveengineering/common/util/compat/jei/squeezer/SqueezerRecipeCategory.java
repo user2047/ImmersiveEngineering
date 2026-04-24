@@ -21,7 +21,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class SqueezerRecipeCategory extends IERecipeCategory<SqueezerRecipe>
 	public SqueezerRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.SQUEEZER, "block.immersiveengineering.squeezer");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/squeezer.png");
+		Identifier background = IEApi.ieLoc("textures/gui/squeezer.png");
 		setBackground(helper.createDrawable(background, 6, 12, 126, 59));
 		setIcon(IEMultiblockLogic.SQUEEZER.iconStack());
 		tankOverlay = helper.createDrawable(background, 179, 33, 16, 47);

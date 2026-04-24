@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionBottleTyp
 import blusunrize.immersiveengineering.common.items.bullets.IEBullets;
 import blusunrize.immersiveengineering.common.util.IELogger;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -107,7 +107,7 @@ public class PotionRecipeGenerators
 			Holder<Potion> output, Holder<Potion> input, IngredientWithSize reagent, Map<Potion, List<MixerRecipe>> all
 	)
 	{
-		ResourceLocation outputID = output.unwrapKey().orElseThrow().location();
+		Identifier outputID = output.unwrapKey().orElseThrow().location();
 		if(!BLACKLIST.contains(outputID.toString()))
 		{
 			List<MixerRecipe> existing = all.computeIfAbsent(output.value(), p -> new ArrayList<>());

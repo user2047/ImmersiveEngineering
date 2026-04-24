@@ -12,10 +12,10 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.common.gui.RevolverContainer;
 import blusunrize.immersiveengineering.common.items.IEItemInterfaces.IBulletContainer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -24,10 +24,10 @@ import javax.annotation.Nonnull;
 
 public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("revolver");
-	private static final ResourceLocation DRUM_MAIN = IEApi.ieLoc("revolver/drum_single");
-	private static final ResourceLocation EXTENDED_MAG = IEApi.ieLoc("revolver/drum_extend");
-	private static final ResourceLocation SECOND_DRUM = IEApi.ieLoc("revolver/drum_second");
+	private static final Identifier TEXTURE = makeTextureLocation("revolver");
+	private static final Identifier DRUM_MAIN = IEApi.ieLoc("revolver/drum_single");
+	private static final Identifier EXTENDED_MAG = IEApi.ieLoc("revolver/drum_extend");
+	private static final Identifier SECOND_DRUM = IEApi.ieLoc("revolver/drum_second");
 
 	private final int[] bullets = new int[2];
 	private final boolean otherRevolver;
@@ -52,7 +52,7 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float par1, int par2, int par3)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float par1, int par2, int par3)
 	{
 		int off = (offset < 0?-offset: 0);
 		for(int hand = 0; hand < (otherRevolver?2: 1); hand++)
@@ -68,12 +68,12 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 	}
 
 	@Override
-	protected void drawBackgroundTexture(GuiGraphics graphics)
+	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(TEXTURE, leftPos+Math.max(offset, 0), topPos+77, 0, 125, 176, 89);
 	}
 
-	public static void drawExternalGUI(NonNullList<ItemStack> bullets, int bulletAmount, GuiGraphics graphics)
+	public static void drawExternalGUI(NonNullList<ItemStack> bullets, int bulletAmount, GuiGraphicsExtractor graphics)
 	{
 		graphics.blitSprite(DRUM_MAIN, 0, 1, 74, 74);
 		if(bulletAmount >= 18)

@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.data.models;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
@@ -31,12 +31,12 @@ public class TRSRModelBuilder extends ModelBuilder<TRSRModelBuilder>
 
 	private final List<SimpleOverride> overrides = new ArrayList<>();
 
-	protected TRSRModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper)
+	protected TRSRModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper)
 	{
 		super(outputLocation, existingFileHelper);
 	}
 
-	public TRSRModelBuilder transforms(ResourceLocation source)
+	public TRSRModelBuilder transforms(Identifier source)
 	{
 		Resource transformFile;
 		try
@@ -53,7 +53,7 @@ public class TRSRModelBuilder extends ModelBuilder<TRSRModelBuilder>
 		}
 	}
 
-	public TRSRModelBuilder override(ModelFile model, ResourceLocation predicateKey, float predicateValue)
+	public TRSRModelBuilder override(ModelFile model, Identifier predicateKey, float predicateValue)
 	{
 		this.overrides.add(new SimpleOverride(model, Map.of(predicateKey, predicateValue)));
 		return this;
@@ -76,7 +76,7 @@ public class TRSRModelBuilder extends ModelBuilder<TRSRModelBuilder>
 		return ret;
 	}
 
-	record SimpleOverride(ModelFile model, Map<ResourceLocation, Float> predicates)
+	record SimpleOverride(ModelFile model, Map<Identifier, Float> predicates)
 	{
 		JsonObject toJson()
 		{

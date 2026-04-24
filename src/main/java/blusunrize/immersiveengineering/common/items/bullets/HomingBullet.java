@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.common.entities.RevolvershotEntity;
 import blusunrize.immersiveengineering.common.entities.RevolvershotHomingEntity;
 import blusunrize.immersiveengineering.common.util.IEDamageSources;
 import com.mojang.datafixers.util.Unit;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
@@ -22,7 +22,7 @@ import java.util.function.DoubleSupplier;
 
 public class HomingBullet extends BulletHandler.DamagingBullet<Unit>
 {
-	public HomingBullet(DoubleSupplier damage, ResourceLocation... textures)
+	public HomingBullet(DoubleSupplier damage, Identifier... textures)
 	{
 		super(
 				CodecsAndDefault.UNIT,

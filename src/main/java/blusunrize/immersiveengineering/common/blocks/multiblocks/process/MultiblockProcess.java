@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.crafting.MultiblockRecipe;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockLevel;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -25,15 +25,15 @@ import java.util.function.BiFunction;
 
 public abstract class MultiblockProcess<R extends MultiblockRecipe, CTX extends ProcessContext<R>>
 {
-	private final ResourceLocation recipeId;
-	private final BiFunction<Level, ResourceLocation, R> getRecipe;
+	private final Identifier recipeId;
+	private final BiFunction<Level, Identifier, R> getRecipe;
 	public int processTick;
 	private LevelDependentData<R> levelData;
 	public boolean clearProcess = false;
 
 	private int extraProcessTicks = -1;
 
-	public MultiblockProcess(ResourceLocation recipeId, BiFunction<Level, ResourceLocation, R> getRecipe)
+	public MultiblockProcess(Identifier recipeId, BiFunction<Level, Identifier, R> getRecipe)
 	{
 		this.recipeId = recipeId;
 		this.getRecipe = getRecipe;
@@ -51,10 +51,10 @@ public abstract class MultiblockProcess<R extends MultiblockRecipe, CTX extends 
 	}
 
 	public MultiblockProcess(
-			BiFunction<Level, ResourceLocation, R> getRecipe, CompoundTag data
+			BiFunction<Level, Identifier, R> getRecipe, CompoundTag data
 	)
 	{
-		this(ResourceLocation.parse(data.getString("recipe")), getRecipe);
+		this(Identifier.parse(data.getString("recipe")), getRecipe);
 		this.processTick = data.getInt("process_processTick");
 	}
 
@@ -188,7 +188,7 @@ public abstract class MultiblockProcess<R extends MultiblockRecipe, CTX extends 
 			this.levelData = new LevelDependentData<>(null, 20, 0);
 	}
 
-	public ResourceLocation getRecipeId()
+	public Identifier getRecipeId()
 	{
 		return recipeId;
 	}

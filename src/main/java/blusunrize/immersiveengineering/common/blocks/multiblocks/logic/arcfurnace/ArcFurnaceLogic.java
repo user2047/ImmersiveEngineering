@@ -44,7 +44,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -110,9 +110,9 @@ public class ArcFurnaceLogic
 	public static final int ENERGY_CAPACITY = 64000;
 
 	// register additional conditions for machine interface
-	public static ResourceLocation MIF_CONDITION_ADDITIVES = ieLoc("arc_furnace/additives");
-	public static ResourceLocation MIF_CONDITION_SLAG = ieLoc("arc_furnace/slag");
-	public static ResourceLocation MIF_CONDITION_ELECTRODES = ieLoc("arc_furnace/electrodes");
+	public static Identifier MIF_CONDITION_ADDITIVES = ieLoc("arc_furnace/additives");
+	public static Identifier MIF_CONDITION_SLAG = ieLoc("arc_furnace/slag");
+	public static Identifier MIF_CONDITION_ELECTRODES = ieLoc("arc_furnace/electrodes");
 
 	static
 	{

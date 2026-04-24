@@ -29,9 +29,9 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluids;
@@ -50,7 +50,7 @@ public class ClocheRecipeCategory extends IERecipeCategory<ClocheRecipe>
 	public ClocheRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.CLOCHE, "block.immersiveengineering.cloche");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/cloche.png");
+		Identifier background = IEApi.ieLoc("textures/gui/cloche.png");
 		setBackground(helper.createDrawable(background, 0, 0, 176, 77));
 		setIcon(new ItemStack(IEBlocks.MetalDevices.CLOCHE));
 		tankOverlay = helper.createDrawable(background, 176, 30, 20, 51);
@@ -96,7 +96,7 @@ public class ClocheRecipeCategory extends IERecipeCategory<ClocheRecipe>
 	}
 
 	@Override
-	public void draw(ClocheRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(ClocheRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		arrow.draw(graphics, 101, 35);
 	}

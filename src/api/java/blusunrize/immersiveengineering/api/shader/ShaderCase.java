@@ -9,7 +9,7 @@
 package blusunrize.immersiveengineering.api.shader;
 
 import blusunrize.immersiveengineering.api.utils.Color4;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 
@@ -68,7 +68,7 @@ public abstract class ShaderCase
 	/**
 	 * @return A string representing which item this shader case applies to. e.g.: "immersiveengineering:revolver"
 	 */
-	public abstract ResourceLocation getShaderType();
+	public abstract Identifier getShaderType();
 
 	/**
 	 * @return if the ResourceLocations of the layers should be stitched into the main texturemap<br>
@@ -83,7 +83,7 @@ public abstract class ShaderCase
 	/**
 	 * @return which icon is to be used for the given pass and model part. These obviously need to be stitched on the given sheet (mind the revolvers!)
 	 */
-	public ResourceLocation getTextureReplacement(String modelPart, int pass)
+	public Identifier getTextureReplacement(String modelPart, int pass)
 	{
 		return getLayers()[pass].getTexture();
 	}

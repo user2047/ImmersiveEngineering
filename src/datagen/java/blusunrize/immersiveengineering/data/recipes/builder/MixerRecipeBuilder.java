@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import blusunrize.immersiveengineering.api.crafting.MixerRecipe;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -63,7 +63,7 @@ public class MixerRecipeBuilder extends IERecipeBuilder<MixerRecipeBuilder>
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		MixerRecipe recipe = new MixerRecipe(fluidOutput, fluidInput, itemInputs, energy);
 		out.accept(name, recipe, null, getConditions());

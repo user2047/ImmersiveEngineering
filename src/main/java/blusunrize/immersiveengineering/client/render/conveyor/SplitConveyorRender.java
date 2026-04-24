@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -31,7 +31,7 @@ import static blusunrize.immersiveengineering.common.util.Utils.withCoordinate;
 
 public class SplitConveyorRender extends BasicConveyorRender<SplitConveyor>
 {
-	public SplitConveyorRender(ResourceLocation active, ResourceLocation inactive)
+	public SplitConveyorRender(Identifier active, Identifier inactive)
 	{
 		super(active, inactive);
 	}
@@ -42,7 +42,7 @@ public class SplitConveyorRender extends BasicConveyorRender<SplitConveyor>
 		return false;
 	}
 
-	public static ResourceLocation texture_casing = IEApi.ieLoc("block/conveyor/split_wall");
+	public static Identifier texture_casing = IEApi.ieLoc("block/conveyor/split_wall");
 
 	@Override
 	public List<BakedQuad> modifyQuads(List<BakedQuad> baseModel, RenderContext<SplitConveyor> context, @Nullable RenderType renderType)

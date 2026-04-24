@@ -27,7 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,7 +55,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 {
 	protected static final List<Vec3i> COLUMN_THREE = ImmutableList.of(BlockPos.ZERO, BlockPos.ZERO.above(), BlockPos.ZERO.above(2));
 
-	protected static final Map<ResourceLocation, String> generatedParticleTextures = new HashMap<>();
+	protected static final Map<Identifier, String> generatedParticleTextures = new HashMap<>();
 	protected final ExistingFileHelper existingFileHelper;
 	protected final NongeneratedModels innerModels;
 
@@ -93,29 +93,29 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModel(b, new ConfiguredModel(models[0]).model);
 	}
 
-	protected void cubeSideVertical(Supplier<? extends Block> b, ResourceLocation side, ResourceLocation vertical)
+	protected void cubeSideVertical(Supplier<? extends Block> b, Identifier side, Identifier vertical)
 	{
 		simpleBlockAndItem(b, models().cubeBottomTop(name(b), side, vertical, vertical));
 	}
 
-	protected void cubeAll(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void cubeAll(Supplier<? extends Block> b, Identifier texture)
 	{
 		cubeAll(b, texture, null);
 	}
 
-	protected void cubeAll(Supplier<? extends Block> b, ResourceLocation texture, @Nullable RenderType layer)
+	protected void cubeAll(Supplier<? extends Block> b, Identifier texture, @Nullable RenderType layer)
 	{
 		final BlockModelBuilder model = models().cubeAll(name(b), texture);
 		setRenderType(layer, model);
 		simpleBlockAndItem(b, model);
 	}
 
-	protected void multiCubeAll(Supplier<? extends Block> b, ResourceLocation... textures)
+	protected void multiCubeAll(Supplier<? extends Block> b, Identifier... textures)
 	{
 		multiCubeAll(b, null, textures);
 	}
 
-	protected void multiCubeAll(Supplier<? extends Block> b, @Nullable RenderType layer, ResourceLocation... textures)
+	protected void multiCubeAll(Supplier<? extends Block> b, @Nullable RenderType layer, Identifier... textures)
 	{
 		final BlockModelBuilder[] models = new BlockModelBuilder[textures.length];
 		for(int i = 0; i < textures.length; i++)
@@ -126,15 +126,15 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		multiBlockAndItem(b, models);
 	}
 
-	protected void multiEightCubeAll(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void multiEightCubeAll(Supplier<? extends Block> b, Identifier texture)
 	{
-		ResourceLocation[] textures = new ResourceLocation[8];
+		Identifier[] textures = new Identifier[8];
 		for(int i = 0; i < 8; i++)
 			textures[i] = texture.withSuffix(Integer.toString(i));
 		multiCubeAll(b, textures);
 	}
 
-	protected void axisBlock(Supplier<? extends RotatedPillarBlock> b, ResourceLocation side, ResourceLocation vertical)
+	protected void axisBlock(Supplier<? extends RotatedPillarBlock> b, Identifier side, Identifier vertical)
 	{
 		ModelFile modelVertical = models().cubeColumn(name(b), side, vertical);
 		ModelFile modelHorizontal = models().cubeColumnHorizontal(name(b)+"_horizontal", side, vertical);
@@ -142,7 +142,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModel(b, modelVertical);
 	}
 
-	protected void scaffold(Supplier<? extends Block> b, ResourceLocation others, ResourceLocation top)
+	protected void scaffold(Supplier<? extends Block> b, Identifier others, Identifier top)
 	{
 		simpleBlockAndItem(
 				b,
@@ -154,24 +154,24 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		);
 	}
 
-	protected void slabFor(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void slabFor(Supplier<? extends Block> b, Identifier texture)
 	{
 		slabFor(b, texture, null);
 	}
 
-	protected void slabFor(Supplier<? extends Block> b, ResourceLocation texture, @Nullable RenderType layer)
+	protected void slabFor(Supplier<? extends Block> b, Identifier texture, @Nullable RenderType layer)
 	{
 		slabFor(b, texture, texture, texture, layer);
 	}
 
-	protected void slabFor(Supplier<? extends Block> b, ResourceLocation side, ResourceLocation top, ResourceLocation bottom)
+	protected void slabFor(Supplier<? extends Block> b, Identifier side, Identifier top, Identifier bottom)
 	{
 		slabFor(b, side, top, bottom, null);
 	}
 
 	protected void slabFor(
 			Supplier<? extends Block> full,
-			ResourceLocation side, ResourceLocation top, ResourceLocation bottom,
+			Identifier side, Identifier top, Identifier bottom,
 			@Nullable RenderType layer
 	)
 	{
@@ -184,20 +184,20 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModel(() -> b, mainModel);
 	}
 
-	protected void slabForMultiEightAll(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void slabForMultiEightAll(Supplier<? extends Block> b, Identifier texture)
 	{
-		ResourceLocation[] textures = new ResourceLocation[8];
+		Identifier[] textures = new Identifier[8];
 		for(int i = 0; i < 8; i++)
 			textures[i] = texture.withSuffix(Integer.toString(i));
 		slabForMultiAll(b, textures);
 	}
 
-	protected void slabForMultiAll(Supplier<? extends Block> b, ResourceLocation... textures)
+	protected void slabForMultiAll(Supplier<? extends Block> b, Identifier... textures)
 	{
 		slabForMultiAll(b, null, textures);
 	}
 
-	protected void slabForMultiAll(Supplier<? extends Block> full, @Nullable RenderType layer, ResourceLocation... textures)
+	protected void slabForMultiAll(Supplier<? extends Block> full, @Nullable RenderType layer, Identifier... textures)
 	{
 		SlabBlock b = IEBlocks.TO_SLAB.get(BuiltInRegistries.BLOCK.getKey(full.get())).get();
 
@@ -225,14 +225,14 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 				.partialState().with(SlabBlock.TYPE, SlabType.DOUBLE).addModels(Stream.of(doubleslab).map(ConfiguredModel::new).toArray(ConfiguredModel[]::new));
 	}
 
-	protected void stairsFor(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void stairsFor(Supplier<? extends Block> b, Identifier texture)
 	{
 		stairsFor(b, texture, texture, texture, null);
 	}
 
 	protected void stairsFor(
 			Supplier<? extends Block> full,
-			ResourceLocation side, ResourceLocation top, ResourceLocation bottom,
+			Identifier side, Identifier top, Identifier bottom,
 			@Nullable RenderType layer
 	)
 	{
@@ -246,20 +246,20 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModel(() -> b, stairs);
 	}
 
-	protected void stairsForMultiEightAll(Supplier<? extends Block> b, ResourceLocation texture)
+	protected void stairsForMultiEightAll(Supplier<? extends Block> b, Identifier texture)
 	{
-		ResourceLocation[] textures = new ResourceLocation[8];
+		Identifier[] textures = new Identifier[8];
 		for(int i = 0; i < 8; i++)
 			textures[i] = texture.withSuffix(Integer.toString(i));
 		stairsForMultiAll(b, textures);
 	}
 
-	protected void stairsForMultiAll(Supplier<? extends Block> b, ResourceLocation... textures)
+	protected void stairsForMultiAll(Supplier<? extends Block> b, Identifier... textures)
 	{
 		stairsForMultiAll(b, null, textures);
 	}
 
-	protected void stairsForMultiAll(Supplier<? extends Block> full, @Nullable RenderType layer, ResourceLocation... textures)
+	protected void stairsForMultiAll(Supplier<? extends Block> full, @Nullable RenderType layer, Identifier... textures)
 	{
 		final IEStairsBlock b = IEBlocks.TO_STAIRS.get(BuiltInRegistries.BLOCK.getKey(full.get())).get();
 
@@ -306,7 +306,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 				}, StairBlock.WATERLOGGED);
 	}
 
-	protected void wallForSingle(Supplier<? extends Block> full, ResourceLocation bottomTexture, ResourceLocation sideTexture, ResourceLocation topTexture)
+	protected void wallForSingle(Supplier<? extends Block> full, Identifier bottomTexture, Identifier sideTexture, Identifier topTexture)
 	{
 		final IEWallBlock b = IEBlocks.TO_WALL.get(BuiltInRegistries.BLOCK.getKey(full.get())).get();
 		wallBlock(b,
@@ -317,11 +317,11 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModel(() -> b, wallModelToppedInventory(name(b), bottomTexture, sideTexture, topTexture));
 	}
 
-	protected void wallForMultiEight(Supplier<? extends Block> b, ResourceLocation bottomTexture, ResourceLocation sideTexture, ResourceLocation topTexture)
+	protected void wallForMultiEight(Supplier<? extends Block> b, Identifier bottomTexture, Identifier sideTexture, Identifier topTexture)
 	{
-		ResourceLocation[] bottomTextures = new ResourceLocation[8];
-		ResourceLocation[] sideTextures = new ResourceLocation[8];
-		ResourceLocation[] topTextures = new ResourceLocation[8];
+		Identifier[] bottomTextures = new Identifier[8];
+		Identifier[] sideTextures = new Identifier[8];
+		Identifier[] topTextures = new Identifier[8];
 		for(int i = 0; i < 8; i++)
 		{
 			bottomTextures[i] = bottomTexture.withSuffix(Integer.toString(i));
@@ -331,12 +331,12 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		wallForMultiMany(b, bottomTextures, sideTextures, topTextures);
 	}
 
-	protected void wallForMultiMany(Supplier<? extends Block> b, ResourceLocation[] bottomTextures, ResourceLocation[] sideTextures, ResourceLocation[] topTextures)
+	protected void wallForMultiMany(Supplier<? extends Block> b, Identifier[] bottomTextures, Identifier[] sideTextures, Identifier[] topTextures)
 	{
 		wallForMultiMany(b, null, bottomTextures, sideTextures, topTextures);
 	}
 
-	protected void wallForMultiMany(Supplier<? extends Block> full, @Nullable RenderType layer, ResourceLocation[] bottomTextures, ResourceLocation[] sideTextures, ResourceLocation[] topTextures)
+	protected void wallForMultiMany(Supplier<? extends Block> full, @Nullable RenderType layer, Identifier[] bottomTextures, Identifier[] sideTextures, Identifier[] topTextures)
 	{
 		final IEWallBlock b = IEBlocks.TO_WALL.get(BuiltInRegistries.BLOCK.getKey(full.get())).get();
 
@@ -400,7 +400,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		}
 	}
 
-	protected ResourceLocation addModelsPrefix(ResourceLocation in)
+	protected Identifier addModelsPrefix(Identifier in)
 	{
 		return in.withPath("models/"+in.getPath());
 	}
@@ -410,7 +410,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		itemModels().getBuilder(name(block)).parent(model);
 	}
 
-	protected BlockModelBuilder wallModelTopped(String name, String type, ResourceLocation bottom, ResourceLocation side, ResourceLocation top)
+	protected BlockModelBuilder wallModelTopped(String name, String type, Identifier bottom, Identifier side, Identifier top)
 	{
 		return models().withExistingParent(name, ImmersiveEngineering.rl("block/"+type))
 				.texture("wall_bottom", bottom)
@@ -418,7 +418,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 				.texture("wall_top", top);
 	}
 
-	protected BlockModelBuilder wallModelToppedInventory(String name, ResourceLocation bottom, ResourceLocation side, ResourceLocation top)
+	protected BlockModelBuilder wallModelToppedInventory(String name, Identifier bottom, Identifier side, Identifier top)
 	{
 		return models().withExistingParent(name, ImmersiveEngineering.rl("block/wall_inventory_topped"))
 				.texture("wall_bottom", bottom)
@@ -459,19 +459,19 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 	}
 
 	protected <T extends ModelBuilder<T>>
-	T obj(String name, ResourceLocation model, ModelProvider<T> provider)
+	T obj(String name, Identifier model, ModelProvider<T> provider)
 	{
 		return obj(name, model, ImmutableMap.of(), provider);
 	}
 
 	protected <T extends ModelBuilder<T>>
-	T obj(String name, ResourceLocation model, Map<String, ResourceLocation> textures, ModelProvider<T> provider)
+	T obj(String name, Identifier model, Map<String, Identifier> textures, ModelProvider<T> provider)
 	{
 		return obj(provider.withExistingParent(name, mcLoc("block")), model, textures);
 	}
 
 	protected <T extends ModelBuilder<T>>
-	T obj(T base, ResourceLocation model, Map<String, ResourceLocation> textures)
+	T obj(T base, Identifier model, Map<String, Identifier> textures)
 	{
 		assertModelExists(model);
 		T ret = base
@@ -485,7 +485,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 			particleTex = textures.get(particleTex.substring(1)).toString();
 		ret.texture("particle", particleTex);
 		generatedParticleTextures.put(ret.getLocation(), particleTex);
-		for(Entry<String, ResourceLocation> e : textures.entrySet())
+		for(Entry<String, Identifier> e : textures.entrySet())
 			ret.texture(e.getKey(), e.getValue());
 		return ret;
 	}
@@ -535,7 +535,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		return new ConfiguredModel(model);
 	}
 
-	public void assertModelExists(ResourceLocation name)
+	public void assertModelExists(Identifier name)
 	{
 		String suffix = name.getPath().contains(".")?"": ".json";
 		Preconditions.checkState(
@@ -548,7 +548,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 		return ieObjBuilder(getAutoNameIEOBJ(loc), modLoc(loc));
 	}
 
-	protected IEOBJBuilder<BlockModelBuilder> ieObjBuilder(String name, ResourceLocation model)
+	protected IEOBJBuilder<BlockModelBuilder> ieObjBuilder(String name, Identifier model)
 	{
 		return ieObjBuilder(name, model, models());
 	}
@@ -566,7 +566,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 	}
 
 	protected <T extends ModelBuilder<T>>
-	IEOBJBuilder<T> ieObjBuilder(String name, ResourceLocation model, ModelProvider<T> modelProvider)
+	IEOBJBuilder<T> ieObjBuilder(String name, Identifier model, ModelProvider<T> modelProvider)
 	{
 		final String particle = DataGenUtils.getTextureFromObj(model, existingFileHelper);
 		generatedParticleTextures.put(modLoc(name), particle);

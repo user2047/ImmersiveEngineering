@@ -26,9 +26,9 @@ import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -48,7 +48,7 @@ public class MixerRecipeCategory extends IERecipeCategory<MixerRecipe>
 		super(helper, recipeType, "block.immersiveengineering.mixer");
 		setBackground(helper.createBlankDrawable(155, 60));
 		setIcon(IEMultiblockLogic.MIXER.iconStack());
-		ResourceLocation background = IEApi.ieLoc("textures/gui/mixer.png");
+		Identifier background = IEApi.ieLoc("textures/gui/mixer.png");
 		tankTexture = helper.createDrawable(background, 68, 8, 74, 60);
 		tankOverlay = helper.drawableBuilder(background, 177, 31, 20, 51).addPadding(-2, 2, -2, 2).build();
 		arrowDrawable = helper.createDrawable(background, 178, 17, 18, 13);
@@ -97,7 +97,7 @@ public class MixerRecipeCategory extends IERecipeCategory<MixerRecipe>
 	}
 
 	@Override
-	public void draw(MixerRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(MixerRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		tankTexture.draw(graphics, 40, 0);
 		arrowDrawable.draw(graphics, 117, 19);

@@ -20,7 +20,7 @@ import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -42,7 +42,7 @@ public class DrillCallbacks implements ItemCallback<Key>
 	{
 		var upgrades = DrillItem.getUpgradesStatic(stack);
 		ItemStack head = DrillItem.getHeadStatic(stack);
-		ResourceLocation headTexture;
+		Identifier headTexture;
 		if(head.getItem() instanceof IDrillHead headItem)
 			headTexture = headItem.getDrillTexture(stack, head);
 		else
@@ -161,7 +161,7 @@ public class DrillCallbacks implements ItemCallback<Key>
 	}
 
 	public record Key(
-			@Nullable ResourceLocation headTexture, int damage, boolean waterproof, boolean oiled, boolean fortune
+			@Nullable Identifier headTexture, int damage, boolean waterproof, boolean oiled, boolean fortune
 	)
 	{
 	}

@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler.IMultib
 import blusunrize.immersiveengineering.api.multiblocks.TemplateMultiblock;
 import blusunrize.immersiveengineering.common.network.MessageMultiblockSync;
 import blusunrize.immersiveengineering.common.network.MessageMultiblockSync.SyncedTemplate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -40,7 +40,7 @@ public class TemplateSyncManager
 			if(mb instanceof TemplateMultiblock templateMB)
 			{
 				StructureTemplate template = templateMB.getTemplate(level).template();
-				ResourceLocation rl = templateMB.getTemplateLocation();
+				Identifier rl = templateMB.getTemplateLocation();
 				toSync.add(new SyncedTemplate(template, rl));
 			}
 

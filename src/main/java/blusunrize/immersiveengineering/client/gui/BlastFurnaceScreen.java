@@ -11,10 +11,10 @@ package blusunrize.immersiveengineering.client.gui;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.FurnaceHandler.StateView;
 import blusunrize.immersiveengineering.common.gui.BlastFurnaceMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
 
@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 
 public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("blast_furnace");
+	private static final Identifier TEXTURE = makeTextureLocation("blast_furnace");
 
 	public BlastFurnaceScreen(BlastFurnaceMenu container, Inventory inventoryPlayer, Component title)
 	{
@@ -30,7 +30,7 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 	}
 
 	public static void drawFlameAndArrow(
-			ContainerData state, GuiGraphics graphics, int leftPos, int topPos, int arrowXOffset
+			ContainerData state, GuiGraphicsExtractor graphics, int leftPos, int topPos, int arrowXOffset
 	)
 	{
 		if(StateView.getLastBurnTime(state) > 0)
@@ -46,13 +46,13 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 	}
 
 	@Override
-	protected void drawBackgroundTexture(GuiGraphics graphics)
+	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(TEXTURE, leftPos, topPos, 0, 0, 176, imageHeight);
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		drawFlameAndArrow(menu.state, graphics, leftPos, topPos, 76);
 	}
@@ -66,7 +66,7 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 		}
 
 		@Override
-		protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+		protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 		{
 			graphics.blit(TEXTURE, leftPos+140, topPos+11, 176, 32, 70, 46);
 			if(menu.leftHeater.get())
@@ -77,7 +77,7 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 		}
 
 		@Override
-		protected void renderLabels(GuiGraphics graphics, int x, int y)
+		protected void renderLabels(GuiGraphicsExtractor graphics, int x, int y)
 		{
 			String title = I18n.get(Lib.GUI+"blast_furnace.preheaters");
 			int w = this.font.width(title)/2;

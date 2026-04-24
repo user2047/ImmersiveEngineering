@@ -9,7 +9,7 @@
 package blusunrize.immersiveengineering.client.gui.info;
 
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
@@ -46,7 +46,7 @@ public class MultitankArea extends InfoArea
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics)
+	public void draw(GuiGraphicsExtractor graphics)
 	{
 		MultiBufferSource.BufferSource buffers = graphics.bufferSource();
 		forEachFluid((fluid, lastY, newY) -> GuiHelper.drawRepeatedFluidSpriteGui(

@@ -12,10 +12,10 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.function.Function;
@@ -25,12 +25,12 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class GuiReactiveList<E> extends Button
 {
-	private static final ResourceLocation SCROLL_TOP = ieLoc("slider_vertical/top");
-	private static final ResourceLocation SCROLL_BOTTOM = ieLoc("slider_vertical/bottom");
-	private static final ResourceLocation SCROLL_CENTER = ieLoc("slider_vertical/center");
-	private static final ResourceLocation SCROLL_BUTTON_TOP = ieLoc("slider_vertical/button_top");
-	private static final ResourceLocation SCROLL_BUTTON_BOTTOM = ieLoc("slider_vertical/button_bottom");
-	private static final ResourceLocation SCROLL_BUTTON_CENTER = ieLoc("slider_vertical/button_center");
+	private static final Identifier SCROLL_TOP = ieLoc("slider_vertical/top");
+	private static final Identifier SCROLL_BOTTOM = ieLoc("slider_vertical/bottom");
+	private static final Identifier SCROLL_CENTER = ieLoc("slider_vertical/center");
+	private static final Identifier SCROLL_BUTTON_TOP = ieLoc("slider_vertical/button_top");
+	private static final Identifier SCROLL_BUTTON_BOTTOM = ieLoc("slider_vertical/button_bottom");
+	private static final Identifier SCROLL_BUTTON_CENTER = ieLoc("slider_vertical/button_center");
 
 	protected Supplier<List<E>> entries;
 	protected Function<E, String> toStringFunction;
@@ -110,7 +110,7 @@ public class GuiReactiveList<E> extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mx, int my, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		recalculateEntries();
 		final List<E> entries = this.entries.get();

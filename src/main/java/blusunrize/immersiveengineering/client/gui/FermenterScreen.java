@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.gui.FermenterMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -25,8 +25,8 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class FermenterScreen extends IEContainerScreen<FermenterMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("fermenter");
-	private static final ResourceLocation TANK = ieLoc("fermenter/tank_overlay");
+	private static final Identifier TEXTURE = makeTextureLocation("fermenter");
+	private static final Identifier TANK = ieLoc("fermenter/tank_overlay");
 
 	public FermenterScreen(FermenterMenu container, Inventory inventoryPlayer, Component title)
 	{

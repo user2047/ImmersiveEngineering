@@ -15,11 +15,11 @@ import blusunrize.immersiveengineering.client.gui.info.FluidInfoArea;
 import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.client.gui.info.TooltipArea;
 import blusunrize.immersiveengineering.common.gui.TurretMenu.ChemTurretMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
@@ -30,8 +30,8 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class ChemTurretScreen extends TurretScreen<ChemTurretMenu>
 {
-	private static final ResourceLocation TANK_BACKGROUND = ieLoc("turret/tank_background");
-	private static final ResourceLocation TANK_OVERLAY = ieLoc("turret/tank_overlay");
+	private static final Identifier TANK_BACKGROUND = ieLoc("turret/tank_background");
+	private static final Identifier TANK_OVERLAY = ieLoc("turret/tank_overlay");
 	private static final ButtonTexture NO_BURN = new ButtonTexture(ieLoc("turret/no_burn"));
 	private static final ButtonTexture BURN = new ButtonTexture(ieLoc("turret/burn"));
 
@@ -56,7 +56,7 @@ public class ChemTurretScreen extends TurretScreen<ChemTurretMenu>
 	}
 
 	@Override
-	protected void drawContainerBackgroundPre(@Nonnull GuiGraphics graphics, float f, int mx, int my)
+	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		super.drawContainerBackgroundPre(graphics, f, mx, my);
 		graphics.blit(TEXTURE, leftPos+132, topPos+14, 176, 0, 20, 51);

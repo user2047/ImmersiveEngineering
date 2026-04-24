@@ -14,7 +14,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -35,14 +35,14 @@ import java.util.stream.StreamSupport;
 // TODO make less alloc-y...
 public class TagUtils
 {
-	private static List<ResourceLocation> getTags(Reference<?> ref) {
+	private static List<Identifier> getTags(Reference<?> ref) {
 		return ref.tags().map(TagKey::location).toList();
 	}
 
-	public static Collection<ResourceLocation> getMatchingTagNames(RegistryAccess tags, ItemStack stack)
+	public static Collection<Identifier> getMatchingTagNames(RegistryAccess tags, ItemStack stack)
 	{
 		// TODO ideally get rid of the block part...
-		Collection<ResourceLocation> ret = new HashSet<>(getTags(stack.getItem().builtInRegistryHolder()));
+		Collection<Identifier> ret = new HashSet<>(getTags(stack.getItem().builtInRegistryHolder()));
 		Block b = Block.byItem(stack.getItem());
 		if(b!=Blocks.AIR)
 			ret.addAll(getTags(b.builtInRegistryHolder()));
@@ -51,7 +51,7 @@ public class TagUtils
 
 	public static String[] getMatchingPrefixAndRemaining(RegistryAccess tags, ItemStack stack, String... componentTypes)
 	{
-		for(ResourceLocation name : getMatchingTagNames(tags, stack))
+		for(Identifier name : getMatchingTagNames(tags, stack))
 		{
 			for(String componentType : componentTypes)
 				if(name.getPath().startsWith(componentType))
@@ -76,7 +76,7 @@ public class TagUtils
 		return false;
 	}
 
-	public static <T> Stream<T> elementStream(RegistryAccess tags, ResourceKey<Registry<T>> registry, ResourceLocation tag) {
+	public static <T> Stream<T> elementStream(RegistryAccess tags, ResourceKey<Registry<T>> registry, Identifier tag) {
 		return holderStream(tags, registry, tag).map(Holder::value);
 	}
 
@@ -88,7 +88,7 @@ public class TagUtils
 		return holderStream(registry, tag).map(Holder::value);
 	}
 
-	public static <T> Stream<Holder<T>> holderStream(RegistryAccess tags, ResourceKey<Registry<T>> registry, ResourceLocation tag) {
+	public static <T> Stream<Holder<T>> holderStream(RegistryAccess tags, ResourceKey<Registry<T>> registry, Identifier tag) {
 		return holderStream(tags.registryOrThrow(registry), TagKey.create(registry, tag));
 	}
 
@@ -96,27 +96,27 @@ public class TagUtils
 		return StreamSupport.stream(registry.getTagOrEmpty(tag).spliterator(), false);
 	}
 
-	public static TagKey<Item> createItemWrapper(ResourceLocation name)
+	public static TagKey<Item> createItemWrapper(Identifier name)
 	{
 		return TagKey.create(Registries.ITEM, name);
 	}
 
-	public static TagKey<Block> createBlockWrapper(ResourceLocation name)
+	public static TagKey<Block> createBlockWrapper(Identifier name)
 	{
 		return TagKey.create(Registries.BLOCK, name);
 	}
 
-	public static TagKey<Fluid> createFluidWrapper(ResourceLocation name)
+	public static TagKey<Fluid> createFluidWrapper(Identifier name)
 	{
 		return TagKey.create(Registries.FLUID, name);
 	}
 
-	public static TagKey<EntityType<?>> createEntityWrapper(ResourceLocation name)
+	public static TagKey<EntityType<?>> createEntityWrapper(Identifier name)
 	{
 		return TagKey.create(Registries.ENTITY_TYPE, name);
 	}
 
-	public static TagKey<Biome> createBiomeWrapper(ResourceLocation name)
+	public static TagKey<Biome> createBiomeWrapper(Identifier name)
 	{
 		return TagKey.create(Registries.BIOME, name);
 	}

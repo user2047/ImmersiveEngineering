@@ -20,7 +20,7 @@ import malte0811.dualcodecs.DualCodecs;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -56,38 +56,38 @@ public class BulletHandler
 	public static ItemLike emptyCasing = Items.AIR;
 	public static ItemLike emptyShell = Items.AIR;
 
-	private final static BiMap<ResourceLocation, IBullet<?>> REGISTRY = HashBiMap.create();
+	private final static BiMap<Identifier, IBullet<?>> REGISTRY = HashBiMap.create();
 
-	public static void registerBullet(ResourceLocation name, IBullet<?> bullet)
+	public static void registerBullet(Identifier name, IBullet<?> bullet)
 	{
 		Preconditions.checkState(!REGISTRY.containsKey(name), name+" is already registered");
 		Preconditions.checkState(!REGISTRY.containsValue(bullet));
 		REGISTRY.put(name, bullet);
 	}
 
-	public static IBullet<?> getBullet(ResourceLocation name)
+	public static IBullet<?> getBullet(Identifier name)
 	{
 		return REGISTRY.get(name);
 	}
 
-	public static ResourceLocation findRegistryName(IBullet<?> bullet)
+	public static Identifier findRegistryName(IBullet<?> bullet)
 	{
 		if(bullet!=null)
 			return REGISTRY.inverse().get(bullet);
 		return null;
 	}
 
-	public static ItemStack getBulletStack(ResourceLocation key)
+	public static ItemStack getBulletStack(Identifier key)
 	{
 		return new ItemStack(getBulletItem(key));
 	}
 
-	public static Item getBulletItem(ResourceLocation key)
+	public static Item getBulletItem(Identifier key)
 	{
 		return GET_BULLET_ITEM.get().apply(getBullet(key));
 	}
 
-	public static Collection<ResourceLocation> getAllKeys()
+	public static Collection<Identifier> getAllKeys()
 	{
 		return REGISTRY.keySet();
 	}
@@ -146,7 +146,7 @@ public class BulletHandler
 		/**
 		 * @return the textures (layers) for the item
 		 */
-		ResourceLocation[] getTextures();
+		Identifier[] getTextures();
 
 		/**
 		 * @return the colour applied to the given layer
@@ -182,24 +182,24 @@ public class BulletHandler
 		private final boolean resetHurt;
 		private final boolean setFire;
 		private final Supplier<ItemStack> casing;
-		private final ResourceLocation[] textures;
+		private final Identifier[] textures;
 
-		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, float damage, Supplier<ItemStack> casing, ResourceLocation... textures)
+		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, float damage, Supplier<ItemStack> casing, Identifier... textures)
 		{
 			this(codec, damageSourceGetter, damage, false, false, casing, textures);
 		}
 
-		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, DoubleSupplier damage, Supplier<ItemStack> casing, ResourceLocation... textures)
+		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, DoubleSupplier damage, Supplier<ItemStack> casing, Identifier... textures)
 		{
 			this(codec, damageSourceGetter, damage, false, false, casing, textures);
 		}
 
-		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, float damage, boolean resetHurt, boolean setFire, Supplier<ItemStack> casing, ResourceLocation... textures)
+		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, float damage, boolean resetHurt, boolean setFire, Supplier<ItemStack> casing, Identifier... textures)
 		{
 			this(codec, damageSourceGetter, () -> damage, resetHurt, setFire, casing, textures);
 		}
 
-		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, DoubleSupplier damage, boolean resetHurt, boolean setFire, Supplier<ItemStack> casing, ResourceLocation... textures)
+		public DamagingBullet(CodecsAndDefault<StackData> codec, DamageSourceProvider damageSourceGetter, DoubleSupplier damage, boolean resetHurt, boolean setFire, Supplier<ItemStack> casing, Identifier... textures)
 		{
 			this.codec = codec;
 			this.damageSourceGetter = damageSourceGetter;
@@ -246,7 +246,7 @@ public class BulletHandler
 		}
 
 		@Override
-		public ResourceLocation[] getTextures()
+		public Identifier[] getTextures()
 		{
 			return textures;
 		}

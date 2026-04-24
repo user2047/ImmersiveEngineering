@@ -23,7 +23,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -50,7 +50,7 @@ public class MovableTags extends IntrinsicHolderTagsProvider<Block>
 
 	private static final List<TagKey<Block>> IMMOVABLE_TAGS = ImmutableList.of(Blocks.RELOCATION_NOT_SUPPORTED);
 
-	private static TagKey<Block> tag(ResourceLocation name)
+	private static TagKey<Block> tag(Identifier name)
 	{
 		return TagKey.create(Registries.BLOCK, name);
 	}

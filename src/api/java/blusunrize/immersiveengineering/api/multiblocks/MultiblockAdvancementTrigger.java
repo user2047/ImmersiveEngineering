@@ -22,7 +22,7 @@ import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.CriterionValidator;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -90,15 +90,15 @@ public class MultiblockAdvancementTrigger implements CriterionTrigger<Multiblock
 			listeners.trigger(multiblock, hammer);
 	}
 
-	public static Criterion<?> create(ResourceLocation multiblock, ItemPredicate hammer)
+	public static Criterion<?> create(Identifier multiblock, ItemPredicate hammer)
 	{
 		return INSTANCE.get().createCriterion(new Instance(multiblock, hammer));
 	}
 
-	public record Instance(ResourceLocation multiblock, ItemPredicate hammer) implements CriterionTriggerInstance
+	public record Instance(Identifier multiblock, ItemPredicate hammer) implements CriterionTriggerInstance
 	{
 		public static final Codec<Instance> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-				ResourceLocation.CODEC.fieldOf("multiblock").forGetter(Instance::multiblock),
+				Identifier.CODEC.fieldOf("multiblock").forGetter(Instance::multiblock),
 				ItemPredicate.CODEC.fieldOf("hammer").forGetter(Instance::hammer)
 		).apply(inst, Instance::new));
 

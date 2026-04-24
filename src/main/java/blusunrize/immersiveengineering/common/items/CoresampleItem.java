@@ -28,7 +28,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -179,7 +179,7 @@ public class CoresampleItem extends IEBaseItem
 	}
 
 	public record VeinSample(
-			ResourceLocation mineral,
+			Identifier mineral,
 			int depletion,
 			double saturation,
 			double percentageInTotalSample
@@ -203,7 +203,7 @@ public class CoresampleItem extends IEBaseItem
 				SamplePosition::new
 		);
 		public static final SamplePosition NONE = new SamplePosition(
-				ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld")), 0, 0
+				ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("overworld")), 0, 0
 		);
 
 		public ColumnPos position()
@@ -212,7 +212,7 @@ public class CoresampleItem extends IEBaseItem
 		}
 	}
 
-	public record CoresampleMapData(Map<String, List<ResourceLocation>> mapDataToMinerals)
+	public record CoresampleMapData(Map<String, List<Identifier>> mapDataToMinerals)
 	{
 		public static final DualCodec<ByteBuf, CoresampleMapData> CODECS = IEDualCodecs.forMap(DualCodecs.STRING, DualCodecs.RESOURCE_LOCATION.listOf())
 				.fieldOf("mapDataToMinerals")
@@ -232,7 +232,7 @@ public class CoresampleItem extends IEBaseItem
 			return new CoresampleMapData(newMap);
 		}
 
-		public CoresampleMapData with(String key, List<ResourceLocation> minerals)
+		public CoresampleMapData with(String key, List<Identifier> minerals)
 		{
 			var newMap = new HashMap<>(mapDataToMinerals);
 			newMap.put(key, minerals);

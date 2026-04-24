@@ -16,7 +16,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -64,7 +64,7 @@ public class RevolvershotRenderer extends EntityRenderer<RevolvershotEntity>
 
 	@Override
 	@Nonnull
-	public ResourceLocation getTextureLocation(@Nonnull RevolvershotEntity entity)
+	public Identifier getTextureLocation(@Nonnull RevolvershotEntity entity)
 	{
 		return IEApi.ieLoc("textures/models/bullet.png");
 	}

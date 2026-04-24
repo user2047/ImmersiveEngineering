@@ -24,7 +24,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.effect.MobEffect;
@@ -189,8 +189,8 @@ public class PotionFluid extends Fluid
 
 	public static class PotionFluidType extends FluidType
 	{
-		public static final ResourceLocation TEXTURE_STILL = rl("block/fluid/potion_still");
-		public static final ResourceLocation TEXTURE_FLOW = rl("block/fluid/potion_flow");
+		public static final Identifier TEXTURE_STILL = rl("block/fluid/potion_still");
+		public static final Identifier TEXTURE_FLOW = rl("block/fluid/potion_flow");
 
 		public PotionFluidType()
 		{

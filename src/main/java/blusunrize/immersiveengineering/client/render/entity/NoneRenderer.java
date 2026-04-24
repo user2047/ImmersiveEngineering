@@ -12,7 +12,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ public class NoneRenderer<T extends Entity> extends EntityRenderer<T>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(@Nonnull T entity)
+	public Identifier getTextureLocation(@Nonnull T entity)
 	{
 		return null;
 	}

@@ -36,7 +36,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.HangingSignItem;
@@ -148,9 +148,9 @@ public final class IEBlocks
 	{
 	}
 
-	public static final Map<ResourceLocation, BlockEntry<SlabBlock>> TO_SLAB = new HashMap<>();
-	public static final Map<ResourceLocation, BlockEntry<IEStairsBlock>> TO_STAIRS = new HashMap<>();
-	public static final Map<ResourceLocation, BlockEntry<IEWallBlock>> TO_WALL = new HashMap<>();
+	public static final Map<Identifier, BlockEntry<SlabBlock>> TO_SLAB = new HashMap<>();
+	public static final Map<Identifier, BlockEntry<IEStairsBlock>> TO_STAIRS = new HashMap<>();
+	public static final Map<Identifier, BlockEntry<IEWallBlock>> TO_WALL = new HashMap<>();
 
 	public static final class StoneDecoration
 	{
@@ -677,7 +677,7 @@ public final class IEBlocks
 			Preconditions.checkState(CONVEYORS.isEmpty());
 			for(IConveyorType<?> type : ConveyorHandler.getConveyorTypes())
 			{
-				ResourceLocation rl = type.getId();
+				Identifier rl = type.getId();
 				BlockEntry<ConveyorBlock> blockEntry = new BlockEntry<>(
 						ConveyorHandler.getRegistryNameFor(rl).getPath(), ConveyorBlock.PROPERTIES, p -> new ConveyorBlock(type, p)
 				);
@@ -883,7 +883,7 @@ public final class IEBlocks
 	{
 		public static SignHolder of(WoodType wood, float strength, MapColor mapColor, NoteBlockInstrument nbi, boolean ignite)
 		{
-			String baseName = ResourceLocation.parse(wood.name()).getPath();
+			String baseName = Identifier.parse(wood.name()).getPath();
 			BlockEntry<IESignBlocks.Standing> sign = new BlockEntry<>(
 					baseName+"_sign", buildProperties(strength, mapColor, nbi, ignite, null),
 					blockProps -> new IESignBlocks.Standing(wood, blockProps)
@@ -1030,7 +1030,7 @@ public final class IEBlocks
 			return get().defaultBlockState();
 		}
 
-		public ResourceLocation getId()
+		public Identifier getId()
 		{
 			return regObject.getId();
 		}

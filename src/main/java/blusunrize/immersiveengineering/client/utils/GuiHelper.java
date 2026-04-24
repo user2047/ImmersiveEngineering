@@ -13,7 +13,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +36,7 @@ import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
 public class GuiHelper
 {
-	public static void drawColouredRect(GuiGraphics graphics, int x, int y, int w, int h, DyeColor dyeColor)
+	public static void drawColouredRect(GuiGraphicsExtractor graphics, int x, int y, int w, int h, DyeColor dyeColor)
 	{
 		Matrix4f mat = graphics.pose().last().pose();
 		var bufferbuilder = graphics.bufferSource().getBuffer(IERenderTypes.TRANSLUCENT_POSITION_COLOR);
@@ -47,7 +47,7 @@ public class GuiHelper
 		bufferbuilder.addVertex(mat, x, y, 0).setColor(color.x, color.y, color.z, 1);
 	}
 
-	public static void colouredBlit(GuiGraphics graphics, ResourceLocation atlasLocation, int x, int y, int blitOffset, int width, int height, int u, int v, float red, float green, float blue, float alpha)
+	public static void colouredBlit(GuiGraphicsExtractor graphics, Identifier atlasLocation, int x, int y, int blitOffset, int width, int height, int u, int v, float red, float green, float blue, float alpha)
 	{
 		RenderSystem.setShaderTexture(0, atlasLocation);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
@@ -137,12 +137,12 @@ public class GuiHelper
 		}
 	}
 
-	public static void drawSlot(int x, int y, int w, int h, GuiGraphics graphics)
+	public static void drawSlot(int x, int y, int w, int h, GuiGraphicsExtractor graphics)
 	{
 		drawSlot(x, y, w, h, 0xff, graphics);
 	}
 
-	public static void drawSlot(GuiGraphics graphics, int x, int y, int w, int h, int dark, int main, int light)
+	public static void drawSlot(GuiGraphicsExtractor graphics, int x, int y, int w, int h, int dark, int main, int light)
 	{
 		final int minX = x+8-w/2;
 		final int minY = y+8-h/2;
@@ -155,17 +155,17 @@ public class GuiHelper
 		graphics.fill(maxX, minY, maxX+1, maxY, light);
 	}
 
-	public static void drawSlot(int x, int y, int w, int h, int alpha, GuiGraphics graphics)
+	public static void drawSlot(int x, int y, int w, int h, int alpha, GuiGraphicsExtractor graphics)
 	{
 		drawSlot(graphics, x, y, w, h, (alpha<<24)|0x373737, (alpha<<24)|0x8b8b8b, (alpha<<24)|0xffffff);
 	}
 
-	public static void drawDarkSlot(GuiGraphics graphics, int x, int y, int w, int h)
+	public static void drawDarkSlot(GuiGraphicsExtractor graphics, int x, int y, int w, int h)
 	{
 		drawSlot(graphics, x, y, w, h, 0x77222222, 0x77111111, 0x77999999);
 	}
 
-	public static void renderItemWithOverlayIntoGUI(GuiGraphics graphics, ItemStack stack, int x, int y, Level level)
+	public static void renderItemWithOverlayIntoGUI(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, Level level)
 	{
 		ItemRenderer itemRenderer = mc().getItemRenderer();
 		BakedModel bakedModel = itemRenderer.getModel(stack, null, mc().player, 0);

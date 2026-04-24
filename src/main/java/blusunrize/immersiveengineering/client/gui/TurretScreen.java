@@ -18,11 +18,11 @@ import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.gui.TurretMenu;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,7 +33,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScreen<C>
 {
-	protected static final ResourceLocation TEXTURE = makeTextureLocation("turret");
+	protected static final Identifier TEXTURE = makeTextureLocation("turret");
 	private static final ButtonTexture BUTTON_ADD = new ButtonTexture(ieLoc("turret/button_add"));
 
 	private EditBox nameField;
@@ -126,7 +126,7 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 	}
 
 	@Override
-	public void render(@Nonnull GuiGraphics graphics, int mx, int my, float partial)
+	public void render(@Nonnull GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		super.render(graphics, mx, my, partial);
 		this.nameField.render(graphics, mx, my, partial);

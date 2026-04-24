@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.common.register.IEBlocks.BlockEntry;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -118,35 +118,35 @@ public class IEFluids
 
 	public record FluidEntry(
 			DeferredHolder<Fluid, IEFluid> flowing,
-			ResourceLocation flowingTexture,
+			Identifier flowingTexture,
 			DeferredHolder<Fluid, IEFluid> still,
-			ResourceLocation stillTexture,
+			Identifier stillTexture,
 			BlockEntry<IEFluidBlock> block,
 			DeferredHolder<Item, BucketItem> bucket,
 			Holder<FluidType> type,
 			List<Property<?>> properties
 	)
 	{
-		private static FluidEntry make(String name, ResourceLocation stillTex, ResourceLocation flowingTex)
+		private static FluidEntry make(String name, Identifier stillTex, Identifier flowingTex)
 		{
 			return make(name, 0, stillTex, flowingTex);
 		}
 
 		private static FluidEntry make(
-				String name, ResourceLocation stillTex, ResourceLocation flowingTex, Consumer<FluidType.Properties> buildAttributes
+				String name, Identifier stillTex, Identifier flowingTex, Consumer<FluidType.Properties> buildAttributes
 		)
 		{
 			return make(name, 0, stillTex, flowingTex, buildAttributes);
 		}
 
-		private static FluidEntry make(String name, int burnTime, ResourceLocation stillTex, ResourceLocation flowingTex)
+		private static FluidEntry make(String name, int burnTime, Identifier stillTex, Identifier flowingTex)
 		{
 			return make(name, burnTime, stillTex, flowingTex, null);
 		}
 
 		private static FluidEntry make(
 				String name, int burnTime,
-				ResourceLocation stillTex, ResourceLocation flowingTex,
+				Identifier stillTex, Identifier flowingTex,
 				@Nullable Consumer<FluidType.Properties> buildAttributes
 		)
 		{
@@ -157,7 +157,7 @@ public class IEFluids
 		}
 
 		private static FluidEntry make(
-				String name, ResourceLocation stillTex, ResourceLocation flowingTex,
+				String name, Identifier stillTex, Identifier flowingTex,
 				Function<FluidEntry, ? extends IEFluid> makeStill, Function<FluidEntry, ? extends IEFluid> makeFlowing,
 				@Nullable Consumer<FluidType.Properties> buildAttributes, ImmutableList<Property<?>> properties
 		)
@@ -167,7 +167,7 @@ public class IEFluids
 
 		private static FluidEntry make(
 				String name, int burnTime,
-				ResourceLocation stillTex, ResourceLocation flowingTex,
+				Identifier stillTex, Identifier flowingTex,
 				Function<FluidEntry, ? extends IEFluid> makeStill, Function<FluidEntry, ? extends IEFluid> makeFlowing,
 				@Nullable Consumer<FluidType.Properties> buildAttributes, List<Property<?>> properties)
 		{

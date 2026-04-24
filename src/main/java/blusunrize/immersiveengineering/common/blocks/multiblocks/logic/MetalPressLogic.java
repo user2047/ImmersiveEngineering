@@ -41,7 +41,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -310,12 +310,12 @@ public class MetalPressLogic
 		}
 
 		public static MultiblockProcessInWorld<MetalPressRecipe> loadProcess(
-				BiFunction<Level, ResourceLocation, MetalPressRecipe> getRecipe, CompoundTag tag, Provider provider
+				BiFunction<Level, Identifier, MetalPressRecipe> getRecipe, CompoundTag tag, Provider provider
 		)
 		{
 			if(tag.contains("baseRecipe", Tag.TAG_STRING))
 				return new SpecialMetalPressProcess(
-						tag, ResourceLocation.parse(tag.getString("baseRecipe")), provider
+						tag, Identifier.parse(tag.getString("baseRecipe")), provider
 				);
 			else
 				return new MultiblockProcessInWorld<>(getRecipe, tag, provider);
@@ -324,9 +324,9 @@ public class MetalPressLogic
 
 	private static class SpecialMetalPressProcess extends MultiblockProcessInWorld<MetalPressRecipe>
 	{
-		private final ResourceLocation baseRecipeLocation;
+		private final Identifier baseRecipeLocation;
 
-		public SpecialMetalPressProcess(CompoundTag data, ResourceLocation baseRecipeLocation, Provider provider)
+		public SpecialMetalPressProcess(CompoundTag data, Identifier baseRecipeLocation, Provider provider)
 		{
 			super((level, name) -> {
 				CraftingRecipe baseRecipe = MetalPressPackingRecipes.CRAFTING_RECIPE_MAP.getById(
@@ -342,7 +342,7 @@ public class MetalPressLogic
 			this.baseRecipeLocation = baseRecipeLocation;
 		}
 
-		public SpecialMetalPressProcess(ResourceLocation id, RecipeDelegate recipe, ItemStack inputItem)
+		public SpecialMetalPressProcess(Identifier id, RecipeDelegate recipe, ItemStack inputItem)
 		{
 			super(new RecipeHolder<>(id, recipe), inputItem);
 			this.baseRecipeLocation = recipe.baseRecipe.id();

@@ -40,7 +40,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -451,13 +451,13 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 				selectedTags[slot] = null;
 		}
 
-		public void setSelectedTag(int slot, @Nullable final ResourceLocation location)
+		public void setSelectedTag(int slot, @Nullable final Identifier location)
 		{
 			this.selectedTags[slot] = FilterTag.deserialize(this.getStackInSlot(slot), location);
 		}
 
 		@Nullable
-		public ResourceLocation getSelectedTag(int slot)
+		public Identifier getSelectedTag(int slot)
 		{
 			return this.selectedTags[slot]==null?null: this.selectedTags[slot].serialize();
 		}
@@ -552,8 +552,8 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 
 	private static final String COMMON_NAMESPACE = "c";
 	private static final Comparator<TagKey<Item>> TAG_SORTER = (o1, o2) -> {
-		ResourceLocation rl1 = o1.location();
-		ResourceLocation rl2 = o2.location();
+		Identifier rl1 = o1.location();
+		Identifier rl2 = o2.location();
 		// common namespace always comes first
 		if(COMMON_NAMESPACE.equals(rl1.getNamespace())&&!COMMON_NAMESPACE.equals(rl2.getNamespace()))
 			return -1;
@@ -586,13 +586,13 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 			});
 		}
 
-		public ResourceLocation serialize()
+		public Identifier serialize()
 		{
-			return inner().map(TagKey::location, modid -> ResourceLocation.fromNamespaceAndPath("modid", modid));
+			return inner().map(TagKey::location, modid -> Identifier.fromNamespaceAndPath("modid", modid));
 		}
 
 		@Nullable
-		public static FilterTag deserialize(ItemStack stack, @Nullable ResourceLocation location)
+		public static FilterTag deserialize(ItemStack stack, @Nullable Identifier location)
 		{
 			if(location==null)
 				return null;
@@ -610,7 +610,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 				return new FilterTag(Either.right(slotTag.getString("selectedMod")));
 			if(slotTag.contains("selectedTag"))
 			{
-				ResourceLocation rl = ResourceLocation.parse(slotTag.getString("selectedTag"));
+				Identifier rl = Identifier.parse(slotTag.getString("selectedTag"));
 				return stack.getTags()
 						.filter(t -> t.location().equals(rl))
 						.findFirst()
@@ -626,10 +626,10 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 					.ifRight(mod -> slotTag.putString("selectedMod", mod));
 		}
 
-		public static List<ResourceLocation> getAvailableForItem(ItemStack stack)
+		public static List<Identifier> getAvailableForItem(ItemStack stack)
 		{
-			List<ResourceLocation> list = new ArrayList<>(stack.getTags().sorted(TAG_SORTER).map(TagKey::location).toList());
-			list.add(ResourceLocation.fromNamespaceAndPath("modid", Utils.getModIdForItemStack(stack)));
+			List<Identifier> list = new ArrayList<>(stack.getTags().sorted(TAG_SORTER).map(TagKey::location).toList());
+			list.add(Identifier.fromNamespaceAndPath("modid", Utils.getModIdForItemStack(stack)));
 			return list;
 		}
 

@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 
@@ -82,15 +82,15 @@ public class ShaderBannerRenderer extends IEBlockEntityRenderer<ShaderBannerBloc
 		float f3 = (float)(blockpos.getX()*7+blockpos.getY()*9+blockpos.getZ()*13)+(float)time+partialTicks;
 		clothModel.xRot = (-0.0125F+0.01F*Mth.cos(f3*(float)Math.PI*0.02F))*(float)Math.PI;
 		clothModel.y = -32.0F;
-		ResourceLocation resourcelocation = this.getBannerResourceLocation(te);
+		Identifier Identifier = this.getBannerResourceLocation(te);
 
-		if(resourcelocation!=null)
+		if(Identifier!=null)
 		{
 			matrixStack.pushPose();
 
 			matrixStack.scale(2f/3, -2f/3, -2f/3);
 			VertexConsumer builder;
-			builder = bufferIn.getBuffer(RenderType.entitySolid(resourcelocation));
+			builder = bufferIn.getBuffer(RenderType.entitySolid(Identifier));
 			this.clothModel.render(matrixStack, builder, combinedLightIn, combinedOverlayIn);
 			builder = ModelBakery.BANNER_BASE.buffer(bufferIn, RenderType::entitySolid);
 			this.crossbar.render(matrixStack, builder, combinedLightIn, combinedOverlayIn);
@@ -102,24 +102,24 @@ public class ShaderBannerRenderer extends IEBlockEntityRenderer<ShaderBannerBloc
 		matrixStack.popPose();
 	}
 
-	private static final ResourceLocation BASE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/banner_base.png");
-	private static final HashMap<ResourceLocation, ResourceLocation> CACHE = new HashMap<>();
+	private static final Identifier BASE_TEXTURE = Identifier.withDefaultNamespace("textures/entity/banner_base.png");
+	private static final HashMap<Identifier, Identifier> CACHE = new HashMap<>();
 
 	@Nullable
-	private ResourceLocation getBannerResourceLocation(ShaderBannerBlockEntity bannerObj)
+	private Identifier getBannerResourceLocation(ShaderBannerBlockEntity bannerObj)
 	{
 		return getShaderResourceLocation(bannerObj.shader.getShader(), bannerObj.shader.getShaderType());
 	}
 
 	@Nullable
-	public static ResourceLocation getShaderResourceLocation(ResourceLocation shader, ResourceLocation shaderType)
+	public static Identifier getShaderResourceLocation(Identifier shader, Identifier shaderType)
 	{
 		ShaderCase sCase = ShaderRegistry.getShader(shader, shaderType);
 
 		if(sCase!=null)
 		{
 			ShaderLayer[] layers = sCase.getLayers();
-			ResourceLocation textureLocation = shader.withPath("bannershader/"+shader.getPath());
+			Identifier textureLocation = shader.withPath("bannershader/"+shader.getPath());
 			ClientUtils.mc().getTextureManager().register(textureLocation, new IEShaderLayerCompositeTexture(BASE_TEXTURE, layers));
 			CACHE.put(shader, textureLocation);
 			return textureLocation;

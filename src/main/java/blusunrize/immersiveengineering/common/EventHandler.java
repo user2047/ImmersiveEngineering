@@ -47,7 +47,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -159,7 +159,7 @@ public class EventHandler
 		ItemStack stack = event.getItemEntity().getItem();
 		if(!stack.isEmpty()&&stack.getItem() instanceof IShaderItem)
 		{
-			ResourceLocation shader = ((IShaderItem)stack.getItem()).getShaderName();
+			Identifier shader = ((IShaderItem)stack.getItem()).getShaderName();
 			ShaderRegistry.markShaderReceived(player.getUUID(), shader);
 		}
 	}

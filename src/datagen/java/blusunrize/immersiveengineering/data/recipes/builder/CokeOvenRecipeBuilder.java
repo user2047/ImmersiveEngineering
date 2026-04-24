@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
@@ -61,7 +61,7 @@ public class CokeOvenRecipeBuilder extends IERecipeBuilder<CokeOvenRecipeBuilder
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		CokeOvenRecipe recipe = new CokeOvenRecipe(output, input, time, creosote);
 		out.accept(name, recipe, null, getConditions());

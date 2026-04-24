@@ -25,7 +25,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.joml.Quaternionf;
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 public class BasicClientProperties implements MultiblockManualData
 {
-	private static final Map<ResourceLocation, DynamicModel> MODELS = new HashMap<>();
+	private static final Map<Identifier, DynamicModel> MODELS = new HashMap<>();
 
 	private final IETemplateMultiblock multiblock;
 	@Nullable

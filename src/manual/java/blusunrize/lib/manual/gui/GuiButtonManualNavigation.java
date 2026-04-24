@@ -11,14 +11,14 @@ package blusunrize.lib.manual.gui;
 import blusunrize.lib.manual.ManualUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
+import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
+import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class GuiButtonManualNavigation extends Button
 {
@@ -37,7 +37,7 @@ public class GuiButtonManualNavigation extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mx, int my, float partial)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		isHovered = mx >= this.getX()&&mx < (this.getX()+this.width)&&my >= this.getY()&&my < (this.getY()+this.height);
 		RenderSystem.enableBlend();

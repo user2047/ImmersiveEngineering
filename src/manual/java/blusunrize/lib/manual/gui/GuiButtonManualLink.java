@@ -12,7 +12,7 @@ import blusunrize.lib.manual.ManualInstance.ManualLink;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -42,7 +42,7 @@ public class GuiButtonManualLink extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mx, int my, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		isHovered = mx >= this.getX()&&my >= this.getY()&&mx < this.getX()+this.width&&my < this.getY()+this.height;
 		if(isHovered)
@@ -54,7 +54,7 @@ public class GuiButtonManualLink extends Button
 		}
 	}
 
-	private void drawHovered(GuiGraphics graphics, int mx, int my)
+	private void drawHovered(GuiGraphicsExtractor graphics, int mx, int my)
 	{
 		Font font = gui.manual.fontRenderer();
 		graphics.drawString(font, localized, getX(), getY(), gui.manual.getHighlightColour(), false);

@@ -20,7 +20,7 @@ import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.item.MCItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -99,7 +99,7 @@ public class SawmillRecipeManager implements IRecipeManager<SawmillRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredient input, int energy, IItemStack strippedOutput, IItemStack[] strippedOutputSecondaries, IItemStack output, IItemStack[] outputSecondaries)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final Ingredient ingredient = input.asVanillaIngredient();
 
 		final ItemStack stripped = strippedOutput.getInternal();
@@ -112,7 +112,7 @@ public class SawmillRecipeManager implements IRecipeManager<SawmillRecipe>
 		final ItemStack[] secondaryOutputs = CrTIngredientUtil.getItemStacks(outputSecondaries);
 
 		final SawmillRecipe recipe = IEServerConfig.MACHINES.sawmillConfig.apply(
-				new SawmillRecipe(resourceLocation, of(mainOutput), of(stripped), ingredient, energy)
+				new SawmillRecipe(Identifier, of(mainOutput), of(stripped), ingredient, energy)
 		);
 		for(ItemStack stack : secondaryStripping)
 			recipe.addToSecondaryStripping(of(stack));

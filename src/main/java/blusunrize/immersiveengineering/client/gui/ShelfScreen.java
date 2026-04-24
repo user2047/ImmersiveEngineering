@@ -16,10 +16,10 @@ import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.ShelfLogic;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.ShelfLogic.CrateVariant;
 import blusunrize.immersiveengineering.common.gui.ShelfMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +33,7 @@ import static blusunrize.immersiveengineering.common.gui.ShelfMenu.*;
 
 public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 {
-	private static final ResourceLocation TEXTURE = makeTextureLocation("shelf");
+	private static final Identifier TEXTURE = makeTextureLocation("shelf");
 	private static final ButtonTexture BUTTON = new ButtonTexture(ieLoc("shelf/swap"));
 	private static final Component TEXT_SWAP = Component.translatable(Lib.GUI_CONFIG+"shelf.swap");
 	private int playerInvX = 0;
@@ -78,7 +78,7 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 
 
 	@Override
-	protected void drawBackgroundTexture(GuiGraphics graphics)
+	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		// Crates
 		List<ItemStack> crates = this.menu.backside.get()?this.menu.cratesBack.get(): this.menu.cratesFront.get();
@@ -109,7 +109,7 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
+	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		List<ItemStack> crates = this.menu.backside.get()?this.menu.cratesBack.get(): this.menu.cratesFront.get();
 		for(int i = 0; i < crates.size(); i++)

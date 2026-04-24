@@ -21,7 +21,7 @@ import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.api.util.random.Percentaged;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -102,12 +102,12 @@ public class CrusherRecipeManager implements IRecipeManager<CrusherRecipe>
 	@ZenCodeType.Method
 	public final void addRecipe(String recipePath, IIngredient input, int energy, IItemStack mainOutput, Percentaged<IItemStack>... additionalOutputs)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 
 		final ItemStack result = mainOutput.getInternal();
 		final Ingredient ingredient = input.asVanillaIngredient();
 		final CrusherRecipe recipe = IEServerConfig.MACHINES.crusherConfig.apply(
-				new CrusherRecipe(resourceLocation, of(result), ingredient, energy)
+				new CrusherRecipe(Identifier, of(result), ingredient, energy)
 		);
 
 		for(Percentaged<IItemStack> additionalOutput : additionalOutputs)

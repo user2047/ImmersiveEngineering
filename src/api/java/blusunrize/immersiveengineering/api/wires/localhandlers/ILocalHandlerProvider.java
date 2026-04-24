@@ -9,13 +9,13 @@
 package blusunrize.immersiveengineering.api.wires.localhandlers;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 
 public interface ILocalHandlerProvider
 {
-	default Collection<ResourceLocation> getRequestedHandlers()
+	default Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of();
 	}

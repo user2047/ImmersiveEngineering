@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.util.compat.jei;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.drawable.IDrawable;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Heavily inspired by Create, which is published under MIT license.
@@ -32,7 +32,7 @@ public record DoubleIcon(IDrawable main, IDrawable secondary, float scale) imple
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int xOffset, int yOffset)
+	public void draw(GuiGraphicsExtractor graphics, int xOffset, int yOffset)
 	{
 		PoseStack matrixStack = graphics.pose();
 

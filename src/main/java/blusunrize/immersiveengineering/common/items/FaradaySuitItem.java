@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.items;
 import blusunrize.immersiveengineering.api.tool.IElectricEquipment;
 import blusunrize.immersiveengineering.common.register.IEArmorMaterials;
 import blusunrize.immersiveengineering.common.util.IEDamageSources.ElectricDamageSource;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -58,7 +58,7 @@ public class FaradaySuitItem extends ArmorItem implements IElectricEquipment
 
 	@Override
 	@Nullable
-	public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, Layer layer, boolean innerModel)
+	public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, Layer layer, boolean innerModel)
 	{
 		// TODO remove
 		//if(slot==EquipmentSlot.LEGS)

@@ -9,7 +9,7 @@
 package blusunrize.immersiveengineering.api;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -181,7 +181,7 @@ public class IETags
 		return metals.get(metal);
 	}
 
-	private static TagKey<Block> createBlockTag(ResourceLocation name)
+	private static TagKey<Block> createBlockTag(Identifier name)
 	{
 		TagKey<Block> blockTag = createBlockWrapper(name);
 		toItemTag.put(blockTag, createItemWrapper(name));
@@ -255,77 +255,77 @@ public class IETags
 	}
 
 	// TODO adjust *all* of these!
-	private static ResourceLocation neoLoc(String path)
+	private static Identifier neoLoc(String path)
 	{
-		return ResourceLocation.fromNamespaceAndPath("neoforge", path);
+		return Identifier.fromNamespaceAndPath("neoforge", path);
 	}
 
-	private static ResourceLocation cLoc(String path)
+	private static Identifier cLoc(String path)
 	{
-		return ResourceLocation.fromNamespaceAndPath("c", path);
+		return Identifier.fromNamespaceAndPath("c", path);
 	}
 
-	public static ResourceLocation getOre(String type)
+	public static Identifier getOre(String type)
 	{
 		return cLoc("ores/"+type);
 	}
 
-	public static ResourceLocation getRawOre(String type)
+	public static Identifier getRawOre(String type)
 	{
 		return cLoc("raw_materials/"+type);
 	}
 
-	public static ResourceLocation getNugget(String type)
+	public static Identifier getNugget(String type)
 	{
 		return cLoc("nuggets/"+type);
 	}
 
-	public static ResourceLocation getIngot(String type)
+	public static Identifier getIngot(String type)
 	{
 		return cLoc("ingots/"+type);
 	}
 
-	public static ResourceLocation getGem(String type)
+	public static Identifier getGem(String type)
 	{
 		return cLoc("gems/"+type);
 	}
 
-	public static ResourceLocation getStorageBlock(String type)
+	public static Identifier getStorageBlock(String type)
 	{
 		return cLoc("storage_blocks/"+type);
 	}
 
-	public static ResourceLocation getRawBlock(String type)
+	public static Identifier getRawBlock(String type)
 	{
 		return getStorageBlock("raw_"+type);
 	}
 
-	public static ResourceLocation getDust(String type)
+	public static Identifier getDust(String type)
 	{
 		return cLoc("dusts/"+type);
 	}
 
-	public static ResourceLocation getPlate(String type)
+	public static Identifier getPlate(String type)
 	{
 		return cLoc("plates/"+type);
 	}
 
-	public static ResourceLocation getRod(String type)
+	public static Identifier getRod(String type)
 	{
 		return cLoc("rods/"+type);
 	}
 
-	public static ResourceLocation getGear(String type)
+	public static Identifier getGear(String type)
 	{
 		return cLoc("gears/"+type);
 	}
 
-	public static ResourceLocation getWire(String type)
+	public static Identifier getWire(String type)
 	{
 		return cLoc("wires/"+type);
 	}
 
-	public static ResourceLocation getSheetmetalBlock(String type)
+	public static Identifier getSheetmetalBlock(String type)
 	{
 		return cLoc("sheetmetals/"+type);
 	}

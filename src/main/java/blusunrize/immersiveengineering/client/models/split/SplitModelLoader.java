@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class SplitModelLoader implements IGeometryLoader<UnbakedSplitModel>
 {
-	public static final ResourceLocation LOCATION = IEApi.ieLoc("basic_split");
+	public static final Identifier LOCATION = IEApi.ieLoc("basic_split");
 	public static final String PARTS = "split_parts";
 	public static final String INNER_MODEL = "inner_model";
 	public static final String DYNAMIC = "dynamic";

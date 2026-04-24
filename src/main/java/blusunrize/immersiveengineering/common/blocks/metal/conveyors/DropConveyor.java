@@ -19,7 +19,7 @@ import blusunrize.immersiveengineering.client.render.conveyor.BasicConveyorRende
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,9 +34,9 @@ import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
  */
 public class DropConveyor extends ConveyorBase
 {
-	public static final ResourceLocation NAME = IEApi.ieLoc("dropper");
-	public static ResourceLocation texture_on = IEApi.ieLoc("block/conveyor/dropper");
-	public static ResourceLocation texture_off = IEApi.ieLoc("block/conveyor/dropper_off");
+	public static final Identifier NAME = IEApi.ieLoc("dropper");
+	public static Identifier texture_on = IEApi.ieLoc("block/conveyor/dropper");
+	public static Identifier texture_off = IEApi.ieLoc("block/conveyor/dropper_off");
 	public static final IConveyorType<DropConveyor> TYPE = new BasicConveyorType<>(
 			NAME, false, true, DropConveyor::new, () -> new BasicConveyorRender<>(texture_on, texture_off)
 	);

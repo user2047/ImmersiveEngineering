@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
@@ -44,7 +44,7 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 @EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
 public class RobotWolfItem extends IEBaseItem
 {
-	public static ResourceLocation REGISTRY_KEY = ieLoc("robot");
+	public static Identifier REGISTRY_KEY = ieLoc("robot");
 
 	public RobotWolfItem()
 	{

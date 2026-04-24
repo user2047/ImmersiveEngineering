@@ -12,7 +12,7 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import java.util.Optional;
@@ -30,7 +30,7 @@ public record FakeRegisteredHolder<T>(
 	}
 
 	@Override
-	public boolean is(ResourceLocation p_205713_)
+	public boolean is(Identifier p_205713_)
 	{
 		return this.key.location().equals(p_205713_);
 	}

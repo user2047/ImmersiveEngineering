@@ -33,7 +33,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -279,7 +279,7 @@ public class ModelConfigurableSides extends BakedIEModel
 
 	public static class Loader implements IGeometryLoader<ConfigSidesModelBase>
 	{
-		public static ResourceLocation NAME = IEApi.ieLoc("conf_sides");
+		public static Identifier NAME = IEApi.ieLoc("conf_sides");
 
 		@Nonnull
 		@Override
@@ -294,7 +294,7 @@ public class ModelConfigurableSides extends BakedIEModel
 				{
 					String key = f.getSerializedName()+"_"+cfg.getTextureName();
 					String tex = name+"_"+namer.getTextureName(f, cfg);
-					builder.put(key, new Material(InventoryMenu.BLOCK_ATLAS, ResourceLocation.parse(tex)));
+					builder.put(key, new Material(InventoryMenu.BLOCK_ATLAS, Identifier.parse(tex)));
 				}
 			return new ConfigSidesModelBase(name, type, builder.build());
 		}
@@ -320,8 +320,8 @@ public class ModelConfigurableSides extends BakedIEModel
 				}
 				tex.put(f, forSide);
 			}
-			final ResourceLocation renderTypeName = Objects.requireNonNullElseGet(
-					owner.getRenderTypeHint(), () -> ResourceLocation.withDefaultNamespace("solid")
+			final Identifier renderTypeName = Objects.requireNonNullElseGet(
+					owner.getRenderTypeHint(), () -> Identifier.withDefaultNamespace("solid")
 			);
 			return new ModelConfigurableSides(name, tex, owner.getRenderType(renderTypeName));
 		}

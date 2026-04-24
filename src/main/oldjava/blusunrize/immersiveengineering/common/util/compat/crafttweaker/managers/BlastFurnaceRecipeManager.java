@@ -18,7 +18,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeType;
@@ -61,12 +61,12 @@ public class BlastFurnaceRecipeManager implements IRecipeManager<BlastFurnaceRec
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount ingredient, int time, IItemStack output, @ZenCodeType.Optional("<item:minecraft:air>") IItemStack slag)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize ingredientWithSize = CrTIngredientUtil.getIngredientWithSize(ingredient);
 		final ItemStack outputItem = output.getInternal();
 		final ItemStack slagItem = slag.getInternal();
 		final BlastFurnaceRecipe blastFurnaceRecipe = new BlastFurnaceRecipe(
-				resourceLocation, of(outputItem), ingredientWithSize, time, of(slagItem)
+				Identifier, of(outputItem), ingredientWithSize, time, of(slagItem)
 		);
 		CraftTweakerAPI.apply(new ActionAddRecipe<>(this, blastFurnaceRecipe, null));
 	}

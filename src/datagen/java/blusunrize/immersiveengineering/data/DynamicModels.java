@@ -19,7 +19,7 @@ import blusunrize.immersiveengineering.data.blockstates.MultiblockStates;
 import blusunrize.immersiveengineering.data.models.IEOBJBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -151,7 +151,7 @@ public class DynamicModels extends ModelProvider<SimpleModelBuilder>
 	public static class SimpleModelBuilder extends ModelBuilder<SimpleModelBuilder>
 	{
 
-		public SimpleModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper)
+		public SimpleModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper)
 		{
 			super(outputLocation, existingFileHelper);
 		}

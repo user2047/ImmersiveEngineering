@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 public class EnergyTransferHandler extends LocalNetworkHandler implements IWorldTickable
 {
-	public static final ResourceLocation ID = IEApi.ieLoc("energy_transfer");
+	public static final Identifier ID = IEApi.ieLoc("energy_transfer");
 
 	private final Map<ConnectionPoint, Map<ConnectionPoint, Path>> energyPaths = new HashMap<>();
 	private Object2DoubleOpenHashMap<Connection> transferredNextTick = new Object2DoubleOpenHashMap<>();

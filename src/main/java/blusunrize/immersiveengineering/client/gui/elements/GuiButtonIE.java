@@ -10,15 +10,15 @@ package blusunrize.immersiveengineering.client.gui.elements;
 
 import blusunrize.immersiveengineering.api.Lib;
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.opengl.GlStateManager.DestFactor;
+import com.mojang.blaze3d.opengl.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class GuiButtonIE extends Button
 {
@@ -36,7 +36,7 @@ public class GuiButtonIE extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();
 		Font fontrenderer = mc.font;
@@ -73,7 +73,7 @@ public class GuiButtonIE extends Button
 		}
 	}
 
-	public record ButtonTexture(ResourceLocation texture, ResourceLocation hovered)
+	public record ButtonTexture(Identifier texture, Identifier hovered)
 	{
 		public ButtonTexture
 		{
@@ -81,12 +81,12 @@ public class GuiButtonIE extends Button
 			Preconditions.checkArgument(hovered!=null);
 		}
 
-		public ButtonTexture(ResourceLocation texture)
+		public ButtonTexture(Identifier texture)
 		{
 			this(texture, texture);
 		}
 
-		public ResourceLocation get(boolean hovered)
+		public Identifier get(boolean hovered)
 		{
 			return hovered?this.hovered: texture;
 		}

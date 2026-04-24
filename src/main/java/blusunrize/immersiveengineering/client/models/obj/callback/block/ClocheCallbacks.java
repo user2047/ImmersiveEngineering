@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -72,7 +72,7 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		ItemStack soil = key.soil().stack;
 		if(!soil.isEmpty()&&"farmland".equals(material))
 		{
-			ResourceLocation rl = getSoilTexture(soil);
+			Identifier rl = getSoilTexture(soil);
 			if(rl!=null)
 				return ClientUtils.getSprite(rl);
 		}
@@ -86,9 +86,9 @@ public class ClocheCallbacks implements BlockCallback<Key>
 	}
 
 	@Nullable
-	private static ResourceLocation getSoilTexture(ItemStack soil)
+	private static Identifier getSoilTexture(ItemStack soil)
 	{
-		ResourceLocation rl = ClocheRecipe.getSoilTexture(soil);
+		Identifier rl = ClocheRecipe.getSoilTexture(soil);
 		if(rl==null)
 		{
 			try

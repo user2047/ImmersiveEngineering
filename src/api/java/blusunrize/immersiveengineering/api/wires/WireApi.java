@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.api.wires;
 
 import blusunrize.immersiveengineering.api.IEProperties;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -26,13 +26,13 @@ public final class WireApi
 {
 	public static final Map<WireType, FeedthroughModelInfo> INFOS = new HashMap<>();
 
-	public static void registerFeedthroughForWiretype(WireType w, ResourceLocation texLoc, double[] uvs,
+	public static void registerFeedthroughForWiretype(WireType w, Identifier texLoc, double[] uvs,
 													  double connLength, BlockState conn)
 	{
 		INFOS.put(w, new FeedthroughModelInfo(conn, texLoc, uvs, connLength, connLength));
 	}
 
-	public static void registerFeedthroughForWiretype(WireType w, ResourceLocation texLoc, double[] uvs,
+	public static void registerFeedthroughForWiretype(WireType w, Identifier texLoc, double[] uvs,
 													  double connLength, double connOffset, BlockState conn)
 	{
 		INFOS.put(w, new FeedthroughModelInfo(conn, texLoc, uvs, connLength, connOffset));
@@ -75,7 +75,7 @@ public final class WireApi
 
 	public static record FeedthroughModelInfo(
 			BlockState connector,
-			ResourceLocation texture,
+			Identifier texture,
 			double[] uvs,
 			double connLength,
 			double connOffset

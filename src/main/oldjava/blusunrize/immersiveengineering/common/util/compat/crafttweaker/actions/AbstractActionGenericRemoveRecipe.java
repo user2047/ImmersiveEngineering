@@ -14,7 +14,7 @@ import com.blamejared.crafttweaker.api.action.base.IRuntimeAction;
 import com.blamejared.crafttweaker.api.bracket.CommandStringDisplayable;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker.natives.fluid.ExpandFluid;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.material.Fluid;
 
@@ -53,7 +53,7 @@ public abstract class AbstractActionGenericRemoveRecipe<T extends Recipe<?>> imp
 	public void apply()
 	{
 		int count = 0;
-		final Iterator<Map.Entry<ResourceLocation, T>> iterator = manager.getRecipes()
+		final Iterator<Map.Entry<Identifier, T>> iterator = manager.getRecipes()
 				.entrySet()
 				.iterator();
 

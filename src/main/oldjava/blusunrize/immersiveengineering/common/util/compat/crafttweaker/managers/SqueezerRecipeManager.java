@@ -23,7 +23,7 @@ import com.blamejared.crafttweaker.api.ingredient.IIngredientWithAmount;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
@@ -107,13 +107,13 @@ public class SqueezerRecipeManager implements IRecipeManager<SqueezerRecipe>
 	@ZenCodeType.Method
 	public void addRecipe(String recipePath, IIngredientWithAmount input, int energy, IFluidStack fluidOutput, @ZenCodeType.Optional("<item:minecraft:air>") IItemStack itemOutput)
 	{
-		final ResourceLocation resourceLocation = new ResourceLocation("crafttweaker", recipePath);
+		final Identifier Identifier = new Identifier("crafttweaker", recipePath);
 		final IngredientWithSize inputWithSize = CrTIngredientUtil.getIngredientWithSize(input);
 		final FluidStack fluidOut = fluidOutput.getInternal();
 		final ItemStack itemOut = itemOutput.getInternal();
 
 		final SqueezerRecipe recipe = IEServerConfig.MACHINES.squeezerConfig.apply(
-				new SqueezerRecipe(resourceLocation, fluidOut, IESerializableRecipe.of(itemOut), inputWithSize, energy)
+				new SqueezerRecipe(Identifier, fluidOut, IESerializableRecipe.of(itemOut), inputWithSize, energy)
 		);
 
 		final String outputDescription = String.format("%s and %s", fluidOutput.getCommandString(), itemOutput.getCommandString());

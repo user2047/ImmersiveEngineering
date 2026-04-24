@@ -19,7 +19,7 @@ import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +41,7 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 		var upgrades = BuzzsawItem.getUpgradesStatic(stack);
 		final boolean hasQuiver = BuzzsawItem.hasQuiverUpgrade(stack);
 		final int numBlades = hasQuiver?3: 1;
-		List<ResourceLocation> bladeTextures = new ArrayList<>();
+		List<Identifier> bladeTextures = new ArrayList<>();
 		for(int i = 0; i < numBlades; ++i)
 		{
 			ItemStack sawblade = BuzzsawItem.getSawblade(stack, i);
@@ -59,7 +59,7 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 		if("blade".equals(material))
 		{
 			int spare = "upgrade_blades1".equals(group)?1: "upgrade_blades2".equals(group)?2: 0;
-			ResourceLocation rl = key.bladeTexture.get(spare);
+			Identifier rl = key.bladeTexture.get(spare);
 			if(rl!=null)
 				return ClientUtils.getSprite(rl);
 		}
@@ -118,7 +118,7 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 		return new Key(Arrays.asList(null, null, null), false, false);
 	}
 
-	public record Key(List<ResourceLocation> bladeTexture, boolean hasQuiver, boolean oiled)
+	public record Key(List<Identifier> bladeTexture, boolean hasQuiver, boolean oiled)
 	{
 	}
 }

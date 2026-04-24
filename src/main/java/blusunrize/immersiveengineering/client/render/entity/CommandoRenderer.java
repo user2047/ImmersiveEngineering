@@ -16,12 +16,12 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.IllagerRenderer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.monster.AbstractIllager.IllagerArmPose;
 
 public class CommandoRenderer extends IllagerRenderer<Commando>
 {
-	private static final ResourceLocation TEXTURE = IEApi.ieLoc("textures/entity/illager/commando.png");
+	private static final Identifier TEXTURE = IEApi.ieLoc("textures/entity/illager/commando.png");
 
 	public CommandoRenderer(EntityRendererProvider.Context p_174354_)
 	{
@@ -64,7 +64,7 @@ public class CommandoRenderer extends IllagerRenderer<Commando>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(Commando entity)
+	public Identifier getTextureLocation(Commando entity)
 	{
 		return TEXTURE;
 	}

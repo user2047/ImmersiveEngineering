@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
@@ -42,7 +42,7 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 	@Override
 	public void updateCachedModels(ModelBaker baker, Function<Material, TextureAtlasSprite> getTexture)
 	{
-		ResourceLocation modelName = MODEL_PANEL.getName();
+		Identifier modelName = MODEL_PANEL.getName();
 		for(Direction d : DirectionUtils.BY_HORIZONTAL_INDEX)
 		{
 			ModelState transform = BlockModelRotation.by(0, (int)d.toYRot()+180);
@@ -50,7 +50,7 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 		}
 	}
 
-	public RedstoneConveyorRender(ResourceLocation active, ResourceLocation inactive)
+	public RedstoneConveyorRender(Identifier active, Identifier inactive)
 	{
 		super(active, inactive);
 	}

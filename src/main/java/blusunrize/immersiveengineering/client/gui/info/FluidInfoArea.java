@@ -12,13 +12,13 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.fluids.PotionFluid;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 
@@ -34,9 +34,9 @@ public class FluidInfoArea extends InfoArea
 	private final Rect2i area;
 	private final int overlayWidth;
 	private final int overlayHeight;
-	private final ResourceLocation overlayTexture;
+	private final Identifier overlayTexture;
 
-	public FluidInfoArea(IFluidTank tank, Rect2i area, int overlayWidth, int overlayHeight, ResourceLocation overlayTexture)
+	public FluidInfoArea(IFluidTank tank, Rect2i area, int overlayWidth, int overlayHeight, Identifier overlayTexture)
 	{
 		super(area);
 		this.tank = tank;
@@ -88,7 +88,7 @@ public class FluidInfoArea extends InfoArea
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics)
+	public void draw(GuiGraphicsExtractor graphics)
 	{
 		FluidStack fluid = tank.getFluid();
 		float capacity = tank.getCapacity();

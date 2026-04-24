@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
 
@@ -62,7 +62,7 @@ public class IEExplosiveRenderer extends EntityRenderer<GunpowderBarrelEntity>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(GunpowderBarrelEntity entity)
+	public Identifier getTextureLocation(GunpowderBarrelEntity entity)
 	{
 		return InventoryMenu.BLOCK_ATLAS;
 	}

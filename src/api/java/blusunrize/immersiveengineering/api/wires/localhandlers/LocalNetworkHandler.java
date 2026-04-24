@@ -10,22 +10,22 @@ package blusunrize.immersiveengineering.api.wires.localhandlers;
 
 import blusunrize.immersiveengineering.api.wires.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class LocalNetworkHandler
 {
-	private static final Map<ResourceLocation, ILocalHandlerConstructor> TYPES = new HashMap<>();
+	private static final Map<Identifier, ILocalHandlerConstructor> TYPES = new HashMap<>();
 
-	public static void register(ResourceLocation loc, ILocalHandlerConstructor constructor)
+	public static void register(Identifier loc, ILocalHandlerConstructor constructor)
 	{
 		TYPES.put(loc, constructor);
 	}
 
 	//TODO make non-API?
-	public static LocalNetworkHandler createHandler(ResourceLocation type, LocalWireNetwork local, GlobalWireNetwork global)
+	public static LocalNetworkHandler createHandler(Identifier type, LocalWireNetwork local, GlobalWireNetwork global)
 	{
 		try
 		{

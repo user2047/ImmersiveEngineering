@@ -16,7 +16,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.phys.Vec3;
 
@@ -59,7 +59,7 @@ public class IEStreamCodecs
 
 	public static <T> StreamCodec<ByteBuf, TagKey<T>> tagCodec(ResourceKey<? extends Registry<T>> key)
 	{
-		return ResourceLocation.STREAM_CODEC.map(rl -> TagKey.create(key, rl), TagKey::location);
+		return Identifier.STREAM_CODEC.map(rl -> TagKey.create(key, rl), TagKey::location);
 	}
 
 	public static <E extends Enum<E>> StreamCodec<ByteBuf, E> enumStreamCodec(E[] keys)

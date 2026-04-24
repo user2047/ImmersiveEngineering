@@ -17,12 +17,12 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.IllagerRenderer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.monster.AbstractIllager.IllagerArmPose;
 
 public class FusilierRenderer extends IllagerRenderer<Fusilier>
 {
-	private static final ResourceLocation TEXTURE = IEApi.ieLoc("textures/entity/illager/fusilier.png");
+	private static final Identifier TEXTURE = IEApi.ieLoc("textures/entity/illager/fusilier.png");
 
 	public FusilierRenderer(EntityRendererProvider.Context p_174354_)
 	{
@@ -43,7 +43,7 @@ public class FusilierRenderer extends IllagerRenderer<Fusilier>
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(Fusilier entity)
+	public Identifier getTextureLocation(Fusilier entity)
 	{
 		return TEXTURE;
 	}

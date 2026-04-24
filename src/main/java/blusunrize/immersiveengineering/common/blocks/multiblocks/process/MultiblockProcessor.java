@@ -18,7 +18,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -39,14 +39,14 @@ public class MultiblockProcessor<R extends MultiblockRecipe, CTX extends Process
 	private final int maxProcessPerTick;
 	private final Runnable markDirty;
 	private final Runnable onQueueChange;
-	private final BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID;
+	private final BiFunction<Level, Identifier, @Nullable R> getRecipeFromID;
 
 	public MultiblockProcessor(
 			int maxQueueLength,
 			float minDelayAfter,
 			int maxProcessPerTick,
 			Runnable markDirty,
-			BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID
+			BiFunction<Level, Identifier, @Nullable R> getRecipeFromID
 	)
 	{
 		this(maxQueueLength, $ -> minDelayAfter, maxProcessPerTick, markDirty, () -> {
@@ -59,7 +59,7 @@ public class MultiblockProcessor<R extends MultiblockRecipe, CTX extends Process
 			int maxProcessPerTick,
 			Runnable markDirty,
 			Runnable onQueueChange,
-			BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID
+			BiFunction<Level, Identifier, @Nullable R> getRecipeFromID
 	)
 	{
 		this.maxQueueLength = maxQueueLength;
@@ -126,7 +126,7 @@ public class MultiblockProcessor<R extends MultiblockRecipe, CTX extends Process
 			}
 	}
 
-	public BiFunction<Level, ResourceLocation, R> recipeGetter()
+	public BiFunction<Level, Identifier, R> recipeGetter()
 	{
 		return getRecipeFromID;
 	}
@@ -252,13 +252,13 @@ public class MultiblockProcessor<R extends MultiblockRecipe, CTX extends Process
 
 	public interface ProcessLoader<R extends MultiblockRecipe, CTX extends ProcessContext<R>>
 	{
-		MultiblockProcess<R, CTX> fromNBT(BiFunction<Level, ResourceLocation, R> getRecipe, CompoundTag data, Provider provider);
+		MultiblockProcess<R, CTX> fromNBT(BiFunction<Level, Identifier, R> getRecipe, CompoundTag data, Provider provider);
 	}
 
 	// Convenience classes to deal with the lack of typedefs
 	public static class InWorldProcessor<R extends MultiblockRecipe> extends MultiblockProcessor<R, ProcessContextInWorld<R>>
 	{
-		public InWorldProcessor(int maxQueueLength, IntToDoubleFunction minDelayAfter, int maxProcessPerTick, Runnable markDirty, Runnable onQueueChange, BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID)
+		public InWorldProcessor(int maxQueueLength, IntToDoubleFunction minDelayAfter, int maxProcessPerTick, Runnable markDirty, Runnable onQueueChange, BiFunction<Level, Identifier, @Nullable R> getRecipeFromID)
 		{
 			super(maxQueueLength, minDelayAfter, maxProcessPerTick, markDirty, onQueueChange, getRecipeFromID);
 		}
@@ -266,12 +266,12 @@ public class MultiblockProcessor<R extends MultiblockRecipe, CTX extends Process
 
 	public static class InMachineProcessor<R extends MultiblockRecipe> extends MultiblockProcessor<R, ProcessContextInMachine<R>>
 	{
-		public InMachineProcessor(int maxQueueLength, float minDelayAfter, int maxProcessPerTick, Runnable markDirty, BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID)
+		public InMachineProcessor(int maxQueueLength, float minDelayAfter, int maxProcessPerTick, Runnable markDirty, BiFunction<Level, Identifier, @Nullable R> getRecipeFromID)
 		{
 			super(maxQueueLength, minDelayAfter, maxProcessPerTick, markDirty, getRecipeFromID);
 		}
 
-		public InMachineProcessor(int maxQueueLength, IntToDoubleFunction minDelayAfter, int maxProcessPerTick, Runnable markDirty, Runnable onQueueChange, BiFunction<Level, ResourceLocation, @Nullable R> getRecipeFromID)
+		public InMachineProcessor(int maxQueueLength, IntToDoubleFunction minDelayAfter, int maxProcessPerTick, Runnable markDirty, Runnable onQueueChange, BiFunction<Level, Identifier, @Nullable R> getRecipeFromID)
 		{
 			super(maxQueueLength, minDelayAfter, maxProcessPerTick, markDirty, onQueueChange, getRecipeFromID);
 		}

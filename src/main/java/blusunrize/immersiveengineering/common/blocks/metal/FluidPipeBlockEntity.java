@@ -39,7 +39,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -227,7 +227,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 			}
 		}
 		final Block oldCover = cover;
-		cover = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(nbt.getString("cover")));
+		cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getString("cover")));
 		DyeColor oldColor = color;
 		if(nbt.contains("color", Tag.TAG_INT))
 			color = DyeColor.byId(nbt.getInt("color"));

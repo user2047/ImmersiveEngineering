@@ -34,7 +34,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -87,7 +87,7 @@ public class WorldGenerationProvider
 		registryBuilder.add(Registries.DAMAGE_TYPE, DamageTypeProvider::bootstrap);
 		registryBuilder.add(Registries.BANNER_PATTERN, BannerTags::bootstrap);
 		registryBuilder.add(Registries.WOLF_VARIANT, context -> {
-			ResourceLocation base_texture = RobotWolfItem.REGISTRY_KEY.withPrefix("entity/wolf/");
+			Identifier base_texture = RobotWolfItem.REGISTRY_KEY.withPrefix("entity/wolf/");
 			context.register(
 					ResourceKey.create(Registries.WOLF_VARIANT, RobotWolfItem.REGISTRY_KEY),
 					new WolfVariant(base_texture, base_texture.withSuffix("_tame"), base_texture.withSuffix("_angry"), HolderSet.empty())
@@ -168,16 +168,16 @@ public class WorldGenerationProvider
 	{
 		public Reference<ConfiguredFeature<?, ?>> configured;
 		public Reference<PlacedFeature> placed;
-		public final ResourceLocation name;
+		public final Identifier name;
 		@Nullable
 		public final TagKey<Biome> inBiomes;
 
-		private FeatureRegistration(ResourceLocation name)
+		private FeatureRegistration(Identifier name)
 		{
 			this(name, BiomeTags.IS_OVERWORLD);
 		}
 
-		private FeatureRegistration(ResourceLocation name, @Nullable TagKey<Biome> inBiomes)
+		private FeatureRegistration(Identifier name, @Nullable TagKey<Biome> inBiomes)
 		{
 			this.name = name;
 			this.inBiomes = inBiomes;

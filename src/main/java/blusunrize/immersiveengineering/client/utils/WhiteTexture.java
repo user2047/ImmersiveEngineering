@@ -13,7 +13,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -26,7 +26,7 @@ public class WhiteTexture implements AutoCloseable
 	public static final Supplier<WhiteTexture> INSTANCE = Suppliers.memoize(WhiteTexture::new);
 
 	private final DynamicTexture whiteTexture;
-	private final ResourceLocation whiteTextureLocation;
+	private final Identifier whiteTextureLocation;
 
 	private WhiteTexture()
 	{
@@ -53,7 +53,7 @@ public class WhiteTexture implements AutoCloseable
 		RenderSystem.texParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	}
 
-	public ResourceLocation getTextureLocation()
+	public Identifier getTextureLocation()
 	{
 		return whiteTextureLocation;
 	}

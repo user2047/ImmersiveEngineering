@@ -12,14 +12,14 @@ package blusunrize.immersiveengineering.api.shader;
 import blusunrize.immersiveengineering.api.utils.Color4;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ShaderLayer
 {
 	/**
 	 * A resource location pointing to a texture on the sheet
 	 */
-	private final ResourceLocation texture;
+	private final Identifier texture;
 	/**
 	 * An ARGB formatted colour
 	 */
@@ -36,7 +36,7 @@ public class ShaderLayer
 	 */
 	private double[] cutoutBounds;
 
-	public ShaderLayer(ResourceLocation texture, int color)
+	public ShaderLayer(Identifier texture, int color)
 	{
 		this.texture = texture;
 		this.color = color;
@@ -81,7 +81,7 @@ public class ShaderLayer
 		return this.cutoutBounds;
 	}
 
-	public ResourceLocation getTexture()
+	public Identifier getTexture()
 	{
 		return texture;
 	}

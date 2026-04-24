@@ -19,7 +19,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -28,7 +28,7 @@ import java.util.function.Function;
 
 public class FeedthroughLoader implements IGeometryLoader<FeedthroughModelRaw>
 {
-	public static final ResourceLocation LOCATION = IEApi.ieLoc("feedthrough");
+	public static final Identifier LOCATION = IEApi.ieLoc("feedthrough");
 
 	@Override
 	public FeedthroughModelRaw read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) throws JsonParseException

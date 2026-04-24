@@ -32,7 +32,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -82,7 +82,7 @@ public class BlockLoot implements LootTableSubProvider
 		this.provider = p;
 	}
 
-	private ResourceKey<LootTable> toTableLoc(ResourceLocation in)
+	private ResourceKey<LootTable> toTableLoc(Identifier in)
 	{
 		return key("blocks/"+in.getPath());
 	}
@@ -242,7 +242,7 @@ public class BlockLoot implements LootTableSubProvider
 		register(BuiltInRegistries.BLOCK.getKey(b.get()), table);
 	}
 
-	private void register(ResourceLocation name, LootTable.Builder table)
+	private void register(Identifier name, LootTable.Builder table)
 	{
 		var loc = toTableLoc(name);
 		if(!generatedTables.add(loc))

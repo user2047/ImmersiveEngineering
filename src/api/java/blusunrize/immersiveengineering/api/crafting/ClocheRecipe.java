@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.crafting.cache.CachedRecipeList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -41,7 +41,7 @@ public class ClocheRecipe extends IESerializableRecipe
 	public final ClocheRenderFunction renderFunction;
 
 	public static final CachedRecipeList<ClocheRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.CLOCHE);
-	private static final List<Pair<Ingredient, ResourceLocation>> soilTextureList = new ArrayList<>();
+	private static final List<Pair<Ingredient, Identifier>> soilTextureList = new ArrayList<>();
 
 	public ClocheRecipe(List<StackWithChance> outputs, Ingredient seed, Ingredient soil, int time, FluidIngredient requiredFluid, ClocheRenderFunction renderFunction)
 	{
@@ -136,14 +136,14 @@ public class ClocheRecipe extends IESerializableRecipe
 	 * @param soil
 	 * @param texture
 	 */
-	public static void registerSoilTexture(Ingredient soil, ResourceLocation texture)
+	public static void registerSoilTexture(Ingredient soil, Identifier texture)
 	{
 		soilTextureList.add(Pair.of(soil, texture));
 	}
 
-	public static ResourceLocation getSoilTexture(ItemStack soil)
+	public static Identifier getSoilTexture(ItemStack soil)
 	{
-		for(Pair<Ingredient, ResourceLocation> entry : soilTextureList)
+		for(Pair<Ingredient, Identifier> entry : soilTextureList)
 			if(entry.getFirst().test(soil))
 				return entry.getSecond();
 		return null;

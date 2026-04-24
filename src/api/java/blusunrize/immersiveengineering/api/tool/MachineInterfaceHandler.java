@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.api.tool;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapability;
@@ -31,21 +31,21 @@ import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
 public class MachineInterfaceHandler
 {
-	public static ResourceLocation BASIC_ACTIVE = ieLoc("basic/active");
-	public static ResourceLocation BASIC_ITEM_IN = ieLoc("basic/item_input");
-	public static ResourceLocation BASIC_ITEM_OUT = ieLoc("basic/item_output");
-	public static ResourceLocation BASIC_FLUID_IN = ieLoc("basic/fluid_input");
-	public static ResourceLocation BASIC_FLUID_OUT = ieLoc("basic/fluid_output");
-	public static ResourceLocation BASIC_ENERGY = ieLoc("basic/energy_storage");
+	public static Identifier BASIC_ACTIVE = ieLoc("basic/active");
+	public static Identifier BASIC_ITEM_IN = ieLoc("basic/item_input");
+	public static Identifier BASIC_ITEM_OUT = ieLoc("basic/item_output");
+	public static Identifier BASIC_FLUID_IN = ieLoc("basic/fluid_input");
+	public static Identifier BASIC_FLUID_OUT = ieLoc("basic/fluid_output");
+	public static Identifier BASIC_ENERGY = ieLoc("basic/energy_storage");
 
-	private static final Map<ResourceLocation, CheckOption<?>[]> CONDITION_REGISTRY = new HashMap<>();
+	private static final Map<Identifier, CheckOption<?>[]> CONDITION_REGISTRY = new HashMap<>();
 
-	public static void register(ResourceLocation key, CheckOption<?>... options)
+	public static void register(Identifier key, CheckOption<?>... options)
 	{
 		CONDITION_REGISTRY.put(key, options);
 	}
 
-	public static void copyOptions(ResourceLocation newKey, ResourceLocation oldKey)
+	public static void copyOptions(Identifier newKey, Identifier oldKey)
 	{
 		CONDITION_REGISTRY.put(newKey, CONDITION_REGISTRY.get(oldKey));
 	}
@@ -118,16 +118,16 @@ public class MachineInterfaceHandler
 		return energyStorage.getEnergyStored()/(float)energyStorage.getMaxEnergyStored();
 	}
 
-	public record CheckOption<T>(ResourceLocation name, ToIntFunction<T> condition)
+	public record CheckOption<T>(Identifier name, ToIntFunction<T> condition)
 	{
 		// helper method to turn boolean conditions into comparator signals
-		public static <T> CheckOption<T> booleanCondition(ResourceLocation name, final Predicate<T> predicate)
+		public static <T> CheckOption<T> booleanCondition(Identifier name, final Predicate<T> predicate)
 		{
 			return new CheckOption<>(name, value -> predicate.test(value)?15: 0);
 		}
 
 		// helper method to turn double conditions into comparator signals
-		public static <T> CheckOption<T> doubleCondition(ResourceLocation name, final ToDoubleFunction<T> toDouble)
+		public static <T> CheckOption<T> doubleCondition(Identifier name, final ToDoubleFunction<T> toDouble)
 		{
 			return new CheckOption<>(name, value -> Mth.ceil(Math.max(toDouble.applyAsDouble(value), 0)*15));
 		}
@@ -143,10 +143,10 @@ public class MachineInterfaceHandler
 		}
 	}
 
-	public record MachineCheckImplementation<T>(T instance, ResourceLocation key, CheckOption<T>[] options)
+	public record MachineCheckImplementation<T>(T instance, Identifier key, CheckOption<T>[] options)
 	{
 		@SuppressWarnings("unchecked")
-		public MachineCheckImplementation(T instance, ResourceLocation key)
+		public MachineCheckImplementation(T instance, Identifier key)
 		{
 			this(instance, key, (CheckOption<T>[])CONDITION_REGISTRY.get(key));
 		}

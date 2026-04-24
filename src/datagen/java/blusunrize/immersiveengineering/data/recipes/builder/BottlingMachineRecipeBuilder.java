@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.api.crafting.TagOutputList;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemInput;
 import blusunrize.immersiveengineering.data.recipes.builder.BaseHelpers.ItemOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
@@ -59,7 +59,7 @@ public class BottlingMachineRecipeBuilder extends IERecipeBuilder<BottlingMachin
 		return this;
 	}
 
-	public void build(RecipeOutput out, ResourceLocation name)
+	public void build(RecipeOutput out, Identifier name)
 	{
 		BottlingMachineRecipe recipe = new BottlingMachineRecipe(new TagOutputList(output), inputs, fluidInput);
 		out.accept(name, recipe, null, getConditions());

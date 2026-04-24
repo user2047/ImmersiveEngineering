@@ -15,7 +15,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,16 +29,16 @@ import java.util.Objects;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageShaderManual(MessageType key, List<ResourceLocation> args) implements IMessage
+public record MessageShaderManual(MessageType key, List<Identifier> args) implements IMessage
 {
 	public static final Type<MessageShaderManual> ID = IMessage.createType("shader_manual");
 	public static final StreamCodec<ByteBuf, MessageShaderManual> CODEC = StreamCodec.composite(
 			ByteBufCodecs.idMapper(i -> MessageType.values()[i], MessageType::ordinal), MessageShaderManual::key,
-			ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()), MessageShaderManual::args,
+			Identifier.STREAM_CODEC.apply(ByteBufCodecs.list()), MessageShaderManual::args,
 			MessageShaderManual::new
 	);
 
-	public MessageShaderManual(MessageType key, ResourceLocation... args)
+	public MessageShaderManual(MessageType key, Identifier... args)
 	{
 		this(key, Arrays.asList(args));
 	}
@@ -60,7 +60,7 @@ public record MessageShaderManual(MessageType key, List<ResourceLocation> args) 
 			context.enqueueWork(() -> {
 				if(key==MessageType.SYNC)
 				{
-					ResourceLocation[] ss = ShaderRegistry.receivedShaders.get(playerId).stream().filter(Objects::nonNull).toArray(ResourceLocation[]::new);
+					Identifier[] ss = ShaderRegistry.receivedShaders.get(playerId).stream().filter(Objects::nonNull).toArray(Identifier[]::new);
 					PacketDistributor.sendToPlayer(player, new MessageShaderManual(MessageType.SYNC, ss));
 				}
 				else if(key==MessageType.UNLOCK&&!args.isEmpty())
@@ -90,7 +90,7 @@ public record MessageShaderManual(MessageType key, List<ResourceLocation> args) 
 					if(player!=null)
 					{
 						UUID name = player.getUUID();
-						for(ResourceLocation shader : args)
+						for(Identifier shader : args)
 							if(shader!=null)
 								ShaderRegistry.receivedShaders.put(name, shader);
 					}

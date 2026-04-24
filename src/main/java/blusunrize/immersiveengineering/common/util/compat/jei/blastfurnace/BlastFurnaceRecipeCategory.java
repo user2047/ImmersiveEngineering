@@ -22,9 +22,9 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
 
@@ -36,7 +36,7 @@ public class BlastFurnaceRecipeCategory extends IERecipeCategory<BlastFurnaceRec
 	public BlastFurnaceRecipeCategory(IGuiHelper helper)
 	{
 		super(helper, JEIRecipeTypes.BLAST_FURNACE, "gui.immersiveengineering.blastFurnace");
-		ResourceLocation background = IEApi.ieLoc("textures/gui/blast_furnace.png");
+		Identifier background = IEApi.ieLoc("textures/gui/blast_furnace.png");
 		setBackground(helper.createDrawable(background, 42, 9, 100, 64));
 		setIcon(helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, IEMultiblockLogic.BLAST_FURNACE.iconStack()));
 		flame = helper.drawableBuilder(background, 177, 0, 14, 14).buildAnimated(300, IDrawableAnimated.StartDirection.TOP, true);
@@ -55,7 +55,7 @@ public class BlastFurnaceRecipeCategory extends IERecipeCategory<BlastFurnaceRec
 	}
 
 	@Override
-	public void draw(BlastFurnaceRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY)
+	public void draw(BlastFurnaceRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 12, 27);
 		arrow.draw(graphics, 33, 26);
