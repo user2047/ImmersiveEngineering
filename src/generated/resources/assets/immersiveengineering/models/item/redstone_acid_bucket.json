@@ -1,5 +1,3 @@
 {
-  "parent": "neoforge:item/bucket",
-  "fluid": "immersiveengineering:redstone_acid",
-  "loader": "neoforge:fluid_container"
+  "parent": "neoforge:item/bucket"
 }

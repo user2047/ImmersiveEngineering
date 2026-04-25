@@ -9,7 +9,7 @@
 package blusunrize.immersiveengineering.data.models;
 
 import blusunrize.immersiveengineering.api.tool.conveyor.IConveyorType;
-import blusunrize.immersiveengineering.client.models.ModelConveyor.ConveyorLoader;
+import blusunrize.immersiveengineering.client.models.PortedConveyorModel;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
@@ -26,7 +26,7 @@ public class ConveyorModelBuilder<T extends ModelBuilder<T>> extends CustomLoade
 
 	protected ConveyorModelBuilder(T parent, ExistingFileHelper existingFileHelper)
 	{
-		super(ConveyorLoader.LOCATION, parent, existingFileHelper, false);
+		super(PortedConveyorModel.LOADER_ID, parent, existingFileHelper, false);
 	}
 
 	private IConveyorType<?> type;
@@ -43,7 +43,10 @@ public class ConveyorModelBuilder<T extends ModelBuilder<T>> extends CustomLoade
 	public JsonObject toJson(JsonObject json)
 	{
 		json = super.toJson(json);
-		json.addProperty(ConveyorLoader.TYPE_KEY, type.getId().toString());
+		json.addProperty(PortedConveyorModel.TYPE_KEY, type.getId().toString());
+		JsonObject textures = json.has("textures")?json.getAsJsonObject("textures"): new JsonObject();
+		PortedConveyorModel.addTextureSlots(textures, type.getId());
+		json.add("textures", textures);
 		return json;
 	}
 }

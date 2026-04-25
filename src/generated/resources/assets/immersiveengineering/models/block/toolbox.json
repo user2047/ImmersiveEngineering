@@ -5,6 +5,7 @@
   "loader": "neoforge:obj",
   "model": "immersiveengineering:models/block/toolbox.obj",
   "textures": {
-    "particle": "immersiveengineering:block/metal_decoration/toolbox"
+    "particle": "immersiveengineering:block/metal_decoration/toolbox",
+    "texture": "immersiveengineering:block/metal_decoration/toolbox"
   }
 }

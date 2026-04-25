@@ -8,10 +8,13 @@
 
 package blusunrize.immersiveengineering.data.models;
 
+import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
+import blusunrize.immersiveengineering.api.utils.DirectionUtils;
 import blusunrize.immersiveengineering.client.models.ModelConfigurableSides.Loader;
 import blusunrize.immersiveengineering.client.models.ModelConfigurableSides.Type;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
@@ -55,6 +58,32 @@ public class SideConfigBuilder<T extends ModelBuilder<T>> extends CustomLoaderBu
 		json = super.toJson(json);
 		json.addProperty("type", type.getName());
 		json.addProperty("base_name", baseName.toString());
+		JsonObject textures = json.has("textures")?json.getAsJsonObject("textures"): new JsonObject();
+		for(Direction side : DirectionUtils.VALUES)
+			for(IOSideConfig cfg : IOSideConfig.values())
+			{
+				Identifier texture = baseName.withSuffix("_"+textureName(type, side, cfg));
+				if(!textures.has(texture.toString()))
+					textures.addProperty(texture.toString(), texture.toString());
+			}
+		Identifier particle = baseName.withSuffix("_"+textureName(type, Direction.DOWN, IOSideConfig.NONE));
+		if(!textures.has("particle"))
+			textures.addProperty("particle", particle.toString());
+		json.add("textures", textures);
 		return json;
+	}
+
+	private static String textureName(Type type, Direction side, IOSideConfig cfg)
+	{
+		String sideName = switch(type)
+		{
+			case SIDE_TOP_BOTTOM -> side.getAxis()==Direction.Axis.Y?side.getSerializedName(): "side";
+			case SIDE_VERTICAL -> side.getAxis()==Direction.Axis.Y?"up": "side";
+			case VERTICAL -> side.getAxis()==Direction.Axis.Y?"up": "side";
+			case ALL_SAME_TEXTURE -> "side";
+		};
+		if(type==Type.VERTICAL&&side.getAxis()!=Direction.Axis.Y)
+			return sideName;
+		return sideName+"_"+cfg.getTextureName();
 	}
 }

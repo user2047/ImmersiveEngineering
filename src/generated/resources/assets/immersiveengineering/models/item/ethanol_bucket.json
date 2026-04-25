@@ -1,5 +1,3 @@
 {
-  "parent": "neoforge:item/bucket",
-  "fluid": "immersiveengineering:ethanol",
-  "loader": "neoforge:fluid_container"
+  "parent": "neoforge:item/bucket"
 }

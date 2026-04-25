@@ -47,7 +47,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.client.model.generators.ModelProvider;
-import net.neoforged.neoforge.client.model.generators.loaders.DynamicFluidContainerModelBuilder;
 import net.neoforged.neoforge.client.model.generators.loaders.ObjModelBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
@@ -311,15 +310,16 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModels("", IEItems.Misc.ICON_BIRTHDAY, IEItems.Misc.ICON_LUCKY, IEItems.Misc.ICON_ACHTUNG, IEItems.Misc.ICON_SNAKE,
 				IEItems.Misc.ICON_DRILLBREAK, IEItems.Misc.ICON_RAVENHOLM, IEItems.Misc.ICON_FRIED, IEItems.Misc.ICON_BTTF);
 
-		withExistingParent(name(SpawnEggs.EGG_FUSILIER), Identifier.withDefaultNamespace("item/template_spawn_egg"));
-		withExistingParent(name(SpawnEggs.EGG_COMMANDO), Identifier.withDefaultNamespace("item/template_spawn_egg"));
-		withExistingParent(name(SpawnEggs.EGG_BULWARK), Identifier.withDefaultNamespace("item/template_spawn_egg"));
+		spawnEgg(SpawnEggs.EGG_FUSILIER);
+		spawnEgg(SpawnEggs.EGG_COMMANDO);
+		spawnEgg(SpawnEggs.EGG_BULWARK);
 		addItemModels("", IEItems.SpawnEggs.ROBOT_WOLF);
 
 		obj(Tools.VOLTMETER, rl("item/voltmeter.obj"))
 				.texture("texture", rl("item/tool_voltmeter"))
 				.transforms(rl("item/voltmeter"));
 		obj(Tools.TOOLBOX, rl("item/toolbox.obj"))
+				.texture("texture", rl("item/toolbox"))
 				.transforms(rl("item/toolbox"));
 		ieObjBuilder(IEItems.Misc.SHIELD, rl("item/shield.obj.ie"))
 				.dynamic(true)
@@ -374,14 +374,13 @@ public class ItemModels extends TRSRItemModelProvider
 				.end()
 				.transforms(modLoc("item/fluorescent_tube"));
 		getBuilder(IEItems.Misc.CORESAMPLE)
+				.texture("particle", Identifier.withDefaultNamespace("block/stone"))
 				.customLoader(SpecialModelBuilder.forLoader(CoresampleLoader.LOCATION));
 	}
 
 	private void createBucket(IEFluids.FluidEntry entry)
 	{
-		withExistingParent(name(entry.getBucket()), forgeLoc("item/bucket"))
-				.customLoader(DynamicFluidContainerModelBuilder::begin)
-				.fluid(entry.getStill());
+		withExistingParent(name(entry.getBucket()), forgeLoc("item/bucket"));
 	}
 
 	private void createStoneModels()
@@ -467,17 +466,43 @@ public class ItemModels extends TRSRItemModelProvider
 	private TRSRModelBuilder obj(ItemLike item, Identifier model)
 	{
 		Preconditions.checkArgument(existingFileHelper.exists(model, PackType.CLIENT_RESOURCES, "", "models"));
-		return getBuilder(item)
+		Collection<String> objTextures = DataGenUtils.getTexturesFromObj(model, existingFileHelper);
+		TRSRModelBuilder builder = getBuilder(item)
 				.customLoader(ObjModelBuilder::begin)
 				.flipV(true)
 				.modelLocation(model.withPath("models/"+model.getPath()))
 				.end();
+		String particle = objTextures.iterator().next();
+		if(particle.charAt(0)!='#')
+			builder.texture("particle", particle);
+		else
+			builder.particleFromTexture(particle.substring(1));
+		for(String objTexture : objTextures)
+			if(objTexture.charAt(0)!='#')
+				builder.texture(objTexture, objTexture);
+		return builder;
+	}
+
+	private void spawnEgg(ItemLike item)
+	{
+		withExistingParent(name(item), Identifier.withDefaultNamespace("item/generated"))
+				.texture("layer0", rl("item/"+name(item)));
 	}
 
 	private IEOBJBuilder<TRSRModelBuilder> ieObjBuilder(ItemLike item, Identifier model)
 	{
 		Preconditions.checkArgument(existingFileHelper.exists(model, PackType.CLIENT_RESOURCES, "", "models"));
-		return getBuilder(item)
+		Collection<String> objTextures = DataGenUtils.getTexturesFromObj(model, existingFileHelper);
+		String particle = objTextures.iterator().next();
+		TRSRModelBuilder builder = getBuilder(item);
+		if(particle.charAt(0)!='#')
+			builder.texture("particle", particle);
+		else
+			builder.particleFromTexture(particle.substring(1));
+		for(String objTexture : objTextures)
+			if(objTexture.charAt(0)!='#')
+				builder.texture(objTexture, objTexture);
+		return builder
 				.customLoader(IEOBJBuilder::begin)
 				.modelLocation(model.withPath("models/"+model.getPath()));
 	}

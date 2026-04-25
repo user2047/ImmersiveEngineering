@@ -19,6 +19,10 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +35,11 @@ public class DataGenUtils
 
 	public static String getTextureFromObj(Identifier obj, ExistingFileHelper helper)
 	{
+		return getTexturesFromObj(obj, helper).get(0);
+	}
+
+	public static List<String> getTexturesFromObj(Identifier obj, ExistingFileHelper helper)
+	{
 		try
 		{
 			String prefix = "models";
@@ -40,9 +49,13 @@ public class DataGenUtils
 			InputStream objStream = objResource.open();
 			String fullObj = IOUtils.toString(objStream, StandardCharsets.US_ASCII);
 			String libLoc = findFirstOccurrenceGroup(MTLLIB, fullObj);
-			String libName = findFirstOccurrenceGroup(USEMTL, fullObj);
 			Identifier libRL = relative(obj, libLoc);
-			return getMTLTexture(libRL, libName, helper);
+			Set<String> materialNames = findAllOccurrenceGroups(USEMTL, fullObj);
+			List<String> result = new ArrayList<>();
+			for(String materialName : materialNames)
+				result.add(getMTLTexture(libRL, materialName, helper));
+			Preconditions.checkArgument(!result.isEmpty());
+			return result;
 		} catch(IOException e)
 		{
 			throw new RuntimeException(e);
@@ -76,6 +89,15 @@ public class DataGenUtils
 		Matcher matcher = pattern.matcher(input);
 		Preconditions.checkArgument(matcher.find());
 		return matcher.group(1);
+	}
+
+	private static Set<String> findAllOccurrenceGroups(Pattern pattern, String input)
+	{
+		Matcher matcher = pattern.matcher(input);
+		Set<String> result = new LinkedHashSet<>();
+		while(matcher.find())
+			result.add(matcher.group(1));
+		return result;
 	}
 
 	private static Identifier relative(Identifier base, String relativePath)

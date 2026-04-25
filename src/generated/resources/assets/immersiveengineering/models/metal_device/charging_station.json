@@ -8,7 +8,8 @@
       "model": "immersiveengineering:models/block/metal_device/charging_station.obj",
       "render_type": "minecraft:solid",
       "textures": {
-        "particle": "immersiveengineering:block/metal_device/charging_station"
+        "particle": "immersiveengineering:block/metal_device/charging_station",
+        "immersiveengineering:block/metal_device/charging_station": "immersiveengineering:block/metal_device/charging_station"
       }
     },
     "translucent": {
@@ -18,7 +19,8 @@
       "model": "immersiveengineering:models/block/metal_device/charging_station_glass.obj",
       "render_type": "minecraft:translucent",
       "textures": {
-        "particle": "immersiveengineering:block/metal_device/charging_station"
+        "particle": "immersiveengineering:block/metal_device/charging_station",
+        "immersiveengineering:block/metal_device/charging_station": "immersiveengineering:block/metal_device/charging_station"
       }
     }
   },

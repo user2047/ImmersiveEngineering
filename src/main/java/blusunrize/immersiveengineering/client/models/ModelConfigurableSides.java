@@ -26,7 +26,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.client.resources.model.cuboid.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.sprite.Material;
@@ -278,7 +277,7 @@ public class ModelConfigurableSides extends BakedIEModel
 				{
 					String key = f.getSerializedName()+"_"+cfg.getTextureName();
 					String tex = name+"_"+namer.getTextureName(f, cfg);
-					builder.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, Identifier.parse(tex)));
+					builder.put(key, new Material(Identifier.parse(tex)));
 				}
 			return new ConfigSidesModelBase(name, type, builder.build());
 		}

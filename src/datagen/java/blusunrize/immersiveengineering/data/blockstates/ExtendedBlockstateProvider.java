@@ -474,17 +474,21 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 	T obj(T base, Identifier model, Map<String, Identifier> textures)
 	{
 		assertModelExists(model);
+		List<String> objTextures = DataGenUtils.getTexturesFromObj(model, existingFileHelper);
 		T ret = base
 				.customLoader(ObjModelBuilder::begin)
 				.automaticCulling(false)
 				.modelLocation(addModelsPrefix(model))
 				.flipV(true)
 				.end();
-		String particleTex = DataGenUtils.getTextureFromObj(model, existingFileHelper);
+		String particleTex = objTextures.get(0);
 		if(particleTex.charAt(0)=='#')
 			particleTex = textures.get(particleTex.substring(1)).toString();
 		ret.texture("particle", particleTex);
 		generatedParticleTextures.put(ret.getLocation(), particleTex);
+		for(String objTexture : objTextures)
+			if(objTexture.charAt(0)!='#'&&!textures.containsKey(objTexture))
+				ret.texture(objTexture, objTexture);
 		for(Entry<String, Identifier> e : textures.entrySet())
 			ret.texture(e.getKey(), e.getValue());
 		return ret;
@@ -568,10 +572,18 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 	protected <T extends ModelBuilder<T>>
 	IEOBJBuilder<T> ieObjBuilder(String name, Identifier model, ModelProvider<T> modelProvider)
 	{
-		final String particle = DataGenUtils.getTextureFromObj(model, existingFileHelper);
+		final List<String> objTextures = DataGenUtils.getTexturesFromObj(model, existingFileHelper);
+		final String particle = objTextures.get(0);
 		generatedParticleTextures.put(modLoc(name), particle);
-		return modelProvider.withExistingParent(name, mcLoc("block"))
-				.texture("particle", particle)
+		T builder = modelProvider.withExistingParent(name, mcLoc("block"));
+		if(particle.charAt(0)!='#')
+			builder.texture("particle", particle);
+		else
+			builder.texture("particle", particle);
+		for(String objTexture : objTextures)
+			if(objTexture.charAt(0)!='#')
+				builder.texture(objTexture, objTexture);
+		return builder
 				.customLoader(IEOBJBuilder::begin)
 				.modelLocation(addModelsPrefix(model));
 	}

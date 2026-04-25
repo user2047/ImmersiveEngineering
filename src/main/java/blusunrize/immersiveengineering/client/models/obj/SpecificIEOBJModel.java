@@ -37,6 +37,7 @@ import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
@@ -44,7 +45,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.UnbakedGeometryHelper;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -271,7 +271,7 @@ public class SpecificIEOBJModel<T> implements BakedModel
 			if(mat==null)
 				continue;
 			TextureAtlasSprite texture = spriteGetter.apply(
-					mat.name(), UnbakedGeometryHelper.resolveDirtyMaterial(mat.map_Kd(), owner)
+					mat.name(), resolveDirtyMaterial(mat.map_Kd(), owner)
 			);
 			Color4 colorTint = colorGetter.apply(mat.name(), Color4.WHITE);
 
@@ -282,6 +282,16 @@ public class SpecificIEOBJModel<T> implements BakedModel
 						callback.useAbsoluteUV(key, mat.name()), callback.shadeQuads(key, mat.name())
 				));
 		}
+	}
+
+	private Material resolveDirtyMaterial(String name, IGeometryBakingContext owner)
+	{
+		if(name!=null&&name.indexOf(':') >= 0)
+			return new Material(Identifier.parse(name));
+		Material material = owner.getMaterial(name);
+		if(material!=null)
+			return material;
+		return owner.getMaterial("particle");
 	}
 
 	public Map<String, Group<OBJMaterial>> getGroups()

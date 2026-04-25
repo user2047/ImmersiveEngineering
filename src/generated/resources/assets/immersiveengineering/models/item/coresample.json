@@ -1,3 +1,6 @@
 {
-  "loader": "immersiveengineering:models/coresample"
+    "loader":  "immersiveengineering:models/coresample",
+    "textures":  {
+                     "particle":  "minecraft:block/stone"
+                 }
 }

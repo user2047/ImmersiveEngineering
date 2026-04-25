@@ -46,6 +46,14 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 
 var generatePortItemModelDefinitions = tasks.register("generatePortItemModelDefinitions") {
     def outputDir = layout.buildDirectory.dir("generated/sources/portItemModelDefinitions")
+    def modelDirs = [
+            layout.projectDirectory.dir("src/main/resources/assets/immersiveengineering/models/item"),
+            layout.projectDirectory.dir("src/generated/resources/assets/immersiveengineering/models/item")
+    ]
+    def itemDefinitionDirs = [
+            layout.projectDirectory.dir("src/main/resources/assets/immersiveengineering/items"),
+            layout.projectDirectory.dir("src/generated/resources/assets/immersiveengineering/items")
+    ]
     outputs.dir outputDir
     inputs.files(
             fileTree("src/main/resources/assets/immersiveengineering/models/item") {
@@ -64,37 +72,48 @@ var generatePortItemModelDefinitions = tasks.register("generatePortItemModelDefi
     doLast {
         def root = outputDir.get().asFile
         def target = new File(root, "assets/immersiveengineering/items")
-        delete target
+        target.deleteDir()
         target.mkdirs()
 
         def existingDefinitions = [] as Set
-        [
-                file("src/main/resources/assets/immersiveengineering/items"),
-                file("src/generated/resources/assets/immersiveengineering/items")
-        ].each { dir ->
+        itemDefinitionDirs.collect { it.asFile }.each { dir ->
             if(dir.exists())
-                fileTree(dir) {
-                    include "*.json"
-                }.each { existingDefinitions.add(it.name) }
+                dir.listFiles((FileFilter){ file -> file.isFile()&&file.name.endsWith(".json") })
+                        .each { existingDefinitions.add(it.name) }
         }
 
-        [
-                file("src/main/resources/assets/immersiveengineering/models/item"),
-                file("src/generated/resources/assets/immersiveengineering/models/item")
-        ].each { dir ->
+        modelDirs.collect { it.asFile }.each { dir ->
             if(dir.exists())
-                fileTree(dir) {
-                    include "*.json"
-                }.each { model ->
+                dir.listFiles((FileFilter){ file -> file.isFile()&&file.name.endsWith(".json") }).each { model ->
                     if(existingDefinitions.contains(model.name))
                         return
                     def modelName = model.name.substring(0, model.name.length()-".json".length())
                     def itemDefinition = new File(target, model.name)
+                    def modelJson = new groovy.json.JsonSlurper().parse(model)
+                    def itemModel = [
+                            type : "minecraft:model",
+                            model: "immersiveengineering:item/${modelName}".toString()
+                    ]
+                    def isFluidBucket = modelJson.loader=="neoforge:fluid_container"||
+                            modelJson.loader=="immersiveengineering:potion_bucket"||
+                            (modelName.endsWith("_bucket")&&modelJson.parent=="neoforge:item/bucket")
+                    if(isFluidBucket) {
+                        def fluid = modelJson.fluid
+                        if(!fluid)
+                            fluid = modelName=="potion_bucket"?
+                                    "immersiveengineering:potion":
+                                    "immersiveengineering:${modelName.substring(0, modelName.length()-"_bucket".length())}"
+                        itemModel = [
+                                type    : "neoforge:fluid_container",
+                                textures: [
+                                        base : "minecraft:item/bucket",
+                                        fluid: "neoforge:item/mask/bucket_fluid"
+                                ],
+                                fluid   : fluid
+                        ]
+                    }
                     itemDefinition.text = JsonOutput.prettyPrint(JsonOutput.toJson([
-                            model: [
-                                    type : "minecraft:model",
-                                    model: "immersiveengineering:item/${modelName}".toString()
-                            ]
+                            model: itemModel
                     ]))+"\n"
                     existingDefinitions.add(model.name)
                 }

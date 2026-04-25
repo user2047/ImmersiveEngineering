@@ -30,6 +30,7 @@ public class TRSRModelBuilder extends ModelBuilder<TRSRModelBuilder>
 	private final TransformationMap transforms = new TransformationMap();
 
 	private final List<SimpleOverride> overrides = new ArrayList<>();
+	private String particleTextureSlot = null;
 
 	protected TRSRModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper)
 	{
@@ -57,6 +58,34 @@ public class TRSRModelBuilder extends ModelBuilder<TRSRModelBuilder>
 	{
 		this.overrides.add(new SimpleOverride(model, Map.of(predicateKey, predicateValue)));
 		return this;
+	}
+
+	public TRSRModelBuilder particleFromTexture(String textureSlot)
+	{
+		this.particleTextureSlot = textureSlot;
+		return this;
+	}
+
+	@Override
+	public TRSRModelBuilder texture(String key, String texture)
+	{
+		super.texture(key, texture);
+		copyParticleTexture(key, texture);
+		return this;
+	}
+
+	@Override
+	public TRSRModelBuilder texture(String key, Identifier texture)
+	{
+		super.texture(key, texture);
+		copyParticleTexture(key, texture.toString());
+		return this;
+	}
+
+	private void copyParticleTexture(String key, String texture)
+	{
+		if(key.equals(particleTextureSlot))
+			super.texture("particle", texture);
 	}
 
 	@Override

@@ -19,6 +19,10 @@ import blusunrize.immersiveengineering.api.utils.SetRestrictedField;
 import blusunrize.immersiveengineering.client.gui.*;
 import blusunrize.immersiveengineering.client.manual.ManualElementBlueprint;
 import blusunrize.immersiveengineering.client.manual.ManualElementMultiblock;
+import blusunrize.immersiveengineering.client.models.PortedConfigurableSidesModel;
+import blusunrize.immersiveengineering.client.models.PortedConveyorModel;
+import blusunrize.immersiveengineering.client.models.PortedCoresampleModel;
+import blusunrize.immersiveengineering.client.models.obj.PortedIEOBJModel;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.*;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.*;
@@ -37,9 +41,11 @@ import blusunrize.immersiveengineering.common.blocks.metal.*;
 import blusunrize.immersiveengineering.common.blocks.wooden.MachineInterfaceBlockEntity;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.common.entities.SkylineHookEntity;
+import blusunrize.immersiveengineering.common.fluids.PotionFluid;
 import blusunrize.immersiveengineering.common.gui.IEBaseContainerOld;
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.register.IEEntityTypes;
+import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.common.register.IEMenuTypes;
 import blusunrize.immersiveengineering.common.register.IEMenuTypes.ArgContainer;
 import blusunrize.immersiveengineering.common.register.IEMultiblockLogic;
@@ -54,6 +60,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
@@ -61,9 +68,11 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -77,15 +86,18 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -170,10 +182,10 @@ public class ClientProxy extends CommonProxy
 	@SubscribeEvent
 	public static void registerModelLoaders(ModelEvent.RegisterLoaders ev)
 	{
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("ie_obj"));
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("conf_sides"));
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("models/conveyor"));
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("models/coresample"));
+		ev.register(IEApi.ieLoc("ie_obj"), PortedIEOBJModel.LOADER);
+		ev.register(IEApi.ieLoc("conf_sides"), PortedConfigurableSidesModel.LOADER);
+		ev.register(IEApi.ieLoc("models/conveyor"), PortedConveyorModel.LOADER);
+		ev.register(IEApi.ieLoc("models/coresample"), PortedCoresampleModel.LOADER);
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("feedthrough"));
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("basic_split"));
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("potion_bucket"));
@@ -183,6 +195,41 @@ public class ClientProxy extends CommonProxy
 	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)
 	{
 		ev.register(id, EMPTY_PORT_MODEL_LOADER);
+	}
+
+	@SubscribeEvent
+	public static void registerFluidModels(RegisterFluidModelsEvent ev)
+	{
+		for(var fluid : IEFluids.ALL_ENTRIES)
+			ev.register(
+					new FluidModel.Unbaked(
+							new Material(fluid.stillTexture()), new Material(fluid.flowingTexture()), null, null
+					),
+					fluid.still(), fluid.flowing()
+			);
+		ev.register(
+				new FluidModel.Unbaked(
+						new Material(PotionFluid.PotionFluidType.TEXTURE_STILL),
+						new Material(PotionFluid.PotionFluidType.TEXTURE_FLOW),
+						null,
+						new FluidTintSource()
+						{
+							@Override
+							public int color(FluidState state)
+							{
+								return 0xff0000ff;
+							}
+
+							@Override
+							public int colorAsStack(FluidStack stack)
+							{
+								var potionData = stack.get(DataComponents.POTION_CONTENTS);
+								return potionData==null?0xff0000ff: 0xff000000|potionData.getColor();
+							}
+						}
+				),
+				IEFluids.POTION
+		);
 	}
 
 	@SubscribeEvent

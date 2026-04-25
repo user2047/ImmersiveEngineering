@@ -262,7 +262,7 @@ public class ModelCoresample extends BakedIEModel
 
 	public TextureAtlasSprite getParticleIcon()
 	{
-		return null;
+		return ClientUtils.getSprite(Identifier.withDefaultNamespace("block/stone"));
 	}
 
 	public ItemTransforms getTransforms()

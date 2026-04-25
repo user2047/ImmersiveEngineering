@@ -13,6 +13,7 @@ import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.common.gui.RevolverContainer;
 import blusunrize.immersiveengineering.common.items.IEItemInterfaces.IBulletContainer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -57,11 +58,11 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 		for(int hand = 0; hand < (otherRevolver?2: 1); hand++)
 		{
 			int side = !otherRevolver?0: (hand==0)==(ImmersiveEngineering.proxy.getClientPlayer().getMainArm()==HumanoidArm.RIGHT)?1: 0;
-			graphics.blitSprite(DRUM_MAIN, leftPos+off, topPos+1, 74, 74);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, DRUM_MAIN, leftPos+off, topPos+1, 74, 74);
 			if(bullets[side] >= 18)
-				graphics.blitSprite(SECOND_DRUM, leftPos+off+47, topPos+1, 74, 103);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SECOND_DRUM, leftPos+off+47, topPos+1, 74, 103);
 			else if(bullets[side] > 8)
-				graphics.blitSprite(EXTENDED_MAG, leftPos+off+57, topPos+1, 79, 39);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, EXTENDED_MAG, leftPos+off+57, topPos+1, 79, 39);
 			off += (bullets[side] >= 18?150: bullets[side] > 8?136: 74)+4;
 		}
 	}
@@ -73,11 +74,11 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 
 	public static void drawExternalGUI(NonNullList<ItemStack> bullets, int bulletAmount, GuiGraphicsExtractor graphics)
 	{
-		graphics.blitSprite(DRUM_MAIN, 0, 1, 74, 74);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, DRUM_MAIN, 0, 1, 74, 74);
 		if(bulletAmount >= 18)
-			graphics.blitSprite(SECOND_DRUM, 47, 1, 74, 103);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SECOND_DRUM, 47, 1, 74, 103);
 		else if(bulletAmount > 8)
-			graphics.blitSprite(EXTENDED_MAG, 57, 1, 79, 39);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, EXTENDED_MAG, 57, 1, 79, 39);
 
 		int[][] slots = RevolverContainer.slotPositions[bulletAmount >= 18?2: bulletAmount > 8?1: 0];
 		for(int i = 0; i < bulletAmount; i++)
@@ -103,7 +104,7 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 					x = ii==0?48: ii==1?29: ii==3?2: 10;
 					y = ii==1?57: ii==3?30: ii==4?11: 49;
 				}
-				graphics.renderItem(b, x, y);
+				graphics.item(b, x, y);
 			}
 		}
 	}

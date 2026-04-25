@@ -19,6 +19,7 @@ import blusunrize.immersiveengineering.api.wires.utils.WireLink;
 import blusunrize.immersiveengineering.client.gui.RevolverScreen;
 import blusunrize.immersiveengineering.client.utils.FontUtils;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import blusunrize.immersiveengineering.client.utils.SpacerComponent;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
 import blusunrize.immersiveengineering.common.items.*;
@@ -28,12 +29,12 @@ import blusunrize.immersiveengineering.common.network.MessageRequestRedstoneUpda
 import blusunrize.immersiveengineering.common.register.IEItems.Misc;
 import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import blusunrize.immersiveengineering.common.util.Utils;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -56,7 +57,6 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +85,7 @@ public class ItemOverlayUtils
 		ItemStack rightHandItem = HumanoidArm.RIGHT==player.getMainArm()?player.getMainHandItem(): player.getOffhandItem();
 		SUBTITLE_OFFSETS.forEach(c -> {
 			if(c.cond.test(rightHandItem))
-				GuiGraphicsExtractor.pose().translate(pre?-c.offset: c.offset, 0, 0);
+				GuiGraphicsPose.translate(GuiGraphicsPose.pose(GuiGraphicsExtractor), pre?-c.offset: c.offset, 0, 0);
 		});
 	}
 
@@ -179,12 +179,12 @@ public class ItemOverlayUtils
 			boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 			float dx = boundLeft?48: scaledWidth-32-48;
 			float dy = scaledHeight-64;
-			PoseStack transform = graphics.pose();
-			transform.pushPose();
-			transform.translate(dx, dy, 0);
-			transform.scale(.5f, .5f, 1);
+			Object transform = GuiGraphicsPose.pose(graphics);
+			GuiGraphicsPose.push(transform);
+			GuiGraphicsPose.translate(transform, dx, dy, 0);
+			GuiGraphicsPose.scale(transform, .5f, .5f, 1);
 			RevolverScreen.drawExternalGUI(bullets, bulletAmount, graphics);
-			transform.popPose();
+			GuiGraphicsPose.pop(transform);
 		}
 	}
 
@@ -199,36 +199,36 @@ public class ItemOverlayUtils
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 		int dx = boundLeft?24: (scaledWidth-24-64);
 		int dy = scaledHeight-16;
-		var transform = graphics.pose();
-		transform.pushPose();
-		transform.translate(dx, dy, 0);
-		graphics.blitSprite(ieLoc("hud/railgun_base"), 0, -32, 64, 32);
+		Object transform = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(transform);
+		GuiGraphicsPose.translate(transform, dx, dy, 0);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/railgun_base"), 0, -32, 64, 32);
 
 		ItemStack ammo = RailgunItem.findAmmo(equipped, player);
 		if(!ammo.isEmpty())
 			GuiHelper.renderItemWithOverlayIntoGUI(graphics, ammo, 6, -22, player.level());
 
-		transform.translate(30, -27.5, 0);
-		transform.scale(scale, scale, 1);
+		GuiGraphicsPose.translate(transform, 30, -27.5f, 0);
+		GuiGraphicsPose.scale(transform, scale, scale, 1);
 		String chargeTxt = chargeLevel < 10?"0 "+chargeLevel: chargeLevel/10+" "+chargeLevel%10;
 		graphics.drawString(
 				ClientUtils.font(), chargeTxt, 0, 0, Lib.COLOUR_I_ImmersiveOrange, true
 		);
-		transform.popPose();
+		GuiGraphicsPose.pop(transform);
 	}
 
 	public static void renderFluidTankOverlay(GuiGraphicsExtractor graphics, int xStart, int scaledHeight,
 											  Player player, InteractionHand hand, ItemStack equipped, boolean renderFluidUse,
 											  BiConsumer<GuiGraphicsExtractor, IFluidHandlerItem> additionalRender)
 	{
-		var transform = graphics.pose();
+		Object transform = GuiGraphicsPose.pose(graphics);
 		float dx = xStart;
 		float dy = scaledHeight;
-		transform.pushPose();
-		transform.translate(dx, dy, 0);
-		graphics.blitSprite(ieLoc("hud/gauge_full_empty"), -24, -68, 31, 62);
+		GuiGraphicsPose.push(transform);
+		GuiGraphicsPose.translate(transform, dx, dy, 0);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/gauge_full_empty"), -24, -68, 31, 62);
 
-		transform.translate(-23, -37, 0);
+		GuiGraphicsPose.translate(transform, -23, -37, 0);
 		IFluidHandlerItem handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(equipped, Capabilities.Fluid.ITEM);
 		if(handler!=null)
 		{
@@ -246,16 +246,16 @@ public class ItemOverlayUtils
 				}
 				float cap = (float)capacity;
 				float angle = 83-(166*amount/cap);
-				transform.pushPose();
-				transform.mulPose(new Quaternionf().rotateZ(angle*Mth.DEG_TO_RAD));
-				graphics.blitSprite(ieLoc("hud/gauge_pointer"), 6, -2, 24, 4);
-				transform.popPose();
-				transform.translate(23, 37, 0);
+				GuiGraphicsPose.push(transform);
+				GuiGraphicsPose.rotateZ(transform, angle*Mth.DEG_TO_RAD);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/gauge_pointer"), 6, -2, 24, 4);
+				GuiGraphicsPose.pop(transform);
+				GuiGraphicsPose.translate(transform, 23, 37, 0);
 
 				additionalRender.accept(graphics, handler);
 			}
 		}
-		transform.popPose();
+		GuiGraphicsPose.pop(transform);
 	}
 
 
@@ -265,7 +265,7 @@ public class ItemOverlayUtils
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 		int xStart = boundLeft?60: scaledWidth-16;
 		renderFluidTankOverlay(graphics, xStart, scaledHeight, player, hand, equipped, false, (builder, handler) -> {
-			builder.blitSprite(ieLoc("hud/gauge_with_item"), -54, -73, 66, 72);
+			builder.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/gauge_with_item"), -54, -73, 66, 72);
 			ItemStack head = ((DrillItem)equipped.getItem()).getHead(equipped);
 			if(!head.isEmpty())
 				GuiHelper.renderItemWithOverlayIntoGUI(graphics, head, -51, -45, player.level());
@@ -278,7 +278,7 @@ public class ItemOverlayUtils
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 		int xStart = boundLeft?60: scaledWidth-16;
 		renderFluidTankOverlay(graphics, xStart, scaledHeight, player, hand, equipped, false, (builder, handler) -> {
-			builder.blitSprite(ieLoc("hud/gauge_with_item"), -54, -73, 66, 72);
+			builder.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/gauge_with_item"), -54, -73, 66, 72);
 			ItemStack blade = ((BuzzsawItem)equipped.getItem()).getHead(equipped);
 			if(!blade.isEmpty())
 				GuiHelper.renderItemWithOverlayIntoGUI(graphics, blade, -51, -45, player.level());
@@ -291,10 +291,10 @@ public class ItemOverlayUtils
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 		int xStart = boundLeft?54: scaledWidth-16;
 		renderFluidTankOverlay(graphics, xStart, scaledHeight, player, hand, equipped, true, (builder, handler) -> {
-			builder.blitSprite(ieLoc("hud/gauge_no_item"), -41, -73, 53, 72);
+			builder.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/gauge_no_item"), -41, -73, 53, 72);
 			boolean ignite = ChemthrowerItem.isIgniteEnable(equipped);
-			builder.blitSprite(ieLoc(ignite?"hud/with_flame": "hud/no_flame"), -32, -43, 12, 12);
-			builder.blitSprite(ieLoc("hud/text_label"), -52, -93, 64, 16);
+			builder.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc(ignite?"hud/with_flame": "hud/no_flame"), -32, -43, 12, 12);
+			builder.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/text_label"), -52, -93, 64, 16);
 			FluidStack fuel = handler.getFluidInTank(0);
 			if(!fuel.isEmpty())
 			{
@@ -314,36 +314,36 @@ public class ItemOverlayUtils
 		boolean boundLeft = ItemUtils.getLivingHand(player, hand)==HumanoidArm.LEFT;
 		float dx = boundLeft?16: (scaledWidth-16-64);
 		float dy = scaledHeight-16;
-		var transform = graphics.pose();
-		transform.pushPose();
-		transform.translate(dx, dy, 0);
-		graphics.blitSprite(ieLoc("hud/shield_upgrades_base"), 0, -22, 64, 22);
+		Object transform = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(transform);
+		GuiGraphicsPose.translate(transform, dx, dy, 0);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/shield_upgrades_base"), 0, -22, 64, 22);
 
 		if(upgrades.has(UpgradeEffect.FLASH))
 		{
-			graphics.blitSprite(ieLoc("hud/shield_upgrade_flash"), 11, -38, 16, 16);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/shield_upgrade_flash"), 11, -38, 16, 16);
 			final var cooldown = upgrades.get(UpgradeEffect.FLASH);
 			if(cooldown.isOnCooldown())
 			{
 				int h = (int)(cooldown.remainingCooldown()/40f*16);
 				graphics.blitSprite(
-						ieLoc("hud/shield_flash_cooldown"), 16, 16, 0, 16-h, 11, -22-h, 16, h
+						RenderPipelines.GUI_TEXTURED, ieLoc("hud/shield_flash_cooldown"), 16, 16, 0, 16-h, 11, -22-h, 16, h
 				);
 			}
 		}
 		if(upgrades.has(UpgradeEffect.SHOCK))
 		{
-			graphics.blitSprite(ieLoc("hud/shield_upgrade_shock"), 40, -38, 12, 16);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ieLoc("hud/shield_upgrade_shock"), 40, -38, 12, 16);
 			final var cooldown = upgrades.get(UpgradeEffect.SHOCK);
 			if(cooldown.isOnCooldown())
 			{
 				int h = (int)(cooldown.remainingCooldown()/40f*16);
 				graphics.blitSprite(
-						ieLoc("hud/shield_shock_cooldown"), 12, 16, 0, 16-h, 40, -22-h, 12, h
+						RenderPipelines.GUI_TEXTURED, ieLoc("hud/shield_shock_cooldown"), 12, 16, 0, 16-h, 40, -22-h, 12, h
 				);
 			}
 		}
-		transform.popPose();
+		GuiGraphicsPose.pop(transform);
 	}
 
 	private static void renderVoltmeterOverlay(GuiGraphicsExtractor graphics, Player player, int scaledWidth, int scaledHeight)

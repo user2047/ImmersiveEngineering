@@ -1,8 +1,10 @@
 package net.minecraft.client.resources.model.geometry;
 
+import com.mojang.blaze3d.platform.Transparency;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import org.joml.Vector3fc;
 
@@ -63,5 +65,14 @@ public class BakedQuad
 
 	public record MaterialInfo(TextureAtlasSprite sprite, ChunkSectionLayer layer, RenderType itemRenderType, int tintIndex, boolean shade, int lightEmission)
 	{
+		public static MaterialInfo of(Material.Baked material, Transparency transparency, int tintIndex, boolean shade, int lightEmission)
+		{
+			return new MaterialInfo(material.sprite(), null, null, tintIndex, shade, lightEmission);
+		}
+
+		public int flags()
+		{
+			return 0;
+		}
 	}
 }

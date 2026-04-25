@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import malte0811.modelsplitter.model.Group;
 import malte0811.modelsplitter.model.MaterialLibrary.OBJMaterial;
 import malte0811.modelsplitter.model.OBJModel;
+import malte0811.modelsplitter.model.Polygon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -39,6 +40,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -95,7 +97,7 @@ public class GeneralIEOBJModel<T> implements BakedModel, ICacheKeyProvider<Model
 		this.blockLayers = blockLayers;
 		this.itemTypes = itemTypes;
 		this.fabulousItemTypes = fabulousItemTypes;
-		this.particles = spriteGetter.apply(owner.getMaterial("particle"));
+		this.particles = spriteGetter.apply(findParticleMaterial(baseModel, owner));
 		this.owner = owner;
 		this.spriteGetter = spriteGetter;
 		this.sprite = sprite;
@@ -258,6 +260,32 @@ public class GeneralIEOBJModel<T> implements BakedModel, ICacheKeyProvider<Model
 	public IGeometryBakingContext getOwner()
 	{
 		return owner;
+	}
+
+	private static Material findParticleMaterial(OBJModel<OBJMaterial> model, IGeometryBakingContext owner)
+	{
+		for(Group<OBJMaterial> group : model.getFacesByGroup().values())
+			for(Polygon<OBJMaterial> face : group.getFaces())
+			{
+				OBJMaterial material = face.getTexture();
+				if(material!=null)
+				{
+					Material resolved = resolveMaterial(material.map_Kd(), owner);
+					if(resolved!=null)
+						return resolved;
+				}
+			}
+		return owner.getMaterial("particle");
+	}
+
+	@Nullable
+	private static Material resolveMaterial(String name, IGeometryBakingContext owner)
+	{
+		if(name==null)
+			return null;
+		if(name.indexOf(':') >= 0)
+			return new Material(Identifier.parse(name));
+		return owner.getMaterial(name);
 	}
 
 	public IEOBJCallback<T> getCallback()

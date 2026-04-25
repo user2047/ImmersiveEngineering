@@ -654,12 +654,13 @@ public class BlockStates extends ExtendedBlockstateProvider
 			itemModel(MetalDevices.CHARGING_STATION, full);
 		}
 		for(BlockEntry<ConveyorBlock> b : MetalDevices.CONVEYORS.values())
-			createMultistateSingleModel(b, new ConfiguredModel(
+			createHorizontalRotatedBlock(
+					b,
 					models().getBuilder(b.getId().getPath())
 							.customLoader(ConveyorModelBuilder::begin)
 							.type(b.get().getType())
 							.end()
-			));
+			);
 		{
 			ModelFile magnetModel = models().cubeBottomTop("electromagnet",
 					modLoc("block/metal_device/electromagnet"),
@@ -692,7 +693,9 @@ public class BlockStates extends ExtendedBlockstateProvider
 					.texture("particle", entry.stillTexture());
 			getVariantBuilder(entry.getBlock()).partialState().setModels(new ConfiguredModel(model));
 		}
-		createHorizontalRotatedBlock(MetalDevices.TOOLBOX, obj("block/toolbox.obj"));
+		createHorizontalRotatedBlock(
+				MetalDevices.TOOLBOX, obj("block/toolbox.obj").texture("texture", rl("block/metal_decoration/toolbox"))
+		);
 	}
 
 	public void createStructuralArm(String texture, Supplier<? extends Block> block)
