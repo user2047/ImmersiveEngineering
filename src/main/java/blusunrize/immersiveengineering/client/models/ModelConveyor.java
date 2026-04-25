@@ -34,15 +34,15 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -52,7 +52,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -61,12 +61,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -94,8 +93,8 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 	private final Map<RenderType, Cache<Object, List<BakedQuad>>> modelCache = new HashMap<>();
 
 	{
-		modelCache.put(RenderType.translucent(), CacheBuilder.newBuilder().maximumSize(100).build());
-		modelCache.put(RenderType.cutout(), CacheBuilder.newBuilder().maximumSize(100).build());
+		modelCache.put(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent(), CacheBuilder.newBuilder().maximumSize(100).build());
+		modelCache.put(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout(), CacheBuilder.newBuilder().maximumSize(100).build());
 		modelCache.put(null, CacheBuilder.newBuilder().maximumSize(100).build());
 	}
 
@@ -109,7 +108,6 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(
 			@Nullable BlockState blockState,
 			@Nullable Direction side,
@@ -154,7 +152,7 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 			TextureAtlasSprite tex_conveyor_colour = null;
 			if(conveyor!=null&&(colourStripes = conveyor.getDyeColour())!=null)
 				tex_conveyor_colour = ClientUtils.getSprite(clientData.getColouredStripesTexture());
-			if(layer==null||layer==RenderType.cutout())
+			if(layer==null||layer==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout())
 				cachedQuads.addAll(getBaseConveyor(facing, 1, matrix, conDir, tex_conveyor, walls, new boolean[]{true, true}, tex_conveyor_colour, colourStripes));
 			cachedQuads = clientData.modifyQuads(cachedQuads, context, layer);
 			layerCache.put(key, ImmutableList.copyOf(cachedQuads));
@@ -273,19 +271,16 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 		return quads;
 	}
 
-	@Override
 	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isCustomRenderer()
 	{
 		return false;
@@ -294,7 +289,6 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 	TextureAtlasSprite tex_particle;
 
 	@Nonnull
-	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
 		if(tex_particle==null)
@@ -303,14 +297,12 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public ItemTransforms getTransforms()
 	{
 		return ItemTransforms.NO_TRANSFORMS;
 	}
 
 	@Nonnull
-	@Override
 	public ItemOverrides getOverrides()
 	{
 		return overrideList;
@@ -326,7 +318,6 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 				.maximumSize(100)
 				.build(CacheLoader.from(key -> new ModelConveyor<>(key.type(), key.defaultCover())));
 
-		@Override
 		public BakedModel resolve(@Nonnull BakedModel originalModel, @Nonnull ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int unused)
 		{
 			if(stack.getItem() instanceof BlockItem asBlock)
@@ -339,7 +330,7 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 					return itemModelCache.getUnchecked(new Key(conveyorType, defaultCover));
 				}
 			}
-			return Minecraft.getInstance().getModelManager().getMissingModel();
+			return null;
 		}
 	};
 
@@ -363,24 +354,22 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public BakedModel applyTransform(ItemDisplayContext transformType, PoseStack stack, boolean applyLeftHandTransform)
 	{
 		Transformation transform = TRANSFORMATION_MAP.get(transformType);
 		if(transform!=null)
 		{
-			Vector3f translate = transform.getTranslation();
+			var translate = transform.translation();
 			stack.translate(translate.x(), translate.y(), translate.z());
-			stack.mulPose(transform.getLeftRotation());
-			Vector3f scale = transform.getScale();
+			stack.mulPose(transform.leftRotation());
+			var scale = transform.scale();
 			stack.scale(scale.x(), scale.y(), scale.z());
-			stack.mulPose(transform.getRightRotation());
+			stack.mulPose(transform.rightRotation());
 		}
 		return this;
 	}
 
 	@Nonnull
-	@Override
 	public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData)
 	{
 		Block b = state.getBlock();
@@ -395,24 +384,20 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 				.build();
 	}
 
-	@Override
 	public List<RenderType> getRenderTypes(ItemStack itemStack, boolean fabulous)
 	{
 		return List.of(NeoForgeRenderTypes.ITEM_LAYERED_CUTOUT.get());
 	}
 
-	@Override
 	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data)
 	{
-		return ChunkRenderTypeSet.of(RenderType.cutout(), RenderType.translucent());
+		return ChunkRenderTypeSet.of(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout(), blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent());
 	}
 
-	@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.MOD)
 	public record RawConveyorModel(IConveyorType<?> type) implements IUnbakedGeometry<RawConveyorModel>
 	{
 		private static final AtomicBoolean REFRESHED_SINCE_BAKE = new AtomicBoolean(false);
 
-		@Override
 		public BakedModel bake(
 				IGeometryBakingContext context,
 				ModelBaker bakery,
@@ -427,7 +412,6 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 			return new ModelConveyor<>(type, Blocks.AIR);
 		}
 
-		@SubscribeEvent
 		public static void onModelBakingDone(ModelEvent.BakingCompleted ev)
 		{
 			REFRESHED_SINCE_BAKE.set(false);
@@ -440,7 +424,6 @@ public class ModelConveyor<T extends IConveyorBelt> extends BakedIEModel
 		public static final String TYPE_KEY = "conveyorType";
 
 		@Nonnull
-		@Override
 		public RawConveyorModel read(JsonObject modelContents, @Nonnull JsonDeserializationContext deserializationContext)
 		{
 			String typeName = modelContents.get(TYPE_KEY).getAsString();

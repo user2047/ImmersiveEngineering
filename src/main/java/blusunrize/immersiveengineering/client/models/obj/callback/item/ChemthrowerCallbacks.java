@@ -15,9 +15,9 @@ import blusunrize.immersiveengineering.client.models.obj.callback.item.Chemthrow
 import blusunrize.immersiveengineering.common.entities.illager.Bulwark;
 import blusunrize.immersiveengineering.common.items.ChemthrowerItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.AbstractIllager.IllagerArmPose;
+import net.minecraft.world.entity.monster.illager.AbstractIllager.IllagerArmPose;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
@@ -26,14 +26,12 @@ public class ChemthrowerCallbacks implements ItemCallback<Key>
 {
 	public static final ChemthrowerCallbacks INSTANCE = new ChemthrowerCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = ChemthrowerItem.getUpgradesStatic(stack);
 		return new Key(upgrades.get(UpgradeEffect.CAPACITY) > 0, upgrades.has(UpgradeEffect.MULTITANK));
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key stack, String group, RenderType layer)
 	{
 		if("base".equals(group)||"grip".equals(group)||"cage".equals(group)||"tanks".equals(group))
@@ -46,7 +44,6 @@ public class ChemthrowerCallbacks implements ItemCallback<Key>
 			return "tank".equals(group);
 	}
 
-	@Override
 	public void handlePerspective(Key key, LivingEntity holder, ItemDisplayContext cameraTransformType, PoseStack mat)
 	{
 		if(holder instanceof Bulwark bulwark&&(cameraTransformType==ItemDisplayContext.THIRD_PERSON_RIGHT_HAND||cameraTransformType==ItemDisplayContext.THIRD_PERSON_LEFT_HAND))
@@ -64,7 +61,6 @@ public class ChemthrowerCallbacks implements ItemCallback<Key>
 			}
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(false, false);

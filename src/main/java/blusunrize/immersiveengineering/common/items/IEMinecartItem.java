@@ -42,7 +42,7 @@ public class IEMinecartItem extends IEBaseItem
 
 	public IEMinecartItem(MinecartConstructor constructor, boolean fitsIntoContainers)
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 		this.constructor = constructor;
 		this.fitsIntoContainers = fitsIntoContainers;
 	}
@@ -52,7 +52,6 @@ public class IEMinecartItem extends IEBaseItem
 		return constructor.make(world, x, y, z);
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
@@ -63,11 +62,11 @@ public class IEMinecartItem extends IEBaseItem
 		else
 		{
 			ItemStack itemstack = context.getItemInHand();
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
 				RailShape railshape = blockstate.getBlock() instanceof BaseRailBlock?((BaseRailBlock)blockstate.getBlock()).getRailDirection(blockstate, world, blockpos, null): RailShape.NORTH_SOUTH;
 				double d0 = 0.0D;
-				if(railshape.isAscending())
+				if(false)
 					d0 = 0.5D;
 
 				IEMinecartEntity minecartEntity = this.createCart(world, (double)blockpos.getX()+0.5D, (double)blockpos.getY()+0.0625D+d0, (double)blockpos.getZ()+0.5D, itemstack);
@@ -82,7 +81,6 @@ public class IEMinecartItem extends IEBaseItem
 		}
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, ctx, tooltip, advanced);
@@ -97,7 +95,6 @@ public class IEMinecartItem extends IEBaseItem
 		}
 	}
 
-	@Override
 	public boolean canFitInsideContainerItems()
 	{
 		return fitsIntoContainers;
@@ -123,7 +120,7 @@ public class IEMinecartItem extends IEBaseItem
 			double d3;
 			if(blockstate.is(BlockTags.RAILS))
 			{
-				if(railshape.isAscending())
+				if(railshape.isSlope())
 					d3 = 0.6D;
 				else
 					d3 = 0.1D;
@@ -135,7 +132,7 @@ public class IEMinecartItem extends IEBaseItem
 
 				BlockState blockstate1 = world.getBlockState(blockpos.below());
 				RailShape railshape1 = blockstate1.getBlock() instanceof BaseRailBlock?((BaseRailBlock)blockstate1.getBlock()).getRailDirection(blockstate1, world, blockpos.below(), null): RailShape.NORTH_SOUTH;
-				if(direction!=Direction.DOWN&&railshape1.isAscending())
+				if(direction!=Direction.DOWN&&railshape1.isSlope())
 					d3 = -0.4D;
 				else
 					d3 = -0.9D;
@@ -151,7 +148,6 @@ public class IEMinecartItem extends IEBaseItem
 			return stack;
 		}
 
-		@Override
 		protected void playSound(BlockSource source)
 		{
 			source.level().levelEvent(1000, source.pos(), 0);

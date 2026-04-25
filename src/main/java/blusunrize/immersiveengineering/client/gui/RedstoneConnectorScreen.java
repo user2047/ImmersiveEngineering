@@ -51,7 +51,6 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 	private GuiButtonState<IOSideConfig> buttonInOut;
 	private GuiButtonBoolean[] colorButtons;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -83,7 +82,6 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity.getBlockPos(), message));
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		ArrayList<Component> tooltip = new ArrayList<>();
@@ -111,7 +109,6 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
-	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
@@ -137,13 +134,11 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 							buttons[j].onClick(buttons[j].getX(), buttons[j].getY());
 				})
 		{
-			@Override
 			protected boolean isValidClickButton(int button)
 			{
 				return button==0&&!getState();
 			}
 
-			@Override
 			public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 			{
 				super.renderWidget(graphics, mouseX, mouseY, partialTicks);

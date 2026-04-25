@@ -14,14 +14,16 @@ import blusunrize.lib.manual.ManualInstance.ManualLink;
 import blusunrize.lib.manual.ManualUtils;
 import blusunrize.lib.manual.Tree.AbstractNode;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -29,14 +31,14 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import org.joml.Matrix3x2fStack;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = "immersiveengineering", bus = Bus.GAME)
+@EventBusSubscriber(value = Dist.CLIENT, modid = "immersiveengineering")
 public class ManualScreen extends Screen
 {
 	private Minecraft mc = Minecraft.getInstance();
@@ -101,16 +103,16 @@ public class ManualScreen extends Screen
 		Window res = mc.getWindow();
 		double oldGuiScale = res.calculateScale(mc.options.guiScale().get(), mc.isEnforceUnicode());
 
-		int guiScaleInt = Math.min(manual.getGuiRescale(), getMinecraft().getWindow().calculateScale(0, true));
+		int guiScaleInt = Math.min(manual.getGuiRescale(), minecraft.getWindow().calculateScale(0, true));
 		double newGuiScale = res.calculateScale(guiScaleInt, true);
 
 		if(guiScaleInt > 0&&newGuiScale!=oldGuiScale)
 		{
 			scaleFactor = (float)newGuiScale/(float)res.getGuiScale();
-			res.setGuiScale(newGuiScale);
+			res.setGuiScale((int)newGuiScale);
 			width = res.getGuiScaledWidth();
 			height = res.getGuiScaledHeight();
-			res.setGuiScale(oldGuiScale);
+			res.setGuiScale((int)oldGuiScale);
 		}
 		else
 			scaleFactor = 1;
@@ -181,21 +183,21 @@ public class ManualScreen extends Screen
 
 	public void fullInit()
 	{
-		super.init(minecraft, width, height);
+		super.init(width, height);
 	}
 
 	@Override
-	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
 	{
-		final PoseStack transform = graphics.pose();
-		transform.pushPose();
+		final Matrix3x2fStack transform = graphics.pose();
+		transform.pushMatrix();
 		if(scaleFactor!=1)
 		{
-			transform.scale(scaleFactor, scaleFactor, scaleFactor);
+			transform.scale(scaleFactor, scaleFactor);
 			mouseX /= scaleFactor;
 			mouseY /= scaleFactor;
 		}
-		super.render(graphics, mouseX, mouseY, deltaTime);
+		super.extractRenderState(graphics, mouseX, mouseY, deltaTime);
 
 		manual.entryRenderPre();
 
@@ -207,11 +209,10 @@ public class ManualScreen extends Screen
 			boolean b0 = mouseX > 32&&mouseX < 32+17&&mouseY > 179&&mouseY < 179+10;
 			boolean b1 = mouseX > 135&&mouseX < 135+17&&mouseY > 179&&mouseY < 179+10;
 
-			RenderSystem.enableBlend();
 			if(page > 0)
-				graphics.blit(texture, guiLeft+32, guiTop+179, 0, 216+(b0?20: 0), 16, 10);
+				blit(graphics, guiLeft+32, guiTop+179, 0, 216+(b0?20: 0), 16, 10);
 			if(page < selectedEntry.getPageCount()-1)
-				graphics.blit(texture, guiLeft+136, guiTop+179, 0, 226+(b1?20: 0), 16, 10);
+				blit(graphics, guiLeft+136, guiTop+179, 0, 226+(b1?20: 0), 16, 10);
 
 			manual.titleRenderPre();
 			//Title
@@ -236,49 +237,48 @@ public class ManualScreen extends Screen
 		}
 		if(this.searchField!=null)
 		{
-			this.searchField.render(graphics, mouseX, mouseY, deltaTime);
+			this.searchField.extractRenderState(graphics, mouseX, mouseY, deltaTime);
 			if(suggestionList.visible)
 				//TODO translation
-				graphics.drawString(manual.fontRenderer(), "It looks like you meant:", guiLeft+180, guiTop+128, manual.getTextColour());
+				graphics.text(manual.fontRenderer(), "It looks like you meant:", guiLeft+180, guiTop+128, manual.getTextColour());
 		}
 		for(Button btn : pageButtons)
-			btn.render(graphics, mouseX, mouseY, deltaTime);
-		RenderSystem.enableBlend();
+			btn.extractRenderState(graphics, mouseX, mouseY, deltaTime);
 		manual.entryRenderPost();
-		transform.popPose();
+		transform.popMatrix();
 	}
 
 	@Override
-	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTime)
 	{
 		// TODO do we want this or not?
-		//  super.renderBackground(graphics, mouseX, mouseY, deltaTime);
-		graphics.blit(texture, guiLeft, guiTop, 0, 0, xSize, ySize);
+		//  super.extractBackground(graphics, mouseX, mouseY, deltaTime);
+		blit(graphics, guiLeft, guiTop, 0, 0, xSize, ySize);
 		if(this.searchField!=null)
 		{
 			int l = searchField.getValue().length()*6;
 			if(l > 20)
-				graphics.blit(texture, guiLeft+166, guiTop+74, 136+(120-l), 238, l, 18);
+				blit(graphics, guiLeft+166, guiTop+74, 136+(120-l), 238, l, 18);
 			if(suggestionList.visible)
 			{
-				graphics.blit(texture, guiLeft+174, guiTop+100, 214, 212, 16, 26);
+				blit(graphics, guiLeft+174, guiTop+100, 214, 212, 16, 26);
 				int h = suggestionList.getHeight();
 				int w = 76;
-				graphics.blit(texture, guiLeft+174, guiTop+116, 230, 212, 16, 16);//Top Left
-				graphics.blit(texture, guiLeft+174, guiTop+132+h, 230, 228, 16, 10);//Bottom Left
-				graphics.blit(texture, guiLeft+190+w, guiTop+116, 246, 212, 10, 16);//Top Right
-				graphics.blit(texture, guiLeft+190+w, guiTop+132+h, 246, 228, 10, 10);//Bottom Right
+				blit(graphics, guiLeft+174, guiTop+116, 230, 212, 16, 16);//Top Left
+				blit(graphics, guiLeft+174, guiTop+132+h, 230, 228, 16, 10);//Bottom Left
+				blit(graphics, guiLeft+190+w, guiTop+116, 246, 212, 10, 16);//Top Right
+				blit(graphics, guiLeft+190+w, guiTop+132+h, 246, 228, 10, 10);//Bottom Right
 				for(int hh = 0; hh < h; hh++)
 				{
-					graphics.blit(texture, guiLeft+174, guiTop+132+hh, 230, 228, 16, 1);
+					blit(graphics, guiLeft+174, guiTop+132+hh, 230, 228, 16, 1);
 					for(int ww = 0; ww < w; ww++)
-						graphics.blit(texture, guiLeft+190+ww, guiTop+132+hh, 246, 228, 1, 1);
-					graphics.blit(texture, guiLeft+190+w, guiTop+132+hh, 246, 228, 10, 1);
+						blit(graphics, guiLeft+190+ww, guiTop+132+hh, 246, 228, 1, 1);
+					blit(graphics, guiLeft+190+w, guiTop+132+hh, 246, 228, 10, 1);
 				}
 				for(int ww = 0; ww < w; ww++)
 				{
-					graphics.blit(texture, guiLeft+190+ww, guiTop+116, 246, 212, 1, 16);
-					graphics.blit(texture, guiLeft+190+ww, guiTop+132+h, 246, 228, 1, 10);
+					blit(graphics, guiLeft+190+ww, guiTop+116, 246, 212, 1, 16);
+					blit(graphics, guiLeft+190+ww, guiTop+132+h, 246, 228, 1, 10);
 
 				}
 			}
@@ -296,7 +296,12 @@ public class ManualScreen extends Screen
 	{
 		int xx = (int)Math.floor(x-(fr.width(s)/2.));
 		int yy = (int)Math.floor(y-(fr.lineHeight/2.));
-		graphics.drawString(fr, s, xx, yy, colour, shadow);
+		graphics.text(fr, s, xx, yy, colour, shadow);
+	}
+
+	private void blit(GuiGraphicsExtractor graphics, int x, int y, int u, int v, int width, int height)
+	{
+		graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, 256, 256);
 	}
 
 	@SubscribeEvent
@@ -338,8 +343,11 @@ public class ManualScreen extends Screen
 	}
 
 	@Override
-	public boolean mouseClicked(double mx, double my, int button)
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
 	{
+		double mx = event.x();
+		double my = event.y();
+		int button = event.button();
 		mx /= scaleFactor;
 		my /= scaleFactor;
 		if(button==0&&currentNode.isLeaf())
@@ -386,24 +394,28 @@ public class ManualScreen extends Screen
 			return true;
 		}
 		lastClick = new double[]{mx-guiLeft, my-guiTop};
-		if(super.mouseClicked(mx, my, button))
+		MouseButtonEvent scaledEvent = new MouseButtonEvent(mx, my, event.buttonInfo());
+		if(super.mouseClicked(scaledEvent, doubleClick))
 			return true;
 		if(this.searchField!=null)
-			this.searchField.mouseClicked(mx, my, button);
+			this.searchField.mouseClicked(scaledEvent, doubleClick);
 		return false;
 	}
 
 	@Override
-	public boolean mouseReleased(double mx, double my, int action)
+	public boolean mouseReleased(MouseButtonEvent event)
 	{
 		lastClick = null;
 		lastDrag = null;
-		return super.mouseReleased(mx, my, action);
+		return super.mouseReleased(event);
 	}
 
 	@Override
-	public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY)
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY)
 	{
+		double mx = event.x();
+		double my = event.y();
+		int button = event.button();
 		mx /= scaleFactor;
 		my /= scaleFactor;
 		if(lastClick!=null&&currentNode.isLeaf())
@@ -419,27 +431,27 @@ public class ManualScreen extends Screen
 	}
 
 	@Override
-	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_)
+	public boolean charTyped(CharacterEvent event)
 	{
-		if(this.searchField!=null&&this.searchField.charTyped(p_charTyped_1_, p_charTyped_2_))
+		if(this.searchField!=null&&this.searchField.charTyped(event))
 		{
 			updateSearch();
 			return true;
 		}
 		else
-			return super.charTyped(p_charTyped_1_, p_charTyped_2_);
+			return super.charTyped(event);
 	}
 
 	@Override
-	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_)
+	public boolean keyPressed(KeyEvent event)
 	{
-		if(this.searchField!=null&&this.searchField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_))
+		if(this.searchField!=null&&this.searchField.keyPressed(event))
 		{
 			updateSearch();
 			return true;
 		}
 		else
-			return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+			return super.keyPressed(event);
 	}
 
 	private void updateSearch()

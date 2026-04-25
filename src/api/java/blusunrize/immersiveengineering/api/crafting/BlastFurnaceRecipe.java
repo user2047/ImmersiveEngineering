@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  */
 public class BlastFurnaceRecipe extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<BlastFurnaceRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BlastFurnaceRecipe>> SERIALIZER;
 	public static final CachedRecipeList<BlastFurnaceRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.BLAST_FURNACE);
 
 	public final IngredientWithSize input;
@@ -46,12 +46,10 @@ public class BlastFurnaceRecipe extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<BlastFurnaceRecipe> getIESerializer()
+	protected RecipeSerializer<BlastFurnaceRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return output.get();

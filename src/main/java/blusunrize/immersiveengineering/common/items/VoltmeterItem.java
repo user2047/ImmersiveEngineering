@@ -37,7 +37,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.List;
@@ -53,10 +53,9 @@ public class VoltmeterItem extends IEBaseItem
 
 	public VoltmeterItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		super.appendHoverText(stack, ctx, tooltip, flagIn);
@@ -71,7 +70,6 @@ public class VoltmeterItem extends IEBaseItem
 			));
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
 		Level level = context.getLevel();
@@ -79,19 +77,10 @@ public class VoltmeterItem extends IEBaseItem
 		Player player = context.getPlayer();
 		if((player==null||!player.isShiftKeyDown()))
 		{
-			IEnergyStorage energyCap = level.getCapability(EnergyStorage.BLOCK, pos, null);
-			if(energyCap!=null)
-			{
-				int max = energyCap.getMaxEnergyStored();
-				int stored = energyCap.getEnergyStored();
-				if(max > 0)
-					ChatUtils.sendServerNoSpamMessages(player, Component.translatable(Lib.CHAT_INFO+"energyStorage", stored, max));
-				return InteractionResult.SUCCESS;
-			}
 		}
 		if(player!=null&&player.isShiftKeyDown())
 		{
-			if(level.isClientSide)
+			if(level.isClientSide())
 				return InteractionResult.SUCCESS;
 			// either measure loss
 			if(!measureLoss(level, pos, player, context))

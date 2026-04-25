@@ -33,10 +33,11 @@ import blusunrize.immersiveengineering.common.blocks.wooden.CraftingTableBlock;
 import blusunrize.immersiveengineering.common.blocks.wooden.*;
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.HangingSignItem;
@@ -359,7 +360,7 @@ public final class IEBlocks
 						.instrument(NoteBlockInstrument.BASS)
 						.sound(SoundType.SAND)
 						.strength(0.5F)
-						.noCollission().noOcclusion(),
+						.noCollision().noOcclusion(),
 				SawdustBlock::new
 		);
 		public static final BlockEntry<IEBaseBlock> FIBERBOARD = BlockEntry.simple("fiberboard",
@@ -682,7 +683,7 @@ public final class IEBlocks
 						ConveyorHandler.getRegistryNameFor(rl).getPath(), ConveyorBlock.PROPERTIES, p -> new ConveyorBlock(type, p)
 				);
 				CONVEYORS.put(type, blockEntry);
-				IEItems.REGISTER.register(blockEntry.getId().getPath(), () -> new BlockItemIE(blockEntry.get()));
+				IEItems.register(blockEntry.getId().getPath(), () -> new BlockItemIE(blockEntry.get()));
 			}
 		}
 	}
@@ -863,13 +864,13 @@ public final class IEBlocks
 			else if(entry==Connectors.TRANSFORMER)
 				toItem = TransformerBlockItem::new;
 			else if(entry==WoodenDevices.CRATE||entry==WoodenDevices.REINFORCED_CRATE)
-				toItem = b -> new CrateItem(b, new Item.Properties().stacksTo(1));
+				toItem = b -> new CrateItem(b, IEItems.defaultProperties().stacksTo(1));
 			else
 				toItem = BlockItemIE::new;
 			if(entry==StoneDecoration.COKE)
 				toItem = toItem.andThen(b -> b.setBurnTime(10*IEItems.COKE_BURN_TIME));
 			Function<Block, BlockItemIE> finalToItem = toItem;
-			IEItems.REGISTER.register(entry.getId().getPath(), () -> finalToItem.apply(entry.get()));
+			IEItems.register(entry.getId().getPath(), () -> finalToItem.apply(entry.get()));
 		}
 		// Signs
 		WoodenDecoration.SIGN.registerItems(IEItems.REGISTER);
@@ -906,11 +907,9 @@ public final class IEBlocks
 		private static Supplier<BlockBehaviour.Properties> buildProperties(float strength, MapColor mapColor, NoteBlockInstrument nbi, boolean ignite, Supplier<Block> dropsLike)
 		{
 			return () -> {
-				BlockBehaviour.Properties props = Properties.of().mapColor(mapColor).instrument(nbi).strength(strength).forceSolidOn().noCollission();
+				BlockBehaviour.Properties props = Properties.of().mapColor(mapColor).instrument(nbi).strength(strength).forceSolidOn().noCollision();
 				if(ignite)
 					props.ignitedByLava();
-				if(dropsLike!=null)
-					props.dropsLike(dropsLike.get());
 				return props;
 			};
 		}
@@ -919,11 +918,11 @@ public final class IEBlocks
 		{
 			register.register(
 					baseName+"_sign",
-					() -> new SignItem(new Item.Properties().stacksTo(16), this.sign().get(), this.wall().get())
+					id -> new SignItem(this.sign().get(), this.wall().get(), IEItems.defaultProperties(id).stacksTo(16))
 			);
 			register.register(
 					baseName+"_hanging_sign",
-					() -> new HangingSignItem(this.hanging().get(), this.wallHanging.get(), new Item.Properties().stacksTo(16))
+					id -> new HangingSignItem(this.hanging().get(), this.wallHanging.get(), IEItems.defaultProperties(id).stacksTo(16))
 			);
 		}
 
@@ -1002,7 +1001,9 @@ public final class IEBlocks
 		public BlockEntry(String name, Supplier<Properties> properties, Function<Properties, T> make)
 		{
 			this.properties = properties;
-			this.regObject = REGISTER.register(name, () -> make.apply(properties.get()));
+			this.regObject = REGISTER.register(name, id -> make.apply(
+					properties.get().setId(ResourceKey.create(Registries.BLOCK, id))
+			));
 			ALL_ENTRIES.add(this);
 		}
 
@@ -1019,7 +1020,6 @@ public final class IEBlocks
 			this.regObject = (DeferredHolder<Block, T>)toCopy.regObject;
 		}
 
-		@Override
 		public T get()
 		{
 			return regObject.get();
@@ -1041,7 +1041,6 @@ public final class IEBlocks
 		}
 
 		@Nonnull
-		@Override
 		public Item asItem()
 		{
 			return get().asItem();

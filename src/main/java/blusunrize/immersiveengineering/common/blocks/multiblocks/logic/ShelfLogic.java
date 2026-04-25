@@ -32,11 +32,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component.Serializer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -45,7 +44,7 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,19 +86,16 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 		return map;
 	});
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(ItemHandler.BLOCK, State::getItemHandler);
+		register.register(Capabilities.Item.BLOCK, State::getItemHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		state.crates.forEach(stack -> {
@@ -108,14 +104,13 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 		});
 	}
 
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
 			Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient
 	)
 	{
 		if(posInMultiblock.getY() < 1)
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		if(!isClient)
 		{
 			final State state = ctx.getState();
@@ -143,10 +138,9 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			else
 				player.openMenu(IEMenuTypes.SHELF.provide(ctx, posInMultiblock));
 		}
-		return ItemInteractionResult.sidedSuccess(isClient);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public @Nullable List<Component> getOverlayText(State state, BlockPos posInMultiblock, BlockHitResult absoluteHit, Player player, boolean hammer)
 	{
 		if(posInMultiblock.getY() < 1||state==null)
@@ -158,7 +152,6 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 		return List.of();
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return ShelfShapes.SHAPE_GETTER;
@@ -245,19 +238,16 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			return (posInMultiblock.getY()-1)*8+posInMultiblock.getX()*2+posInMultiblock.getZ();
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			ContainerHelper.saveAllItems(nbt, crates, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, crates, provider);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			ContainerHelper.loadAllItems(nbt, crates, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, crates, provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			ListTag crates = new ListTag();
@@ -266,25 +256,24 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			{
 				CompoundTag tag = new CompoundTag();
 				Component name = stack.isEmpty()?Component.empty(): stack.getHoverName();
-				tag.putString("name", Serializer.toJson(name, provider));
-				tag.putString("id", stack.getItemHolder().getKey().location().toString());
+				tag.putString("name", name.getString());
+				tag.putString("id", stack.getItem().builtInRegistryHolder().key().identifier().toString());
 				crates.add(tag);
 				cratesAsInt = (cratesAsInt<<1)|(stack.isEmpty()?0: 1);
 			}
 			nbt.put("crates", crates);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			ListTag names = nbt.getList("crates", 10);
+			ListTag names = nbt.getListOrEmpty("crates");
 			for(int i = 0; i < NUM_CRATES; i++)
 			{
-				CompoundTag tag = names.getCompound(i);
-				Item item = BuiltInRegistries.ITEM.get(Identifier.parse(tag.getString("id")));
+				CompoundTag tag = names.getCompoundOrEmpty(i);
+				Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse(tag.getStringOr("id", "minecraft:air")));
 				CrateVariant variant = CRATE_VARIANTS.get().get(item);
 				this.renderCrates[i] = variant!=null?variant.crateTexture(): null;
-				this.names[i] = Serializer.fromJson(tag.getString("name"), provider);
+				this.names[i] = Component.literal(tag.getStringOr("name", ""));
 			}
 			this.doUpdate.run();
 		}
@@ -305,13 +294,11 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 
 	public record ShelfItemHandler(Supplier<List<ItemStack>> crates) implements IItemHandlerModifiable
 	{
-		@Override
 		public int getSlots()
 		{
 			return crates.get().size()*WoodenCrateBlockEntity.CONTAINER_SIZE;
 		}
 
-		@Override
 		public @NotNull ItemStack getStackInSlot(int slot)
 		{
 			if(slot < 0||slot >= getSlots())
@@ -324,7 +311,6 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			return contents.getStackInSlot(innerSlot);
 		}
 
-		@Override
 		public void setStackInSlot(int slot, ItemStack itemStack)
 		{
 			if(slot < 0||slot >= getSlots()||!isItemValid(slot, itemStack))
@@ -340,7 +326,6 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			crates.get().get(crateIndex).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(edited));
 		}
 
-		@Override
 		public @NotNull ItemStack insertItem(int slot, ItemStack stackToInsert, boolean simulate)
 		{
 			if(slot < 0||slot >= getSlots()||!isItemValid(slot, stackToInsert))
@@ -411,7 +396,6 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			return stackToInsert;
 		}
 
-		@Override
 		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate)
 		{
 			if(slot < 0||slot >= getSlots())
@@ -437,13 +421,11 @@ public class ShelfLogic implements IMultiblockLogic<State>, MBOverlayText<State>
 			return result;
 		}
 
-		@Override
 		public int getSlotLimit(int i)
 		{
 			return 64;
 		}
 
-		@Override
 		public boolean isItemValid(int i, ItemStack stack)
 		{
 			return IEApi.isAllowedInCrate(stack);

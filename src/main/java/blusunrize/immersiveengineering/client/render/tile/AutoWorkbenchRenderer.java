@@ -25,7 +25,7 @@ import blusunrize.immersiveengineering.common.register.IEMultiblockLogic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -36,7 +36,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Quaternionf;
 
 import java.util.List;
@@ -48,7 +48,6 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 	public static final String NAME = "auto_workbench_animated";
 	public static DynamicModel DYNAMIC;
 
-	@Override
 	public void render(
 			IMultiblockContext<State> ctx,
 			float partialTicks,
@@ -58,7 +57,7 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 			int combinedOverlayIn
 	)
 	{
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 		BakedModel model = DYNAMIC.get();
 		final State state = ctx.getState();
 
@@ -222,7 +221,7 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 						matrixStack.translate(itemDisplays[i][1], itemDisplays[i][2], itemDisplays[i][3]);
 						matrixStack.mulPose(new Quaternionf().rotateXYZ(itemDisplays[i][4], 0, 0));
 						matrixStack.scale(scale, scale, .5f);
-						ClientUtils.mc().getItemRenderer().renderStatic(
+						ClientUtils.getItemRenderer().renderStatic(
 								dList.get(0), ItemDisplayContext.FIXED,
 								combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 								level, 0
@@ -263,7 +262,7 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 							matrixStack.translate(localItemX, localItemY, localItemZ);
 							matrixStack.mulPose(new Quaternionf().rotateXYZ((float)Math.toRadians(localAngle), 0, 0));
 							matrixStack.scale(scale, scale, .5f);
-							ClientUtils.mc().getItemRenderer().renderStatic(
+							ClientUtils.getItemRenderer().renderStatic(
 									dList.get(d), ItemDisplayContext.FIXED,
 									combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 									level, 0
@@ -308,9 +307,9 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 		ModelData data = ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts));
 
 		blockRenderer.getModelRenderer().renderModel(
-				matrix.last(), buffers.getBuffer(RenderType.solid()), null, model,
+				matrix.last(), buffers.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, model,
 				1, 1, 1,
-				light, overlay, data, RenderType.solid()
+				light, overlay, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);
 		matrix.popPose();
 	}

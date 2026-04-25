@@ -24,18 +24,15 @@ public class InventoryCraftingFalse
 {
 	private static final AbstractContainerMenu NULL_CONTAINER = new AbstractContainerMenu(MenuType.CRAFTING, 0)
 	{
-		@Override
 		public ItemStack quickMoveStack(Player p_38941_, int p_38942_)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public void slotsChanged(Container paramIInventory)
 		{
 		}
 
-		@Override
 		public boolean stillValid(@Nonnull Player playerIn)
 		{
 			return false;

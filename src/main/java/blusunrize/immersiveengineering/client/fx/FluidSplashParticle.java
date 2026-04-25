@@ -11,11 +11,11 @@ package blusunrize.immersiveengineering.client.fx;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -28,12 +28,12 @@ import javax.annotation.Nullable;
 /**
  * @author BluSunrize - 21.02.2017
  */
-public class FluidSplashParticle extends TextureSheetParticle
+public class FluidSplashParticle extends SingleQuadParticle
 {
 	public FluidSplashParticle(Fluid fluid, ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
 							   double xSpeedIn, double ySpeedIn, double zSpeedIn)
 	{
-		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, ClientUtils.getSprite(IClientFluidTypeExtensions.of(fluid).getStillTexture(new FluidStack(fluid, FluidType.BUCKET_VOLUME))));
 
 		this.xd *= 0.3D;
 		this.yd = Math.random()*0.2D+0.1D;
@@ -48,7 +48,6 @@ public class FluidSplashParticle extends TextureSheetParticle
 		this.setFluidTexture(new FluidStack(fluid, FluidType.BUCKET_VOLUME));
 	}
 
-	@Override
 	public void tick()
 	{
 		this.xo = this.x;
@@ -99,17 +98,15 @@ public class FluidSplashParticle extends TextureSheetParticle
 	}
 
 	@Nonnull
-	@Override
-	public ParticleRenderType getRenderType()
+	protected Layer getLayer()
 	{
-		return ParticleRenderType.TERRAIN_SHEET;
+		return Layer.TRANSLUCENT_TERRAIN;
 	}
 
-	public static class Factory implements ParticleProvider.Sprite<FluidSplashOptions>
+	public static class Factory implements ParticleProvider<FluidSplashOptions>
 	{
 		@Nullable
-		@Override
-		public TextureSheetParticle createParticle(FluidSplashOptions typeIn, @Nonnull ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+		public SingleQuadParticle createParticle(FluidSplashOptions typeIn, @Nonnull ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random)
 		{
 			return new FluidSplashParticle(typeIn.fluid(), worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
 		}

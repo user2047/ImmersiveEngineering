@@ -30,14 +30,12 @@ public class FertilizerInfoArea extends InfoArea
 		this.fertilizerMod = fertilizerMod;
 	}
 
-	@Override
 	protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		tooltip.add(Component.translatable(Lib.DESC_INFO+"fertFill", Utils.formatDouble(fertilizerAmount.get()/(float)IEServerConfig.MACHINES.cloche_fertilizer.get(), "0.00")));
 		tooltip.add(Component.translatable(Lib.DESC_INFO+"fertMod", Utils.formatDouble(fertilizerMod.get(), "0.00")));
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		final int height = area.getHeight();

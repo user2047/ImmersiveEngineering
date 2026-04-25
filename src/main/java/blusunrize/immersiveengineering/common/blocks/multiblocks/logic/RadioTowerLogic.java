@@ -40,7 +40,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +59,6 @@ public class RadioTowerLogic
 	private static final CapabilityPosition CONTROL_CONNECTION = new CapabilityPosition(3, 1, 5, RelativeBlockFace.UP);
 	public static final BlockPos BROADCAST_POS = new BlockPos(2, 13, 2);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		State state = context.getState();
@@ -107,7 +106,6 @@ public class RadioTowerLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 	}
@@ -131,27 +129,23 @@ public class RadioTowerLogic
 		return (int)Mth.clamp(1024*mod, 16, 1024);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAt(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.registerAt(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
 		register.registerAt(CapabilityRedstoneNetwork.REDSTONE_BUNDLE_CONNECTION, IO_CONNECTION, state -> state.bundleConnection);
 		register.registerAt(CapabilityRedstoneNetwork.REDSTONE_BUNDLE_CONNECTION, CONTROL_CONNECTION, state -> state.controlConnection);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 //		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return RadioTowerShapes.SHAPE_GETTER;
@@ -178,7 +172,6 @@ public class RadioTowerLogic
 		{
 			bundleConnection = new RedstoneBundleConnection()
 			{
-				@Override
 				public void onChange(byte[] externalInputs, Direction side)
 				{
 					if(!Arrays.equals(externalInputs, sendingSignals))
@@ -188,7 +181,6 @@ public class RadioTowerLogic
 					}
 				}
 
-				@Override
 				public void updateInput(byte[] signals, Direction side)
 				{
 					for(int i = 0; i < signals.length; i++)
@@ -197,7 +189,6 @@ public class RadioTowerLogic
 			};
 			controlConnection = new RedstoneBundleConnection()
 			{
-				@Override
 				public void onChange(byte[] externalInputs, Direction side)
 				{
 					int maxSignal = 0;
@@ -219,7 +210,6 @@ public class RadioTowerLogic
 			Arrays.fill(savedFrequencies, frequency);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putInt("frequency", frequency);
@@ -227,22 +217,19 @@ public class RadioTowerLogic
 			nbt.put("energy", energy.serializeNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			frequency = nbt.getInt("frequency");
-			savedFrequencies = nbt.getIntArray("savedFrequencies");
-			energy.deserializeNBT(provider, nbt.getCompound("energy"));
+			frequency = nbt.getIntOr("frequency", 0);
+			savedFrequencies = nbt.getIntArray("savedFrequencies").orElse(new int[0]);
+			energy.deserializeNBT(provider, nbt.getCompoundOrEmpty("energy"));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			// write a dummy value to prevent NPE exceptions
 			nbt.putBoolean("npe_avoid", true);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 		}
@@ -262,25 +249,21 @@ public class RadioTowerLogic
 			return rangeInChunks;
 		}
 
-		@Override
 		public boolean isActive()
 		{
 			return active;
 		}
 
-		@Override
 		public int getChunkRangeSq()
 		{
 			return rangeInChunks*rangeInChunks;
 		}
 
-		@Override
 		public int getFrequency()
 		{
 			return frequency;
 		}
 
-		@Override
 		public byte[] getBroadcastSignal()
 		{
 			return sendingSignals;
@@ -291,7 +274,6 @@ public class RadioTowerLogic
 			this.frequency = frequency;
 		}
 
-		@Override
 		public void notifyOfUpdate(WirelessRedstoneHandler handler)
 		{
 			markSendAndReceiveDirty();

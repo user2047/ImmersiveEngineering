@@ -23,7 +23,6 @@ public class ArcFurnaceMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.ARC_FURNACE);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

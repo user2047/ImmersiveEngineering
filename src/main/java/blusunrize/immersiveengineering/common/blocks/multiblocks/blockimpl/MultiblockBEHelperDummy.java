@@ -45,14 +45,12 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 		this.positionInMB = BlockPos.ZERO;
 	}
 
-	@Override
 	@Nullable
 	public State getState()
 	{
 		return getOnMaster(IMultiblockBEHelperMaster::getState);
 	}
 
-	@Override
 	@Nullable
 	public IMultiblockContext<State> getContext()
 	{
@@ -60,26 +58,22 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 	}
 
 	@Nullable
-	@Override
 	protected IMultiblockBEHelperMaster<State> getMasterHelperWithChunkloads()
 	{
 		return getMasterHelper(level.forciblyGetBlockEntity(multiblock.masterPosInMB()));
 	}
 
-	@Override
 	public void load(CompoundTag tag, Provider provider)
 	{
-		final String key = tag.contains("posInMultiblock", Tag.TAG_COMPOUND)?"posInMultiblock": "posInMB";
-		this.positionInMB = NbtUtils.readBlockPos(tag, key).orElseThrow();
+		final String key = tag.contains("posInMultiblock")?"posInMultiblock": "posInMB";
+		this.positionInMB = BlockPos.of(tag.getLongOr(key, BlockPos.ZERO.asLong()));
 	}
 
-	@Override
 	public void saveAdditional(CompoundTag tag, Provider provider)
 	{
-		tag.put("posInMB", NbtUtils.writeBlockPos(this.positionInMB));
+		tag.putLong("posInMB", this.positionInMB.asLong());
 	}
 
-	@Override
 	public CompoundTag getUpdateTag(Provider provider)
 	{
 		CompoundTag result = new CompoundTag();
@@ -87,25 +81,21 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 		return result;
 	}
 
-	@Override
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		load(tag, provider);
 	}
 
-	@Override
 	public Packet<ClientGamePacketListener> getUpdatePacket()
 	{
 		return ClientboundBlockEntityDataPacket.create(this.be);
 	}
 
-	@Override
 	public void onDataPacket(CompoundTag tag, Provider provider)
 	{
 		load(tag, provider);
 	}
 
-	@Override
 	public MultiblockRegistration<State> getMultiblock()
 	{
 		return multiblock;
@@ -122,7 +112,6 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 	}
 
 	@Nullable
-	@Override
 	protected MultiblockBEHelperMaster<State> getMasterHelper()
 	{
 		return getIMasterHelper() instanceof MultiblockBEHelperMaster<State> helper?helper: null;
@@ -147,7 +136,6 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 			return null;
 	}
 
-	@Override
 	public void setPositionInMB(BlockPos pos)
 	{
 		Preconditions.checkArgument(!multiblock.masterPosInMB().equals(pos));
@@ -155,7 +143,6 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 		this.be.setChanged();
 	}
 
-	@Override
 	public BlockPos getPositionInMB()
 	{
 		return positionInMB;

@@ -22,7 +22,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -43,10 +42,9 @@ public class MultiblockDropsLootContainer extends LootPoolSingletonContainer
 		super(weightIn, qualityIn, conditionsIn, functionsIn);
 	}
 
-	@Override
 	protected void createItemStack(@Nonnull Consumer<ItemStack> output, LootContext context)
 	{
-		if(context.getParamOrNull(LootContextParams.BLOCK_ENTITY) instanceof IMultiblockBE<?> multiblockBE)
+		if(context.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof IMultiblockBE<?> multiblockBE)
 		{
 			final IMultiblockBEHelper<?> helper = multiblockBE.getHelper();
 			dropOriginalBlock(helper, context, output);
@@ -78,9 +76,8 @@ public class MultiblockDropsLootContainer extends LootPoolSingletonContainer
 		return simpleBuilder(MultiblockDropsLootContainer::new);
 	}
 
-	@Override
-	public LootPoolEntryType getType()
+	public MapCodec<? extends LootPoolSingletonContainer> codec()
 	{
-		return IELootFunctions.MULTIBLOCK_DROPS.value();
+		return CODEC;
 	}
 }

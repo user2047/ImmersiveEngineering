@@ -8,55 +8,40 @@
 
 package blusunrize.immersiveengineering.common.items;
 
-import net.minecraft.world.entity.EquipmentSlotGroup;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.world.entity.ai.attributes.Attributes;
+import blusunrize.immersiveengineering.common.register.IEItems;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 import java.util.function.Supplier;
 
-import static net.minecraft.world.item.Item.BASE_ATTACK_DAMAGE_ID;
-import static net.minecraft.world.item.Item.BASE_ATTACK_SPEED_ID;
-
 public class IETools
 {
-	public static Supplier<ShovelItem> createShovel(Tier tier)
+	public static Supplier<ShovelItem> createShovel(ToolMaterial tier)
 	{
-		return () -> new ShovelItem(tier, toolProperties(tier, 1.5, -3));
+		return () -> new ShovelItem(tier, 1.5F, -3F, toolProperties());
 	}
 
-	public static Supplier<AxeItem> createAxe(Tier tier)
+	public static Supplier<AxeItem> createAxe(ToolMaterial tier)
 	{
-		return () -> new AxeItem(tier, toolProperties(tier, 6, -3.1));
+		return () -> new AxeItem(tier, 6F, -3.1F, toolProperties());
 	}
 
-	public static Supplier<PickaxeItem> createPickaxe(Tier tier)
+	public static Supplier<Item> createPickaxe(ToolMaterial tier)
 	{
-		return () -> new PickaxeItem(tier, toolProperties(tier, 1, -2.8));
+		return () -> new Item(toolProperties().pickaxe(tier, 1, -2.8F));
 	}
 
-	public static Supplier<SwordItem> createSword(Tier tier)
+	public static Supplier<Item> createSword(ToolMaterial tier)
 	{
-		return () -> new SwordItem(tier, toolProperties(tier, 3, -2.4));
+		return () -> new Item(toolProperties().sword(tier, 3, -2.4F));
 	}
 
-	public static Supplier<HoeItem> createHoe(Tier tier)
+	public static Supplier<HoeItem> createHoe(ToolMaterial tier)
 	{
-		return () -> new HoeItem(tier, toolProperties(tier, -2, -1));
+		return () -> new HoeItem(tier, -2F, -1F, toolProperties());
 	}
 
-	private static Item.Properties toolProperties(Tier tier, double attackDamage, double attackSpeed)
+	private static Item.Properties toolProperties()
 	{
-		return new Item.Properties().stacksTo(1).attributes(ItemAttributeModifiers.builder().add(
-				Attributes.ATTACK_DAMAGE,
-				new AttributeModifier(BASE_ATTACK_DAMAGE_ID, (attackDamage+tier.getAttackDamageBonus()), Operation.ADD_VALUE),
-				EquipmentSlotGroup.MAINHAND
-		).add(
-				Attributes.ATTACK_SPEED,
-				new AttributeModifier(BASE_ATTACK_SPEED_ID, attackSpeed, Operation.ADD_VALUE),
-				EquipmentSlotGroup.MAINHAND
-		).build());
+		return IEItems.defaultProperties().stacksTo(1);
 	}
 }

@@ -27,9 +27,9 @@ public interface IConnectionTemplate
 		public TemplateConnection(CompoundTag nbt)
 		{
 			this(
-					new ConnectionPoint(nbt.getCompound("endA")),
-					new ConnectionPoint(nbt.getCompound("endB")),
-					WireType.getValue(nbt.getString("type"))
+					new ConnectionPoint(nbt.getCompoundOrEmpty("endA")),
+					new ConnectionPoint(nbt.getCompoundOrEmpty("endB")),
+					WireType.getValue(nbt.getStringOr("type", ""))
 			);
 		}
 

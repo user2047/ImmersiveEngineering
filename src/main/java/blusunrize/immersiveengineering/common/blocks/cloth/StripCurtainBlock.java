@@ -48,14 +48,12 @@ public class StripCurtainBlock extends IEEntityBlock<StripCurtainBlockEntity>
 		setHasColours();
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(CEILING_ATTACHED, FACING);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag advanced)
 	{
 		var color = stack.get(IEDataComponents.COLOR);

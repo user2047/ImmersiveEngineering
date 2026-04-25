@@ -37,7 +37,6 @@ public class ScaffoldingBlock extends IEBaseBlock.IELadderBlock
 		lightOpacity = 0;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -45,14 +44,12 @@ public class ScaffoldingBlock extends IEBaseBlock.IELadderBlock
 	}
 
 	@Nonnull
-	@Override
 	public VoxelShape getShape(@Nonnull BlockState state, @Nonnull BlockGetter worldIn, @Nonnull BlockPos pos, @Nonnull CollisionContext context)
 	{
 		return Shapes.block();
 	}
 
 	@Nonnull
-	@Override
 	public VoxelShape getCollisionShape(@Nonnull BlockState state, @Nonnull BlockGetter worldIn, @Nonnull BlockPos pos, CollisionContext context)
 	{
 		// This checks if the entity for the context is above the given shape if the context is actually
@@ -65,7 +62,6 @@ public class ScaffoldingBlock extends IEBaseBlock.IELadderBlock
 			return FULL_SHAPE;
 	}
 
-	@Override
 	public boolean skipRendering(@Nonnull BlockState state, BlockState adjState, @Nonnull Direction side)
 	{
 		// TODO a similar check for vanilla fences was replaced by "inTag(wooden_fence) is same for both". Similar here?

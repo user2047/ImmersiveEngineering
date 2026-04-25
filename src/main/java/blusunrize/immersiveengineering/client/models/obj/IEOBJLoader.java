@@ -38,7 +38,6 @@ public class IEOBJLoader implements IGeometryLoader<IEOBJModel>
 	public static final String LAYERS_KEY = "layers";
 	public static final IEOBJLoader instance = new IEOBJLoader();
 
-	@Override
 	public IEOBJModel read(
 			JsonObject modelContents, JsonDeserializationContext deserializationContext
 	) throws JsonParseException

@@ -68,38 +68,32 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 		super(IEBlockEntities.LOGIC_UNIT.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return placer.isShiftKeyDown();
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.loadAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 		updateOutputs();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.saveAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -109,7 +103,6 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final var instructions = ctx.getItemInHand().get(IEDataComponents.CIRCUIT_INSTRUCTIONS);
@@ -118,43 +111,36 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 				inventory.set(i, LogicCircuitBoardItem.buildCircuitBoard(instructions.get(i)));
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public LogicUnitBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<LogicUnitBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.LOGIC_UNIT;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return stack.getItem() instanceof LogicCircuitBoardItem;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 1;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -191,7 +177,6 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 		{
 			RedstoneBundleConnection forSide = new RedstoneBundleConnection()
 			{
-				@Override
 				public void onChange(byte[] externalInputs, Direction side)
 				{
 					boolean[] sideInputs = inputs.getOrDefault(side, new boolean[SIZE_COLORS]);
@@ -207,7 +192,6 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 					}
 				}
 
-				@Override
 				public void updateInput(byte[] signals, Direction side)
 				{
 					for(DyeColor dye : DyeColor.values())
@@ -235,7 +219,6 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 		return ret;
 	});
 
-	@Override
 	public boolean getLogicCircuitRegister(LogicCircuitRegister register)
 	{
 		if(register.ordinal() < SIZE_COLORS)
@@ -243,7 +226,6 @@ public class LogicUnitBlockEntity extends IEBaseBlockEntity implements IIEInvent
 		return this.registers[register.ordinal()-SIZE_COLORS];
 	}
 
-	@Override
 	public void setLogicCircuitRegister(LogicCircuitRegister register, boolean state)
 	{
 		if(register.ordinal() < SIZE_COLORS)

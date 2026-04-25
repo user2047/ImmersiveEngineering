@@ -31,7 +31,6 @@ public class SheetmetalTankMultiblock extends IETemplateMultiblock
 		);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

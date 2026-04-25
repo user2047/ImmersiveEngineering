@@ -29,7 +29,6 @@ public class IEOreFeature extends Feature<IEOreFeature.IEOreFeatureConfig>
 		super(IEOreFeatureConfig.CODEC);
 	}
 
-	@Override
 	public boolean place(FeaturePlaceContext<IEOreFeatureConfig> ctx)
 	{
 		IEOreFeatureConfig config = ctx.config();

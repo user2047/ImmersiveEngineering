@@ -23,14 +23,13 @@ import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 
-public class RevolvershotRenderer extends EntityRenderer<RevolvershotEntity>
+public class RevolvershotRenderer extends IEEntityRenderer<RevolvershotEntity>
 {
 	public RevolvershotRenderer(Context renderManager)
 	{
 		super(renderManager);
 	}
 
-	@Override
 	public void render(@Nonnull RevolvershotEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn,
 						 MultiBufferSource bufferIn, int packedLightIn)
 	{
@@ -62,7 +61,6 @@ public class RevolvershotRenderer extends EntityRenderer<RevolvershotEntity>
 		matrixStackIn.popPose();
 	}
 
-	@Override
 	@Nonnull
 	public Identifier getTextureLocation(@Nonnull RevolvershotEntity entity)
 	{

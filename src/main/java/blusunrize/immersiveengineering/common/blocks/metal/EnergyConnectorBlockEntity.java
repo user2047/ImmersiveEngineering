@@ -47,7 +47,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -81,7 +81,7 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 				Supplier<BlockEntityType<EnergyConnectorBlockEntity>> teType = event.register(
 						name, () -> new BlockEntityType<>(
 								(pos, state) -> new EnergyConnectorBlockEntity(type, relay, pos, state),
-								ImmutableSet.of(Connectors.ENERGY_CONNECTORS.get(key).get()), null)
+								ImmutableSet.of(Connectors.ENERGY_CONNECTORS.get(key).get()))
 				);
 				SPEC_TO_TYPE.put(key, teType);
 				NAME_TO_SPEC.put(ImmersiveEngineering.rl(name), key);
@@ -97,7 +97,7 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 	private final IEnergyStorage energyCap;
 
 	private final IEBlockCapabilityCache<IEnergyStorage> output = IEBlockCapabilityCaches.forNeighbor(
-			EnergyStorage.BLOCK, this, this::getFacing
+			Energy.BLOCK, this, this::getFacing
 	);
 
 	public EnergyConnectorBlockEntity(BlockEntityType<? extends EnergyConnectorBlockEntity> type, BlockPos pos, BlockState state)
@@ -116,7 +116,6 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		this(SPEC_TO_TYPE.get(Pair.of(voltage, relay)).get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		int maxOut = Math.min(storageToMachine.getEnergyStored(), getMaxOutput()-currentTickToMachine);
@@ -133,31 +132,26 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		currentTickToNet = 0;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return ConnectorBlock.DEFAULT_FACING_PROP;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		if(!relay)
@@ -169,7 +163,6 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		return voltage.equals(cableType.getCategory());
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -181,21 +174,19 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		nbt.put("toMachine", toMachine);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		CompoundTag toMachine = nbt.getCompound("toMachine");
+		CompoundTag toMachine = nbt.getCompoundOrEmpty("toMachine");
 		EnergyHelper.deserializeFrom(storageToMachine, toMachine, provider);
-		CompoundTag toNet = nbt.getCompound("toNet");
+		CompoundTag toNet = nbt.getCompoundOrEmpty("toNet");
 		EnergyHelper.deserializeFrom(storageToNet, toNet, provider);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
-		double lengthFromHalf = LENGTH.getFloat(Pair.of(voltage, relay))-type.getRenderDiameter()/2-.5;
+		double lengthFromHalf = LENGTH.getOrDefault(Pair.of(voltage, relay), 0.5F)-type.getRenderDiameter()/2-.5;
 		return new Vec3(.5+lengthFromHalf*side.getStepX(),
 				.5+lengthFromHalf*side.getStepY(),
 				.5+lengthFromHalf*side.getStepZ());
@@ -203,14 +194,6 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 
 	public static void registerCapabilities(RegisterCapabilitiesEvent event)
 	{
-		SPEC_TO_TYPE.forEach((spec, type) -> {
-			if(!spec.getSecond())
-				event.registerBlockEntity(
-						EnergyStorage.BLOCK,
-						type.get(),
-						(be, side) -> side==null||side==be.getFacing()?be.energyCap: null
-				);
-		});
 	}
 
 	private IEWireType getWireType()
@@ -258,50 +241,42 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 				};
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
-		float length = LENGTH.getFloat(Pair.of(voltage, relay));
+		float length = LENGTH.getOrDefault(Pair.of(voltage, relay), 0.5F);
 		return getConnectorBounds(getFacing(), length);
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return !relay;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return !relay;
 	}
 
-	@Override
 	public int getAvailableEnergy()
 	{
 		return storageToNet.getEnergyStored();
 	}
 
-	@Override
 	public int getRequestedEnergy()
 	{
 		return storageToMachine.getMaxEnergyStored()-storageToMachine.getEnergyStored();
 	}
 
-	@Override
 	public void insertEnergy(int amount)
 	{
 		storageToMachine.receiveEnergy(amount, false);
 	}
 
-	@Override
 	public void extractEnergy(int amount)
 	{
 		storageToNet.extractEnergy(amount, false);
 	}
 
-	@Override
 	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(EnergyTransferHandler.ID);
@@ -310,10 +285,9 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 	private class ConnectorEnergyStorage implements IEnergyStorage
 	{
 
-		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate)
 		{
-			if(level.isClientSide||relay)
+			if(level.isClientSide()||relay)
 				return 0;
 			maxReceive = Math.min(getMaxInput()-currentTickToNet, maxReceive);
 			if(maxReceive <= 0)
@@ -334,31 +308,26 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 			return accepted;
 		}
 
-		@Override
 		public int extractEnergy(int maxExtract, boolean simulate)
 		{
 			return storageToMachine.extractEnergy(maxExtract, simulate);
 		}
 
-		@Override
 		public int getEnergyStored()
 		{
 			return storageToNet.getEnergyStored();
 		}
 
-		@Override
 		public int getMaxEnergyStored()
 		{
 			return storageToNet.getMaxEnergyStored();
 		}
 
-		@Override
 		public boolean canExtract()
 		{
 			return true;
 		}
 
-		@Override
 		public boolean canReceive()
 		{
 			return true;

@@ -43,7 +43,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -51,7 +51,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -63,8 +63,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -76,7 +75,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPipe, IColouredBE, IPlayerInteraction,
 		IHammerInteraction, IPlacementInteraction, ISelectionBounds, ICollisionBounds, IAdditionalDrops
 {
@@ -114,7 +113,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	public static Set<DirectionalFluidOutput> getConnectedFluidHandlers(BlockPos node, Level world)
 	{
-		if(world.isClientSide)
+		if(world.isClientSide())
 			return ImmutableSet.of();
 		Set<DirectionalFluidOutput> cachedResult = indirectConnections.get(world, node);
 		if(cachedResult!=null)
@@ -140,7 +139,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 							openList.add(nextPos);
 						else
 						{
-							IFluidHandler handler = world.getCapability(FluidHandler.BLOCK, nextPos, fd.getOpposite());
+							IFluidHandler handler = null;
 							if(handler!=null&&handler.getTanks() > 0)
 								fluidHandlers.add(new DirectionalFluidOutput(handler, fd, adjacentTile, nextPos));
 						}
@@ -152,7 +151,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return fluidHandlers;
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
@@ -171,23 +169,20 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		}
 	}
 
-	@Override
 	public void setRemovedIE()
 	{
 		super.setRemovedIE();
-		if(level!=null&&!level.isClientSide)
+		if(level!=null&&!level.isClientSide())
 			indirectConnections.clearDimension(level);
 	}
 
-	@Override
 	public void onChunkUnloaded()
 	{
 		super.onChunkUnloaded();
-		if(level!=null&&!level.isClientSide)
+		if(level!=null&&!level.isClientSide())
 			indirectConnections.clearDimension(level);
 	}
 
-	@Override
 	public void onEntityCollision(Level world, Entity entity)
 	{
 		if(entity instanceof LivingEntity&&!((LivingEntity)entity).onClimbable()&&this.cover!=Blocks.AIR)
@@ -204,10 +199,9 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		}
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		int[] config = nbt.getIntArray("sideConfig");
+		int[] config = nbt.getIntArray("sideConfig").orElse(new int[0]);
 		for(int i = 0; i < 6; ++i)
 		{
 			Direction curDir = Direction.from3DDataValue(i);
@@ -227,27 +221,26 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 			}
 		}
 		final Block oldCover = cover;
-		cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getString("cover")));
+		cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getStringOr("cover", ""))).map(h -> h.value()).orElse(Blocks.AIR);
 		DyeColor oldColor = color;
-		if(nbt.contains("color", Tag.TAG_INT))
-			color = DyeColor.byId(nbt.getInt("color"));
+		if(nbt.contains("color"))
+			color = DyeColor.byId(nbt.getIntOr("color", 0));
 		else
 			color = null;
 		byte oldConns = connections;
-		connections = nbt.getByte("connections");
-		if(level!=null&&level.isClientSide&&(connections!=oldConns||color!=oldColor||cover!=oldCover))
+		connections = nbt.getByteOr("connections", (byte)0);
+		if(level!=null&&level.isClientSide()&&(connections!=oldConns||color!=oldColor||cover!=oldCover))
 		{
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] config = new int[6];
 		for(int i = 0; i < 6; ++i)
-			if(sideConfig.getBoolean(Direction.from3DDataValue(i)))
+			if(sideConfig.getOrDefault(Direction.from3DDataValue(i), false))
 				config[i] = 1;
 		nbt.putIntArray("sideConfig", config);
 		if(hasCover())
@@ -266,7 +259,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	private final Map<Direction, IFluidHandler> sidedHandlers = new EnumMap<>(Direction.class);
 	private final Map<Direction, IEBlockCapabilityCache<IFluidHandler>> neighbors = IEBlockCapabilityCaches.allNeighbors(
-			FluidHandler.BLOCK, this
+			Capabilities.Fluid.BLOCK, this
 	);
 
 	{
@@ -296,8 +289,8 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	public static void registerCapabilities(BECapabilityRegistrar<FluidPipeBlockEntity> registrar)
 	{
-		registrar.register(FluidHandler.BLOCK, (be, side) -> {
-			if(side!=null&&be.sideConfig.getBoolean(side))
+		registrar.register(Capabilities.Fluid.BLOCK, (be, side) -> {
+			if(side!=null&&be.sideConfig.getOrDefault(side, false))
 				return be.sidedHandlers.get(side);
 			else
 				return null;
@@ -309,7 +302,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return this.cover!=Blocks.AIR;
 	}
 
-	@Override
 	public Collection<ItemStack> getExtraDrops(Player player, BlockState state)
 	{
 		if(hasCover())
@@ -317,18 +309,17 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return null;
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos otherPos)
 	{
 		super.onNeighborBlockChange(otherPos);
 		Direction dir = Direction.getNearest(otherPos.getX()-worldPosition.getX(),
-				otherPos.getY()-worldPosition.getY(), otherPos.getZ()-worldPosition.getZ());
+				otherPos.getY()-worldPosition.getY(), otherPos.getZ()-worldPosition.getZ(), null);
 		if(updateConnectionByte(dir))
 		{
 			Level world = getLevelNonnull();
-			world.updateNeighborsAtExceptFromFacing(worldPosition, getBlockState().getBlock(), dir);
+			world.updateNeighborsAtExceptFromFacing(worldPosition, getBlockState().getBlock(), dir, null);
 			markContainingBlockForUpdate(null);
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 				indirectConnections.clearDimension(world);
 		}
 	}
@@ -346,32 +337,27 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 			this.facing = facing;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return FluidStack.EMPTY;
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return FluidType.BUCKET_VOLUME;
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			return tank==0;
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction doFill)
 		{
 			if(resource==null)
@@ -442,14 +428,12 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction doDrain)
 		{
 			return this.drain(resource.getAmount(), doDrain);
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction doDrain)
 		{
 			if(maxDrain <= 0)
@@ -491,13 +475,13 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	public boolean updateConnectionByte(Direction dir)
 	{
-		if(level==null||level.isClientSide||!SafeChunkUtils.isChunkSafe(level, worldPosition.relative(dir)))
+		if(level==null||level.isClientSide()||!SafeChunkUtils.isChunkSafe(level, worldPosition.relative(dir)))
 			return false;
 		final byte oldConn = connections;
 		int i = dir.get3DDataValue();
 		int mask = 1<<i;
 		connections &= ~mask;
-		if(sideConfig.getBoolean(dir))
+		if(sideConfig.getOrDefault(dir, false))
 		{
 			IFluidHandler handler = neighbors.get(dir).getCapability();
 			if(handler!=null&&handler.getTanks() > 0)
@@ -547,7 +531,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	public void toggleSide(Direction side)
 	{
-		boolean newSideConnected = !sideConfig.getBoolean(side);
+		boolean newSideConnected = !sideConfig.getOrDefault(side, false);
 		setSide(side, newSideConnected);
 	}
 
@@ -574,7 +558,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		level.blockEvent(getBlockPos(), getBlockState().getBlock(), 0, 0);
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -587,13 +570,11 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	private static final CachedVoxelShapes<BoundingBoxKey> SHAPES = new CachedVoxelShapes<>(FluidPipeBlockEntity::getBoxes);
 
-	@Override
 	public VoxelShape getCollisionShape(CollisionContext ctx)
 	{
 		return SHAPES.get(new BoundingBoxKey(false, this));
 	}
 
-	@Override
 	public VoxelShape getSelectionShape(@Nullable CollisionContext ctx)
 	{
 		//TODO needs to be a more generic check!
@@ -655,7 +636,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 				connectionStyles.put(d, te.getConnectionStyle(d));
 		}
 
-		@Override
 		public boolean equals(Object o)
 		{
 			if(this==o) return true;
@@ -668,7 +648,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 					connectionStyles.equals(that.connectionStyles);
 		}
 
-		@Override
 		public int hashCode()
 		{
 			return Objects.hash(showToolView, connections, availableConnections, hasCover, connectionStyles);
@@ -676,7 +655,6 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	}
 
-	@Override
 	public int getRenderColour(int tintIndex)
 	{
 		return 0xffffff;
@@ -684,7 +662,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 
 	public void dropCover(Player player)
 	{
-		if(!level.isClientSide&&hasCover()&&level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+		if(level instanceof ServerLevel serverLevel&&hasCover()&&serverLevel.getGameRules().get(GameRules.BLOCK_DROPS))
 		{
 			ItemEntity entityitem = player.drop(new ItemStack(cover), false);
 			if(entityitem!=null)
@@ -692,12 +670,11 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		}
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(heldItem.isEmpty()&&player.isShiftKeyDown()&&hasCover())
 		{
-			if(!player.level().isClientSide)
+			if(!player.level().isClientSide())
 			{
 				dropCover(player);
 				this.cover = Blocks.AIR;
@@ -705,34 +682,34 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 				level.blockEvent(getBlockPos(), getBlockState().getBlock(), 255, 0);
 				markChunkDirty();
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else if(!heldItem.isEmpty()&&!player.isShiftKeyDown())
 			return setColorOrCoverFrom(heldItem, player);
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	private ItemInteractionResult setColorOrCoverFrom(ItemStack heldItem, Player player)
+	private InteractionResult setColorOrCoverFrom(ItemStack heldItem, Player player)
 	{
 		DyeColor heldDye = Utils.getDye(heldItem);
 		if(heldDye!=null)
 		{
-			if(!player.level().isClientSide)
+			if(!player.level().isClientSide())
 			{
 				color = heldDye;
 				markChunkDirty();
 				markContainingBlockForUpdate(null);
 				level.blockEvent(getBlockPos(), getBlockState().getBlock(), 255, 0);
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		Block heldBlock = Block.byItem(heldItem.getItem());
 		if(heldBlock==Blocks.AIR)
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		for(Predicate<Block> func : validPipeCovers)
 			if(func.test(heldBlock)&&this.cover!=heldBlock)
 			{
-				if(!player.level().isClientSide)
+				if(!player.level().isClientSide())
 				{
 					dropCover(player);
 					this.cover = heldBlock;
@@ -742,15 +719,14 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 					this.markContainingBlockForUpdate(null);
 					level.blockEvent(getBlockPos(), getBlockState().getBlock(), 255, 0);
 				}
-				return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+				return InteractionResult.SUCCESS;
 			}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			return true;
 		hitVec = hitVec.subtract(Vec3.atLowerCornerOf(worldPosition));
 		Direction fd = side;
@@ -779,11 +755,10 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return false;
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final Level level = ctx.getLevel();
-		if(level.isClientSide)
+		if(level.isClientSide())
 			return;
 		if(ctx.getPlayer()!=null)
 		{
@@ -795,13 +770,13 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		final BlockPos pos = ctx.getClickedPos();
 		for(Direction dir : Direction.values())
 			if(level.getBlockEntity(pos.relative(dir)) instanceof FluidPipeBlockEntity neighborPipe)
-				if(neighborPipe.color!=this.color||!neighborPipe.sideConfig.getBoolean(dir.getOpposite()))
+				if(neighborPipe.color!=this.color||!neighborPipe.sideConfig.getOrDefault(dir.getOpposite(), false))
 					this.setSide(dir, false);
 	}
 
 	public boolean hasOutputConnection(Direction side)
 	{
-		return sideConfig.getBoolean(side);
+		return sideConfig.getOrDefault(side, false);
 	}
 
 	@SubscribeEvent

@@ -29,7 +29,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,6 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 	public static final BlockPos OUTPUT_POS = new BlockPos(1, 0, 1);
 	private static final Set<BlockPos> IO_OFFSETS = Set.of(OUTPUT_POS, new BlockPos(1, 6, 1));
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -74,16 +73,14 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 		}
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(ItemHandler.BLOCK, (state, position) -> {
+		register.register(Capabilities.Item.BLOCK, (state, position) -> {
 			if(IO_OFFSETS.contains(position.posInMultiblock()))
 				return state.inputHandler;
 			else
@@ -91,7 +88,6 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 		});
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		// calculate amounts
@@ -105,19 +101,16 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 		drop.accept(state.identStack.copyWithCount(remainder));
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return SHAPE_GETTER;
 	}
 
-	@Override
 	public void setMemorizedBlockState(State state, BlockPos pos, BlockState blockState)
 	{
 		state.structureMemo.put(pos, blockState);
 	}
 
-	@Override
 	public BlockState getMemorizedBlockState(State state, BlockPos pos)
 	{
 		return state.structureMemo.get(pos);
@@ -143,7 +136,7 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 				if(face!=RelativeBlockFace.DOWN)
 				{
 					final BlockPos neighbor = face.offsetRelative(OUTPUT_POS, -1);
-					outputBuilder.add(capabilitySource.getCapabilityAt(ItemHandler.BLOCK, neighbor, face));
+					outputBuilder.add(capabilitySource.getCapabilityAt(Capabilities.Item.BLOCK, neighbor, face));
 				}
 			this.outputs = outputBuilder.build();
 			this.inputHandler = new InventoryHandler(this, () -> {
@@ -152,29 +145,25 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 			});
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("identStack", identStack.saveOptional(provider));
+			nbt.put("identStack", blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(identStack, provider));
 			nbt.putInt("count", storageAmount);
 			structureMemo.writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			identStack = ItemStack.parseOptional(provider, nbt.getCompound("identStack"));
-			storageAmount = nbt.getInt("count");
+			identStack = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("identStack"));
+			storageAmount = nbt.getIntOr("count", 0);
 			structureMemo.readSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			readSaveNBT(nbt, provider);
@@ -184,13 +173,11 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 	private record InventoryHandler(State state, Runnable onChange) implements IItemHandler
 	{
 
-		@Override
 		public int getSlots()
 		{
 			return 2;
 		}
 
-		@Override
 		public ItemStack getStackInSlot(int slot)
 		{
 			if(slot==0)
@@ -199,7 +186,6 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 				return state.identStack.copyWithCount(state.storageAmount);
 		}
 
-		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 		{
 			int space = MAX_STORAGE-state.storageAmount;
@@ -218,7 +204,6 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 			return stack;
 		}
 
-		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate)
 		{
 			if(slot!=1||state.storageAmount < 1||amount < 1||state.identStack.isEmpty())
@@ -235,13 +220,11 @@ public class SiloLogic implements IMultiblockLogic<State>, IServerTickableCompon
 			return out;
 		}
 
-		@Override
 		public int getSlotLimit(int slot)
 		{
 			return MAX_STORAGE;
 		}
 
-		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
 			return slot==0;

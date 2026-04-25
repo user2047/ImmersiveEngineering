@@ -25,7 +25,6 @@ public class ItemKeybindConflictContext implements IKeyConflictContext
 		this.activePredicate = activePredicate;
 	}
 
-	@Override
 	public boolean isActive()
 	{
 		if(ClientUtils.mc().screen!=null)
@@ -41,7 +40,6 @@ public class ItemKeybindConflictContext implements IKeyConflictContext
 		return false;
 	}
 
-	@Override
 	public boolean conflicts(IKeyConflictContext other)
 	{
 		return other==KeyConflictContext.IN_GAME;

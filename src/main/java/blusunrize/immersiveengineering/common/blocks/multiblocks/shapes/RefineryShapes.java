@@ -27,7 +27,6 @@ public class RefineryShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getZ()%2==0&&posInMultiblock.getY()==0&&posInMultiblock.getX()%4==0)

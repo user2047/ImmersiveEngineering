@@ -37,7 +37,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -50,7 +50,7 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -73,10 +73,8 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 		super(IEBlockEntities.WOODEN_CRATE.get(), pos, state);
 	}
 
-	@Override
 	public void loadAdditional(CompoundTag nbt, Provider provider)
 	{
-		super.loadAdditional(nbt, provider);
 		loadIEData(nbt, provider);
 	}
 
@@ -86,22 +84,17 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 			this.enchantments = IECodecs.fromNbtOrThrow(ItemEnchantments.CODEC, nbt.get("enchantments"));
 		else
 			this.enchantments = ItemEnchantments.EMPTY;
-		if(!tryLoadLootTable(nbt))
-			ContainerHelper.loadAllItems(nbt, inventory, provider);
-		this.sealingProgress = nbt.getInt("sealingProgress");
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
+		this.sealingProgress = nbt.getIntOr("sealingProgress", 0);
 	}
 
-	@Override
 	protected void saveAdditional(CompoundTag nbt, Provider provider)
 	{
-		super.saveAdditional(nbt, provider);
 		nbt.put("enchantments", IECodecs.toNbtOrThrow(ItemEnchantments.CODEC, enchantments));
-		if(!trySaveLootTable(nbt))
-			ContainerHelper.saveAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 		nbt.putInt("sealingProgress", this.sealingProgress);
 	}
 
-	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket()
 	{
 		return ClientboundBlockEntityDataPacket.create(this, (be, access) -> {
@@ -111,28 +104,25 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 		});
 	}
 
-	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider access)
 	{
 		CompoundTag nonNullTag = pkt.getTag()!=null?pkt.getTag(): new CompoundTag();
-		if(nonNullTag.contains("CustomName", 8))
+		if(nonNullTag.contains("CustomName"))
 		{
-			Component customName = Component.Serializer.fromJson(nonNullTag.getString("CustomName"), access);
+			Component customName = Component.literal(nonNullTag.getStringOr("CustomName", ""));
 			if(customName!=null)
 				this.setCustomName(customName);
 		}
 	}
 
-	@Override
 	public CompoundTag getUpdateTag(Provider provider)
 	{
 		CompoundTag nbt = super.getUpdateTag(provider);
 		if(getCustomName()!=null)
-			nbt.putString("CustomName", Component.Serializer.toJson(getCustomName(), provider));
+			nbt.putString("CustomName", getCustomName().getString());
 		return nbt;
 	}
 
-	@Override
 	protected Component getDefaultName()
 	{
 		Block b = getBlockState().getBlock();
@@ -142,44 +132,37 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 			return Component.translatable("block.immersiveengineering.crate");
 	}
 
-	@Override
 	protected NonNullList<ItemStack> getItems()
 	{
 		return inventory;
 	}
 
-	@Override
 	protected void setItems(NonNullList<ItemStack> pItemStacks)
 	{
 		this.inventory = pItemStacks;
 	}
 
-	@Override
 	protected AbstractContainerMenu createMenu(int pContainerId, Inventory pInventory)
 	{
 		return new CrateMenu(IEMenuTypes.WOODEN_CRATE.get(), pContainerId, pInventory, this);
 	}
 
-	@Override
 	@Nonnull
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return IEApi.isAllowedInCrate(stack);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -188,7 +171,6 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -203,7 +185,6 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		onBEPlaced(ctx.getItemInHand());
@@ -215,7 +196,6 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 		// Inventory contents are loaded by vanilla via applyImplicitComponents
 	}
 
-	@Override
 	public boolean canOpen(Player player)
 	{
 		return super.canOpen(player)&&!isSealed();
@@ -230,7 +210,7 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 
 	public static void registerCapabilities(BECapabilityRegistrar<WoodenCrateBlockEntity> registrar)
 	{
-		registrar.registerAllContexts(ItemHandler.BLOCK, be -> be.inventoryCap);
+		registrar.registerAllContexts(Capabilities.Item.BLOCK, be -> be.inventoryCap);
 	}
 
 	public IItemHandler getInventoryCap()
@@ -238,44 +218,39 @@ public class WoodenCrateBlockEntity extends RandomizableContainerBlockEntity
 		return inventoryCap;
 	}
 
-	@Override
 	public boolean canPlaceItem(int index, ItemStack stack)
 	{
 		return isStackValid(index, stack);
 	}
 
-	@Override
 	public int getComparatorInputOverride()
 	{
 		return Utils.calcRedstoneFromInventory(this);
 	}
 
-	@Override
 	public int getContainerSize()
 	{
 		return CONTAINER_SIZE;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(heldItem.is(IETags.hammers)&&player.isCrouching())
 		{
-			if(!player.getCooldowns().isOnCooldown(heldItem.getItem())&&!isSealed())
+			if(!player.getCooldowns().isOnCooldown(heldItem)&&!isSealed())
 			{
 				if(++sealingProgress >= HITS_TO_SEAL)
-					player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"crate_sealed"), true);
+					player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"crate_sealed"));
 				player.playSound(SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR);
-				player.getCooldowns().addCooldown(heldItem.getItem(), 10);
-				return ItemInteractionResult.sidedSuccess(Objects.requireNonNull(getLevel()).isClientSide);
+				player.getCooldowns().addCooldown(heldItem, 10);
+				return InteractionResult.SUCCESS;
 			}
-			return ItemInteractionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	@Nullable
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		Component customName = getCustomName();

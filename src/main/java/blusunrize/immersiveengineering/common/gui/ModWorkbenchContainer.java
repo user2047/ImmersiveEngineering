@@ -20,13 +20,13 @@ import blusunrize.immersiveengineering.common.items.EngineersBlueprintItem;
 import blusunrize.immersiveengineering.mixin.accessors.ContainerAccess;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -76,13 +76,13 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 		ItemStack tool = this.getSlot(0).getItem();
 		if(tool.getItem() instanceof IUpgradeableTool upgradeableTool)
 		{
-			IItemHandler toolInv = Objects.requireNonNull(tool.getCapability(ItemHandler.ITEM));
+			IItemHandler toolInv = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(tool, Capabilities.Item.ITEM));
 
 			// Use a "simple" inventory on the client rather than the one for the tool stack. The server always syncs an
 			// "empty" tool to the client, so if the slots use the tool inventory the behavior become highly dependent
 			// on slot update order
 			Slot[] slots = upgradeableTool.getWorkbenchSlots(
-					this, tool, world, () -> inventoryPlayer.player, world.isClientSide?clientInventory: toolInv
+					this, tool, world, () -> inventoryPlayer.player, world.isClientSide()?clientInventory: toolInv
 			);
 			if(slots!=null)
 				for(Slot s : slots)
@@ -91,7 +91,7 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 					ownSlotCount++;
 				}
 
-			ShaderWrapper wrapper = tool.getCapability(CapabilityShader.ITEM);
+			ShaderWrapper wrapper = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(tool, CapabilityShader.ITEM);
 			if(wrapper!=null)
 			{
 				this.shaderInv = new ShaderInventory(this, wrapper);
@@ -148,7 +148,6 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 		return slot.getSlotIndex() >= this.currentPage*OUTPUTS_PER_PAGE&&slot.getSlotIndex() < (this.currentPage+1)*OUTPUTS_PER_PAGE;
 	}
 
-	@Override
 	public boolean clickMenuButton(Player player, int buttonId)
 	{
 		if(buttonId==1)
@@ -159,7 +158,6 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 	}
 
 	@Nonnull
-	@Override
 	// TODO this is broken when moving from an ISI slot to the player inv for some reason???
 	//  I think we're modifying the stack we got from the slot, which doesn't work at all with components
 	public ItemStack quickMoveStack(Player player, int slot)
@@ -209,7 +207,6 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 		return resultStack;
 	}
 
-	@Override
 	protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection)
 	{
 		// TODO I think super::moveItemStackTo just assumes it can mutate the stacks in slots and it will propagate
@@ -217,16 +214,14 @@ public class ModWorkbenchContainer extends IEBaseContainerOld<ModWorkbenchBlockE
 		return IEContainerMenu.moveItemStackToWithMayPlace(slots, super::moveItemStackTo, stack, startIndex, endIndex);
 	}
 
-	@Override
-	public void clicked(int id, int dragType, ClickType clickType, Player player)
+	public void clicked(int id, int dragType, ContainerInput ContainerInput, Player player)
 	{
-		super.clicked(id, dragType, clickType, player);
+		super.clicked(id, dragType, ContainerInput, player);
 		tile.markContainingBlockForUpdate(null);
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 			broadcastChanges();
 	}
 
-	@Override
 	public boolean canTakeItemForPickAll(ItemStack pStack, Slot pSlot)
 	{
 		return pSlot.container!=this.inventoryBPoutput&&super.canTakeItemForPickAll(pStack, pSlot);

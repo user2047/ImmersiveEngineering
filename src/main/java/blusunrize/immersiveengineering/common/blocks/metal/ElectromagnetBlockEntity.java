@@ -30,7 +30,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -39,7 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -63,7 +63,6 @@ public class ElectromagnetBlockEntity extends IEBaseBlockEntity implements IESer
 		this(IEBlockEntities.ELECTROMAGNET.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(isRSPowered()==redstoneControlInverted&&energyStorage.extractEnergy(MAGNET_CONSUMPTION, false) >= MAGNET_CONSUMPTION)
@@ -105,11 +104,11 @@ public class ElectromagnetBlockEntity extends IEBaseBlockEntity implements IESer
 				if(itemEntity.hasPickUpDelay())
 					return false;
 				// only allow grabbing items that have gone 40 ticks without being near a magnet
-				int lastMagnetized = itemEntity.getPersistentData().getInt(Lib.MAGNET_TIME_NBT);
+				int lastMagnetized = itemEntity.getPersistentData().getIntOr(Lib.MAGNET_TIME_NBT, 0);
 				if(lastMagnetized > 0&&itemEntity.tickCount-lastMagnetized < 40)
 					return false;
 				// check if already being pulled by a different magnet
-				String nbtSource = itemEntity.getPersistentData().getString(Lib.MAGNET_SOURCE_NBT);
+				String nbtSource = itemEntity.getPersistentData().getStringOr(Lib.MAGNET_SOURCE_NBT, "");
 				if(!nbtSource.isEmpty()&&!nbtSource.equals(key))
 					return false;
 				// check if NBT blacklisted (e.g.: on a conveyor)
@@ -140,14 +139,12 @@ public class ElectromagnetBlockEntity extends IEBaseBlockEntity implements IESer
 		return items;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		redstoneControlInverted = nbt.getBoolean("redstoneInverted");
+		redstoneControlInverted = nbt.getBooleanOr("redstoneInverted", false);
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putBoolean("redstoneInverted", redstoneControlInverted);
@@ -156,34 +153,28 @@ public class ElectromagnetBlockEntity extends IEBaseBlockEntity implements IESer
 
 	public static void registerCapabilities(BECapabilityRegistrar<ElectromagnetBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> side!=be.getFacing()?be.energyStorage: null);
+		registrar.register(Energy.BLOCK, (be, side) -> side!=be.getFacing()?be.energyStorage: null);
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_INVERTED;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(player.isShiftKeyDown()&&!getLevelNonnull().isClientSide)
+		if(player.isShiftKeyDown()&&!getLevelNonnull().isClientSide())
 		{
 			redstoneControlInverted = !redstoneControlInverted;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")),
-					true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
 			setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

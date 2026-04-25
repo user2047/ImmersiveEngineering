@@ -27,7 +27,6 @@ import java.util.Optional;
 
 public class IEGhostItemHandler implements IGhostIngredientHandler<IEContainerScreen>
 {
-	@Override
 	public <I> List<Target<I>> getTargetsTyped(IEContainerScreen gui, ITypedIngredient<I> ingredient, boolean doStart)
 	{
 		Optional<ItemStack> ingr = ingredient.getIngredient(VanillaTypes.ITEM_STACK);
@@ -40,7 +39,6 @@ public class IEGhostItemHandler implements IGhostIngredientHandler<IEContainerSc
 		return builder.build();
 	}
 
-	@Override
 	public void onComplete()
 	{
 
@@ -67,7 +65,6 @@ public class IEGhostItemHandler implements IGhostIngredientHandler<IEContainerSc
 			lastGuiTop = gui.getGuiTop();
 		}
 
-		@Override
 		public Rect2i getArea()
 		{
 			if(lastGuiLeft!=gui.getGuiLeft()||lastGuiTop!=gui.getGuiTop())
@@ -75,7 +72,6 @@ public class IEGhostItemHandler implements IGhostIngredientHandler<IEContainerSc
 			return area;
 		}
 
-		@Override
 		public void accept(ItemStack ingredient)
 		{
 			Int2ObjectMap<ItemStack> change = new Int2ObjectOpenHashMap<>();

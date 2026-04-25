@@ -55,7 +55,7 @@ public class WireSyncManager implements IWireSyncManager
 		if(conn.isInternal())
 			return false;
 		ConnectionPoint other = conn.getOtherEnd(currEnd);
-		ChunkPos otherChunk = new ChunkPos(other.position());
+		ChunkPos otherChunk = ChunkPos.containing(other.position());
 		if(otherChunk.equals(pos))
 			return conn.isPositiveEnd(currEnd);
 		else
@@ -123,7 +123,6 @@ public class WireSyncManager implements IWireSyncManager
 		sendToPlayersForConnection(Operation.REMOVE, world, c);
 	}
 
-	@Override
 	public void onConnectionEndpointsChanged(Connection c)
 	{
 		sendToPlayersForConnection(Operation.UPDATE, world, c);

@@ -22,7 +22,6 @@ public class LightningRodShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(new BlockPos(1, 2, 1).equals(posInMultiblock))

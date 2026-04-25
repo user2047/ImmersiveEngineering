@@ -40,7 +40,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -90,7 +90,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		this.rsDirty = true;
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(rsDirty)
@@ -102,7 +101,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		}
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
 		if(cp.index()==LEFT_INDEX)
@@ -115,7 +113,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 
 	}
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		if(cp.index()==RIGHT_INDEX)
@@ -126,7 +123,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -135,50 +131,43 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		nbt.put("settings", settingsTag);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		ListTag settingsTag = nbt.getList("settings", 10);
+		ListTag settingsTag = nbt.getListOrEmpty("settings");
 		this.settings.clear();
 		for(int i = 0; i < settingsTag.size(); i++)
-			this.settings.add(new SwitchboardSetting(settingsTag.getCompound(i)));
+			this.settings.add(new SwitchboardSetting(settingsTag.getCompoundOrEmpty(i)));
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("remove"))
-			removeSetting(DyeColor.byId(message.getInt("remove")));
+			removeSetting(DyeColor.byId(message.getIntOr("remove", 0)));
 		else
 			addSetting(new SwitchboardSetting(message));
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(new ConnectionPoint(worldPosition, RIGHT_INDEX), new ConnectionPoint(worldPosition, LEFT_INDEX));
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_PREFER_SIDE;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		boolean right = here.index()==RIGHT_INDEX;
@@ -194,20 +183,17 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		return new Vec3(.5, .5, .5);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return REDSTONE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(RedstoneNetworkHandler.ID);
 	}
 
 	@Nullable
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(!Utils.isScrewdriver(player.getItemInHand(InteractionHand.MAIN_HAND)))
@@ -228,12 +214,11 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 			return new Component[]{Component.translatable(Lib.DESC_INFO+"blockSide.io.output")};
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_RedstoneSwitchboard, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	CachedVoxelShapes<Direction> SHAPES = new CachedVoxelShapes<>(
@@ -245,7 +230,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 	);
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(getFacing());
@@ -253,7 +237,6 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo target, Vec3i offset)
 	{
 		ConnectionPoint leftCP = new ConnectionPoint(worldPosition, LEFT_INDEX);
@@ -283,9 +266,9 @@ public class RedstoneSwitchboardBlockEntity extends ImmersiveConnectableBlockEnt
 		private SwitchboardSetting(CompoundTag nbt)
 		{
 			this(
-					DyeColor.byId(nbt.getInt("input")),
-					nbt.getBoolean("invert"),
-					DyeColor.byId(nbt.getInt("output"))
+					DyeColor.byId(nbt.getIntOr("input", 0)),
+					nbt.getBooleanOr("invert", false),
+					DyeColor.byId(nbt.getIntOr("output", 0))
 			);
 		}
 

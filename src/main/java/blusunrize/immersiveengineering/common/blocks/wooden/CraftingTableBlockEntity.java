@@ -30,7 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -51,13 +51,12 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 		super(IEBlockEntities.CRAFTING_TABLE.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(!descPacket)
 		{
 			NonNullList<ItemStack> totalInv = NonNullList.withSize(inventory.size()+craftingInv.size(), ItemStack.EMPTY);
-			ContainerHelper.loadAllItems(nbt, totalInv, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, totalInv, provider);
 			for(int i = 0; i < inventory.size(); ++i)
 				inventory.set(i, totalInv.get(i));
 			for(int i = 0; i < craftingInv.size(); ++i)
@@ -65,7 +64,6 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(!descPacket)
@@ -75,30 +73,26 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 				totalInv.set(i, inventory.get(i));
 			for(int i = 0; i < craftingInv.size(); ++i)
 				totalInv.set(inventory.size()+i, craftingInv.get(i));
-			ContainerHelper.saveAllItems(nbt, totalInv, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, totalInv, provider);
 		}
 	}
 
-	@Override
 	@Nonnull
 	public Component getDisplayName()
 	{
 		return Component.translatable("block.immersiveengineering.craftingtable");
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public CraftingTableBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<CraftingTableBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.CRAFTING_TABLE;
@@ -106,7 +100,6 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 
 	private final IItemHandler inventoryCap = new ItemStackHandler(inventory)
 	{
-		@Override
 		protected void onContentsChanged(int slot)
 		{
 			super.onContentsChanged(slot);
@@ -116,16 +109,19 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 
 	public static void registerCapabilities(BECapabilityRegistrar<CraftingTableBlockEntity> registrar)
 	{
-		registrar.registerAllContexts(ItemHandler.BLOCK, be -> be.inventoryCap);
+		registrar.registerAllContexts(Capabilities.Item.BLOCK, be -> be.inventoryCap);
 	}
 
-	@Override
+	public IItemHandler getInventoryCap()
+	{
+		return inventoryCap;
+	}
+
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
@@ -136,7 +132,6 @@ public class CraftingTableBlockEntity extends IEBaseBlockEntity
 		return craftingInv;
 	}
 
-	@Override
 	public Stream<ItemStack> getDroppedItems()
 	{
 		return Streams.concat(craftingInv.stream(), inventory.stream());

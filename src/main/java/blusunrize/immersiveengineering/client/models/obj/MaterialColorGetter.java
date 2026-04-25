@@ -42,7 +42,6 @@ public class MaterialColorGetter<T> implements BiFunction<String, Color4, Color4
 		this.renderPass = pass;
 	}
 
-	@Override
 	public Color4 apply(String material, Color4 originalColor)
 	{
 		Color4 color = originalColor;

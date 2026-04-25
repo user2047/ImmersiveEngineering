@@ -42,9 +42,9 @@ public class ItemUtils
 	public static CompoundTag parseNbtFromJson(JsonElement jsonElement) throws CommandSyntaxException
 	{
 		if(jsonElement.isJsonObject())
-			return TagParser.parseTag(GSON.toJson(jsonElement));
+			return TagParser.parseCompoundFully(GSON.toJson(jsonElement));
 		else
-			return TagParser.parseTag(jsonElement.getAsString());
+			return TagParser.parseCompoundFully(jsonElement.getAsString());
 	}
 
 	/**

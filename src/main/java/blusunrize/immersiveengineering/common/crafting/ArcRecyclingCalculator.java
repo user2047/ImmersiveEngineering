@@ -161,97 +161,11 @@ public class ArcRecyclingCalculator
 
 		public void process()
 		{
-			for(RecipeHolder<?> recipe : recipeList)
-			{
-				RecyclingCalculation calc = getRecycleCalculation(recipe.value().getResultItem(tags), recipe);
-				if(calc!=null)
-				{
-					if(calc.isValid())
-						validated.add(calc);
-					else
-					{
-						for(ItemStack s : calc.queriedSubcomponents.keySet())
-							nonValidated.put(s, calc);
-						invalidCount++;
-					}
-				}
-			}
+			// TODO 1.26: Rebuild recycling introspection against the new recipe display/placement API.
 		}
 
 		private RecyclingCalculation getRecycleCalculation(ItemStack stack, RecipeHolder<?> recipe)
 		{
-			// Check if recipe output is among the items that have fixed returns
-			Pair<ItemStack, Double> brokenDown = ApiUtils.breakStackIntoPreciseIngots(tags, stack);
-			if(brokenDown!=null&&ArcRecyclingChecker.isValidRecyclingOutput(tags, brokenDown.getFirst())&&brokenDown.getSecond() > 0)
-				return new RecyclingCalculation(recipe.value(), stack.copyWithCount(1),
-						ImmutableMap.of(brokenDown.getFirst(), brokenDown.getSecond()));
-
-			// Else check recipe inputs
-			NonNullList<Ingredient> inputs = recipe.value().getIngredients();
-			if(!inputs.isEmpty())
-			{
-				int resultCount = stack.getCount();
-				Map<ItemStack, Integer> missingSub = new HashMap<>();
-				Map<ItemStack, Double> outputs = new IdentityHashMap<>();
-				for(Ingredient in : inputs)
-					if(in!=null&&in!=Ingredient.EMPTY)
-					{
-						ItemStack[] matchingStacks = in.getItems();
-						ItemStack inputStack = ItemStack.EMPTY;
-						if(matchingStacks.length > 0)
-							inputStack = IEApi.getPreferredStackbyMod(in.getItems());
-						if(inputStack.isEmpty())
-						{
-							IELogger.warn("Recipe has invalid inputs and will be ignored: "+recipe+" ("+recipe.id()+")");
-							return null;
-						}
-						brokenDown = ApiUtils.breakStackIntoPreciseIngots(tags, inputStack);
-						if(brokenDown==null)
-						{
-							if(checker.isAllowed(tags, inputStack)&&ArcRecyclingChecker.isValidRecyclingOutput(tags, inputStack))
-							{
-								boolean b = false;
-								for(ItemStack storedMiss : missingSub.keySet())
-									if(ItemStack.isSameItem(inputStack, storedMiss))
-									{
-										missingSub.put(storedMiss, missingSub.get(storedMiss)+inputStack.getCount());
-										b = true;
-									}
-								if(!b)
-									missingSub.put(inputStack.copyWithCount(1), inputStack.getCount());
-							}
-							continue;
-						}
-						if(!brokenDown.getFirst().isEmpty()&&brokenDown.getSecond() > 0)
-						{
-							boolean invalidOutput = !ArcRecyclingChecker.isValidRecyclingOutput(tags, brokenDown.getFirst());
-							if(!invalidOutput)
-							{
-								boolean b = false;
-								for(ItemStack storedOut : outputs.keySet())
-									if(ItemStack.isSameItem(brokenDown.getFirst(), storedOut))
-									{
-										outputs.put(storedOut, outputs.get(storedOut)+brokenDown.getSecond());
-										b = true;
-									}
-								if(!b)
-									outputs.put(brokenDown.getFirst().copyWithCount(1), brokenDown.getSecond());
-							}
-						}
-					}
-				Map<ItemStack, Double> outputScaled = new IdentityHashMap<>(outputs.size());
-				for(Entry<ItemStack, Double> e : outputs.entrySet())
-					outputScaled.put(e.getKey(), e.getValue()/resultCount);
-				if(!outputs.isEmpty()||!missingSub.isEmpty())
-				{
-					ItemStack in = stack.copyWithCount(1);
-					RecyclingCalculation calc = new RecyclingCalculation(recipe.value(), in, outputScaled);
-					if(!missingSub.isEmpty())
-						for(ItemStack s : missingSub.keySet())
-							calc.queriedSubcomponents.put(s, (double)missingSub.get(s)/resultCount);
-					return calc;
-				}
-			}
 			return null;
 		}
 	}

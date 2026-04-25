@@ -39,7 +39,6 @@ public record FractalOptions(
 	public static final Color4[] COLOUR_ORANGE = {new Color4(Lib.COLOUR_F_ImmersiveOrange[0], Lib.COLOUR_F_ImmersiveOrange[1], Lib.COLOUR_F_ImmersiveOrange[2], .5f), new Color4(1, .97f, .87f, .75f)};
 	public static final Color4[] COLOUR_LIGHTNING = {new Color4(77/255f, 74/255f, 152/255f, .75f), new Color4(1, 1, 1, 1)};
 
-	@Override
 	public ParticleType<?> getType()
 	{
 		return IEParticles.FRACTAL.get();

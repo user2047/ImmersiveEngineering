@@ -17,20 +17,23 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
-public class RGBRecipeSerializer implements RecipeSerializer<RGBColourationRecipe>
+public class RGBRecipeSerializer
 {
 	public static final DualMapCodec<RegistryFriendlyByteBuf, RGBColourationRecipe> CODEC = DualCodecs.INGREDIENT.fieldOf("target")
 			.map(RGBColourationRecipe::new, RGBColourationRecipe::target);
 
-	@Override
 	public MapCodec<RGBColourationRecipe> codec()
 	{
 		return CODEC.mapCodec();
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, RGBColourationRecipe> streamCodec()
 	{
 		return CODEC.streamCodec();
+	}
+
+	public RecipeSerializer<RGBColourationRecipe> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

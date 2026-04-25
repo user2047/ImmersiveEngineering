@@ -15,6 +15,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import malte0811.dualcodecs.DualCodec;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -66,7 +67,7 @@ public class IngredientWithSize implements Predicate<ItemStack>
 
 	public IngredientWithSize(TagKey<Item> basePredicate, int count)
 	{
-		this(Ingredient.of(basePredicate), count);
+		this(Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(basePredicate)), count);
 	}
 
 	public IngredientWithSize(TagKey<Item> basePredicate)
@@ -85,11 +86,9 @@ public class IngredientWithSize implements Predicate<ItemStack>
 	@Nonnull
 	public ItemStack[] getMatchingStacks()
 	{
-		ItemStack[] baseStacks = basePredicate.getItems();
-		ItemStack[] ret = new ItemStack[baseStacks.length];
-		for(int i = 0; i < baseStacks.length; ++i)
-			ret[i] = baseStacks[i].copyWithCount(this.count);
-		return ret;
+		return basePredicate.items()
+				.map(holder -> new ItemStack(holder.value(), this.count))
+				.toArray(ItemStack[]::new);
 	}
 
 	@Nonnull
@@ -126,7 +125,7 @@ public class IngredientWithSize implements Predicate<ItemStack>
 
 	public static IngredientWithSize of(ItemStack stack)
 	{
-		return new IngredientWithSize(Ingredient.of(stack), stack.getCount());
+		return new IngredientWithSize(Ingredient.of(stack.getItem()), stack.getCount());
 	}
 
 	public ItemStack getRandomizedExampleStack(int rand)

@@ -24,9 +24,9 @@ public class SafeChunkUtils
 	public static LevelChunk getSafeChunk(LevelAccessor w, BlockPos pos)
 	{
 		ChunkSource provider = w.getChunkSource();
-		ChunkPos chunkPos = new ChunkPos(pos);
+		ChunkPos chunkPos = new ChunkPos(pos.getX()>>4, pos.getZ()>>4);
 		//TODO does this do what I want?
-		return provider.getChunkNow(chunkPos.x, chunkPos.z);
+		return provider.getChunkNow(chunkPos.x(), chunkPos.z());
 	}
 
 	public static boolean isChunkSafe(LevelAccessor w, BlockPos pos)

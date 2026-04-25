@@ -20,7 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -156,7 +156,6 @@ public class IEBlockInterfaces
 
 		Property<Direction> getFacingProperty();
 
-		@Override
 		default Direction getFacing()
 		{
 			BlockState state = getState();
@@ -166,7 +165,6 @@ public class IEBlockInterfaces
 				return Direction.NORTH;
 		}
 
-		@Override
 		default void setFacing(Direction facing)
 		{
 			BlockState oldState = getState();
@@ -224,7 +222,7 @@ public class IEBlockInterfaces
 
 	public interface IPlayerInteraction
 	{
-		ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ);
+		InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ);
 	}
 
 	public interface IHammerInteraction
@@ -239,7 +237,7 @@ public class IEBlockInterfaces
 
 	public interface IScrewdriverInteraction
 	{
-		ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec);
+		InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec);
 	}
 
 	public interface IPlacementInteraction
@@ -291,14 +289,12 @@ public class IEBlockInterfaces
 		VoxelShape getBlockBounds(@Nullable CollisionContext ctx);
 
 		@Nonnull
-		@Override
 		default VoxelShape getCollisionShape(CollisionContext ctx)
 		{
 			return getBlockBounds(ctx);
 		}
 
 		@Nonnull
-		@Override
 		default VoxelShape getSelectionShape(@Nullable CollisionContext ctx)
 		{
 			return getBlockBounds(ctx);
@@ -358,7 +354,6 @@ public class IEBlockInterfaces
 		}
 
 		@Nonnull//Super is annotated nullable, but Forge assumes Nonnull in at least one place
-		@Override
 		default AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity)
 		{
 			T master = getGuiMaster();
@@ -367,7 +362,6 @@ public class IEBlockInterfaces
 			return type.create(id, playerInventory, master);
 		}
 
-		@Override
 		default Component getDisplayName()
 		{
 			return Component.literal("");

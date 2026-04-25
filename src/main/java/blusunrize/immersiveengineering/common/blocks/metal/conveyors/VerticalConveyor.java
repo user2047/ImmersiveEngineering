@@ -55,31 +55,26 @@ public class VerticalConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<VerticalConveyor> getType()
 	{
 		return TYPE;
 	}
 
-	@Override
 	public boolean changeConveyorDirection()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean setConveyorDirection(ConveyorDirection dir)
 	{
 		return false;
 	}
 
-	@Override
 	public Direction[] sigTransportDirections()
 	{
 		return new Direction[]{Direction.UP, getFacing()};
 	}
 
-	@Override
 	public Vec3 getDirection(Entity entity, boolean outputBlocked)
 	{
 		BlockPos posWall = getBlockEntity().getBlockPos().relative(getFacing());
@@ -125,7 +120,6 @@ public class VerticalConveyor extends ConveyorBase
 		return new Vec3(vX, vY, vZ);
 	}
 
-	@Override
 	public void onEntityCollision(@Nonnull Entity entity)
 	{
 		collisionTracker.onEntityCollided(entity);
@@ -189,7 +183,7 @@ public class VerticalConveyor extends ConveyorBase
 			{
 				BlockPos outputPos = getBlockEntity().getBlockPos().offset(0, 1, 0);
 				BlockEntity inventoryTile = getBlockEntity().getLevel().getBlockEntity(outputPos);
-				if(!getBlockEntity().getLevel().isClientSide)
+				if(!getBlockEntity().getLevel().isClientSide())
 				{
 					if(!(inventoryTile instanceof IConveyorBlockEntity))
 						ItemUtils.tryInsertEntity(getBlockEntity().getLevel(), outputPos, Direction.DOWN, item);
@@ -201,13 +195,11 @@ public class VerticalConveyor extends ConveyorBase
 			item.setPickUpDelay(10);
 	}
 
-	@Override
 	public BlockPos getOutputInventory()
 	{
 		return getBlockEntity().getBlockPos().above();
 	}
 
-	@Override
 	public List<BlockPos> getNextConveyorCandidates()
 	{
 		BlockPos pos = getBlockEntity().getBlockPos();
@@ -247,13 +239,11 @@ public class VerticalConveyor extends ConveyorBase
 				return list;
 			});
 
-	@Override
 	public VoxelShape getSelectionShape()
 	{
 		return getCollisionShape();
 	}
 
-	@Override
 	public VoxelShape getCollisionShape()
 	{
 		final Direction facing = getFacing();

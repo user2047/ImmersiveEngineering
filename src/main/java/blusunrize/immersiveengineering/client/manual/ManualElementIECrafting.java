@@ -39,10 +39,8 @@ public abstract class ManualElementIECrafting extends SpecialManualElements
 		this.stacks = stacks;
 	}
 
-	@Override
 	public abstract void recalculateCraftingRecipes();
 
-	@Override
 	public void onOpened(ManualScreen gui, int x, int y, List<Button> pageButtons)
 	{
 		if(this.recipes.size() > 1)
@@ -61,7 +59,6 @@ public abstract class ManualElementIECrafting extends SpecialManualElements
 		super.onOpened(gui, x, y+yOff+2, pageButtons);
 	}
 
-	@Override
 	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		highlighted = ItemStack.EMPTY;
@@ -93,7 +90,6 @@ public abstract class ManualElementIECrafting extends SpecialManualElements
 		this.renderHighlightedTooltip(graphics, mouseX, mouseY);
 	}
 
-	@Override
 	public boolean listForSearch(String searchTag)
 	{
 		for(PositionedItemStack[] recipe : this.recipes)
@@ -104,7 +100,6 @@ public abstract class ManualElementIECrafting extends SpecialManualElements
 		return false;
 	}
 
-	@Override
 	public int getPixelsTaken()
 	{
 		int maxY = 0;

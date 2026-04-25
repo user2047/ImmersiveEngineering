@@ -45,7 +45,6 @@ public class DirectProcessingItemHandler<R extends MultiblockRecipe> extends Ins
 		return this;
 	}
 
-	@Override
 	protected ItemStack insert(ItemStack stack, boolean simulate)
 	{
 		stack = stack.copy();

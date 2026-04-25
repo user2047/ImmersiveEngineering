@@ -10,6 +10,7 @@ package blusunrize.immersiveengineering.api.tool;
 
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -39,12 +40,15 @@ public class RailgunHandler
 
 	public static StandardRailgunProjectile registerStandardProjectile(TagKey<Item> tag, double damage, double gravity)
 	{
-		return (StandardRailgunProjectile)registerProjectile(() -> Ingredient.of(tag), new StandardRailgunProjectile(damage, gravity));
+		return (StandardRailgunProjectile)registerProjectile(
+				() -> Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(tag)),
+				new StandardRailgunProjectile(damage, gravity)
+		);
 	}
 
 	public static StandardRailgunProjectile registerStandardProjectile(ItemStack stack, double damage, double gravity)
 	{
-		return (StandardRailgunProjectile)registerProjectile(() -> Ingredient.of(stack), new StandardRailgunProjectile(damage, gravity));
+		return (StandardRailgunProjectile)registerProjectile(() -> Ingredient.of(stack.getItem()), new StandardRailgunProjectile(damage, gravity));
 	}
 
 	public static IRailgunProjectile getProjectile(ItemStack stack)

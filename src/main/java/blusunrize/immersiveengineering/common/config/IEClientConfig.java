@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
@@ -31,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class IEClientConfig
 {
 	public final static BooleanValue showUpdateNews;

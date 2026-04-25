@@ -49,20 +49,17 @@ public class BalloonBlock extends IEEntityBlock<BalloonBlockEntity>
 		setLightOpacity(0);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(@Nonnull Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public void fallOn(@Nonnull Level w, @Nonnull BlockState state, @Nonnull BlockPos pos, Entity entity, float fallStrength)
 	{
 		entity.fallDistance = 0;
 	}
 
-	@Override
 	@Deprecated
 	public void onProjectileHit(@Nonnull Level level, @Nonnull BlockState p_60454_, @Nonnull BlockHitResult hitResult, @Nonnull Projectile p_60456_)
 	{

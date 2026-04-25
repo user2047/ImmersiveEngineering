@@ -13,17 +13,17 @@ import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.utils.ResettableLazy;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,7 +55,6 @@ public class BakedBasicSplitModel extends AbstractSplitModel<BakedModel>
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(
 			@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand,
 			@Nonnull ModelData extraData, @Nullable RenderType layer
@@ -69,7 +68,6 @@ public class BakedBasicSplitModel extends AbstractSplitModel<BakedModel>
 	}
 
 	@Nonnull
-	@Override
 	public ItemTransforms getTransforms()
 	{
 		return itemTransforms;

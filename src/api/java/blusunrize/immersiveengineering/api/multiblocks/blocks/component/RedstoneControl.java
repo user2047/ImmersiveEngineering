@@ -20,7 +20,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -62,7 +62,7 @@ public class RedstoneControl<S> implements IMultiblockComponent<RSState>, StateW
 	}
 
 	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<RSState> ctx,
 			BlockPos posInMultiblock,
 			Player player,
@@ -73,17 +73,17 @@ public class RedstoneControl<S> implements IMultiblockComponent<RSState>, StateW
 	{
 		final ItemStack held = player.getItemInHand(hand);
 		if(!held.is(IETags.screwdrivers)||!positions.contains(posInMultiblock))
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		if(!isClient)
 		{
 			final boolean inverted = !ctx.getState().rsEnablesMachine;
 			ctx.getState().rsEnablesMachine = inverted;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(inverted?"invertedOn": "invertedOff")), true
+			player.sendOverlayMessage(
+					Component.translatable(Lib.CHAT_INFO+"rsControl."+(inverted?"invertedOn": "invertedOff"))
 			);
 			ctx.markMasterDirty();
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	public static class RSState implements IMultiblockState
@@ -126,7 +126,7 @@ public class RedstoneControl<S> implements IMultiblockComponent<RSState>, StateW
 		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			rsEnablesMachine = nbt.getBoolean("rsEnablesMachine");
+			rsEnablesMachine = nbt.getBooleanOr("rsEnablesMachine", false);
 		}
 
 		public ComputerControlState getComputerControlState()

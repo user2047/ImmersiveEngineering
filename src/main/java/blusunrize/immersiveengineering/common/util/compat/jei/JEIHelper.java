@@ -56,7 +56,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
@@ -83,13 +85,11 @@ public class JEIHelper implements IModPlugin
 	public static IDrawableStatic slotDrawable;
 	public static IRecipeSlotRichTooltipCallback fluidTooltipCallback = new IEFluidTooltipCallback();
 
-	@Override
 	public Identifier getPluginUid()
 	{
 		return UID;
 	}
 
-	@Override
 	public void registerItemSubtypes(ISubtypeRegistration subtypeRegistry)
 	{
 		subtypeRegistry.registerSubtypeInterpreter(
@@ -116,7 +116,6 @@ public class JEIHelper implements IModPlugin
 			);
 	}
 
-	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry)
 	{
 		//Recipes
@@ -147,7 +146,6 @@ public class JEIHelper implements IModPlugin
 		slotDrawable = guiHelper.getSlotDrawable();
 	}
 
-	@Override
 	public void registerRecipes(IRecipeRegistration registration)
 	{
 		IELogger.info("Adding recipes to JEI!!");
@@ -212,19 +210,18 @@ public class JEIHelper implements IModPlugin
 
 	private <T extends Recipe<?>, C extends Comparable<? super C>> Comparator<RecipeHolder<T>> compareIDs()
 	{
-		return (h1, h2) -> h1.id().compareNamespaced(h2.id());
+		return (h1, h2) -> h1.id().compareTo(h2.id());
 	}
 
 	private <T extends Recipe<?>, C extends Comparable<? super C>> Comparator<RecipeHolder<T>> compareInRecipe(Function<? super T, C> keyExtractor)
 	{
 		return (h1, h2) -> {
 			int ret = keyExtractor.apply(h1.value()).compareTo(keyExtractor.apply(h2.value()));
-			return ret!=0?ret: h1.id().compareNamespaced(h2.id());
+			return ret!=0?ret: h1.id().compareTo(h2.id());
 		};
 	}
 
 
-	@Override
 	public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration)
 	{
 		registration.addRecipeTransferHandler(new AssemblerRecipeTransferHandler(registration.getTransferHelper()), RecipeTypes.CRAFTING);
@@ -234,7 +231,6 @@ public class JEIHelper implements IModPlugin
 		);
 	}
 
-	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
 	{
 		registration.addRecipeCatalyst(IEMultiblockLogic.ASSEMBLER.iconStack(), RecipeTypes.CRAFTING);
@@ -258,7 +254,6 @@ public class JEIHelper implements IModPlugin
 		registration.addRecipeCatalyst(IEMultiblockLogic.MIXER.iconStack(), JEIRecipeTypes.MIXER, JEIRecipeTypes.MIXER_POTIONS);
 	}
 
-	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration)
 	{
 		registration.addRecipeClickArea(CokeOvenScreen.class, 58, 36, 11, 13, JEIRecipeTypes.COKE_OVEN);
@@ -282,18 +277,18 @@ public class JEIHelper implements IModPlugin
 
 	private List<RecipeHolder<BottlingMachineRecipe>> getFluidBucketRecipes()
 	{
-		return BuiltInRegistries.FLUID.holders()
-				.filter(holder -> holder.value().isSource(holder.value().defaultFluidState()))
-				.filter(holder -> !holder.value().getBucket().getDefaultInstance().isEmpty())
-				.map(holder -> {
-					ItemStack bucket = holder.value().getBucket().getDefaultInstance();
-					Identifier key = holder.key().location();
+		return BuiltInRegistries.FLUID.entrySet().stream()
+				.filter(entry -> entry.getValue().isSource(entry.getValue().defaultFluidState()))
+				.filter(entry -> !entry.getValue().getBucket().getDefaultInstance().isEmpty())
+				.map(entry -> {
+					ItemStack bucket = entry.getValue().getBucket().getDefaultInstance();
+					Identifier key = entry.getKey().identifier();
 					return new RecipeHolder<>(
-							IEApi.ieLoc("jei_bucket_"+key.getNamespace()+"_"+key.getPath()),
+							ResourceKey.create(Registries.RECIPE, IEApi.ieLoc("jei_bucket_"+key.getNamespace()+"_"+key.getPath())),
 							new BottlingMachineRecipe(
 									new TagOutputList(new TagOutput(bucket)),
 									IngredientWithSize.of(new ItemStack(Items.BUCKET)),
-									SizedFluidIngredient.of(holder.value(), 1000)
+									SizedFluidIngredient.of(entry.getValue(), 1000)
 							)
 					);
 				}).toList();
@@ -307,14 +302,12 @@ public class JEIHelper implements IModPlugin
 		return new ISubtypeInterpreter<ItemStack>()
 		{
 
-			@Override
 			public @Nullable Object getSubtypeData(ItemStack itemStack, UidContext uidContext)
 			{
 				return componentGetter.apply(itemStack);
 			}
 
 			// deprecated for future removal?
-			@Override
 			public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext uidContext)
 			{
 				return componentGetter.andThen(legacyStringGetter).apply(itemStack);

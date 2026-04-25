@@ -14,6 +14,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -29,7 +30,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.common.util.JsonUtils;
-import net.neoforged.neoforge.common.util.LogicalSidedProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Random;
@@ -44,7 +44,12 @@ public class ApiUtils
 	 */
 	public static final Random RANDOM = new Random();
 
-	public static final RandomSource RANDOM_SOURCE = RandomSource.createNewThreadLocalInstance();
+	public static final RandomSource RANDOM_SOURCE = RandomSource.createThreadLocalInstance();
+
+	public static Random getRandom()
+	{
+		return RANDOM;
+	}
 
 	public static Pair<ItemStack, Double> breakStackIntoPreciseIngots(RegistryAccess tags, ItemStack stack)
 	{
@@ -70,7 +75,7 @@ public class ApiUtils
 	//Based on net.minecraft.entity.EntityLivingBase.knockBack
 	public static void knockbackNoSource(LivingEntity entity, double strength, double xRatio, double zRatio)
 	{
-		entity.hasImpulse = true;
+		entity.hurtMarked = true;
 		Vec3 motionOld = entity.getDeltaMovement();
 		Vec3 toAdd = (new Vec3(xRatio, 0.0D, zRatio)).normalize().scale(strength);
 		entity.setDeltaMovement(
@@ -81,20 +86,20 @@ public class ApiUtils
 
 	public static void addFutureServerTask(Level world, Runnable task, boolean forceFuture)
 	{
-		LogicalSide side = world.isClientSide?LogicalSide.CLIENT: LogicalSide.SERVER;
-		//TODO this sometimes causes NPEs?
-		BlockableEventLoop<? super TickTask> tmp = LogicalSidedProvider.WORKQUEUE.get(side);
+		LogicalSide side = world.isClientSide()?LogicalSide.CLIENT: LogicalSide.SERVER;
+		@SuppressWarnings("rawtypes")
+		BlockableEventLoop tmp = side==LogicalSide.CLIENT?Minecraft.getInstance(): world.getServer();
 		if(forceFuture)
 		{
 			int tick;
-			if(world.isClientSide)
+			if(world.isClientSide())
 				tick = 0;
 			else
 				tick = ((MinecraftServer)tmp).getTickCount();
-			tmp.tell(new TickTask(tick, task));
+			tmp.schedule(new TickTask(tick, task));
 		}
 		else
-			tmp.submitAsync(task);
+			tmp.submit(task);
 	}
 
 	public static void addFutureServerTask(Level world, Runnable task)

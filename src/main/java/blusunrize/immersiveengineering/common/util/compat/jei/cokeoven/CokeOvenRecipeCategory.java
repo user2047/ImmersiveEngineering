@@ -53,7 +53,6 @@ public class CokeOvenRecipeCategory extends IERecipeCategory<CokeOvenRecipe>
 		flame = helper.drawableBuilder(background, 177, 0, 14, 14).buildAnimated(500, IDrawableAnimated.StartDirection.TOP, true);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, CokeOvenRecipe recipe, IFocusGroup focuses)
 	{
 		final int batchSize = recipe.input.getCount();
@@ -77,7 +76,6 @@ public class CokeOvenRecipeCategory extends IERecipeCategory<CokeOvenRecipe>
 		}
 	}
 
-	@Override
 	public void onDisplayedIngredientsUpdate(@Nonnull RecipeHolder<CokeOvenRecipe> recipe, @Nonnull List<IRecipeSlotDrawable> recipeSlots, @Nonnull IFocusGroup focuses)
 	{
 		// timing shenanigans, this is the same formula that JEI uses internally for cycling
@@ -102,7 +100,6 @@ public class CokeOvenRecipeCategory extends IERecipeCategory<CokeOvenRecipe>
 		}
 	}
 
-	@Override
 	public void draw(CokeOvenRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 31, 20);

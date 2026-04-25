@@ -26,7 +26,6 @@ public class BreakerSwitchBlock<T extends BreakerSwitchBlockEntity> extends Conn
 		super(props, tileType);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

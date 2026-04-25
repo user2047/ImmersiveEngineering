@@ -25,7 +25,6 @@ public class ToolboxScreen extends IEContainerScreen<ToolboxMenu>
 		this.imageHeight = 238;
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
@@ -43,7 +42,6 @@ public class ToolboxScreen extends IEContainerScreen<ToolboxMenu>
 		}
 	}
 
-	@Override
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(background, leftPos, topPos-17, 0, 0, 176, imageHeight+17);

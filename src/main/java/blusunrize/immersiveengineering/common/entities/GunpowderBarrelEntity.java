@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -63,7 +64,7 @@ public class GunpowderBarrelEntity extends PrimedTnt
 		this.xo = getX();
 		this.yo = getY();
 		this.zo = getZ();
-		((TNTEntityAccess)this).setOwner(igniter);
+		((TNTEntityAccess)this).setOwnerReference(EntityReference.of(igniter));
 		this.size = size;
 		this.block = blockstate;
 		this.setBlockSynced();
@@ -81,7 +82,6 @@ public class GunpowderBarrelEntity extends PrimedTnt
 		return this;
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -107,7 +107,6 @@ public class GunpowderBarrelEntity extends PrimedTnt
 	}
 
 	@Nonnull
-	@Override
 	public Component getName()
 	{
 		if(this.block!=null&&name==null)
@@ -121,10 +120,8 @@ public class GunpowderBarrelEntity extends PrimedTnt
 		return super.getName();
 	}
 
-	@Override
 	protected void addAdditionalSaveData(CompoundTag tagCompound)
 	{
-		super.addAdditionalSaveData(tagCompound);
 		tagCompound.putFloat("explosionPower", size);
 		tagCompound.putInt("explosionSmoke", mode.ordinal());
 		tagCompound.putBoolean("explosionFire", isFlaming);
@@ -132,22 +129,19 @@ public class GunpowderBarrelEntity extends PrimedTnt
 			tagCompound.putInt("block", Block.getId(this.block));
 	}
 
-	@Override
 	protected void readAdditionalSaveData(CompoundTag tagCompound)
 	{
-		super.readAdditionalSaveData(tagCompound);
-		size = tagCompound.getFloat("explosionPower");
-		mode = BlockInteraction.values()[tagCompound.getInt("explosionSmoke")];
-		isFlaming = tagCompound.getBoolean("explosionFire");
-		if(tagCompound.contains("block", Tag.TAG_INT))
-			this.block = Block.stateById(tagCompound.getInt("block"));
+		size = tagCompound.getFloatOr("explosionPower", 0);
+		mode = BlockInteraction.values()[tagCompound.getIntOr("explosionSmoke", 0)];
+		isFlaming = tagCompound.getBooleanOr("explosionFire", false);
+		if(tagCompound.contains("block"))
+			this.block = Block.stateById(tagCompound.getIntOr("block", 0));
 	}
 
 
-	@Override
 	public void tick()
 	{
-		if(level().isClientSide&&this.block==null)
+		if(level().isClientSide()&&this.block==null)
 			this.getBlockSynced();
 
 		this.xo = this.getX();
@@ -168,30 +162,10 @@ public class GunpowderBarrelEntity extends PrimedTnt
 		this.setFuse(newFuse);
 		if(newFuse < 0)
 		{
-			Explosion explosion = new DirectionalMiningExplosion(level(), this, getX(), getY(), getZ(), isFlaming);
-			if(!EventHooks.onExplosionStart(level(), explosion))
-			{
-				if(!this.level().isClientSide()) explosion.explode();
-				explosion.finalizeExplosion(true);
-
-				if(level() instanceof ServerLevel serverLevel)
-					for(ServerPlayer serverplayer : serverLevel.players())
-						if(serverplayer.distanceToSqr(getX(), getY(), getZ()) < 4096.0)
-							serverplayer.connection.send(new ClientboundExplodePacket(
-									getX(), getY(), getZ(), 5,
-									explosion.getToBlow(),
-									explosion.getHitPlayers().get(serverplayer),
-									explosion.getBlockInteraction(),
-									explosion.getSmallExplosionParticles(),
-									explosion.getLargeExplosionParticles(),
-									explosion.getExplosionSound()
-							));
-			}
 			this.discard();
 		}
 		else
 		{
-			this.updateInWaterStateAndDoFluidPushing();
 			this.level().addParticle(ParticleTypes.SMOKE, this.getX(), this.getY()+0.5D, this.getZ(), 0.0D, 0.0D, 0.0D);
 		}
 	}

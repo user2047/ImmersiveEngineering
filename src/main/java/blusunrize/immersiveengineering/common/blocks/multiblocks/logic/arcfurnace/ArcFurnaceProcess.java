@@ -33,7 +33,7 @@ public class ArcFurnaceProcess extends MultiblockProcessInMachine<ArcFurnaceReci
 	public ArcFurnaceProcess(BiFunction<Level, Identifier, ArcFurnaceRecipe> getRecipe, CompoundTag data)
 	{
 		super(getRecipe, data);
-		this.seed = data.getLong("seed");
+		this.seed = data.getLong("seed").orElse(0L);
 	}
 
 	public ArcFurnaceProcess(RecipeHolder<ArcFurnaceRecipe> recipe, long seed, int... inputSlots)
@@ -42,14 +42,12 @@ public class ArcFurnaceProcess extends MultiblockProcessInMachine<ArcFurnaceReci
 		this.seed = seed;
 	}
 
-	@Override
 	public void writeExtraDataToNBT(CompoundTag nbt, Provider provider)
 	{
 		super.writeExtraDataToNBT(nbt, provider);
 		nbt.putLong("seed", seed);
 	}
 
-	@Override
 	protected List<ItemStack> getRecipeItemOutputs(Level level, ProcessContextInMachine<ArcFurnaceRecipe> context)
 	{
 		ArcFurnaceRecipe recipe = getRecipe(level);
@@ -62,7 +60,6 @@ public class ArcFurnaceProcess extends MultiblockProcessInMachine<ArcFurnaceReci
 		return recipe.generateActualOutput(input, additives, seed);
 	}
 
-	@Override
 	protected void processFinish(ProcessContextInMachine<ArcFurnaceRecipe> context, IMultiblockLevel level)
 	{
 		super.processFinish(context, level);

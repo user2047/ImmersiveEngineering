@@ -93,13 +93,12 @@ public class RadioTowerMenu extends IEContainerMenu
 	}
 
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
-		if(nbt.contains("frequency", Tag.TAG_INT))
-			this.frequency.set(nbt.getInt("frequency"));
-		if(nbt.contains("savedFrequencies", Tag.TAG_INT_ARRAY))
-			this.savedFrequencies.set(nbt.getIntArray("savedFrequencies"));
+		if(nbt.contains("frequency"))
+			this.frequency.set(nbt.getIntOr("frequency", 0));
+		if(nbt.contains("savedFrequencies"))
+			this.savedFrequencies.set(nbt.getIntArray("savedFrequencies").orElse(new int[0]));
 		this.markDirty.run();
 	}
 

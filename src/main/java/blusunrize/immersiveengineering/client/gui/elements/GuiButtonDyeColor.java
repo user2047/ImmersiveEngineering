@@ -45,7 +45,6 @@ public class GuiButtonDyeColor extends GuiButtonState<DyeColor>
 		);
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderWidget(graphics, mouseX, mouseY, partialTicks);

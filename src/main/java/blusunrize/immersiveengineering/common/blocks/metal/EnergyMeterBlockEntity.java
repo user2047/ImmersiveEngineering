@@ -36,7 +36,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -69,11 +69,10 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		super(type, pos, state);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(!heldItem.isEmpty()&&heldItem.getItem() instanceof IWireCoil)
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		int transfer = getAveragePower();
 		int packets = lastPackets.size();
 		if(isDummy())
@@ -86,10 +85,9 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		if(transfer > 0)
 			transferred = Utils.formatDouble(transfer, "0.###");
 		ChatUtils.sendServerNoSpamMessages(player, Component.translatable(Lib.CHAT_INFO+"energyTransfered", packets, transferred));
-		return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(((level.getGameTime()&31)==(worldPosition.asLong()&31)||compVal < 0))
@@ -100,7 +98,7 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		if(handler!=null)
 		{
 			Object2DoubleMap<Connection> map = handler.getTransferredLastTick();
-			transferred = map.getDouble(shuntConnection);
+			transferred = map.getOrDefault(shuntConnection, 0D);
 		}
 		if(nextPacketIndex >= lastPackets.size())
 			lastPackets.add(transferred);
@@ -109,13 +107,11 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		nextPacketIndex = (nextPacketIndex+1)%20;
 	}
 
-	@Override
 	public boolean canConnect()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		if(isDummy())
@@ -133,7 +129,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return true;
 	}
 
-	@Override
 	public Set<BlockPos> getIgnored(IImmersiveConnectable other)
 	{
 		if(isDummy())
@@ -149,7 +144,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo info, Vec3i offset)
 	{
 		ConnectionPoint targetByHit;
@@ -163,7 +157,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 			return targetByHit;
 	}
 
-	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget)
 	{
 		if(isDummy())
@@ -176,7 +169,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 			super.connectCable(cableType, target, other, otherTarget);
 	}
 
-	@Override
 	public BlockPos getConnectionMaster(WireType cableType, TargetingInfo target)
 	{
 		if(isDummy())
@@ -185,7 +177,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 			return worldPosition;
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		if(getFacing().getAxis()==Axis.X)
@@ -195,7 +186,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 	}
 
 	@Nullable
-	@Override
 	public IGeneralMultiblock master()
 	{
 		if(!isDummy())
@@ -205,7 +195,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return this.getClass().isInstance(te)?(IGeneralMultiblock)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		BlockPos dummyPos = worldPosition.above();
@@ -215,7 +204,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		((EnergyMeterBlockEntity)level.getBlockEntity(dummyPos)).setFacing(this.getFacing());
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		if(isDummy())
@@ -245,7 +233,6 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return (int)Math.round(sum/te.lastPackets.size());
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(isDummy());
@@ -265,25 +252,21 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return list;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
@@ -319,32 +302,27 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 		}
 	}
 
-	@Override
 	public int getComparatorInputOverride()
 	{
 		return compVal;
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public void onLoad()
 	{
 		shuntConnection = new Connection(worldPosition, 0, 1);
 		super.onLoad();
 	}
 
-	@Override
 	public Iterable<? extends Connection> getInternalConnections()
 	{
 		if(shuntConnection!=null)
@@ -353,13 +331,11 @@ public class EnergyMeterBlockEntity extends ImmersiveConnectableBlockEntity impl
 			return ImmutableList.of();
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(new ConnectionPoint(worldPosition, 0), new ConnectionPoint(worldPosition, 1));
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		if(isDummy())

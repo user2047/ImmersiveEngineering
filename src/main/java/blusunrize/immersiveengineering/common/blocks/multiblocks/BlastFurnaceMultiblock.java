@@ -21,7 +21,6 @@ public class BlastFurnaceMultiblock extends StoneMultiblock
 				IEMultiblockLogic.BLAST_FURNACE);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 16;

@@ -31,7 +31,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.Level;
@@ -54,23 +54,20 @@ public class SurveyToolsItem extends IEBaseItem
 
 	public SurveyToolsItem()
 	{
-		super(new Properties().stacksTo(1).durability(300));
+		super(itemProperties().stacksTo(1).durability(300));
 		CAN_USE_ON.add((world, pos) -> world.getBlockState(pos).is(IETags.surveyToolTargets));
 	}
 
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
-	@Override
 	public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_)
 	{
 		return 50;
 	}
 
-	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
 		Player player = context.getPlayer();
@@ -80,14 +77,13 @@ public class SurveyToolsItem extends IEBaseItem
 		BlockPos pos = context.getClickedPos();
 		if(!CAN_USE_ON.stream().anyMatch(predicate -> predicate.test(world, pos)))
 		{
-			player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"survey.wrong_block"), true);
+			player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"survey.wrong_block"));
 			return InteractionResult.FAIL;
 		}
 		player.startUsingItem(context.getHand());
 		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entityLiving)
 	{
 		if(!(entityLiving instanceof ServerPlayer player))
@@ -97,7 +93,7 @@ public class SurveyToolsItem extends IEBaseItem
 		MineralVein vein = ExcavatorHandler.getRandomMineral(world, pos);
 		if(vein==null||vein.getMineral(world)==null)
 		{
-			player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"survey.no_vein"), true);
+			player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"survey.no_vein"));
 			return stack;
 		}
 
@@ -121,7 +117,7 @@ public class SurveyToolsItem extends IEBaseItem
 		});
 		if(tooClose)
 		{
-			player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"survey.too_close"), true);
+			player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"survey.too_close"));
 			return stack;
 		}
 
@@ -152,10 +148,10 @@ public class SurveyToolsItem extends IEBaseItem
 			};
 		}
 		// Send message to player
-		player.displayClientMessage(response, false);
+		player.sendSystemMessage(response);
 		addHintedPosition(stack, world.dimension(), vein.getPos(), new HintedPosition(pos.getX(), pos.getZ(), response));
 
-		world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0F, 1.0F+(world.random.nextFloat()-world.random.nextFloat())*0.4F);
+		world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0F, 1.0F+(world.getRandom().nextFloat()-world.getRandom().nextFloat())*0.4F);
 		stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
 		return stack;
@@ -193,13 +189,11 @@ public class SurveyToolsItem extends IEBaseItem
 		surveyTools.set(IEDataComponents.SURVERYTOOL_DATA, newVeins);
 	}
 
-	@Override
 	public boolean doesSneakBypassUse(ItemStack stack, LevelReader world, BlockPos pos, Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isEnchantable(@Nonnull ItemStack stack)
 	{
 		return false;

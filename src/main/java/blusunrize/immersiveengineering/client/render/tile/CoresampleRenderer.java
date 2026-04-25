@@ -19,7 +19,6 @@ import org.joml.Quaternionf;
 
 public class CoresampleRenderer extends IEBlockEntityRenderer<CoresampleBlockEntity>
 {
-	@Override
 	public void render(CoresampleBlockEntity tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(!tile.getLevelNonnull().hasChunkAt(tile.getBlockPos())||tile.containedSample==null)
@@ -32,7 +31,7 @@ public class CoresampleRenderer extends IEBlockEntityRenderer<CoresampleBlockEnt
 		));
 		matrixStack.mulPose(new Quaternionf().rotateX(-Mth.HALF_PI/2));
 		matrixStack.translate(0, .04864, .02903);
-		ClientUtils.mc().getItemRenderer().renderStatic(
+		ClientUtils.getItemRenderer().renderStatic(
 				tile.makeSampleStack(), ItemDisplayContext.FIXED,
 				combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 				tile.getLevel(), 0

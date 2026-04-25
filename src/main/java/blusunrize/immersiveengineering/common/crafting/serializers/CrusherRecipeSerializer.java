@@ -31,13 +31,11 @@ public class CrusherRecipeSerializer extends IERecipeSerializer<CrusherRecipe>
 			CrusherRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, CrusherRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.CRUSHER.iconStack();

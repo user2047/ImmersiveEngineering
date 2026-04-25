@@ -32,7 +32,7 @@ import java.util.List;
 
 public class WindmillBiome extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<WindmillBiome>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<WindmillBiome>> SERIALIZER;
 
 	public static final CachedRecipeList<WindmillBiome> ALL_BIOMES = new CachedRecipeList<>(IERecipeTypes.WINDMILL_BIOME);
 
@@ -57,13 +57,12 @@ public class WindmillBiome extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<?> getIESerializer()
+	protected RecipeSerializer<?> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;

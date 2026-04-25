@@ -32,10 +32,9 @@ public class WorkbenchRecipeCategory extends IERecipeCategory<BlueprintCraftingR
 		setIcon(new ItemStack(IEBlocks.WoodenDevices.WORKBENCH));
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, BlueprintCraftingRecipe recipe, IFocusGroup focuses)
 	{
-		builder.addSlot(RecipeIngredientRole.CATALYST, 25, 6)
+		builder.addSlot(RecipeIngredientRole.INPUT, 25, 6)
 				.addItemStacks(Lists.newArrayList(BlueprintCraftingRecipe.getTypedBlueprint(recipe.blueprintCategory)))
 				.setBackground(JEIHelper.slotDrawable, -1, -1);
 		int y = recipe.inputs.size() <= 4?13: 1;

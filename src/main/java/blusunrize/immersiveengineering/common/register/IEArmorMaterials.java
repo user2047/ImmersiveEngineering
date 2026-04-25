@@ -12,61 +12,62 @@ import blusunrize.immersiveengineering.api.EnumMetals;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.IETags;
 import blusunrize.immersiveengineering.api.Lib;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem.Type;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterial.Layer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.List;
 import java.util.Map;
 
-import static net.minecraft.world.item.ArmorItem.Type.*;
+import static net.minecraft.world.item.equipment.ArmorType.*;
 
 public class IEArmorMaterials
 {
-	private static final DeferredRegister<ArmorMaterial> REGISTER = DeferredRegister.create(
-			Registries.ARMOR_MATERIAL, Lib.MODID
+	private static final ResourceKey<EquipmentAsset> FARADAY_ASSET = ResourceKey.create(
+			EquipmentAssets.ROOT_ID, IEApi.ieLoc("faraday")
 	);
-	public static final Holder<ArmorMaterial> FARADAY = REGISTER.register("faraday", () -> new ArmorMaterial(
-			Map.of(BOOTS, 1, HELMET, 1, LEGGINGS, 2, CHESTPLATE, 3),
-			0,
+	private static final ResourceKey<EquipmentAsset> STEEL_ASSET = ResourceKey.create(
+			EquipmentAssets.ROOT_ID, IEApi.ieLoc("steel")
+	);
+
+	public static final ArmorMaterial FARADAY = new ArmorMaterial(
+			1,
+			Map.of(BOOTS, 1, HELMET, 1, LEGGINGS, 2, CHESTPLATE, 3, BODY, 3),
+			1,
 			SoundEvents.ARMOR_EQUIP_CHAIN,
-			() -> Ingredient.of(IETags.getTagsFor(EnumMetals.ALUMINUM).plate),
-			// TODO may be wrong
-			List.of(new Layer(IEApi.ieLoc("faraday"))),
 			0,
-			0
-	));
-	public static final Holder<ArmorMaterial> STEEL = REGISTER.register("steel", () -> new ArmorMaterial(
-			Map.of(BOOTS, 2, HELMET, 2, LEGGINGS, 6, CHESTPLATE, 7),
+			0,
+			IETags.getTagsFor(EnumMetals.ALUMINUM).plate,
+			FARADAY_ASSET
+	);
+	public static final ArmorMaterial STEEL = new ArmorMaterial(
+			21,
+			Map.of(BOOTS, 2, HELMET, 2, LEGGINGS, 6, CHESTPLATE, 7, BODY, 7),
 			10,
 			SoundEvents.ARMOR_EQUIP_IRON,
-			() -> Ingredient.of(IETags.getTagsFor(EnumMetals.STEEL).ingot),
-			List.of(new Layer(IEApi.ieLoc("steel"))),
 			0,
-			0
-	));
+			0,
+			IETags.getTagsFor(EnumMetals.STEEL).ingot,
+			STEEL_ASSET
+	);
 
 	public static void init(IEventBus modBus)
 	{
-		REGISTER.register(modBus);
 	}
 
-	public static Item.Properties getProperties(Holder<ArmorMaterial> material, Type type)
+	public static Item.Properties getProperties(ArmorMaterial material, ArmorType type)
 	{
-		return new Properties().durability(getDurability(material, type));
+		return IEItems.defaultProperties().humanoidArmor(material, type);
 	}
 
-	public static int getDurability(Holder<ArmorMaterial> material, Type type)
+	public static int getDurability(ArmorMaterial material, ArmorType type)
 	{
-		if(material.value()==STEEL.value())
+		if(material==STEEL)
 		{
 			return switch(type)
 			{
@@ -77,7 +78,7 @@ public class IEArmorMaterials
 				case BODY -> throw new UnsupportedOperationException("Steel body armor not implemented");
 			};
 		}
-		else if(material.value()==FARADAY.value())
+		else if(material==FARADAY)
 		{
 			return switch(type)
 			{
@@ -89,6 +90,6 @@ public class IEArmorMaterials
 			};
 		}
 		else
-			throw new UnsupportedOperationException("Unknown material "+material.getRegisteredName());
+			throw new UnsupportedOperationException("Unknown armor material "+material);
 	}
 }

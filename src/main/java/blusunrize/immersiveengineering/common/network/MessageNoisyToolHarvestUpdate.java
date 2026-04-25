@@ -36,7 +36,6 @@ public record MessageNoisyToolHarvestUpdate(int noisyToolHolderID, byte actionOr
 		this(noisyToolHolder.getId(), (byte)action.ordinal(), targetPos);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -50,7 +49,6 @@ public record MessageNoisyToolHarvestUpdate(int noisyToolHolderID, byte actionOr
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

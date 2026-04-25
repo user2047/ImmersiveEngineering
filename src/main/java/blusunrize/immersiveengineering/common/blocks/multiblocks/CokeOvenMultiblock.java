@@ -21,7 +21,6 @@ public class CokeOvenMultiblock extends StoneMultiblock
 				IEMultiblockLogic.COKE_OVEN);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 16;

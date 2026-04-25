@@ -39,7 +39,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -81,7 +80,7 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 		this.pageHeight = pageHeight;
 		this.pageWidth = pageWidth;
 		contentTree = new Tree<>(name);
-		((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
+		// MC 26 freezes the reload listener list before client setup. The manual still reloads lazily when opened.
 		registerSpecialElement(name.withPath("crafting"), s -> {
 			ManualRecipeRef[][] stacksAndRecipes;
 			if(GsonHelper.isArrayNode(s, "recipes"))
@@ -172,9 +171,9 @@ public abstract class ManualInstance implements ResourceManagerReloadListener, C
 						{
 							JsonElement element = s.get("nbt");
 							if(element.isJsonObject())
-								entityData = TagParser.parseTag(element.toString());
+								entityData = TagParser.parseCompoundFully(element.toString());
 							else
-								entityData = TagParser.parseTag(GsonHelper.convertToString(element, "nbt"));
+								entityData = TagParser.parseCompoundFully(GsonHelper.convertToString(element, "nbt"));
 						} catch(CommandSyntaxException e)
 						{
 							throw new JsonSyntaxException("Invalid NBT Entry: "+e);

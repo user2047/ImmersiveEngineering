@@ -34,14 +34,14 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.ItemAttributeModifiers.Entry;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
@@ -62,7 +62,6 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 		super(props, upgradeType, slotCount);
 	}
 
-	@Override
 	public int getEnchantmentValue()
 	{
 		return 0;
@@ -71,32 +70,28 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 	public static void registerCapabilities(ItemCapabilityRegistration.ItemCapabilityRegistrar registrar)
 	{
 		registerCapabilitiesISI(registrar);
-		registrar.register(FluidHandler.ITEM, (stack, $) -> new IEItemFluidHandler(stack, CAPACITY));
+		registrar.register(Capabilities.Fluid.ITEM, (stack, $) -> new IEItemFluidHandler(stack, CAPACITY));
 		registrar.register(
 				CapabilityShader.ITEM,
 				stack -> new ShaderWrapper_Item(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack)
 		);
 	}
 
-	@Override
 	public int getBarWidth(@Nonnull ItemStack stack)
 	{
 		return Math.round(MAX_BAR_WIDTH*(1-(float)getHeadDamage(stack)/(float)getMaxHeadDamage(stack)));
 	}
 
-	@Override
 	public boolean isBarVisible(@Nonnull ItemStack stack)
 	{
 		return getHeadDamage(stack) > 0;
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public void finishUpgradeRecalculation(ItemStack stack, RegistryAccess registries)
 	{
 		super.finishUpgradeRecalculation(stack, registries);
@@ -108,44 +103,37 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 		}
 	}
 
-	@Override
-	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity player)
+	public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity player)
 	{
-		consumeDurability(stack, target.getCommandSenderWorld(), null, null, player);
-		return true;
+		consumeDurability(stack, target.level(), null, null, player);
 	}
 
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
 	/* ------------- FLUID ------------- */
 
-	@Override
 	public int getCapacity(ItemStack container, int baseCapacity)
 	{
 		return baseCapacity+getUpgrades(container).get(UpgradeEffect.CAPACITY);
 	}
 
-	@Override
 	public boolean allowFluid(ItemStack container, FluidStack fluid)
 	{
 		return fluid!=null&&fluid.getFluid().is(IETags.drillFuel);
 	}
 
-	@Override
 	public boolean isCorrectToolForDrops(ItemStack stack, BlockState state)
 	{
 		//TODO fix drill air tank
-		Tier tier = getHarvestLevel(stack, null);
+		ToolMaterial tier = getHarvestLevel(stack, null);
 		if(tier==null)
 			return false;
-		return isEffective(stack, state)&&canToolBeUsed(stack)&&!state.is(tier.getIncorrectBlocksForDrops());
+		return isEffective(stack, state)&&canToolBeUsed(stack)&&!state.is(tier.incorrectBlocksForDrops());
 	}
 
-	@Override
 	public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack)
 	{
 		List<Entry> modifiers = new ArrayList<>();
@@ -159,10 +147,9 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 					BASE_ATTACK_SPEED_ID, -2.5D, Operation.ADD_VALUE
 			), EquipmentSlotGroup.MAINHAND));
 		}
-		return new ItemAttributeModifiers(modifiers, false);
+		return new ItemAttributeModifiers(modifiers);
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		if(slotChanged||CapabilityShader.shouldReequipDueToShader(oldStack, newStack))
@@ -173,7 +160,6 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 
 	private final Map<UUID, Integer> animationTimer = new HashMap<>();
 
-	@Override
 	public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand)
 	{
 		if(canToolBeUsed(stack))
@@ -202,7 +188,7 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 			ItemStack head = getHead(stack);
 			if(!head.isEmpty())
 			{
-				if(!getUpgrades(stack).has(UpgradeEffect.OILED)||ApiUtils.RANDOM.nextInt(4)==0)
+				if(!getUpgrades(stack).has(UpgradeEffect.OILED)||ApiUtils.getRandom().nextInt(4)==0)
 					damageHead(head, dmg, living);
 				this.setHead(stack, head);
 				IFluidHandler handler = FluidUtil.getFluidHandler(stack).orElseThrow(RuntimeException::new);
@@ -231,7 +217,7 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 
 	public abstract boolean isEffective(ItemStack stack, BlockState state);
 
-	public abstract Tier getHarvestLevel(ItemStack stack, @Nullable Player player);
+	public abstract ToolMaterial getHarvestLevel(ItemStack stack, @Nullable Player player);
 
 	public abstract boolean canToolBeUsed(ItemStack stack);
 
@@ -243,21 +229,15 @@ public abstract class DieselToolItem extends UpgradeableToolItem implements IAdv
 
 	public abstract int getHeadDamage(ItemStack stack);
 
-	@Override
 	public abstract Holder<SoundEvent> getIdleSound(ItemStack stack);
 
-	@Override
 	public abstract Holder<SoundEvent> getBusySound(ItemStack stack);
 
-	@Override
 	public abstract Holder<SoundEvent> getFadingSound(ItemStack stack);
 
-	@Override
 	public abstract Holder<SoundEvent> getAttackSound(ItemStack stack);
 
-	@Override
 	public abstract Holder<SoundEvent> getHarvestSound(ItemStack stack);
 
-	@Override
 	public abstract boolean ableToMakeNoise(ItemStack stack);
 }

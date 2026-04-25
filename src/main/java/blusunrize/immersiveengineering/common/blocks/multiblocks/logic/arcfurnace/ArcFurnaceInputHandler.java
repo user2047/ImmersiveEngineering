@@ -32,7 +32,6 @@ public class ArcFurnaceInputHandler implements IItemHandler
 		this.onChanged = onChanged;
 	}
 
-	@Override
 	public @NotNull ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 	{
 		if(stack.isEmpty())
@@ -70,31 +69,26 @@ public class ArcFurnaceInputHandler implements IItemHandler
 		return stack;
 	}
 
-	@Override
 	public int getSlots()
 	{
 		return IN_SLOT_COUNT;
 	}
 
-	@Override
 	public @NotNull ItemStack getStackInSlot(int slot)
 	{
 		return wrapped.getStackInSlot(slot);
 	}
 
-	@Override
 	public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return Math.min(64, wrapped.getSlotLimit(slot));
 	}
 
-	@Override
 	public boolean isItemValid(int slot, @NotNull ItemStack stack)
 	{
 		return wrapped.isItemValid(slot, stack);

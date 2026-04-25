@@ -31,7 +31,6 @@ public class BlockIESlab<T extends Block & IIEBlock> extends SlabBlock implement
 		this.base = base;
 	}
 
-	@Override
 	public boolean isLadder(BlockState state, LevelReader world, BlockPos pos, @Nullable LivingEntity entity)
 	{
 		if(entity == null)
@@ -49,29 +48,25 @@ public class BlockIESlab<T extends Block & IIEBlock> extends SlabBlock implement
 		return false;
 	}
 
-	@Override
 	public boolean hasFlavour()
 	{
 		return base.get().hasFlavour();
 	}
 
-	@Override
 	public String getNameForFlavour()
 	{
 		return base.get().getNameForFlavour();
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos)
 	{
-		return Math.min(base.get().defaultBlockState().getLightBlock(worldIn, pos), super.getLightBlock(state, worldIn, pos));
+		return 0;
 	}
 
-	@Override
 	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos)
 	{
-		return super.propagatesSkylightDown(state, reader, pos)||base.get().defaultBlockState().propagatesSkylightDown(reader, pos);
+		return true;
 	}
 
 	public static BlockBehaviour.StatePredicate causesSuffocation(Supplier<? extends Block> base)

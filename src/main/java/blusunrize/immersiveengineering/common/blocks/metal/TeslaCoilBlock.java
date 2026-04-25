@@ -26,14 +26,12 @@ public class TeslaCoilBlock extends IEEntityBlock<TeslaCoilBlockEntity>
 		super(IEBlockEntities.TESLACOIL, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_ALL, IEProperties.MULTIBLOCKSLAVE);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos start = context.getClickedPos();

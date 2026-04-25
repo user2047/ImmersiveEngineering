@@ -45,14 +45,12 @@ public class BlueprintShelfBlock extends AnyFacingEntityBlock<BlueprintShelfBloc
 		this.registerDefaultState(defaultState);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(BLUEPRINT_SLOT_FILLED);
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(IEProperties.FACING_ALL));

@@ -27,7 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.EnumMap;
@@ -38,7 +38,7 @@ public class ThermoelectricGenBlockEntity extends IEBaseBlockEntity implements I
 {
 	private int energyOutput = -1;
 	private final Map<Direction, IEBlockCapabilityCache<IEnergyStorage>> energyWrappers = IEBlockCapabilityCaches.allNeighbors(
-			EnergyStorage.BLOCK, this
+			Energy.BLOCK, this
 	);
 
 	public ThermoelectricGenBlockEntity(BlockPos pos, BlockState state)
@@ -46,7 +46,6 @@ public class ThermoelectricGenBlockEntity extends IEBaseBlockEntity implements I
 		super(IEBlockEntities.THERMOELECTRIC_GEN.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		// TODO apparently thermos take some time to start after world load? When did that start?
@@ -69,7 +68,6 @@ public class ThermoelectricGenBlockEntity extends IEBaseBlockEntity implements I
 		}
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos pos)
 	{
 		super.onNeighborBlockChange(pos);
@@ -112,13 +110,11 @@ public class ThermoelectricGenBlockEntity extends IEBaseBlockEntity implements I
 		return temperatureGetters.get(offset).apply(level, state.getBlock());
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		this.energyOutput = nbt.getInt("enegyOutput");
+		this.energyOutput = nbt.getIntOr("enegyOutput", 0);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putInt("enegyOutput", this.energyOutput);
@@ -126,6 +122,6 @@ public class ThermoelectricGenBlockEntity extends IEBaseBlockEntity implements I
 
 	public static void registerCapabilities(BECapabilityRegistrar<ThermoelectricGenBlockEntity> registrar)
 	{
-		registrar.registerAllContexts(EnergyStorage.BLOCK, $ -> NullEnergyStorage.INSTANCE);
+		registrar.registerAllContexts(Energy.BLOCK, $ -> NullEnergyStorage.INSTANCE);
 	}
 }

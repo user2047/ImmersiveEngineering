@@ -189,12 +189,12 @@ public class LogicCircuitHandler
 
 		public static LogicCircuitInstruction deserialize(CompoundTag nbt)
 		{
-			LogicCircuitOperator operator = LogicCircuitOperator.valueOf(nbt.getString("operator"));
-			LogicCircuitRegister output = LogicCircuitRegister.valueOf(nbt.getString("output"));
-			ListTag inputList = nbt.getList("inputs", Tag.TAG_STRING);
+			LogicCircuitOperator operator = LogicCircuitOperator.valueOf(nbt.getStringOr("operator", LogicCircuitOperator.SET.name()));
+			LogicCircuitRegister output = LogicCircuitRegister.valueOf(nbt.getStringOr("output", LogicCircuitRegister.WHITE.name()));
+			ListTag inputList = nbt.getListOrEmpty("inputs");
 			LogicCircuitRegister[] inputs = new LogicCircuitRegister[inputList.size()];
 			for(int i = 0; i < inputs.length; i++)
-				inputs[i] = LogicCircuitRegister.valueOf(inputList.getString(i));
+				inputs[i] = LogicCircuitRegister.valueOf(inputList.getStringOr(i, LogicCircuitRegister.WHITE.name()));
 			return new LogicCircuitInstruction(operator, output, inputs);
 		}
 

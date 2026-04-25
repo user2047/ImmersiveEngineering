@@ -22,14 +22,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,55 +42,47 @@ public class WirecutterItem extends IEBaseItem
 {
 	public WirecutterItem()
 	{
-		super(new Properties().durability(100));
+		super(itemProperties().durability(100));
 	}
 
-	@Override
 	public int getMaxDamage(ItemStack stack)
 	{
 		return IEServerConfig.getOrDefault(IEServerConfig.TOOLS.cutterDurabiliy);
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getCraftingRemainingItem(@Nonnull ItemStack stack)
 	{
 		return ItemUtils.damageCopy(stack, 1);
 	}
 
-	@Override
 	public boolean hasCraftingRemainingItem(@Nonnull ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isEnchantable(@Nonnull ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getEnchantmentValue()
 	{
 		return 14;
 	}
 
-	@Override
 	public boolean isBookEnchantable(ItemStack stack, ItemStack book)
 	{
 		var enchantments = book.get(DataComponents.ENCHANTMENTS);
 		return enchantments.keySet().stream().allMatch(HammerItem::canApplyAtEnchantingTable);
 	}
 
-	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate)
 	{
 		return repairCandidate.is(Tags.Items.INGOTS_IRON);
 	}
 
 	// Block breaking
-	@Override
 	public boolean mineBlock(ItemStack itemstack, Level pLevel, BlockState state, BlockPos pPos, LivingEntity pEntityLiving)
 	{
 		boolean effective = state.is(IETags.wirecutterHarvestable);
@@ -101,7 +92,6 @@ public class WirecutterItem extends IEBaseItem
 		return effective;
 	}
 
-	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
 		if(isCorrectToolForDrops(stack, state))
@@ -109,20 +99,17 @@ public class WirecutterItem extends IEBaseItem
 		return super.getDestroySpeed(stack, state);
 	}
 
-	@Override
 	public boolean isCorrectToolForDrops(ItemStack stack, BlockState state)
 	{
 		return state.is(IETags.wirecutterHarvestable);
 	}
 
-	@Override
 	public boolean canPerformAction(ItemStack stack, ItemAbility toolAction)
 	{
 		return toolAction==Lib.WIRECUTTER_DIG;
 	}
 
 	// Wire breaking
-	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
@@ -141,14 +128,14 @@ public class WirecutterItem extends IEBaseItem
 			if(!(tileEntity instanceof IImmersiveConnectable))
 				return InteractionResult.PASS;
 
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
 				IImmersiveConnectable nodeHere = (IImmersiveConnectable)tileEntity;
 				GlobalWireNetwork net = GlobalWireNetwork.getNetwork(world);
 				AtomicBoolean cut = new AtomicBoolean(false);
 				net.removeAllConnectionsAt(nodeHere, conn -> {
 					ItemStack coil = conn.type.getWireCoil(conn);
-					if(world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+					if(true)
 						world.addFreshEntity(new ItemEntity(world, player.getX(), player.getY(), player.getZ(), coil, 0, 0, 0));
 					cut.set(true);
 				});
@@ -158,17 +145,16 @@ public class WirecutterItem extends IEBaseItem
 		}
 		else if(player!=null)
 		{
-			return use(world, player, context.getHand()).getResult();
+			return use(world, player, context.getHand());
 		}
 		return InteractionResult.SUCCESS;
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 		{
 			double reachDistance = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);
 			Connection target = WireUtils.getTargetConnection(world, player, null, reachDistance);
@@ -179,6 +165,6 @@ public class WirecutterItem extends IEBaseItem
 					ItemUtils.damageDirect(stack, 1);
 			}
 		}
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 }

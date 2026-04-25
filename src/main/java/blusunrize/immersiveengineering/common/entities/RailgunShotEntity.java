@@ -51,7 +51,6 @@ public class RailgunShotEntity extends IEProjectileEntity
 		this.pickup = Pickup.ALLOWED;
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -59,14 +58,12 @@ public class RailgunShotEntity extends IEProjectileEntity
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getPickupItem()
 	{
 		return ammo;
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getDefaultPickupItem()
 	{
 		return Ingredients.STICK_STEEL.asItem().getDefaultInstance();
@@ -95,30 +92,26 @@ public class RailgunShotEntity extends IEProjectileEntity
 		return ammoProperties;
 	}
 
-	@Override
 	public double getDefaultGravity()
 	{
 		return .005*(getProjectileProperties()!=null?getProjectileProperties().getGravity(): 1);
 	}
 
-	@Override
 	public int getMaxTicksInGround()
 	{
 		return 500;
 	}
 
-	@Override
 	public void baseTick()
 	{
-		if(this.getAmmo().isEmpty()&&this.level().isClientSide)
+		if(this.getAmmo().isEmpty()&&this.level().isClientSide())
 			this.ammo = getAmmoSynced();
 		super.baseTick();
 	}
 
-	@Override
 	protected void onHitEntity(EntityHitResult result)
 	{
-		if(!this.level().isClientSide&&!getAmmo().isEmpty())
+		if(!this.level().isClientSide()&&!getAmmo().isEmpty())
 		{
 			IRailgunProjectile projectileProperties = getProjectileProperties();
 			if(projectileProperties!=null)
@@ -139,18 +132,17 @@ public class RailgunShotEntity extends IEProjectileEntity
 		this.discard();
 	}
 
-	@Override
 	protected void onHitBlock(BlockHitResult result)
 	{
 		super.onHitBlock(result);
-		if(!this.level().isClientSide&&!getAmmo().isEmpty())
+		if(!this.level().isClientSide()&&!getAmmo().isEmpty())
 		{
 			IRailgunProjectile projectileProperties = getProjectileProperties();
 			if(projectileProperties!=null)
 			{
 				Entity owner = getOwner();
 				UUID shooterUuid = owner!=null?owner.getUUID():null;
-				double breakRoll = this.random.nextDouble();
+				double breakRoll = this.getRandom().nextDouble();
 				if(breakRoll <= getProjectileProperties().getBreakChance(shooterUuid, ammo))
 					this.discard();
 				projectileProperties.onHitTarget(this.level(), result, shooterUuid, this);
@@ -158,18 +150,14 @@ public class RailgunShotEntity extends IEProjectileEntity
 		}
 	}
 
-	@Override
 	public void addAdditionalSaveData(CompoundTag nbt)
 	{
-		super.addAdditionalSaveData(nbt);
 		if(!this.ammo.isEmpty())
-			nbt.put("ammo", this.ammo.save(level().registryAccess()));
+			nbt.put("ammo", blusunrize.immersiveengineering.common.util.ItemStackCompat.save(this.ammo, level().registryAccess()));
 	}
 
-	@Override
 	public void readAdditionalSaveData(CompoundTag nbt)
 	{
-		super.readAdditionalSaveData(nbt);
-		this.ammo = ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("ammo"));
+		this.ammo = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(level().registryAccess(), nbt.getCompoundOrEmpty("ammo"));
 	}
 }

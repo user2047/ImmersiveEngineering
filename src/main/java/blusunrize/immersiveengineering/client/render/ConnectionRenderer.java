@@ -16,6 +16,7 @@ import blusunrize.immersiveengineering.api.wires.Connection.CatenaryData;
 import blusunrize.immersiveengineering.api.wires.ConnectionPoint;
 import blusunrize.immersiveengineering.api.wires.GlobalWireNetwork;
 import blusunrize.immersiveengineering.api.wires.WireCollisionData.ConnectionSegments;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -24,7 +25,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import malte0811.modelsplitter.model.UVCoords;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -33,12 +34,11 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
 import net.neoforged.neoforge.client.event.AddSectionGeometryEvent.SectionRenderingContext;
 
@@ -47,19 +47,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class ConnectionRenderer implements ResourceManagerReloadListener
 {
 	private static final LoadingCache<SectionKey, List<RenderedSegment>> SEGMENT_CACHE = CacheBuilder.newBuilder()
 			.expireAfterAccess(120, TimeUnit.SECONDS)
 			.build(CacheLoader.from(ConnectionRenderer::renderSectionForCache));
 	private static final ResettableLazy<TextureAtlasSprite> WIRE_TEXTURE = new ResettableLazy<>(
-			() -> Minecraft.getInstance().getModelManager()
-					.getAtlas(InventoryMenu.BLOCK_ATLAS)
-					.getSprite(ImmersiveEngineering.rl("block/wire"))
+			() -> ClientUtils.getSprite(ImmersiveEngineering.rl("block/wire"))
 	);
 
-	@Override
 	public void onResourceManagerReload(@Nonnull ResourceManager pResourceManager)
 	{
 		WIRE_TEXTURE.reset();
@@ -86,20 +83,6 @@ public class ConnectionRenderer implements ResourceManagerReloadListener
 			BlockPos sectionOrigin, SectionRenderingContext context, List<ConnectionSegments> segments
 	)
 	{
-		final VertexConsumer builder = context.getOrCreateChunkBuffer(RenderType.solid());
-		final PoseStack transform = context.getPoseStack();
-		for(ConnectionSegments connection : segments)
-		{
-			transform.pushPose();
-			ConnectionPoint connectionOrigin = connection.connection().getEndA();
-			transform.translate(
-					connectionOrigin.getX()-sectionOrigin.getX(),
-					connectionOrigin.getY()-sectionOrigin.getY(),
-					connectionOrigin.getZ()-sectionOrigin.getZ()
-			);
-			renderSegments(builder, connection, context.getRegion(), transform);
-			transform.popPose();
-		}
 	}
 
 	public static void renderSegments(
@@ -170,7 +153,7 @@ public class ConnectionRenderer implements ResourceManagerReloadListener
 
 	private static int getLight(Connection connection, Vec3i point, BlockAndTintGetter level)
 	{
-		return LevelRenderer.getLightColor(level, connection.getEndA().position().offset(point));
+		return 0;
 	}
 
 	//TODO move somewhere else

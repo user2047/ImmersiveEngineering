@@ -19,18 +19,18 @@ import blusunrize.immersiveengineering.common.entities.*;
 import blusunrize.immersiveengineering.common.items.*;
 import blusunrize.immersiveengineering.common.items.upgrades.ToolUpgrade;
 import blusunrize.immersiveengineering.common.items.upgrades.ToolUpgradeItem;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -43,6 +43,7 @@ public final class IEItems
 {
 	public static final int COKE_BURN_TIME = 3200;
 	public static final DeferredRegister<Item> REGISTER = DeferredRegister.create(BuiltInRegistries.ITEM, Lib.MODID);
+	private static final ThreadLocal<ResourceKey<Item>> CURRENT_ITEM_ID = new ThreadLocal<>();
 
 	private IEItems()
 	{
@@ -173,7 +174,7 @@ public final class IEItems
 		public static final ItemRegObject<ManualItem> MANUAL = register("manual", ManualItem::new);
 		public static final ItemRegObject<VoltmeterItem> VOLTMETER = register("voltmeter", VoltmeterItem::new);
 
-		public static final ItemRegObject<PickaxeItem> STEEL_PICK = register(
+		public static final ItemRegObject<Item> STEEL_PICK = register(
 				"pickaxe_steel", IETools.createPickaxe(Lib.MATERIAL_Steel)
 		);
 		public static final ItemRegObject<ShovelItem> STEEL_SHOVEL = register(
@@ -185,10 +186,10 @@ public final class IEItems
 		public static final ItemRegObject<HoeItem> STEEL_HOE = register(
 				"hoe_steel", IETools.createHoe(Lib.MATERIAL_Steel)
 		);
-		public static final ItemRegObject<SwordItem> STEEL_SWORD = register(
+		public static final ItemRegObject<Item> STEEL_SWORD = register(
 				"sword_steel", IETools.createSword(Lib.MATERIAL_Steel)
 		);
-		public static final Map<Type, ItemRegObject<ArmorItem>> STEEL_ARMOR = new EnumMap<>(Type.class);
+		public static final Map<ArmorType, ItemRegObject<Item>> STEEL_ARMOR = new EnumMap<>(ArmorType.class);
 
 		public static final ItemRegObject<ToolboxItem> TOOLBOX = register("toolbox", ToolboxItem::new);
 
@@ -217,11 +218,11 @@ public final class IEItems
 
 		private static void init()
 		{
-			for(var slot : ArmorItem.Type.values())
-				if(slot!=Type.BODY)
+			for(var slot : ArmorType.values())
+				if(slot!=ArmorType.BODY)
 					STEEL_ARMOR.put(slot, register(
 							"armor_steel_"+slot.getName().toLowerCase(Locale.ENGLISH),
-							() -> new ArmorItem(IEArmorMaterials.STEEL, slot, IEArmorMaterials.getProperties(IEArmorMaterials.STEEL, slot))
+							() -> new IEBaseItem(IEArmorMaterials.getProperties(IEArmorMaterials.STEEL, slot))
 					));
 		}
 	}
@@ -236,7 +237,7 @@ public final class IEItems
 
 		private static void init()
 		{
-			for(Identifier bulletType : BulletHandler.getAllKeys())
+			for(Identifier bulletType : BulletHandler.keySet())
 			{
 				IBullet<?> bullet = BulletHandler.getBullet(bulletType);
 				if(bullet.isProperCartridge())
@@ -295,7 +296,7 @@ public final class IEItems
 		public static final ItemRegObject<EarmuffsItem> EARMUFFS = register("earmuffs", EarmuffsItem::new);
 		public static final ItemRegObject<CoresampleItem> CORESAMPLE = register("coresample", CoresampleItem::new);
 		public static final ItemRegObject<GraphiteElectrodeItem> GRAPHITE_ELECTRODE = register("graphite_electrode", GraphiteElectrodeItem::new);
-		public static final Map<Type, ItemRegObject<FaradaySuitItem>> FARADAY_SUIT = new EnumMap<>(Type.class);
+		public static final Map<ArmorType, ItemRegObject<FaradaySuitItem>> FARADAY_SUIT = new EnumMap<>(ArmorType.class);
 		public static final ItemRegObject<FluorescentTubeItem> FLUORESCENT_TUBE = register("fluorescent_tube", FluorescentTubeItem::new);
 		public static final ItemRegObject<PowerpackItem> POWERPACK = register("powerpack", PowerpackItem::new);
 		public static final ItemRegObject<IEShieldItem> SHIELD = register("shield", IEShieldItem::new);
@@ -329,8 +330,8 @@ public final class IEItems
 				IEItems.Misc.TOOL_UPGRADES.put(upgrade, register(
 						"toolupgrade_"+upgrade.name().toLowerCase(Locale.US), () -> new ToolUpgradeItem(upgrade)
 				));
-			for(Type slot : Type.values())
-				if(slot!=Type.BODY)
+			for(ArmorType slot : ArmorType.values())
+				if(slot!=ArmorType.BODY)
 					IEItems.Misc.FARADAY_SUIT.put(slot, register(
 							"armor_faraday_"+slot.name().toLowerCase(Locale.ENGLISH), () -> new FaradaySuitItem(slot)
 					));
@@ -368,8 +369,8 @@ public final class IEItems
 				DeferredHolder<EntityType<?>, ? extends EntityType<? extends Mob>> type, int col1, int col2
 		)
 		{
-			Identifier id = type.unwrapKey().get().location();
-			return register(id.getPath()+"_spawn_egg", () -> new DeferredSpawnEggItem(type::value, col1, col2, new Item.Properties()));
+			Identifier id = type.unwrapKey().get().identifier();
+			return register(id.getPath()+"_spawn_egg", () -> new SpawnEggItem(defaultProperties().spawnEgg(type.value())));
 		}
 	}
 
@@ -411,13 +412,37 @@ public final class IEItems
 	)
 	{
 		return register(
-				name, () -> Util.make(new IEBaseItem(Util.make(new Properties(), makeProps)), processItem)
+				name, () -> Util.make(new IEBaseItem(Util.make(defaultProperties(), makeProps)), processItem)
 		);
 	}
 
 	static <T extends Item> ItemRegObject<T> register(String name, Supplier<? extends T> make)
 	{
-		return new ItemRegObject<>(REGISTER.register(name, make));
+		return new ItemRegObject<>(REGISTER.register(name, id -> {
+			CURRENT_ITEM_ID.set(ResourceKey.create(Registries.ITEM, id));
+			try
+			{
+				return make.get();
+			}
+			finally
+			{
+				CURRENT_ITEM_ID.remove();
+			}
+		}));
+	}
+
+	public static Properties defaultProperties()
+	{
+		Properties properties = new Properties();
+		ResourceKey<Item> itemId = CURRENT_ITEM_ID.get();
+		if(itemId!=null)
+			properties.setId(itemId);
+		return properties;
+	}
+
+	public static Properties defaultProperties(Identifier id)
+	{
+		return new Properties().setId(ResourceKey.create(Registries.ITEM, id));
 	}
 
 	private static <T extends Item> ItemRegObject<T> of(T existing)
@@ -430,7 +455,6 @@ public final class IEItems
 	// TODO replace by NFs DeferredItem?
 	public record ItemRegObject<T extends Item>(DeferredHolder<Item, T> regObject) implements Supplier<T>, ItemLike
 	{
-		@Override
 		@Nonnull
 		public T get()
 		{
@@ -438,7 +462,6 @@ public final class IEItems
 		}
 
 		@Nonnull
-		@Override
 		public Item asItem()
 		{
 			return regObject.get();

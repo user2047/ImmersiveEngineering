@@ -18,7 +18,6 @@ import malte0811.dualcodecs.DualCompositeMapCodecs;
 import malte0811.dualcodecs.DualMapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Optional;
 
@@ -28,18 +27,16 @@ public class RefineryRecipeSerializer extends IERecipeSerializer<RefineryRecipe>
 			IEDualCodecs.FLUID_STACK.fieldOf("result"), r -> r.output,
 			IEDualCodecs.SIZED_FLUID_INGREDIENT.fieldOf("input0"), r -> r.input0,
 			IEDualCodecs.SIZED_FLUID_INGREDIENT.optionalFieldOf("input1"), r -> Optional.ofNullable(r.input1),
-			DualCodecs.INGREDIENT.optionalFieldOf("catalyst", Ingredient.EMPTY), r -> r.catalyst,
+			DualCodecs.INGREDIENT.optionalFieldOf("catalyst"), r -> r.catalyst,
 			DualCodecs.INT.fieldOf("energy"), MultiblockRecipe::getBaseEnergy,
 			RefineryRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, RefineryRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.REFINERY.iconStack();

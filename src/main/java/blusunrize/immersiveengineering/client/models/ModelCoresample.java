@@ -23,15 +23,15 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
@@ -43,7 +43,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -79,7 +79,6 @@ public class ModelCoresample extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(
 			@Nullable BlockState coreState, @Nullable Direction side, @Nonnull RandomSource rand,
 			@Nonnull ModelData extraData, @Nullable RenderType layer
@@ -117,11 +116,11 @@ public class ModelCoresample extends BakedIEModel
 								if(b==Blocks.AIR)
 									b = mineral.background;
 								BlockState state = b.defaultBlockState();
-								BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state);
+								BakedModel model = ClientUtils.getBlockRenderer().getBlockModelShaper().getBlockModel(state);
 								textureOre.add(Pair.of(model.getParticleIcon(), weight));
 								pixelLength += weight;
 							}
-						BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(mineral.background.defaultBlockState());
+						BakedModel model = ClientUtils.getBlockRenderer().getBlockModelShaper().getBlockModel(mineral.background.defaultBlockState());
 						textureStone = model.getParticleIcon();
 					}
 				}
@@ -241,42 +240,36 @@ public class ModelCoresample extends BakedIEModel
 	{
 		float d = QuadLighter.calculateShade((float)normal.x, (float)normal.y, (float)normal.z, false);
 		BakedQuad quad = ModelUtils.createBakedQuad(
-				vertices, Direction.getNearest(normal.x, normal.y, normal.z), sprite, uvs, new float[]{d, d, d, 1}, false
+				vertices, Direction.getNearest((int)Math.signum(normal.x), (int)Math.signum(normal.y), (int)Math.signum(normal.z), Direction.NORTH), sprite, uvs, new float[]{d, d, d, 1}, false
 		);
 		out.add(quad);
 	}
 
-	@Override
 	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isCustomRenderer()
 	{
 		return false;
 	}
 
-	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
 		return null;
 	}
 
-	@Override
 	public ItemTransforms getTransforms()
 	{
 		return ItemTransforms.NO_TRANSFORMS;
 	}
 
-	@Override
 	public ItemOverrides getOverrides()
 	{
 		return overrideList;
@@ -286,7 +279,6 @@ public class ModelCoresample extends BakedIEModel
 	private final ItemOverrides overrideList = new ItemOverrides()
 	{
 		@Nullable
-		@Override
 		public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel worldIn, @Nullable LivingEntity entityIn, int unused)
 		{
 			List<RecipeHolder<MineralMix>> minerals = CoresampleItem.getMineralMixes(Minecraft.getInstance().level, stack);
@@ -295,7 +287,7 @@ public class ModelCoresample extends BakedIEModel
 				try
 				{
 					List<Identifier> cacheKey = minerals.stream()
-							.map(RecipeHolder::id)
+							.map(holder -> holder.id().identifier())
 							.toList();
 					return modelCache.get(cacheKey, () -> new ModelCoresample(
 							minerals.stream().map(RecipeHolder::value).toArray(MineralMix[]::new)
@@ -322,7 +314,6 @@ public class ModelCoresample extends BakedIEModel
 		transformationMap.put(ItemDisplayContext.GROUND, new Matrix4().scale(1.5, 1.5, 1.5).rotate(Math.toRadians(180), 1, 0, 0));
 	}
 
-	@Override
 	public boolean usesBlockLight()
 	{
 		return false;
@@ -330,7 +321,6 @@ public class ModelCoresample extends BakedIEModel
 
 	public static class RawCoresampleModel implements IUnbakedGeometry<RawCoresampleModel>
 	{
-		@Override
 		public BakedModel bake(IGeometryBakingContext owner, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides)
 		{
 			return new ModelCoresample(null);
@@ -341,7 +331,6 @@ public class ModelCoresample extends BakedIEModel
 	{
 		public static final Identifier LOCATION = IEApi.ieLoc("models/coresample");
 
-		@Override
 		public RawCoresampleModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext)
 		{
 			return new RawCoresampleModel();

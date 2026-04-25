@@ -9,6 +9,7 @@
 package blusunrize.immersiveengineering.common.util.inventory;
 
 import blusunrize.immersiveengineering.common.util.Utils;
+import blusunrize.immersiveengineering.common.util.NBTCompat;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -56,7 +57,6 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 	{
 		this.rawHandler = new ItemStackHandler(slotConstraints.size())
 		{
-			@Override
 			protected void onContentsChanged(int slot)
 			{
 				super.onContentsChanged(slot);
@@ -66,19 +66,16 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 		this.slotConstraints = slotConstraints;
 	}
 
-	@Override
 	public int getSlots()
 	{
 		return rawHandler.getSlots();
 	}
 
-	@Override
 	public @NotNull ItemStack getStackInSlot(int slot)
 	{
 		return rawHandler.getStackInSlot(slot);
 	}
 
-	@Override
 	@NotNull
 	public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)
 	{
@@ -87,7 +84,6 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 		return rawHandler.insertItem(slot, stack, simulate);
 	}
 
-	@Override
 	@NotNull
 	public ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
@@ -96,20 +92,17 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 		return rawHandler.extractItem(slot, amount, simulate);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return Math.min(64, rawHandler.getSlotLimit(slot));
 	}
 
-	@Override
 	public boolean isItemValid(int slot, @NotNull ItemStack stack)
 	{
 		// TODO may not be entirely correct
 		return rawHandler.isItemValid(slot, stack);
 	}
 
-	@Override
 	public void setStackInSlot(int slot, @NotNull ItemStack stack)
 	{
 		rawHandler.setStackInSlot(slot, stack);
@@ -117,12 +110,14 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 
 	public Tag serializeNBT(Provider provider)
 	{
-		return rawHandler.serializeNBT(provider);
+		var output = NBTCompat.createOutput(provider);
+		rawHandler.serialize(output);
+		return output.buildResult();
 	}
 
 	public void deserializeNBT(Provider provider, CompoundTag nbt)
 	{
-		rawHandler.deserializeNBT(provider, nbt);
+		rawHandler.deserialize(NBTCompat.createInput(provider, nbt));
 	}
 
 	public ItemStackHandler getRawHandler()
@@ -131,20 +126,17 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 	}
 
 	@Nonnull
-	@Override
 	public Iterator<ItemStack> iterator()
 	{
 		return new Iterator<>()
 		{
 			private int slot = 0;
 
-			@Override
 			public boolean hasNext()
 			{
 				return slot < getSlots();
 			}
 
-			@Override
 			public ItemStack next()
 			{
 				final ItemStack next = getStackInSlot(slot);

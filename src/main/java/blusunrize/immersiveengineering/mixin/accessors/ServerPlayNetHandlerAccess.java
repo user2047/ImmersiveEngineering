@@ -17,10 +17,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ServerPlayNetHandlerAccess extends PlayerUtils.ConnectionAccess
 {
 	@Accessor
-	@Override
 	void setClientIsFloating(boolean shouldFloat);
 
 	@Accessor
-	@Override
 	void setAboveGroundTickCount(int ticks);
 }

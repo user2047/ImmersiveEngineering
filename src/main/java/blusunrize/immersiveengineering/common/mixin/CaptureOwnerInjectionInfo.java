@@ -25,7 +25,6 @@ public class CaptureOwnerInjectionInfo extends InjectionInfo
 		super(mixin, method, annotation);
 	}
 
-	@Override
 	protected Injector parseInjector(AnnotationNode injectAnnotation)
 	{
 		return new CaptureOwnerInjector(this);

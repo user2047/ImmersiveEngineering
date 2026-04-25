@@ -28,13 +28,11 @@ public class BottlingMachineRecipeSerializer extends IERecipeSerializer<Bottling
 			BottlingMachineRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, BottlingMachineRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.BOTTLING_MACHINE.iconStack();

@@ -50,37 +50,32 @@ public class SplitConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<SplitConveyor> getType()
 	{
 		return TYPE;
 	}
 
-	@Override
 	public ConveyorDirection getConveyorDirection()
 	{
 		return ConveyorDirection.HORIZONTAL;
 	}
 
-	@Override
 	public boolean changeConveyorDirection()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean setConveyorDirection(ConveyorDirection dir)
 	{
 		return false;
 	}
 
-	@Override
 	public void handleInsertion(ItemEntity entity, ConveyorDirection conDir, double distX, double distZ)
 	{
 		String nbtKey = "immersiveengineering:conveyorDir"+Integer.toHexString(getBlockEntity().getBlockPos().hashCode());
-		if(entity.getPersistentData().contains(nbtKey, Tag.TAG_INT))
+		if(entity.getPersistentData().contains(nbtKey))
 		{
-			Direction redirect = Direction.values()[entity.getPersistentData().getInt(nbtKey)];
+			Direction redirect = Direction.values()[entity.getPersistentData().getIntOr(nbtKey, 0)];
 			BlockPos nextPos = getBlockEntity().getBlockPos().relative(redirect);
 			double distNext = Math.abs((redirect.getAxis()==Axis.Z?nextPos.getZ(): nextPos.getX())+.5-(redirect.getAxis()==Axis.Z?entity.getZ(): entity.getX()));
 			BlockEntity inventoryTile = getBlockEntity().getLevel().getBlockEntity(nextPos);
@@ -89,7 +84,6 @@ public class SplitConveyor extends ConveyorBase
 		}
 	}
 
-	@Override
 	public void onEntityCollision(@Nonnull Entity entity)
 	{
 		if(!isActive())
@@ -98,8 +92,8 @@ public class SplitConveyor extends ConveyorBase
 		if(entity.isAlive())
 		{
 			String nbtKey = "immersiveengineering:conveyorDir"+Integer.toHexString(getBlockEntity().getBlockPos().hashCode());
-			if(entity.getPersistentData().contains(nbtKey, Tag.TAG_INT))
-				redirect = Direction.values()[entity.getPersistentData().getInt(nbtKey)];
+			if(entity.getPersistentData().contains(nbtKey))
+				redirect = Direction.values()[entity.getPersistentData().getIntOr(nbtKey, 0)];
 			else
 			{
 				redirect = getOutputFace();
@@ -128,20 +122,18 @@ public class SplitConveyor extends ConveyorBase
 		}
 	}
 
-	@Override
 	public Direction[] sigTransportDirections()
 	{
 		return new Direction[]{getFacing().getClockWise(), getFacing().getCounterClockWise()};
 	}
 
-	@Override
 	public Vec3 getDirection(Entity entity, boolean outputBlocked)
 	{
 		Vec3 vec = super.getDirection(entity, outputBlocked);
 		String nbtKey = "immersiveengineering:conveyorDir"+Integer.toHexString(getBlockEntity().getBlockPos().hashCode());
-		if(!entity.getPersistentData().contains(nbtKey, Tag.TAG_INT))
+		if(!entity.getPersistentData().contains(nbtKey))
 			return vec;
-		Direction redirect = Direction.from3DDataValue(entity.getPersistentData().getInt(nbtKey));
+		Direction redirect = Direction.from3DDataValue(entity.getPersistentData().getIntOr(nbtKey, 0));
 		BlockPos wallPos = getBlockEntity().getBlockPos().relative(getFacing());
 		double distNext = Math.abs((getFacing().getAxis()==Axis.Z?wallPos.getZ(): wallPos.getX())+.5-(getFacing().getAxis()==Axis.Z?entity.getZ(): entity.getX()));
 		if(distNext < 1.33)
@@ -154,7 +146,6 @@ public class SplitConveyor extends ConveyorBase
 		return vec;
 	}
 
-	@Override
 	public CompoundTag writeConveyorNBT()
 	{
 		CompoundTag nbt = super.writeConveyorNBT();
@@ -162,14 +153,12 @@ public class SplitConveyor extends ConveyorBase
 		return nbt;
 	}
 
-	@Override
 	public void readConveyorNBT(CompoundTag nbt)
 	{
 		super.readConveyorNBT(nbt);
-		nextOutputLeft = nbt.getBoolean("nextLeft");
+		nextOutputLeft = nbt.getBooleanOr("nextLeft", false);
 	}
 
-	@Override
 	public List<BlockPos> getNextConveyorCandidates()
 	{
 		BlockPos baseOutput = getBlockEntity().getBlockPos().relative(getOutputFace());
@@ -179,7 +168,6 @@ public class SplitConveyor extends ConveyorBase
 		);
 	}
 
-	@Override
 	public boolean isOutputBlocked()
 	{
 		// Consider the belt blocked if at least one of the possible outputs is blocked

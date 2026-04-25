@@ -47,6 +47,11 @@ public class TargetingInfo
 
 	public static TargetingInfo readFromNBT(CompoundTag tag)
 	{
-		return new TargetingInfo(Direction.from3DDataValue(tag.getInt("side")), tag.getFloat("hitX"), tag.getFloat("hitY"), tag.getFloat("hitZ"));
+		return new TargetingInfo(
+				Direction.from3DDataValue(tag.getIntOr("side", 0)),
+				tag.getFloatOr("hitX", 0),
+				tag.getFloatOr("hitY", 0),
+				tag.getFloatOr("hitZ", 0)
+		);
 	}
 }

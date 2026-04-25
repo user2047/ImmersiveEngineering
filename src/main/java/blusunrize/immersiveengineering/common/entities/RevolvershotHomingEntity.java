@@ -52,12 +52,11 @@ public class RevolvershotHomingEntity extends RevolvershotEntity
 		super(type, world, living, ax, ay, az, type1, Unit.INSTANCE);
 	}
 
-	@Override
 	public void tick()
 	{
 		super.tick();
 
-		if(!level().isClientSide&&this.tickCount > trackCountdown)
+		if(!level().isClientSide()&&this.tickCount > trackCountdown)
 		{
 			LivingEntity target = getTarget();
 			if(target!=null)

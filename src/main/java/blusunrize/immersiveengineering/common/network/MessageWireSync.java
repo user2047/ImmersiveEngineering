@@ -41,7 +41,6 @@ public record MessageWireSync(SyncedConnection connection, Operation operation) 
 		this(new SyncedConnection(conn), operation);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -87,7 +86,6 @@ public record MessageWireSync(SyncedConnection connection, Operation operation) 
 		private static final Operation[] VALUES = values();
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

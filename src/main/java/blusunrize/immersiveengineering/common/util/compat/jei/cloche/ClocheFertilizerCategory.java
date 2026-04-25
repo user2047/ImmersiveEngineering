@@ -40,15 +40,13 @@ public class ClocheFertilizerCategory extends IERecipeCategory<ClocheFertilizer>
 		));
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, ClocheFertilizer recipe, IFocusGroup focuses)
 	{
 			builder.addSlot(RecipeIngredientRole.INPUT, 33, 13)
-					.addItemStack(recipe.input.getItems()[0])
+					.addItemStack(net.minecraft.world.item.ItemStack.EMPTY)
 					.setBackground(JEIHelper.slotDrawable, -1, -1);
 	}
 
-	@Override
 	public void draw(ClocheFertilizer recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		graphics.pose().pushPose();

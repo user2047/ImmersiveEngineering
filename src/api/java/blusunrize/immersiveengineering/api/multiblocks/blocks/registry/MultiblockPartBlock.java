@@ -18,9 +18,11 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockS
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.ShapeType;
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -34,8 +36,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -99,9 +101,9 @@ public class MultiblockPartBlock<State extends IMultiblockState> extends Block i
 	{
 		if(state.getValue(IEProperties.MULTIBLOCKSLAVE))
 			return null;
-		if(level.isClientSide&&needsClientTicker)
+		if(level.isClientSide()&&needsClientTicker)
 			return createTickerHelper(actual, ($1, $2, $3, blockEntity) -> blockEntity.getHelper().tickClient());
-		if(!level.isClientSide&&needsServerTicker)
+		if(!level.isClientSide()&&needsServerTicker)
 			return createTickerHelper(actual, ($1, $2, $3, blockEntity) -> blockEntity.getHelper().tickServer());
 		return null;
 	}
@@ -158,27 +160,9 @@ public class MultiblockPartBlock<State extends IMultiblockState> extends Block i
 			return Shapes.block();
 	}
 
-	@Override
-	public void onRemove(BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, BlockState newState, boolean isMoving)
-	{
-		if(state.getBlock()!=newState.getBlock())
-		{
-			BlockEntity blockEntity = level.getBlockEntity(pos);
-			if(blockEntity instanceof IMultiblockBE<?> multiblockBE)
-			{
-				// Remove the BE here before disassembling: The block is already gone, so setting the block state here
-				// to a block providing a BE will produce strange results otherwise
-				super.onRemove(state, level, pos, newState, isMoving);
-				multiblockBE.getHelper().disassemble();
-				return;
-			}
-		}
-		super.onRemove(state, level, pos, newState, isMoving);
-	}
-
 	@Nonnull
 	@Override
-	public ItemInteractionResult useItemOn(
+	public InteractionResult useItemOn(
 			@Nonnull ItemStack stack,
 			@Nonnull BlockState state,
 			@Nonnull Level level,
@@ -192,11 +176,18 @@ public class MultiblockPartBlock<State extends IMultiblockState> extends Block i
 		if(bEntity instanceof IMultiblockBE<?> multiblockBE)
 			return multiblockBE.getHelper().click(player, hand, hit);
 		else
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 	}
 
 	@Override
-	public void entityInside(@Nonnull BlockState state, Level level, @Nonnull BlockPos pos, @Nonnull Entity entity)
+	public void entityInside(
+			@Nonnull BlockState state,
+			Level level,
+			@Nonnull BlockPos pos,
+			@Nonnull Entity entity,
+			@Nonnull InsideBlockEffectApplier effectApplier,
+			boolean isInside
+	)
 	{
 		final BlockEntity bEntity = level.getBlockEntity(pos);
 		if(bEntity instanceof IMultiblockBE<?> multiblockBE)
@@ -212,11 +203,11 @@ public class MultiblockPartBlock<State extends IMultiblockState> extends Block i
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public int getAnalogOutputSignal(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos)
+	public int getAnalogOutputSignal(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nullable Direction side)
 	{
 		if(multiblock.hasComparatorOutput()&&level.getBlockEntity(pos) instanceof IMultiblockBE<?> multiblockBE)
 			return multiblockBE.getHelper().getComparatorValue();
-		return super.getAnalogOutputSignal(state, level, pos);
+		return super.getAnalogOutputSignal(state, level, pos, side);
 	}
 
 	@Override
@@ -225,17 +216,17 @@ public class MultiblockPartBlock<State extends IMultiblockState> extends Block i
 			@Nonnull Level level,
 			@Nonnull BlockPos pos,
 			@Nonnull Block block,
-			@Nonnull BlockPos fromPos,
+			@Nullable Orientation orientation,
 			boolean isMoving
 	)
 	{
-		super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+		super.neighborChanged(state, level, pos, block, orientation, isMoving);
 		if(multiblock.redstoneInputAware()&&level.getBlockEntity(pos) instanceof IMultiblockBE<?> multiblockBE)
-			multiblockBE.getHelper().onNeighborChanged(fromPos);
+			multiblockBE.getHelper().onNeighborChanged(pos);
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player)
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData)
 	{
 		if(level.getBlockEntity(pos) instanceof IMultiblockBE<?> multiblockBE)
 			return multiblockBE.getHelper().getPickBlock();

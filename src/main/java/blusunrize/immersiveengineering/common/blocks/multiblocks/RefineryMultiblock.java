@@ -20,7 +20,6 @@ public class RefineryMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.REFINERY);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 13;

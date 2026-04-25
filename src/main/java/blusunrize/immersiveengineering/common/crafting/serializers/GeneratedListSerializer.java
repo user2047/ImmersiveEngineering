@@ -36,13 +36,11 @@ public class GeneratedListSerializer extends IERecipeSerializer<GeneratedListRec
 			CODEC, STREAM_CODEC
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, GeneratedListRecipe<?, ?>> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(Misc.WIRE_COILS.get(WireType.COPPER));

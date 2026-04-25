@@ -39,7 +39,7 @@ public class WireCollisions
 {
 	public static void handleEntityCollision(BlockPos p, Entity e)
 	{
-		if(!e.level().isClientSide&&IEServerConfig.WIRES.enableWireDamage.get()&&e instanceof LivingEntity living&&
+		if(!e.level().isClientSide()&&IEServerConfig.WIRES.enableWireDamage.get()&&e instanceof LivingEntity living&&
 				!(e instanceof Player player&&player.getAbilities().invulnerable))
 		{
 			GlobalWireNetwork global = GlobalWireNetwork.getNetwork(e.level());
@@ -62,7 +62,7 @@ public class WireCollisions
 
 	public static void notifyBlockUpdate(@Nonnull Level worldIn, @Nonnull BlockPos pos, @Nonnull BlockState newState, int flags)
 	{
-		if(IEServerConfig.WIRES.blocksBreakWires.get()&&!worldIn.isClientSide&&(flags&1)!=0&&!newState.getCollisionShape(worldIn, pos).isEmpty())
+		if(IEServerConfig.WIRES.blocksBreakWires.get()&&!worldIn.isClientSide()&&(flags&1)!=0&&!newState.getCollisionShape(worldIn, pos).isEmpty())
 		{
 			GlobalWireNetwork globalNet = GlobalWireNetwork.getNetwork(worldIn);
 			Collection<CollisionInfo> data = globalNet.getCollisionData().getCollisionInfo(pos);

@@ -14,6 +14,8 @@ import blusunrize.immersiveengineering.common.entities.*;
 import blusunrize.immersiveengineering.common.entities.illager.Bulwark;
 import blusunrize.immersiveengineering.common.entities.illager.Commando;
 import blusunrize.immersiveengineering.common.entities.illager.Fusilier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityType.Builder;
@@ -120,6 +122,8 @@ public class IEEntityTypes
 	private static <T extends Entity>
 	DeferredHolder<EntityType<?>, EntityType<T>> register(String name, Supplier<Builder<T>> prepare)
 	{
-		return REGISTER.register(name, () -> prepare.get().build(ImmersiveEngineering.MODID+":"+name));
+		return REGISTER.register(name, () -> prepare.get().build(ResourceKey.create(
+				Registries.ENTITY_TYPE, ImmersiveEngineering.rl(name)
+		)));
 	}
 }

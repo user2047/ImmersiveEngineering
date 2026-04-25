@@ -17,11 +17,11 @@ import blusunrize.immersiveengineering.common.blocks.metal.*;
 import blusunrize.immersiveengineering.common.blocks.wooden.*;
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.util.VanillaFurnaceHeater;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(bus = Bus.MOD, modid = Lib.MODID)
+@EventBusSubscriber(modid = Lib.MODID)
 public class BlockCapabilityRegistration
 {
 	@SubscribeEvent
@@ -91,10 +91,10 @@ public class BlockCapabilityRegistration
 	{
 		return new BECapabilityRegistrar<>()
 		{
-			@Override
-			public <C, T> void register(BlockCapability<T, C> capability, ICapabilityProvider<? super BE, C, T> provider)
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			public void register(BlockCapability capability, BECapabilityProvider<? super BE> provider)
 			{
-				ev.registerBlockEntity(capability, type.get(), provider);
+				ev.registerBlockEntity(capability, type.get(), (be, ctx) -> provider.getCapability(be, (Direction)ctx));
 			}
 		};
 	}
@@ -105,29 +105,38 @@ public class BlockCapabilityRegistration
 	{
 		return new BECapabilityRegistrar<>()
 		{
-			@Override
-			public <C, T> void register(BlockCapability<T, C> capability, ICapabilityProvider<? super BE, C, T> provider)
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			public void register(BlockCapability capability, BECapabilityProvider<? super BE> provider)
 			{
-				ev.registerBlockEntity(capability, type.dummy(), provider);
-				ev.registerBlockEntity(capability, type.master(), provider);
+				ev.registerBlockEntity(capability, type.dummy(), (be, ctx) -> provider.getCapability(be, (Direction)ctx));
+				ev.registerBlockEntity(capability, type.master(), (be, ctx) -> provider.getCapability(be, (Direction)ctx));
 			}
 		};
 	}
 
 	public interface BECapabilityRegistrar<BE>
 	{
-		<C, T> void register(BlockCapability<T, C> capability, ICapabilityProvider<? super BE, C, T> provider);
+		@SuppressWarnings("rawtypes")
+		void register(BlockCapability capability, BECapabilityProvider<? super BE> provider);
 
-		default <C, T> void registerOnContext(
-				BlockCapability<T, C> capability, Function<? super BE, T> getValue, C onContext
+		@SuppressWarnings("rawtypes")
+		default void registerOnContext(
+				BlockCapability capability, Function<? super BE, ?> getValue, Object onContext
 		)
 		{
 			register(capability, (be, ctx) -> Objects.equals(onContext, ctx)?getValue.apply(be): null);
 		}
 
-		default <T> void registerAllContexts(BlockCapability<T, ?> capability, Function<? super BE, T> getValue)
+		@SuppressWarnings("rawtypes")
+		default void registerAllContexts(BlockCapability capability, Function<? super BE, ?> getValue)
 		{
 			register(capability, (be, ctx) -> getValue.apply(be));
 		}
+	}
+
+	@FunctionalInterface
+	public interface BECapabilityProvider<BE>
+	{
+		Object getCapability(BE be, Direction context);
 	}
 }

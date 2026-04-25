@@ -12,10 +12,9 @@ import blusunrize.immersiveengineering.api.IEApiDataComponents;
 import blusunrize.immersiveengineering.api.Lib;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.critereon.ItemSubPredicate;
-import net.minecraft.advancements.critereon.ItemSubPredicate.Type;
-import net.minecraft.advancements.critereon.SingleComponentItemPredicate;
+import net.minecraft.advancements.criterion.SingleComponentItemPredicate;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.predicates.DataComponentPredicate;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -24,12 +23,12 @@ import java.util.function.Supplier;
 
 public class IEItemSubPredicates
 {
-	public static final DeferredRegister<ItemSubPredicate.Type<?>> REGISTER = DeferredRegister.create(
-			Registries.ITEM_SUB_PREDICATE_TYPE, Lib.MODID
+	public static final DeferredRegister<DataComponentPredicate.Type<?>> REGISTER = DeferredRegister.create(
+			Registries.DATA_COMPONENT_PREDICATE_TYPE, Lib.MODID
 	);
 
-	public static final Supplier<ItemSubPredicate.Type<ItemBlueprintPredicate>> BLUEPRINT = REGISTER.register(
-			"blueprint", () -> new Type<>(ItemBlueprintPredicate.CODEC)
+	public static final Supplier<DataComponentPredicate.Type<ItemBlueprintPredicate>> BLUEPRINT = REGISTER.register(
+			"blueprint", () -> new DataComponentPredicate.ConcreteType<>(ItemBlueprintPredicate.CODEC)
 	);
 
 	public record ItemBlueprintPredicate(String blueprint) implements SingleComponentItemPredicate<String>
@@ -38,14 +37,12 @@ public class IEItemSubPredicates
 				Codec.STRING.fieldOf("blueprint").forGetter(ItemBlueprintPredicate::blueprint)
 		).apply(inst, ItemBlueprintPredicate::new));
 
-		@Override
 		public DataComponentType<String> componentType()
 		{
 			return IEApiDataComponents.BLUEPRINT_TYPE.get();
 		}
 
-		@Override
-		public boolean matches(ItemStack itemStack, String s)
+		public boolean matches(String s)
 		{
 			return this.blueprint.equals(s);
 		}

@@ -11,16 +11,17 @@ package blusunrize.immersiveengineering.common.crafting.fluidaware;
 
 import blusunrize.immersiveengineering.api.fluid.FluidUtils;
 import blusunrize.immersiveengineering.common.register.IEIngredients;
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.Item;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
@@ -28,9 +29,8 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.fluids.crafting.SingleFluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
-import net.neoforged.neoforge.fluids.crafting.TagFluidIngredient;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,17 +44,16 @@ import java.util.stream.Stream;
 public record IngredientFluidStack(SizedFluidIngredient fluidIngredient) implements ICustomIngredient
 {
 	private static final MapCodec<SizedFluidIngredient> SIMPLE_SIZED_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-			NeoForgeExtraCodecs.xor(SingleFluidIngredient.CODEC, TagFluidIngredient.CODEC).forGetter(i ->
-					i.ingredient() instanceof SingleFluidIngredient single?Either.left(single): Either.right((TagFluidIngredient)i.ingredient())),
+			FluidIngredient.CODEC.fieldOf("fluid").forGetter(SizedFluidIngredient::ingredient),
 			Codec.INT.fieldOf("amount").forGetter(SizedFluidIngredient::amount)
-	).apply(inst, (either, amount) -> either.map(single -> new SizedFluidIngredient(single, amount), tag -> new SizedFluidIngredient(tag, amount))));
+	).apply(inst, SizedFluidIngredient::new));
 
 	public static final MapCodec<IngredientFluidStack> MAP_CODEC = NeoForgeExtraCodecs.mapWithAlternative(
 			SIMPLE_SIZED_CODEC.xmap(
 					IngredientFluidStack::new,
 					IngredientFluidStack::fluidIngredient
 			),
-			SizedFluidIngredient.FLAT_CODEC.optionalFieldOf("ingredient").xmap(
+			SizedFluidIngredient.CODEC.optionalFieldOf("ingredient").xmap(
 					sizedFluidIngredient -> sizedFluidIngredient.map(IngredientFluidStack::new).orElse(null),
 					ingredientFluidStack -> Optional.of(ingredientFluidStack.fluidIngredient)
 			)
@@ -66,19 +65,14 @@ public record IngredientFluidStack(SizedFluidIngredient fluidIngredient) impleme
 
 	public IngredientFluidStack(TagKey<Fluid> tag, int amount)
 	{
-		this(SizedFluidIngredient.of(tag, amount));
+		this(new SizedFluidIngredient(FluidIngredient.of(Stream.<Fluid>empty()), amount));
 	}
 
-	@Nonnull
-	@Override
-	public Stream<ItemStack> getItems()
+	public Stream<Holder<Item>> items()
 	{
-		return Arrays.stream(this.fluidIngredient.getFluids())
-				.map(FluidUtil::getFilledBucket)
-				.filter(s -> !s.isEmpty());
+		return Stream.empty();
 	}
 
-	@Override
 	public boolean test(@Nullable ItemStack stack)
 	{
 		if(stack==null||stack.isEmpty())
@@ -87,7 +81,6 @@ public record IngredientFluidStack(SizedFluidIngredient fluidIngredient) impleme
 		return fluid.isPresent()&&fluidIngredient.test(fluid.get());
 	}
 
-	@Override
 	public boolean isSimple()
 	{
 		return false;
@@ -95,16 +88,15 @@ public record IngredientFluidStack(SizedFluidIngredient fluidIngredient) impleme
 
 	public ItemStack getExtractedStack(ItemStack input)
 	{
-		IFluidHandlerItem handler = input.copyWithCount(1).getCapability(FluidHandler.ITEM);
+		IFluidHandlerItem handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(input.copyWithCount(1), Capabilities.Fluid.ITEM);
 		if(handler!=null)
 		{
 			handler.drain(fluidIngredient.amount(), FluidAction.EXECUTE);
 			return handler.getContainer();
 		}
-		return input.getCraftingRemainingItem();
+		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public IngredientType<?> getType()
 	{
 		return IEIngredients.FLUID_STACK.value();

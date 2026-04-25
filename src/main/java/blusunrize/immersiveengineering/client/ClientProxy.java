@@ -19,21 +19,9 @@ import blusunrize.immersiveengineering.api.utils.SetRestrictedField;
 import blusunrize.immersiveengineering.client.gui.*;
 import blusunrize.immersiveengineering.client.manual.ManualElementBlueprint;
 import blusunrize.immersiveengineering.client.manual.ManualElementMultiblock;
-import blusunrize.immersiveengineering.client.models.ModelConfigurableSides;
-import blusunrize.immersiveengineering.client.models.ModelConveyor.ConveyorLoader;
-import blusunrize.immersiveengineering.client.models.ModelCoresample;
-import blusunrize.immersiveengineering.client.models.ModelCoresample.CoresampleLoader;
-import blusunrize.immersiveengineering.client.models.ModelPowerpack;
-import blusunrize.immersiveengineering.client.models.PotionBucketModel;
-import blusunrize.immersiveengineering.client.models.PotionBucketModel.Loader;
-import blusunrize.immersiveengineering.client.models.connection.FeedthroughLoader;
-import blusunrize.immersiveengineering.client.models.connection.FeedthroughModel;
-import blusunrize.immersiveengineering.client.models.mirror.MirroredModelLoader;
-import blusunrize.immersiveengineering.client.models.obj.IEOBJLoader;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.*;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.*;
-import blusunrize.immersiveengineering.client.models.split.SplitModelLoader;
 import blusunrize.immersiveengineering.client.render.ConnectionRenderer;
 import blusunrize.immersiveengineering.client.render.IEBipedLayerRenderer;
 import blusunrize.immersiveengineering.client.render.conveyor.RedstoneConveyorRender;
@@ -68,22 +56,24 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
 import net.minecraft.client.renderer.entity.*;
-import net.minecraft.client.resources.PlayerSkin.Model;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -91,10 +81,10 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers;
+import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Arrays;
@@ -106,9 +96,19 @@ import static blusunrize.immersiveengineering.ImmersiveEngineering.MODID;
 import static blusunrize.immersiveengineering.ImmersiveEngineering.rl;
 import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = MODID, bus = Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = MODID)
 public class ClientProxy extends CommonProxy
 {
+	private static final UnbakedModel EMPTY_PORT_MODEL = new UnbakedModel()
+	{
+		@Override
+		public UnbakedGeometry geometry()
+		{
+			return UnbakedGeometry.EMPTY;
+		}
+	};
+	private static final UnbakedModelLoader<UnbakedModel> EMPTY_PORT_MODEL_LOADER = ($json, $context) -> EMPTY_PORT_MODEL;
+
 	public static void modConstruction()
 	{
 		IEOBJCallbacks.register(rl("default"), DefaultCallback.INSTANCE);
@@ -158,9 +158,7 @@ public class ClientProxy extends CommonProxy
 
 		ClientEventHandler handler = new ClientEventHandler();
 		NeoForge.EVENT_BUS.register(handler);
-		ReloadableResourceManager reloadableManager = (ReloadableResourceManager)mc().getResourceManager();
-		reloadableManager.registerReloadListener(handler);
-		reloadableManager.registerReloadListener(new ConnectionRenderer());
+		// MC 26 freezes the reload listener list before this fallback path runs.
 	}
 
 	@SubscribeEvent
@@ -170,45 +168,31 @@ public class ClientProxy extends CommonProxy
 	}
 
 	@SubscribeEvent
-	public static void registerModelLoaders(ModelEvent.RegisterGeometryLoaders ev)
+	public static void registerModelLoaders(ModelEvent.RegisterLoaders ev)
 	{
-		ev.register(IEOBJLoader.LOADER_NAME, IEOBJLoader.instance);
-		ev.register(ModelConfigurableSides.Loader.NAME, new ModelConfigurableSides.Loader());
-		ev.register(ConveyorLoader.LOCATION, new ConveyorLoader());
-		ev.register(CoresampleLoader.LOCATION, new CoresampleLoader());
-		ev.register(FeedthroughLoader.LOCATION, new FeedthroughLoader());
-		ev.register(SplitModelLoader.LOCATION, new SplitModelLoader());
-		ev.register(Loader.LOADER_NAME, new PotionBucketModel.Loader());
-		ev.register(MirroredModelLoader.ID, new MirroredModelLoader());
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("ie_obj"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("conf_sides"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("models/conveyor"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("models/coresample"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("feedthrough"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("basic_split"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("potion_bucket"));
+		registerEmptyPortModelLoader(ev, IEApi.ieLoc("mirror"));
+		registerEmptyPortModelLoader(ev, Identifier.fromNamespaceAndPath("neoforge", "fluid_container"));
+	}
 
-		ArcFurnaceRenderer.ELECTRODES = new DynamicModel(ArcFurnaceRenderer.NAME);
-		AutoWorkbenchRenderer.DYNAMIC = new DynamicModel(AutoWorkbenchRenderer.NAME);
-		BottlingMachineRenderer.DYNAMIC = new DynamicModel(BottlingMachineRenderer.NAME);
-		BucketWheelRenderer.WHEEL = new DynamicModel(BucketWheelRenderer.NAME);
-		CrusherRenderer.BARREL_LEFT = new DynamicModel(CrusherRenderer.NAME_LEFT);
-		CrusherRenderer.BARREL_RIGHT = new DynamicModel(CrusherRenderer.NAME_RIGHT);
-		SawmillRenderer.BLADE = new DynamicModel(SawmillRenderer.NAME);
-		DieselGeneratorRenderer.FAN = new DynamicModel(DieselGeneratorRenderer.NAME);
-		MetalPressRenderer.PISTON = new DynamicModel(MetalPressRenderer.NAME);
-		MixerRenderer.AGITATOR = new DynamicModel(MixerRenderer.NAME);
-		SampleDrillRenderer.DRILL = new DynamicModel(SampleDrillRenderer.NAME);
-		SqueezerRenderer.PISTON = new DynamicModel(SqueezerRenderer.NAME);
-		WatermillRenderer.MODEL = new DynamicModel(WatermillRenderer.NAME);
-		WindmillRenderer.MODEL = new DynamicModel(WindmillRenderer.NAME);
-		RedstoneConveyorRender.MODEL_PANEL = new DynamicModel(RedstoneConveyorRender.MODEL_NAME);
-		SawbladeRenderer.MODEL = new DynamicModel(SawbladeRenderer.NAME);
-		BlastFurnacePreheaterRenderer.MODEL = new DynamicModel(BlastFurnacePreheaterRenderer.NAME);
-		TurretRenderer.fillModels();
-		BasicClientProperties.initModels();
+	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)
+	{
+		ev.register(id, EMPTY_PORT_MODEL_LOADER);
 	}
 
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent ev)
 	{
-		if(IEClientConfig.stencilBufferEnabled.get())
-			ev.enqueueWork(() -> Minecraft.getInstance().getMainRenderTarget().enableStencil());
-
-		IEManual.addIEManualEntries();
+		if(!ManualHelper.IE_MANUAL_INSTANCE.isInitialized())
+			initWithMC();
+		if(Minecraft.getInstance().getResourceManager().getResource(IEApi.ieLoc("manual/mineral_deposits.json")).isPresent())
+			IEManual.addIEManualEntries();
 		// TODO probably data driven now?
 		//IEBannerPatterns.ALL_BANNERS.forEach(entry -> {
 		//	for(var key : entry.patterns())
@@ -229,7 +213,7 @@ public class ClientProxy extends CommonProxy
 	@SubscribeEvent
 	public static void textureStichPost(TextureAtlasStitchedEvent event)
 	{
-		if(!event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS))
+		if(!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS))
 			return;
 		ImmersiveEngineering.proxy.clearRenderCaches();
 		RevolverCallbacks.retrieveRevolverTextures(event.getAtlas());
@@ -237,14 +221,13 @@ public class ClientProxy extends CommonProxy
 
 	private final Map<BlockPos, IEBlockEntitySound> tileSoundMap = new HashMap<>();
 
-	@Override
 	public void handleTileSound(
 			Holder<SoundEvent> soundEvent, BlockEntity tile, boolean tileActive, float volume, float pitch
 	)
 	{
 		BlockPos pos = tile.getBlockPos();
 		IEBlockEntitySound sound = tileSoundMap.get(pos);
-		if((sound==null||!soundEvent.value().getLocation().equals(sound.getLocation()))&&tileActive)
+		if((sound==null||!soundEvent.value().location().equals(sound.getLocation()))&&tileActive)
 		{
 			if(sound!=null)
 				stopTileSound(null, tile);
@@ -284,46 +267,40 @@ public class ClientProxy extends CommonProxy
 		for(var entityType : BuiltInRegistries.ENTITY_TYPE)
 		{
 			var render = ev.getRenderer(entityType);
-			if(render instanceof HumanoidMobRenderer<?, ?> hmr)
-				addIELayer(hmr, ev.getEntityModels());
-			else if(render instanceof ArmorStandRenderer asr)
-				addIELayer(asr, ev.getEntityModels());
-		}
-		for(Model skin : ev.getSkins())
-		{
-			EntityRenderer<? extends Player> render = ev.getSkin(skin);
-			if(render instanceof LivingEntityRenderer<?, ?> livingRenderer)
-				addIELayer(livingRenderer, ev.getEntityModels());
-		}
+		if(render instanceof LivingEntityRenderer<?, ?, ?> livingRenderer)
+			addIELayer(livingRenderer, ev.getEntityModels());
 	}
-
-	private static <T extends LivingEntity, M extends EntityModel<T>>
-	void addIELayer(LivingEntityRenderer<T, M> render, EntityModelSet models)
+	for(PlayerModelType skin : ev.getSkins())
 	{
-		render.addLayer(new IEBipedLayerRenderer<>(render, models));
+		EntityRenderer<? extends Player, ?> render = ev.getPlayerRenderer(skin);
+		if(render instanceof LivingEntityRenderer<?, ?, ?> livingRenderer)
+			addIELayer(livingRenderer, ev.getEntityModels());
+	}
 	}
 
-	@Override
+	private static <S extends net.minecraft.client.renderer.entity.state.LivingEntityRenderState, M extends EntityModel<? super S>>
+	void addIELayer(LivingEntityRenderer<?, S, M> render, EntityModelSet models)
+	{
+		render.addLayer(new IEBipedLayerRenderer(render, models));
+	}
+
 	public Level getClientWorld()
 	{
 		return mc().level;
 	}
 
-	@Override
 	public Player getClientPlayer()
 	{
 		return mc().player;
 	}
 
-	@Override
 	public void reInitGui()
 	{
 		Screen currentScreen = mc().screen;
 		if(currentScreen instanceof IEContainerScreen)
-			currentScreen.init(mc(), currentScreen.width, currentScreen.height);
+			((IEContainerScreen<?>)currentScreen).fullInit();
 	}
 
-	@Override
 	public void resetManual()
 	{
 		if(mc().screen instanceof ManualScreen)
@@ -338,33 +315,28 @@ public class ClientProxy extends CommonProxy
 		IEApi.renderCacheClearers.add(WatermillRenderer::reset);
 		IEApi.renderCacheClearers.add(WindmillRenderer::reset);
 		IEApi.renderCacheClearers.add(BucketWheelRenderer::reset);
-		IEApi.renderCacheClearers.add(ModelCoresample::clearCache);
-		IEApi.renderCacheClearers.add(ModelPowerpack.CATENARY_DATA_CACHE::invalidateAll);
-		IEApi.renderCacheClearers.add(FeedthroughModel.CACHE::invalidateAll);
+		// TODO 1.26 port: Re-enable these once IE's custom baked model wrappers are
+		// migrated to Minecraft's BlockStateModelPart/ItemModel rendering API.
 		IEApi.renderCacheClearers.add(ConnectionRenderer::resetCache);
 	}
 
-	@Override
 	public void clearRenderCaches()
 	{
 		for(Runnable r : IEApi.renderCacheClearers)
 			r.run();
 	}
 
-	@Override
 	public void startSkyhookSound(SkylineHookEntity hook)
 	{
 		Minecraft.getInstance().getSoundManager().play(new SkyhookSound(hook,
 				IEApi.ieLoc("skyhook")));
 	}
 
-	@Override
 	public void openManual()
 	{
 		Minecraft.getInstance().setScreen(ManualHelper.getManual().getGui());
 	}
 
-	@Override
 	public void openTileScreen(String guiId, BlockEntity tileEntity)
 	{
 		if(guiId.equals(Lib.GUIID_RedstoneConnector)&&tileEntity instanceof ConnectorRedstoneBlockEntity)
@@ -412,7 +384,7 @@ public class ClientProxy extends CommonProxy
 		registerEntityRenderingHandler(event, IEEntityTypes.CRATE_MINECART, IEMinecartRenderer.provide(IEModelLayers.CRATE_MINECART));
 		registerEntityRenderingHandler(event, IEEntityTypes.REINFORCED_CRATE_CART, IEMinecartRenderer.provide(IEModelLayers.REINFORCED_CRATE_CART));
 		registerEntityRenderingHandler(event, IEEntityTypes.METAL_BARREL_CART, IEMinecartRenderer.provide(IEModelLayers.METAL_BARREL_CART));
-		registerEntityRenderingHandler(event, IEEntityTypes.SAWBLADE, SawbladeRenderer::new);
+		registerEntityRenderingHandler(event, IEEntityTypes.SAWBLADE, NoneRenderer::new);
 		registerEntityRenderingHandler(event, IEEntityTypes.FUSILIER, FusilierRenderer::new);
 		registerEntityRenderingHandler(event, IEEntityTypes.COMMANDO, CommandoRenderer::new);
 		registerEntityRenderingHandler(event, IEEntityTypes.BULWARK, BulwarkRenderer::new);
@@ -457,7 +429,7 @@ public class ClientProxy extends CommonProxy
 
 	private static <T extends BlockEntity>
 	void registerBERenderNoContext(
-			RegisterRenderers event, Supplier<BlockEntityType<? extends T>> type, Supplier<BlockEntityRenderer<T>> render
+			RegisterRenderers event, Supplier<BlockEntityType<? extends T>> type, Supplier<BlockEntityRenderer<T, ?>> render
 	)
 	{
 		ClientProxy.registerBERenderNoContext(event, type.get(), render);
@@ -465,7 +437,7 @@ public class ClientProxy extends CommonProxy
 
 	private static <T extends BlockEntity>
 	void registerBERenderNoContext(
-			RegisterRenderers event, BlockEntityType<? extends T> type, Supplier<BlockEntityRenderer<T>> render
+			RegisterRenderers event, BlockEntityType<? extends T> type, Supplier<BlockEntityRenderer<T, ?>> render
 	)
 	{
 		event.registerBlockEntityRenderer(type, $ -> render.get());
@@ -502,7 +474,7 @@ public class ClientProxy extends CommonProxy
 		//CLOTH
 		event.registerBlockEntityRenderer(IEBlockEntities.SHADER_BANNER.get(), ShaderBannerRenderer::new);
 		//SIGNS
-		event.registerBlockEntityRenderer(IEBlockEntities.SIGN.get(), SignRenderer::new);
+		event.registerBlockEntityRenderer(IEBlockEntities.SIGN.get(), StandingSignRenderer::new);
 		event.registerBlockEntityRenderer(IEBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
 	}
 
@@ -535,9 +507,7 @@ public class ClientProxy extends CommonProxy
 			return ManualHelper.MAKE_BLUEPRINT_ELEMENT_NEW.get().create(refs);
 		});
 		IEManual.initManual();
-		ItemCallback.DYNAMIC_IEOBJ_RENDERER.setValue(new blusunrize.immersiveengineering.client.render.IEOBJItemRenderer(
-				Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels()
-		));
+		ItemCallback.DYNAMIC_IEOBJ_RENDERER.setValue(new Object());
 		SetRestrictedField.lock(true);
 	}
 }

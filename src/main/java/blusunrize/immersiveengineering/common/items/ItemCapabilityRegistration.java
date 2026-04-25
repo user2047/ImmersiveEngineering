@@ -21,8 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.capabilities.ItemCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -31,7 +30,7 @@ import net.neoforged.neoforge.energy.ComponentEnergyStorage;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(bus = Bus.MOD, modid = Lib.MODID)
+@EventBusSubscriber(modid = Lib.MODID)
 public class ItemCapabilityRegistration
 {
 	@SubscribeEvent
@@ -61,8 +60,10 @@ public class ItemCapabilityRegistration
 			RegisterCapabilitiesEvent ev, Supplier<? extends ItemLike> capItem, CapacitorConfig config
 	)
 	{
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		ItemCapability energy = (ItemCapability)Energy.ITEM;
 		ev.registerItem(
-				EnergyStorage.ITEM,
+				energy,
 				(stack, $) -> new ComponentEnergyStorage(stack, IEDataComponents.GENERIC_ENERGY.get(), config.storage.getAsInt()),
 				capItem.get()
 		);
@@ -72,21 +73,29 @@ public class ItemCapabilityRegistration
 	{
 		return new ItemCapabilityRegistrar()
 		{
-			@Override
-			public <C, T> void register(ItemCapability<T, C> capability, ICapabilityProvider<ItemStack, C, T> provider)
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			public void register(ItemCapability capability, ItemCapabilityProvider provider)
 			{
-				ev.registerItem(capability, provider, type.get());
+				ev.registerItem(capability, (stack, ctx) -> provider.getCapability(stack, ctx), type.get());
 			}
 		};
 	}
 
 	public interface ItemCapabilityRegistrar
 	{
-		<C, T> void register(ItemCapability<T, C> capability, ICapabilityProvider<ItemStack, C, T> provider);
+		@SuppressWarnings("rawtypes")
+		void register(ItemCapability capability, ItemCapabilityProvider provider);
 
-		default <T> void register(ItemCapability<T, Void> capability, Function<ItemStack, T> provider)
+		@SuppressWarnings("rawtypes")
+		default void register(ItemCapability capability, Function<ItemStack, ?> provider)
 		{
 			register(capability, (stack, $) -> provider.apply(stack));
 		}
+	}
+
+	@FunctionalInterface
+	public interface ItemCapabilityProvider
+	{
+		Object getCapability(ItemStack stack, Object context);
 	}
 }

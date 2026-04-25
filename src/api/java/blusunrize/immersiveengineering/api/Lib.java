@@ -20,15 +20,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.BlockSetType.PressurePlateSensitivity;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.fml.common.asm.enumextension.EnumProxy;
 import net.neoforged.neoforge.common.ItemAbility;
-import net.neoforged.neoforge.common.SimpleTier;
 
 import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
@@ -201,8 +199,8 @@ public class Lib
 		}
 	}
 
-	public static final Tier MATERIAL_Steel = new SimpleTier(
-			IETags.incorrectDropsSteel, 641, 7, 3, 10, () -> Ingredient.of(IETags.getTagsFor(EnumMetals.STEEL).ingot)
+	public static final ToolMaterial MATERIAL_Steel = new ToolMaterial(
+			IETags.incorrectDropsSteel, 641, 7, 3, 10, IETags.getTagsFor(EnumMetals.STEEL).ingot
 	);
 	public static final EnumProxy<Rarity> RARITY_MASTERWORK = new EnumProxy<>(
 			// 0 is "index" parameter, should get replaced by Neo's enum extension handler

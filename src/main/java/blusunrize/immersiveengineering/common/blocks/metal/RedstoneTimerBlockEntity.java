@@ -17,14 +17,14 @@ import blusunrize.immersiveengineering.api.wires.redstone.RedstoneNetworkHandler
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.util.Utils;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,7 +57,6 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 		super(IEBlockEntities.REDSTONE_TIMER.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(this.currentTimer > 0&&this.output > 0)
@@ -71,10 +70,9 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 		super.tickServer();
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
-		if(!level.isClientSide&&SafeChunkUtils.isChunkSafe(level, worldPosition))
+		if(!level.isClientSide()&&SafeChunkUtils.isChunkSafe(level, worldPosition))
 		{
 			final boolean hadSignal = hasControlSignal;
 			hasControlSignal = handler.getValue(redstoneChannelControl.getId()) > 0;
@@ -103,43 +101,38 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 		}
 	}
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		signals[redstoneChannel.ordinal()] = (byte)this.output;
 		rsDirty = false;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_RedstoneTimer, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("timerSetting"))
-			timerSetting = message.getInt("timerSetting");
+			timerSetting = message.getIntOr("timerSetting", 0);
 		if(message.contains("redstoneChannel"))
-			redstoneChannel = DyeColor.byId(message.getInt("redstoneChannel"));
+			redstoneChannel = DyeColor.byId(message.getIntOr("redstoneChannel", 0));
 		if(message.contains("redstoneChannelControl"))
-			redstoneChannelControl = DyeColor.byId(message.getInt("redstoneChannelControl"));
+			redstoneChannelControl = DyeColor.byId(message.getIntOr("redstoneChannelControl", 0));
 		if(message.contains("requireControlSignal"))
-			requireControlSignal = message.getBoolean("requireControlSignal");
+			requireControlSignal = message.getBooleanOr("requireControlSignal", false);
 		updateAfterConfigure();
 	}
 
-	@Override
 	protected void updateAfterConfigure()
 	{
 		resetTimer();
 		super.updateAfterConfigure();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -150,18 +143,16 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 		nbt.putInt("redstoneChannelControl", redstoneChannelControl.getId());
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		timerSetting = nbt.getInt("timerSetting");
-		currentTimer = nbt.getInt("currentTimer");
-		requireControlSignal = nbt.getBoolean("requireControlSignal");
-		hasControlSignal = nbt.getBoolean("hasControlSignal");
-		redstoneChannelControl = DyeColor.byId(nbt.getInt("redstoneChannelControl"));
+		timerSetting = nbt.getIntOr("timerSetting", 0);
+		currentTimer = nbt.getIntOr("currentTimer", 0);
+		requireControlSignal = nbt.getBooleanOr("requireControlSignal", false);
+		hasControlSignal = nbt.getBooleanOr("hasControlSignal", false);
+		redstoneChannelControl = DyeColor.byId(nbt.getIntOr("redstoneChannelControl", 0));
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -178,26 +169,22 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 		};
 	}
 
-	@Override
 	public boolean isRSInput()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isRSOutput()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return false;
 	}
 
 	private static final Pair<DyeColor, Byte>[] NO_OVERRIDE = new Pair[0];
-	@Override
 	public Pair<DyeColor, Byte>[] overrideVoltmeterRead()
 	{
 		return NO_OVERRIDE;
@@ -216,14 +203,12 @@ public class RedstoneTimerBlockEntity extends ConnectorRedstoneBlockEntity
 			}
 	);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(getFacing());
 	}
 
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(!Utils.isScrewdriver(player.getItemInHand(InteractionHand.MAIN_HAND)))

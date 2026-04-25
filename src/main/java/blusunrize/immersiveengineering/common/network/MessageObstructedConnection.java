@@ -32,7 +32,6 @@ public record MessageObstructedConnection(
 			MessageObstructedConnection::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> LevelStageRenders.FAILED_CONNECTIONS.put(
@@ -40,7 +39,6 @@ public record MessageObstructedConnection(
 		));
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

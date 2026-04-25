@@ -8,9 +8,10 @@
 
 package blusunrize.immersiveengineering.api.crafting;
 
-import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -35,40 +36,53 @@ public abstract class IESerializableRecipe implements Recipe<RecipeInput>
 	}
 
 	@Override
-	public ItemStack getToastSymbol()
-	{
-		return getIESerializer().getIcon();
-	}
-
-	@Override
 	public boolean matches(RecipeInput inv, Level worldIn)
 	{
 		return false;
 	}
 
 	@Override
-	public ItemStack assemble(RecipeInput inv, Provider access)
+	public ItemStack assemble(RecipeInput inv)
 	{
 		return this.outputDummy.get();
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int width, int height)
+	public boolean showNotification()
 	{
 		return false;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer()
+	public String group()
 	{
-		return getIESerializer();
+		return "";
 	}
 
-	protected abstract IERecipeSerializer<?> getIESerializer();
+	@Override
+	public PlacementInfo placementInfo()
+	{
+		return PlacementInfo.NOT_PLACEABLE;
+	}
 
 	@Override
-	public RecipeType<?> getType()
+	public RecipeBookCategory recipeBookCategory()
 	{
-		return this.type;
+		return new RecipeBookCategory();
+	}
+
+	@SuppressWarnings("unchecked")
+	public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer()
+	{
+		return (RecipeSerializer<? extends Recipe<RecipeInput>>)getIESerializer();
+	}
+
+	protected abstract RecipeSerializer<?> getIESerializer();
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public RecipeType<? extends Recipe<RecipeInput>> getType()
+	{
+		return (RecipeType<? extends Recipe<RecipeInput>>)this.type;
 	}
 }

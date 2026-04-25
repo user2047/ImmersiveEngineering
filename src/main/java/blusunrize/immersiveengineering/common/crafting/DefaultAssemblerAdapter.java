@@ -27,41 +27,15 @@ import java.util.List;
 
 public class DefaultAssemblerAdapter implements IRecipeAdapter<Recipe<CraftingInput>>
 {
-	@Override
 	public List<RecipeQuery> getQueriedInputs(Recipe<CraftingInput> recipe, NonNullList<ItemStack> input, Level world)
 	{
-		NonNullList<Ingredient> ingred = recipe.getIngredients();
 		CraftingInput craftingInput = InventoryCraftingFalse.createFilledCraftingInventory(3, 3, input);
-		// Check that the ingredients roughly match what the recipe actually requires.
-		// This is necessary to prevent infinite crafting for recipes like FireworkRocketRecipe which don't return
-		// meaningful values in getIngredients.
-		NonNullList<Ingredient> ingredientsForMatching = NonNullList.create();
-		for(Ingredient i : ingred)
-			if(!i.isEmpty())
-				ingredientsForMatching.add(i);
-		while(ingredientsForMatching.size() < craftingInput.size())
-			ingredientsForMatching.add(Ingredient.EMPTY);
-		CommonHooks.setCraftingPlayer(FakePlayerUtil.getFakePlayer(world));
-		int[] ingredientAssignment = RecipeMatcher.findMatches(craftingInput.items(), ingredientsForMatching);
-		CommonHooks.setCraftingPlayer(null);
-
-		// Collect remaining items
-		NonNullList<ItemStack> remains = recipe.getRemainingItems(craftingInput);
+		NonNullList<ItemStack> remains = NonNullList.withSize(craftingInput.size(), ItemStack.EMPTY);
 
 		List<RecipeQuery> queries = new ArrayList<>();
 		for(int i = 0; i < craftingInput.size(); i++)
 		{
-			final RecipeQuery query;
-			if(ingredientAssignment!=null)
-				// If the ingredients provided by the recipe are plausible request those
-				// Try to request each ingredient at the index where it is in the input pattern, this is needed for
-				// some CraftTweaker recipes
-				query = AssemblerHandler.createQueryFromIngredient(
-						ingredientsForMatching.get(ingredientAssignment[i]), remains.get(i)
-				);
-			else
-				// Otherwise request the exact stacks used in the input
-				query = AssemblerHandler.createQueryFromItemStack(craftingInput.getItem(i), remains.get(i));
+			final RecipeQuery query = AssemblerHandler.createQueryFromItemStack(craftingInput.getItem(i), remains.get(i));
 			if(query!=null)
 				queries.add(query);
 		}

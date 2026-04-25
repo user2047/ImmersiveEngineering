@@ -260,8 +260,7 @@ public class IEBlockEntities
 				Arrays.stream(valid)
 						.flatMap(Collection::stream)
 						.map(Supplier::get)
-						.collect(Collectors.toSet()),
-				null
+						.collect(Collectors.toSet())
 		);
 	}
 

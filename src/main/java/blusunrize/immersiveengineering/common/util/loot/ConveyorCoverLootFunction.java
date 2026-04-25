@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -40,13 +39,12 @@ public class ConveyorCoverLootFunction extends LootItemConditionalFunction
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack run(@Nonnull ItemStack stack, @Nonnull LootContext context)
 	{
 		Block asBlock = Block.byItem(stack.getItem());
-		if(ConveyorHandler.isConveyorBlock(asBlock)&&context.hasParam(LootContextParams.BLOCK_ENTITY))
+		if(ConveyorHandler.isConveyorBlock(asBlock)&&context.hasParameter(LootContextParams.BLOCK_ENTITY))
 		{
-			BlockEntity te = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
+			BlockEntity te = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 			if(te instanceof IConveyorBlockEntity<?> conveyorBE)
 			{
 				Block cover = conveyorBE.getConveyorInstance().getCover();
@@ -57,10 +55,9 @@ public class ConveyorCoverLootFunction extends LootItemConditionalFunction
 		return stack;
 	}
 
-	@Override
-	public LootItemFunctionType getType()
+	public MapCodec<? extends LootItemConditionalFunction> codec()
 	{
-		return IELootFunctions.CONVEYOR_COVER.value();
+		return CODEC;
 	}
 
 	public static LootItemFunction.Builder builder()

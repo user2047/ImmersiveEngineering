@@ -36,30 +36,25 @@ public abstract class ImmersiveConnectableBlockEntity extends IEBaseBlockEntity 
 		super(type, pos, state);
 	}
 
-	@Override
 	public boolean canConnect()
 	{
 		return true;
 	}
 
-	@Override
 	public BlockPos getConnectionMaster(WireType cableType, TargetingInfo target)
 	{
 		return getBlockPos();
 	}
 
-	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget)
 	{
 	}
 
-	@Override
 	public void removeCable(Connection connection, ConnectionPoint attachedPoint)
 	{
 		this.setChanged();
 	}
 
-	@Override
 	public void setLevel(Level worldIn)
 	{
 		super.setLevel(worldIn);
@@ -67,44 +62,37 @@ public abstract class ImmersiveConnectableBlockEntity extends IEBaseBlockEntity 
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo info, Vec3i offset)
 	{
 		return new ConnectionPoint(worldPosition, 0);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
-	@Override
 	public void writeCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
-	@Override
 	public void onChunkUnloaded()
 	{
 		super.onChunkUnloaded();
 		ConnectorBlockEntityHelper.onChunkUnload(globalNet, this);
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
 		ConnectorBlockEntityHelper.onChunkLoad(this, level);
 	}
 
-	@Override
 	public void setRemovedIE()
 	{
 		super.setRemovedIE();
 		ConnectorBlockEntityHelper.remove(level, this);
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(new ConnectionPoint(worldPosition, 0));
@@ -117,7 +105,6 @@ public abstract class ImmersiveConnectableBlockEntity extends IEBaseBlockEntity 
 		return ConnectorBlockEntityHelper.getLocalNetWithCache(globalNet, getBlockPos(), cpIndex, cachedLocalNets);
 	}
 
-	@Override
 	public BlockPos getPosition()
 	{
 		return worldPosition;

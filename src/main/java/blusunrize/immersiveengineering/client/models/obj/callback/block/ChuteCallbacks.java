@@ -21,7 +21,7 @@ import org.joml.Matrix4f;
 import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -36,7 +36,6 @@ public class ChuteCallbacks implements BlockCallback<Key>
 
 	private static final Key INVALID = new Key(false, Direction.NORTH, ImmutableList.of());
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof ChuteBlockEntity chuteBE))
@@ -48,13 +47,11 @@ public class ChuteCallbacks implements BlockCallback<Key>
 		return new Key(chuteBE.isDiagonal(), chuteBE.getFacing(), solidWalls);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Key key)
 	{
 		if(key.diagonal())

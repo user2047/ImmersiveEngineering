@@ -16,12 +16,12 @@ import blusunrize.immersiveengineering.client.utils.ModelUtils;
 import blusunrize.immersiveengineering.common.blocks.metal.StructuralArmBlockEntity;
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
-import net.minecraft.Util;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.util.Util;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -43,7 +43,6 @@ public class StructuralArmCallbacks implements BlockCallback<Key>
 	});
 	private static final Key INVALID = new Key(0, 1, false, NORTH);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof StructuralArmBlockEntity structuralArm))
@@ -56,13 +55,11 @@ public class StructuralArmCallbacks implements BlockCallback<Key>
 		);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public List<BakedQuad> modifyQuads(Key object, List<BakedQuad> quads)
 	{
 		boolean onCeiling = object.onCeiling();
@@ -148,7 +145,7 @@ public class StructuralArmCallbacks implements BlockCallback<Key>
 			facing = facing.getOpposite();
 		float[] colour = {1, 1, 1, 1};
 		BakedQuadBuilder builder = new BakedQuadBuilder();
-		Vec3 faceNormal = Vec3.atLowerCornerOf(facing.getNormal());
+		Vec3 faceNormal = Vec3.atLowerCornerOf(facing.getUnitVec3i());
 		int vertexId = invert?3: 0;
 		double v = onCeiling?16-leftV: 0;
 		builder.putVertexData(vertices[vertexId], faceNormal, vertexId > 1?16: 0, v, sprite, colour, 1);

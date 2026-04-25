@@ -61,7 +61,6 @@ public class CokeOvenMenu extends IEContainerMenu
 
 		this.addSlot(new SlotItemHandler(inv, 0, 30, 35)
 		{
-			@Override
 			public boolean mayPlace(@Nonnull ItemStack itemStack)
 			{
 				return CokeOvenRecipe.findRecipe(inventoryPlayer.player.level(), itemStack)!=null;

@@ -10,32 +10,32 @@ package blusunrize.immersiveengineering.client.render.tile;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SqueezerLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 public class SqueezerRenderer extends IEMultiblockRenderer<State>
 {
 	public static final String NAME = "squeezer_piston";
 	public static DynamicModel PISTON;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 		BakedModel model = PISTON.get();
 		final MultiblockOrientation orientation = ctx.getLevel().getOrientation();
 
 		matrixStack.pushPose();
 		matrixStack.translate(.5, .5, .5);
 		bufferIn = BERenderUtils.mirror(orientation, matrixStack, bufferIn);
-		VertexConsumer buffer = bufferIn.getBuffer(RenderType.solid());
+		VertexConsumer buffer = bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid());
 
 		float piston = ctx.getState().animation_piston;
 		//Smoothstep! TODO partial ticks?
@@ -48,7 +48,7 @@ public class SqueezerRenderer extends IEMultiblockRenderer<State>
 		blockRenderer.getModelRenderer().renderModel(
 				matrixStack.last(), buffer, null, model,
 				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, RenderType.solid()
+				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);
 
 		matrixStack.popPose();

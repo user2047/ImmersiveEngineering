@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.mixin.accessors.client;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import org.spongepowered.asm.mixin.Mixin;

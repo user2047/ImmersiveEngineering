@@ -25,14 +25,19 @@ public class FluidStackRecipeQuery extends RecipeQuery
 	public boolean matchesIgnoringSize(ItemStack stack)
 	{
 		return FluidUtil.getFluidContained(stack)
-				.map(fs -> fs.containsFluid(fluidStack))
+				.map(this::containsQueriedFluid)
 				.orElse(false);
 	}
 
 	@Override
 	public boolean matchesFluid(FluidStack fluid)
 	{
-		return fluid.containsFluid(fluidStack);
+		return containsQueriedFluid(fluid);
+	}
+
+	private boolean containsQueriedFluid(FluidStack fluid)
+	{
+		return FluidStack.isSameFluidSameComponents(fluid, fluidStack)&&fluid.getAmount() >= fluidStack.getAmount();
 	}
 
 	@Override

@@ -8,8 +8,8 @@
 
 package blusunrize.immersiveengineering.client.models.connection;
 
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;

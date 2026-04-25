@@ -22,7 +22,6 @@ public class FluidPipeBlock extends IEEntityBlock<FluidPipeBlockEntity>
 		super(IEBlockEntities.FLUID_PIPE, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

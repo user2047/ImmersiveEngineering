@@ -15,7 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -84,13 +84,11 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return this;
 	}
 
-	@Override
 	public String getNameForFlavour()
 	{
 		return BuiltInRegistries.BLOCK.getKey(this).getPath();
 	}
 
-	@Override
 	public boolean hasFlavour()
 	{
 		return hasFlavour;
@@ -102,7 +100,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return this;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos)
 	{
@@ -111,19 +108,17 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		else if(notNormalBlock)
 			return 0;
 		else
-			return super.getLightBlock(state, worldIn, pos);
+			return state.canOcclude()?15: 0;
 	}
 
-	@Override
 	public float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos)
 	{
 		return notNormalBlock?1: super.getShadeBrightness(state, world, pos);
 	}
 
-	@Override
 	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos)
 	{
-		return notNormalBlock||super.propagatesSkylightDown(state, reader, pos);
+		return notNormalBlock||super.propagatesSkylightDown(state);
 	}
 
 	protected BlockState getInitDefaultState()
@@ -143,7 +138,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return true;
 	}
 
-	@Override
 	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
 	{
 		super.setPlacedBy(worldIn, pos, state, placer, stack);
@@ -154,11 +148,10 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		out.accept(this);
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam)
 	{
-		if(worldIn.isClientSide&&eventID==255)
+		if(worldIn.isClientSide()&&eventID==255)
 		{
 			worldIn.sendBlockUpdated(pos, state, state, 3);
 			return true;
@@ -166,9 +159,8 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return super.triggerEvent(state, worldIn, pos, eventID, eventParam);
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
-	public ItemInteractionResult useItemOn(
+	public InteractionResult useItemOn(
 			ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
 			BlockHitResult hit
 	)
@@ -181,17 +173,16 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return super.useItemOn(stack, state, world, pos, player, hand, hit);
 	}
 
-	public ItemInteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
+	public InteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
 	{
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
 	{
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	protected boolean isPathfindable(BlockState p_60475_, PathComputationType p_60478_)
 	{
 		return false;
@@ -206,7 +197,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return state;
 	}
 
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState state = this.defaultBlockState();
@@ -214,17 +204,15 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return state;
 	}
 
-	@Override
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos)
 	{
 		if(stateIn.hasProperty(BlockStateProperties.WATERLOGGED)&&stateIn.getValue(BlockStateProperties.WATERLOGGED))
 			worldIn.getFluidTicks().schedule(new ScheduledTick<>(
 					Fluids.WATER, currentPos, Fluids.WATER.getTickDelay(worldIn), 0
 			));
-		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+		return stateIn;
 	}
 
-	@Override
 	public FluidState getFluidState(BlockState state)
 	{
 		if(state.hasProperty(BlockStateProperties.WATERLOGGED)&&state.getValue(BlockStateProperties.WATERLOGGED))
@@ -232,7 +220,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return super.getFluidState(state);
 	}
 
-	@Override
 	public boolean canPlaceLiquid(
 			@Nullable Player player, BlockGetter worldIn, BlockPos pos, BlockState state, Fluid fluidIn
 	)
@@ -242,13 +229,11 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return SimpleWaterloggedBlock.super.canPlaceLiquid(player, worldIn, pos, state, fluidIn);
 	}
 
-	@Override
 	public boolean placeLiquid(LevelAccessor worldIn, BlockPos pos, BlockState state, FluidState fluidStateIn)
 	{
 		return state.hasProperty(BlockStateProperties.WATERLOGGED)&&SimpleWaterloggedBlock.super.placeLiquid(worldIn, pos, state, fluidStateIn);
 	}
 
-	@Override
 	public ItemStack pickupBlock(@Nullable Player player, LevelAccessor level, BlockPos pos, BlockState state)
 	{
 		if(state.hasProperty(BlockStateProperties.WATERLOGGED))
@@ -262,7 +247,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return fitsIntoContainer;
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		Property<Direction> facingProp = findFacingProperty(state);
@@ -275,7 +259,6 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 		return super.rotate(state, rot);
 	}
 
-	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn)
 	{
 		if(state.hasProperty(IEProperties.MIRRORED)&&canRotate()&&mirrorIn==Mirror.LEFT_RIGHT)
@@ -319,16 +302,13 @@ public class IEBaseBlock extends Block implements IIEBlock, SimpleWaterloggedBlo
 			super(material);
 		}
 
-		@Override
 		public boolean isLadder(BlockState state, LevelReader world, BlockPos pos, @Nullable LivingEntity entity)
 		{
 			return true;
 		}
 
-		@Override
 		public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn)
 		{
-			super.entityInside(state, worldIn, pos, entityIn);
 			if(entityIn instanceof LivingEntity&&isLadder(state, worldIn, pos, (LivingEntity)entityIn))
 				applyLadderLogic(entityIn);
 		}

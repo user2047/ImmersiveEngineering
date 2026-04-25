@@ -46,7 +46,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -67,25 +67,21 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 		super(IEBlockEntities.CHUTE.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return !entity.isShiftKeyDown();
 	}
 
-	@Override
 	public void onEntityCollision(Level world, Entity entity)
 	{
 		boolean contact = false;
@@ -112,13 +108,13 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 
 			long time = world.getGameTime();
 			long nbt_pos = getBlockPos().asLong();
-			long timeSince = time-entity.getPersistentData().getLong(NBT_TIME);
+			long timeSince = time-entity.getPersistentData().getLongOr(NBT_TIME, 0);
 
 			boolean prevent = entity.getPersistentData().contains(NBT_POS)
-					&&nbt_pos==entity.getPersistentData().getLong(NBT_POS)
+					&&nbt_pos==entity.getPersistentData().getLongOr(NBT_POS, 0)
 					&&timeSince < 20;
 			// glitch timer resets after 60 seconds
-			boolean glitched = entity.getPersistentData().contains(NBT_GLITCH)&&time-entity.getPersistentData().getLong(NBT_GLITCH) < 1200;
+			boolean glitched = entity.getPersistentData().contains(NBT_GLITCH)&&time-entity.getPersistentData().getLongOr(NBT_GLITCH, 0) < 1200;
 
 			if(entity.getBbWidth() > 0.75||entity.getBbHeight() > 0.75)
 			{
@@ -147,13 +143,13 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 
 			if(!contact&&!prevent&&!glitched)
 			{
-				world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), IESounds.chute.value(), SoundSource.BLOCKS, .6f+(.4f*world.random.nextFloat()), .5f+(.5f*world.random.nextFloat()));
+				world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), IESounds.chute.value(), SoundSource.BLOCKS, .6f+(.4f*world.getRandom().nextFloat()), .5f+(.5f*world.getRandom().nextFloat()));
 				CompoundTag entityData = entity.getPersistentData();
 				entityData.putLong(NBT_POS, nbt_pos);
 				entityData.putLong(NBT_TIME, time);
 				if(entity instanceof Player player&&!world.isClientSide())
 				{
-					int bonkCount = entityData.getInt(NBT_COUNT)+1;
+					int bonkCount = entityData.getIntOr(NBT_COUNT, 0)+1;
 					if(timeSince > 200)
 						bonkCount = 1;
 					entity.getPersistentData().putInt(NBT_COUNT, bonkCount);
@@ -177,7 +173,7 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 				BlockPos invPos = diagonal?getBlockPos().relative(facing): getBlockPos().below();
 				inventoryTile = world.getBlockEntity(invPos);
 				Direction insertFrom = diagonal?facing.getOpposite(): Direction.UP;
-				if(!world.isClientSide&&isValidTargetInventory(inventoryTile))
+				if(!world.isClientSide()&&isValidTargetInventory(inventoryTile))
 					ItemUtils.tryInsertEntity(world, invPos, insertFrom, itemEntity);
 			}
 		}
@@ -200,13 +196,11 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 		return IConveyorBelt.isCovered(belt, Blocks.AIR);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		diagonal = nbt.getBoolean("diagonal");
+		diagonal = nbt.getBooleanOr("diagonal", false);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putBoolean("diagonal", diagonal);
@@ -225,7 +219,6 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 	static final AABB AABB_DOWN = new AABB(0, 0, 0, 1, .125f, 1);
 	private static final CachedVoxelShapes<BoundingBoxKey> SHAPES = new CachedVoxelShapes<>(BoundingBoxKey::getBoxes);
 
-	@Override
 	public VoxelShape getCollisionShape(CollisionContext ctx)
 	{
 		return SHAPES.get(new BoundingBoxKey(this));
@@ -269,7 +262,6 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 			return list;
 		}
 
-		@Override
 		public boolean equals(Object o)
 		{
 			if(this==o) return true;
@@ -279,7 +271,6 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 					sidesToAdd.equals(that.sidesToAdd);
 		}
 
-		@Override
 		public int hashCode()
 		{
 			return Objects.hash(diagonal, sidesToAdd);
@@ -288,7 +279,6 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 
 	static final VoxelShape selectionShape = Shapes.block();
 
-	@Override
 	public VoxelShape getSelectionShape(@Nullable CollisionContext ctx)
 	{
 		return selectionShape;
@@ -339,12 +329,11 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 		return false;
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(player.isShiftKeyDown())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				this.diagonal = !this.diagonal;
 				this.setChanged();
@@ -356,7 +345,6 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 		return false;
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -376,7 +364,7 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 
 	public static void registerCapabilities(BECapabilityRegistrar<ChuteBlockEntity> registrar)
 	{
-		registrar.registerAllContexts(ItemHandler.BLOCK, be -> be.insertionCap);
+		registrar.registerAllContexts(Capabilities.Item.BLOCK, be -> be.insertionCap);
 	}
 
 	public static class ChuteInventoryHandler implements IItemHandler
@@ -388,19 +376,16 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 			this.chute = chute;
 		}
 
-		@Override
 		public int getSlots()
 		{
 			return 1;
 		}
 
-		@Override
 		public ItemStack getStackInSlot(int slot)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 		{
 			if(!simulate)
@@ -413,19 +398,16 @@ public class ChuteBlockEntity extends IEBaseBlockEntity implements IStateBasedDi
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public int getSlotLimit(int slot)
 		{
 			return 64;
 		}
 
-		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
 			return true;

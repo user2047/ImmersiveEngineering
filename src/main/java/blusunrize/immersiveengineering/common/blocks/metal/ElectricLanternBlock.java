@@ -28,7 +28,6 @@ public class ElectricLanternBlock extends ConnectorBlock<ElectricLanternBlockEnt
 		super(props, IEBlockEntities.ELECTRIC_LANTERN);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

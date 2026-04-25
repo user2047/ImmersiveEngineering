@@ -45,17 +45,15 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 
 	public WireCoilItem(@Nonnull WireType type)
 	{
-		super(new Properties());
+		super(itemProperties());
 		this.type = type;
 	}
 
-	@Override
 	public WireType getWireType(ItemStack stack)
 	{
 		return type;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		if(WireType.REDSTONE_CATEGORY.equals(type.getCategory()))
@@ -74,7 +72,7 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 			String dimensionName = "";
 			if(link.dimension()!=null)
 			{
-				String s2 = link.dimension().location().getPath();
+				String s2 = link.dimension().identifier().getPath();
 				if(s2.toLowerCase(Locale.ENGLISH).startsWith("the_"))
 					s2 = s2.substring(4);
 				dimensionName = Utils.toCamelCase(s2);
@@ -84,7 +82,6 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 		}
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		return WirecoilUtils.doCoilUse(this, ctx.getPlayer(), ctx.getLevel(), ctx.getClickedPos(), ctx.getHand(), ctx.getClickedFace(),
@@ -113,12 +110,12 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 			if(cpHere==null||!iicHere.canConnectCable(wire, cpHere, masterOffsetHere)||
 					!coil.canConnectCable(stack, tileEntity))
 			{
-				if(!world.isClientSide)
-					player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"wrongCable"), true);
+				if(!world.isClientSide())
+					player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"wrongCable"));
 				return InteractionResult.FAIL;
 			}
 
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
 				final WireLink storedLink = stack.get(IEApiDataComponents.WIRE_LINK);
 				if(storedLink==null)
@@ -130,22 +127,22 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 					int maxLengthSq = coil.getMaxLength(stack); //not squared yet
 					maxLengthSq *= maxLengthSq;
 					if(!storedLink.dimension().equals(world.dimension()))
-						player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"wrongDimension"), true);
+						player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"wrongDimension"));
 					else if(storedLink.cp().position().equals(masterPos))
-						player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"sameConnection"), true);
+						player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"sameConnection"));
 					else if(distanceSq > maxLengthSq)
-						player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"tooFar"), true);
+						player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"tooFar"));
 					else
 					{
 						if(!(tileEntityLinkingPos instanceof IImmersiveConnectable iicLink))
-							player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"invalidPoint"), true);
+							player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"invalidPoint"));
 						else
 						{
 							if(!iicLink.canConnectCable(wire, storedLink.cp(), storedLink.offset())||
 									!iicLink.getConnectionMaster(wire, storedLink.target()).equals(storedLink.cp().position())||
 									!coil.canConnectCable(stack, tileEntityLinkingPos))
 							{
-								player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"invalidPoint"), true);
+								player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"invalidPoint"));
 							}
 							else
 							{
@@ -162,7 +159,7 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 												connectionExists = true;
 								}
 								if(connectionExists)
-									player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"connectionExists"), true);
+									player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"connectionExists"));
 								else
 								{
 									Set<BlockPos> ignore = new HashSet<>();
@@ -192,7 +189,7 @@ public class WireCoilItem extends IEBaseItem implements IWireCoil
 									}
 									else
 									{
-										player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"cantSee"), true);
+										player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"cantSee"));
 										PacketDistributor.sendToPlayer(
 												(ServerPlayer)player,
 												new MessageObstructedConnection(failedReasons, new SyncedConnection(conn))

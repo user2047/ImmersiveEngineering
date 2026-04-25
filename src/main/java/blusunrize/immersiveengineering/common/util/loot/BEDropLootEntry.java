@@ -15,7 +15,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -36,12 +35,11 @@ public class BEDropLootEntry extends LootPoolSingletonContainer
 		super(weightIn, qualityIn, conditionsIn, functionsIn);
 	}
 
-	@Override
 	protected void createItemStack(@Nonnull Consumer<ItemStack> output, LootContext context)
 	{
-		if(context.hasParam(LootContextParams.BLOCK_ENTITY))
+		if(context.hasParameter(LootContextParams.BLOCK_ENTITY))
 		{
-			BlockEntity te = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
+			BlockEntity te = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 			if(te instanceof IBlockEntityDrop dropBE)
 				dropBE.getBlockEntityDrop(context, output);
 		}
@@ -52,10 +50,8 @@ public class BEDropLootEntry extends LootPoolSingletonContainer
 		return simpleBuilder(BEDropLootEntry::new);
 	}
 
-	@Nonnull
-	@Override
-	public LootPoolEntryType getType()
+	public MapCodec<? extends LootPoolSingletonContainer> codec()
 	{
-		return IELootFunctions.TILE_DROP.value();
+		return CODEC;
 	}
 }

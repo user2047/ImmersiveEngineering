@@ -89,7 +89,7 @@ public class PotionRecipeGenerators
 		bottleRecipes.put(Potions.WATER, toBottleRecipe.apply(Potions.WATER));
 		IELogger.logger.info(
 				"Recipes for potions: "+bottleRecipes.keySet().stream()
-						.map(h -> h.unwrapKey().orElseThrow().location().toString())
+						.map(h -> h.unwrapKey().orElseThrow().identifier().toString())
 						.collect(Collectors.joining(", "))
 		);
 		;
@@ -107,7 +107,7 @@ public class PotionRecipeGenerators
 			Holder<Potion> output, Holder<Potion> input, IngredientWithSize reagent, Map<Potion, List<MixerRecipe>> all
 	)
 	{
-		Identifier outputID = output.unwrapKey().orElseThrow().location();
+		Identifier outputID = output.unwrapKey().orElseThrow().identifier();
 		if(!BLACKLIST.contains(outputID.toString()))
 		{
 			List<MixerRecipe> existing = all.computeIfAbsent(output.value(), p -> new ArrayList<>());

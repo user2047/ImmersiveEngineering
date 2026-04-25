@@ -34,13 +34,11 @@ public class SawmillRecipeSerializer extends IERecipeSerializer<SawmillRecipe>
 			SawmillRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, SawmillRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.SAWMILL.iconStack();

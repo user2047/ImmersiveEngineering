@@ -21,7 +21,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -51,7 +51,6 @@ public class MaintenanceKitContainer extends ItemContainer
 			addSlot(new Slot(inventoryPlayer, i, 8+i*18, 143));
 	}
 
-	@Override
 	public int addSlots()
 	{
 		if(this.inv==null)
@@ -66,9 +65,9 @@ public class MaintenanceKitContainer extends ItemContainer
 		if(tool.getItem() instanceof IUpgradeableTool upgradeableTool)
 		{
 			wasUsed = true;
-			IItemHandler toolInv = Objects.requireNonNull(tool.getCapability(ItemHandler.ITEM));
+			IItemHandler toolInv = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(tool, Capabilities.Item.ITEM));
 			Slot[] slots = upgradeableTool.getWorkbenchSlots(
-					this, tool, world, () -> player, world.isClientSide?clientInventory: toolInv
+					this, tool, world, () -> player, world.isClientSide()?clientInventory: toolInv
 			);
 			if(slots!=null)
 				for(Slot s : slots)
@@ -85,7 +84,6 @@ public class MaintenanceKitContainer extends ItemContainer
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack stack = ItemStack.EMPTY;
@@ -145,7 +143,6 @@ public class MaintenanceKitContainer extends ItemContainer
 		return stack;
 	}
 
-	@Override
 	public void removed(Player par1EntityPlayer)
 	{
 		if(wasUsed)

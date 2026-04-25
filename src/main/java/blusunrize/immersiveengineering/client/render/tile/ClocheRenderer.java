@@ -19,10 +19,10 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,7 +31,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -41,12 +41,11 @@ public class ClocheRenderer extends IEBlockEntityRenderer<ClocheBlockEntity>
 {
 	private static final Map<BlockState, List<BakedQuad>> plantQuads = new HashMap<>();
 
-	@Override
 	public void render(ClocheBlockEntity tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(!tile.getLevelNonnull().hasChunkAt(tile.getBlockPos()))
 			return;
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 		BlockPos blockPos = tile.getBlockPos();
 
 		// Render particles in the TER rather than using the standard particle engine to avoid depth issues/the
@@ -81,8 +80,9 @@ public class ClocheRenderer extends IEBlockEntityRenderer<ClocheBlockEntity>
 						plantQuadList.addAll(plantModel.getQuads(state, f, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, null));
 					plantQuads.put(state, plantQuadList);
 				}
-				int col = ClientUtils.mc().getBlockColors().getColor(state, null, blockPos, -1);
-				matrixStack.pushTransformation(block.getSecond());
+				int col = -1;
+				matrixStack.pushPose();
+				matrixStack.mulPose(block.getSecond());
 				RenderUtils.renderModelTESRFancy(
 						plantQuadList, baseBuilder, matrixStack, tile.getLevelNonnull(), blockPos, false, col, combinedLightIn
 				);
@@ -107,7 +107,6 @@ public class ClocheRenderer extends IEBlockEntityRenderer<ClocheBlockEntity>
 		plantQuads.clear();
 	}
 
-	@Override
 	@NotNull
 	public AABB getRenderBoundingBox(ClocheBlockEntity blockEntity)
 	{

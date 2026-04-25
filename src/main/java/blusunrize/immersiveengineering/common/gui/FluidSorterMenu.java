@@ -72,22 +72,21 @@ public class FluidSorterMenu extends IEContainerMenu
 		addGenericData(new GenericContainerData<>(GenericDataSerializers.BYTE_ARRAY, sortWithNBT));
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag message)
 	{
-		if(message.contains("useNBT", Tag.TAG_INT))
+		if(message.contains("useNBT"))
 		{
-			byte config = message.getByte("useNBT");
-			int side = message.getInt("side");
+			byte config = message.getByteOr("useNBT", (byte)0);
+			int side = message.getIntOr("side", 0);
 			this.sortWithNBT.get()[side] = config;
 		}
-		if(message.contains("filter_side", Tag.TAG_INT))
+		if(message.contains("filter_side"))
 		{
 			var currentServer = ServerLifecycleHooks.getCurrentServer();
 			if(null == currentServer) return;
-			int side = message.getInt("filter_side");
-			int slot = message.getInt("filter_slot");
-			FluidStack newFilter = FluidStack.parseOptional(currentServer.registryAccess(), message.getCompound("filter"));
+			int side = message.getIntOr("filter_side", 0);
+			int slot = message.getIntOr("filter_slot", 0);
+			FluidStack newFilter = blusunrize.immersiveengineering.common.util.FluidStackCompat.parseOptional(currentServer.registryAccess(), message.getCompoundOrEmpty("filter"));
 			if(!newFilter.isEmpty())
 				newFilter.setAmount(1); // Not strictly necessary, but also doesn't hurt
 			this.filters.get(side).get(slot).set(newFilter);
@@ -95,7 +94,6 @@ public class FluidSorterMenu extends IEContainerMenu
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		return ItemStack.EMPTY;

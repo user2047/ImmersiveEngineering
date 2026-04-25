@@ -31,14 +31,13 @@ public class MetalPressRecipeCategory extends IERecipeCategory<MetalPressRecipe>
 		setIcon(IEMultiblockLogic.METAL_PRESS.iconStack());
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, MetalPressRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 1, 13)
 				.addItemStacks(Arrays.asList(recipe.input.getMatchingStacks()))
 				.setBackground(JEIHelper.slotDrawable, -1, -1);
 
-		builder.addSlot(RecipeIngredientRole.CATALYST, 57, 1)
+		builder.addSlot(RecipeIngredientRole.INPUT, 57, 1)
 				.addItemStack(recipe.mold.getDefaultInstance())
 				.setBackground(JEIHelper.slotDrawable, -1, -1);
 
@@ -47,7 +46,6 @@ public class MetalPressRecipeCategory extends IERecipeCategory<MetalPressRecipe>
 				.setBackground(JEIHelper.slotDrawable, -1, -1);
 	}
 
-	@Override
 	public void draw(MetalPressRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		graphics.pose().pushPose();

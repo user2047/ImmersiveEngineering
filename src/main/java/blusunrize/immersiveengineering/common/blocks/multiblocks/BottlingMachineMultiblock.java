@@ -21,7 +21,6 @@ public class BottlingMachineMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.BOTTLING_MACHINE);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

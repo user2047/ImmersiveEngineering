@@ -32,7 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -62,7 +62,6 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 		super(IEBlockEntities.MACHINE_INTERFACE.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		IMachineInterfaceConnection machineCapability = machine.getCapability();
@@ -82,17 +81,15 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 		}
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ListTag list = nbt.getList("configurations", Tag.TAG_COMPOUND);
+		ListTag list = nbt.getListOrEmpty("configurations");
 		configurations.clear();
 		for(int i = 0; i < list.size(); i++)
-			configurations.add(MachineInterfaceConfig.readFromNBT(list.getCompound(i)));
-		inputColor = DyeColor.byId(nbt.getInt("inputColor"));
+			configurations.add(MachineInterfaceConfig.readFromNBT(list.getCompoundOrEmpty(i)));
+		inputColor = DyeColor.byId(nbt.getIntOr("inputColor", 0));
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		ListTag list = new ListTag();
@@ -101,40 +98,36 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 		nbt.putInt("inputColor", inputColor.getId());
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("configuration"))
 		{
-			int idx = message.getInt("idx");
+			int idx = message.getIntOr("idx", 0);
 			if(idx >= this.configurations.size())
-				this.configurations.add(MachineInterfaceConfig.readFromNBT(message.getCompound("configuration")));
+				this.configurations.add(MachineInterfaceConfig.readFromNBT(message.getCompoundOrEmpty("configuration")));
 			else
-				this.configurations.set(idx, MachineInterfaceConfig.readFromNBT(message.getCompound("configuration")));
+				this.configurations.set(idx, MachineInterfaceConfig.readFromNBT(message.getCompoundOrEmpty("configuration")));
 		}
-		else if(message.getBoolean("delete"))
-			this.configurations.remove(message.getInt("idx"));
+		else if(message.getBooleanOr("delete", false))
+			this.configurations.remove(message.getIntOr("idx", 0));
 		else if(message.contains("inputColor"))
-			this.inputColor = DyeColor.byId(message.getInt("inputColor"));
+			this.inputColor = DyeColor.byId(message.getIntOr("inputColor", 0));
 		setChanged();
 		this.markContainingBlockForUpdate(null);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
-		if(getLevelNonnull().isClientSide)
+		if(getLevelNonnull().isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_MachineInterface, this);
-		return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_PREFER_SIDE;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
@@ -143,7 +136,6 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 
 	private final RedstoneBundleConnection redstoneCap = new RedstoneBundleConnection()
 	{
-		@Override
 		public void onChange(byte[] externalInputs, Direction side)
 		{
 			if(externalInputs[inputColor.getId()]!=inputSignalStrength)
@@ -154,7 +146,6 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 			}
 		}
 
-		@Override
 		public void updateInput(byte[] signals, Direction side)
 		{
 			for(DyeColor dye : DyeColor.values())
@@ -170,13 +161,11 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 		);
 	}
 
-	@Override
 	public int getStrongRSOutput(Direction side)
 	{
 		return canConnectRedstone(side)?inputSignalStrength: 0;
 	}
 
-	@Override
 	public boolean canConnectRedstone(Direction side)
 	{
 		return side==getFacing().getOpposite();
@@ -216,9 +205,9 @@ public class MachineInterfaceBlockEntity extends IEBaseBlockEntity implements IE
 		static MachineInterfaceConfig<?> readFromNBT(CompoundTag nbt)
 		{
 			return new MachineInterfaceConfig<>(
-					nbt.getInt("selectedCheck"),
-					nbt.getInt("selectedOption"),
-					DyeColor.byId(nbt.getInt("outputColor"))
+					nbt.getIntOr("selectedCheck", 0),
+					nbt.getIntOr("selectedOption", 0),
+					DyeColor.byId(nbt.getIntOr("outputColor", 0))
 			);
 		}
 

@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 public class RockcutterItem extends SawbladeItem
 {
 	private static final Set<ItemAbility> TOOL_ACTIONS = ImmutableSet.of(
-			ItemAbilities.PICKAXE_DIG
+			ItemAbilities.SHEARS_CARVE
 	);
 	public static final Identifier TEXTURE = ImmersiveEngineering.rl("item/rockcutter_blade");
 
@@ -35,25 +35,21 @@ public class RockcutterItem extends SawbladeItem
 		super(maxDamage, sawbladeSpeed, sawbladeDamage, TEXTURE);
 	}
 
-	@Override
 	public boolean canSawbladeFellTree()
 	{
 		return false;
 	}
 
-	@Override
 	public Map<ResourceKey<Enchantment>, Integer> getExtraEnchantments()
 	{
 		return Map.of(Enchantments.SILK_TOUCH, 1);
 	}
 
-	@Override
 	public Predicate<BlockState> getSawbladeMaterials()
 	{
 		return s -> s.is(IETags.rockcutterHarvestable);
 	}
 
-	@Override
 	public Set<ItemAbility> getItemAbilities()
 	{
 		return TOOL_ACTIONS;

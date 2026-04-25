@@ -11,14 +11,17 @@ package blusunrize.immersiveengineering.common.entities;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -46,8 +49,8 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 	public IEProjectileEntity(EntityType<? extends IEProjectileEntity> type, Level world, double x, double y, double z)
 	{
 		this(type, world);
-		this.moveTo(x, y, z, this.getYRot(), this.getXRot());
 		this.setPos(x, y, z);
+		this.setRot(this.getYRot(), this.getXRot());
 	}
 
 	public IEProjectileEntity(EntityType<? extends IEProjectileEntity> type, Level world, LivingEntity living, double ax, double ay, double az)
@@ -68,8 +71,8 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 		this(type, world);
 		float yaw = living!=null?living.getYRot(): 0;
 		float pitch = living!=null?living.getXRot(): 0;
-		this.moveTo(x, y, z, yaw, pitch);
-		this.setPos(this.getX(), this.getY(), this.getZ());
+		this.setPos(x, y, z);
+		this.setRot(yaw, pitch);
 		setDeltaMovement(ax, ay, az);
 		setOwner(living);
 		Vec3 motion = getDeltaMovement();
@@ -77,7 +80,6 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 	}
 
 	@Nonnull
-	@Override
 	public EntityDimensions getDimensions(Pose poseIn)
 	{
 		return new EntityDimensions(.125f, .125f, .125f, EntityAttachments.createDefault(0, 0), true);
@@ -89,7 +91,6 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getPickupItem()
 	{
 		return ItemStack.EMPTY;
@@ -97,10 +98,9 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 
 	public boolean isInGround()
 	{
-		return this.inGround;
+		return super.isInGround();
 	}
 
-	@Override
 	public void tick()
 	{
 		if(!isInGround())
@@ -125,7 +125,7 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 
 		// Vanilla has a fun issue where it ignores a block hit result if it found any entities instead
 		// so we check for block hits here again...
-		if(!this.isRemoved() && !this.inGround)
+		if(!this.isRemoved() && !this.isInGround())
 		{
 			Vec3 vec32 = this.position();
 			Vec3 vec33 = vec32.add(delta);
@@ -133,11 +133,10 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 			if(blockHitResult.getType()!=HitResult.Type.MISS&&!EventHooks.onProjectileImpact(this, blockHitResult))
 			{
 				this.onHit(blockHitResult);
-				this.hasImpulse = true;
 			}
 		}
 
-		if(!this.inGround)
+		if(!this.isInGround())
 		{
 			// restore rotations
 			this.setXRot(xRotPrev);
@@ -167,10 +166,9 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 		}
 	}
 
-	@Override
 	public void playerTouch(Player player)
 	{
-		if(!this.level().isClientSide&&(this.inGround||this.isNoPhysics())&&this.shakeTime <= 0)
+		if(!this.level().isClientSide()&&(this.isInGround()||this.isNoPhysics())&&this.shakeTime <= 0)
 		{
 			boolean flag = this.pickup==AbstractArrow.Pickup.ALLOWED
 					||this.pickup==AbstractArrow.Pickup.CREATIVE_ONLY&&player.getAbilities().instabuild
@@ -225,25 +223,19 @@ public abstract class IEProjectileEntity extends AbstractArrow//Yes I have to ex
 		return 0.99F;
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
+	protected void addAdditionalSaveData(ValueOutput nbt)
 	{
-		super.addAdditionalSaveData(nbt);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
+	protected void readAdditionalSaveData(ValueInput nbt)
 	{
-		super.readAdditionalSaveData(nbt);
 	}
 
-	@Override
-	public boolean hurt(DamageSource source, float amount)
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isNoGravity()
 	{
 		return this.forceNoGravity||super.isNoGravity();

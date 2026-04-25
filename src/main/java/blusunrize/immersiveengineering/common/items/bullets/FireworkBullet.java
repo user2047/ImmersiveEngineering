@@ -43,13 +43,11 @@ public class FireworkBullet implements BulletHandler.IBullet<Fireworks>
 	{
 	}
 
-	@Override
 	public CodecsAndDefault<Fireworks> getCodec()
 	{
 		return CODEC;
 	}
 
-	@Override
 	public Entity getProjectile(Player shooter, Fireworks data, Entity projectile, boolean electro)
 	{
 		ItemStack fireworkStack = new ItemStack(Items.FIREWORK_ROCKET);
@@ -60,37 +58,29 @@ public class FireworkBullet implements BulletHandler.IBullet<Fireworks>
 		return firework;
 	}
 
-	@Override
 	public SoundEvent getSound()
 	{
 		return IESounds.revolverFireThump.value();
 	}
 
-	@Override
 	public void onHitTarget(Level world, HitResult target, UUID shooter, Entity projectile, boolean headshot, Fireworks bulletData)
 	{
 	}
 
-	@Override
 	public ItemStack getCasing(ItemStack stack)
 	{
 		return BulletHandler.emptyShell.asItem().getDefaultInstance();
 	}
 
-	@Override
 	public Identifier[] getTextures()
 	{
 		return textures;
 	}
 
-	@Override
 	public void addTooltip(Fireworks data, TooltipContext world, List<Component> list, TooltipFlag flag)
 	{
-		if(data!=null)
-			data.addToTooltip(world, list::add, flag);
 	}
 
-	@Override
 	public boolean isValidForTurret()
 	{
 		return true;

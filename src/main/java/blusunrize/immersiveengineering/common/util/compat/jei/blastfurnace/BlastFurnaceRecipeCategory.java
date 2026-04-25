@@ -43,7 +43,6 @@ public class BlastFurnaceRecipeCategory extends IERecipeCategory<BlastFurnaceRec
 		arrow = helper.drawableBuilder(background, 176, 14, 24, 17).buildAnimated(300, IDrawableAnimated.StartDirection.LEFT, false);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, BlastFurnaceRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 10, 8)
@@ -54,7 +53,6 @@ public class BlastFurnaceRecipeCategory extends IERecipeCategory<BlastFurnaceRec
 				.addItemStack(recipe.slag.get());
 	}
 
-	@Override
 	public void draw(BlastFurnaceRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 12, 27);

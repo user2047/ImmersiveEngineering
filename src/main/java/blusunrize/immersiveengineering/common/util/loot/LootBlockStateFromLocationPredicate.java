@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.common.util.loot;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nonnull;
@@ -46,17 +45,14 @@ public record LootBlockStateFromLocationPredicate(Holder<Block> block,
 				.orElse(DataResult.success(condition));
 	}
 
-	@Nonnull
-	@Override
-	public LootItemConditionType getType()
+	public MapCodec<? extends LootItemCondition> codec()
 	{
-		return IELootFunctions.BLOCKSTATE.value();
+		return CODEC;
 	}
 
-	@Override
 	public boolean test(LootContext lootContext)
 	{
-		Vec3 pos = lootContext.getParamOrNull(LootContextParams.ORIGIN);
+		Vec3 pos = lootContext.getOptionalParameter(LootContextParams.ORIGIN);
 		if(pos==null)
 			return false;
 		BlockState blockstate = lootContext.getLevel().getBlockState(BlockPos.containing(pos));

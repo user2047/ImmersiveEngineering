@@ -12,10 +12,9 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.common.register.IEEntityTypes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
-@EventBusSubscriber(bus = Bus.MOD, modid = Lib.MODID)
+@EventBusSubscriber(modid = Lib.MODID)
 public class EntityCapabilityRegistration
 {
 	@SubscribeEvent

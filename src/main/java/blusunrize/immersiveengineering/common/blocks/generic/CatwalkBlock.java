@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -65,13 +65,11 @@ public class CatwalkBlock extends IEBaseBlock implements IColouredBlock, IHammer
 		this.lightOpacity = 0;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		builder.add(DYE_PROPERTY, BlockStateProperties.WATERLOGGED).add(RAILING_PROPERTIES.values().toArray(BooleanProperty[]::new)).add();
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		BlockState ret = super.getInitDefaultState();
@@ -82,9 +80,8 @@ public class CatwalkBlock extends IEBaseBlock implements IColouredBlock, IHammer
 		return ret;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
-	public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+	public InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
 										   BlockHitResult hit)
 	{
 		if(this.isDyeable&&Utils.isDye(stack))
@@ -92,13 +89,12 @@ public class CatwalkBlock extends IEBaseBlock implements IColouredBlock, IHammer
 			DyeColor dye = Utils.getDye(stack);
 			if(dye!=null)
 				world.setBlock(pos, state.setValue(DYE_PROPERTY, dye), 3);
-			return ItemInteractionResult.sidedSuccess(world.isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		return super.useItemOn(stack, state, world, pos, player, hand, hit);
 	}
 
 
-	@Override
 	public InteractionResult useHammer(BlockState state, Level world, BlockPos pos, @Nullable Player player, UseOnContext context)
 	{
 		if(player!=null && player.isShiftKeyDown())
@@ -113,19 +109,17 @@ public class CatwalkBlock extends IEBaseBlock implements IColouredBlock, IHammer
 			if(prop!=null)
 			{
 				world.setBlock(pos, state.setValue(prop, !state.getValue(prop)), 3);
-				return InteractionResult.sidedSuccess(world.isClientSide);
+				return InteractionResult.SUCCESS;
 			}
 		}
 		return InteractionResult.PASS;
 	}
 
-	@Override
 	public boolean hasCustomBlockColours()
 	{
 		return this.isDyeable;
 	}
 
-	@Override
 	public int getRenderColour(BlockState state, @Nullable BlockGetter worldIn, @Nullable BlockPos pos, int tintIndex)
 	{
 		if(this.isDyeable&&tintIndex==1)
@@ -150,19 +144,16 @@ public class CatwalkBlock extends IEBaseBlock implements IColouredBlock, IHammer
 		return list;
 	});
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(new RailingsKey(state, false));
 	}
 
-	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(new RailingsKey(state, true));
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		boolean north = state.getValue(PipeBlock.NORTH);

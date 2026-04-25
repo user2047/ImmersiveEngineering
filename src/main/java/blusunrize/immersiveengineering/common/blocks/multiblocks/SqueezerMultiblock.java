@@ -20,7 +20,6 @@ public class SqueezerMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.SQUEEZER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

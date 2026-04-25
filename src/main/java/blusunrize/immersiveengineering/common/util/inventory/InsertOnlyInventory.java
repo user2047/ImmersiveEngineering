@@ -14,37 +14,31 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class InsertOnlyInventory implements IItemHandler
 {
-	@Override
 	public int getSlots()
 	{
 		return 1;
 	}
 
-	@Override
 	public final @NotNull ItemStack getStackInSlot(int slot)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public final @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)
 	{
 		return insert(stack, simulate);
 	}
 
-	@Override
 	public final @NotNull ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public final int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public final boolean isItemValid(int slot, @NotNull ItemStack stack)
 	{
 		return true;

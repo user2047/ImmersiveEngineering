@@ -76,13 +76,11 @@ public class IEBullets
 				() -> BulletHandler.emptyShell.asItem().getDefaultInstance(),
 				IEApi.ieLoc("item/bullet_buckshot"))
 		{
-			@Override
 			public int getProjectileCount(Player shooter)
 			{
 				return 10;
 			}
 
-			@Override
 			public void onHitTarget(Level world, HitResult rtr, @Nullable UUID shooterUUID, Entity projectile, boolean headshot, Unit bulletData)
 			{
 				super.onHitTarget(world, rtr, shooterUUID, projectile, headshot, bulletData);
@@ -96,7 +94,6 @@ public class IEBullets
 				CodecsAndDefault.UNIT, null, 0, () -> BulletHandler.emptyShell.asItem().getDefaultInstance(), IEApi.ieLoc("item/bullet_he")
 		)
 		{
-			@Override
 			public void onHitTarget(Level world, HitResult target, UUID shooterId, Entity projectile, boolean headshot, Unit bulletData)
 			{
 				Entity shooter = null;
@@ -107,7 +104,6 @@ public class IEBullets
 				world.explode(shooter, projectile.getX(), projectile.getY(), projectile.getZ(), 2, ExplosionInteraction.MOB);
 			}
 
-			@Override
 			public Entity getProjectile(@Nullable Player shooter, Unit ignored, Entity projectile, boolean charged)
 			{
 				if(projectile instanceof RevolvershotEntity)
@@ -118,7 +114,6 @@ public class IEBullets
 				return projectile;
 			}
 
-			@Override
 			public SoundEvent getSound()
 			{
 				return IESounds.revolverFireThump.value();
@@ -132,7 +127,6 @@ public class IEBullets
 				() -> BulletHandler.emptyCasing.asItem().getDefaultInstance(),
 				IEApi.ieLoc("item/bullet_silver"))
 		{
-			@Override
 			protected float getDamage(Entity hitEntity, boolean headshot)
 			{
 				float dmg = super.getDamage(hitEntity, headshot);
@@ -151,13 +145,11 @@ public class IEBullets
 				() -> BulletHandler.emptyShell.asItem().getDefaultInstance(),
 				IEApi.ieLoc("item/bullet_dragons_breath"))
 		{
-			@Override
 			public int getProjectileCount(Player shooter)
 			{
 				return 30;
 			}
 
-			@Override
 			public Entity getProjectile(Player shooter, Unit ignored, Entity projectile, boolean electro)
 			{
 				((RevolvershotEntity)projectile).setTickLimit(10);

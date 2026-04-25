@@ -23,7 +23,6 @@ import java.util.Optional;
 public class FluidSorterGhostHandler implements IGhostIngredientHandler<FluidSorterScreen>
 {
 
-	@Override
 	public <I> List<Target<I>> getTargetsTyped(FluidSorterScreen gui, ITypedIngredient<I> ingredient, boolean doStart)
 	{
 		Optional<FluidStack> ingr = ingredient.getIngredient(NeoForgeTypes.FLUID_STACK);
@@ -36,7 +35,6 @@ public class FluidSorterGhostHandler implements IGhostIngredientHandler<FluidSor
 		return builder.build();
 	}
 
-	@Override
 	public void onComplete()
 	{
 
@@ -67,7 +65,6 @@ public class FluidSorterGhostHandler implements IGhostIngredientHandler<FluidSor
 			lastGuiTop = gui.getGuiTop();
 		}
 
-		@Override
 		public Rect2i getArea()
 		{
 			if(lastGuiLeft!=gui.getGuiLeft()||lastGuiTop!=gui.getGuiTop())
@@ -75,7 +72,6 @@ public class FluidSorterGhostHandler implements IGhostIngredientHandler<FluidSor
 			return area;
 		}
 
-		@Override
 		public void accept(FluidStack ingredient)
 		{
 			gui.setFluidInSlot(side, slot, ingredient, Minecraft.getInstance().level.registryAccess());

@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.util.CapabilityPos
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,14 +35,14 @@ public interface IMultiblockComponent<State>
 	{
 	}
 
-	default ItemInteractionResult click(
+	default InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock, Player player,
 			InteractionHand hand,
 			BlockHitResult absoluteHit,
 			boolean isClient
 	)
 	{
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	/**
@@ -66,46 +66,51 @@ public interface IMultiblockComponent<State>
 
 	interface CapabilityRegistrar<State>
 	{
-		<T> void register(BlockCapability<T, @Nullable Direction> capability, CapabilityGetter<T, State> getter);
+		@SuppressWarnings("rawtypes")
+		void register(BlockCapability capability, CapabilityGetter<State> getter);
 
-		default <T> void registerAtBlockPos(
-				BlockCapability<T, @Nullable Direction> capability,
+		@SuppressWarnings("rawtypes")
+		default void registerAtBlockPos(
+				BlockCapability capability,
 				BlockPos atPosition,
-				Function<State, T> getter
+				Function<State, ?> getter
 		)
 		{
 			register(capability, (state, position) -> Objects.equals(position.posInMultiblock(), atPosition)?getter.apply(state): null);
 		}
 
-		default <T> void registerAt(
-				BlockCapability<T, @Nullable Direction> capability,
+		@SuppressWarnings("rawtypes")
+		default void registerAt(
+				BlockCapability capability,
 				CapabilityPosition atPosition,
-				Function<State, T> getter
+				Function<State, ?> getter
 		)
 		{
 			register(capability, (state, position) -> Objects.equals(position, atPosition)?getter.apply(state): null);
 		}
 
-		default <T> void registerAtOrNull(
-				BlockCapability<T, @Nullable Direction> capability,
+		@SuppressWarnings("rawtypes")
+		default void registerAtOrNull(
+				BlockCapability capability,
 				CapabilityPosition atPosition,
-				Function<State, T> getter
+				Function<State, ?> getter
 		)
 		{
 			register(capability, (state, position) -> atPosition.equalsOrNullFace(position)?getter.apply(state): null);
 		}
 
-		default <T> void registerEverywhere(
-				BlockCapability<T, @Nullable Direction> capability, Function<State, T> getter
+		@SuppressWarnings("rawtypes")
+		default void registerEverywhere(
+				BlockCapability capability, Function<State, ?> getter
 		)
 		{
 			register(capability, (state, position) -> getter.apply(state));
 		}
 	}
 
-	interface CapabilityGetter<T, State>
+	interface CapabilityGetter<State>
 	{
 		@Nullable
-		T getCapability(State state, CapabilityPosition position);
+		Object getCapability(State state, CapabilityPosition position);
 	}
 }

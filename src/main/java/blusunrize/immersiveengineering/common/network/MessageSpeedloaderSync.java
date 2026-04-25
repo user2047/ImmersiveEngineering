@@ -32,7 +32,6 @@ public record MessageSpeedloaderSync(int slot, InteractionHand hand) implements 
 			MessageSpeedloaderSync::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -49,7 +48,6 @@ public record MessageSpeedloaderSync(int slot, InteractionHand hand) implements 
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

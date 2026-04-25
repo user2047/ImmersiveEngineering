@@ -28,10 +28,9 @@ public class PotionBulletFillRecipe extends CustomRecipe
 {
 	public PotionBulletFillRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		boolean hasBullet = false;
@@ -61,8 +60,7 @@ public class PotionBulletFillRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		ItemStack bullet = ItemStack.EMPTY;
 		ItemStack potion = ItemStack.EMPTY;
@@ -80,15 +78,13 @@ public class PotionBulletFillRecipe extends CustomRecipe
 		return newBullet;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= 2;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.POTION_BULLET_FILL.get();
 	}

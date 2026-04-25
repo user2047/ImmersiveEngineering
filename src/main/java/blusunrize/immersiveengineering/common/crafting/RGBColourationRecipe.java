@@ -21,9 +21,8 @@ import net.minecraft.world.level.Level;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public record RGBColourationRecipe(Ingredient target) implements CraftingRecipe
+public record RGBColourationRecipe(Ingredient target) implements IECraftingRecipe
 {
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		ItemStack itemToColour = ItemStack.EMPTY;
@@ -45,8 +44,7 @@ public record RGBColourationRecipe(Ingredient target) implements CraftingRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		int[] colourArray = new int[3];
 		int j = 0;
@@ -105,33 +103,28 @@ public record RGBColourationRecipe(Ingredient target) implements CraftingRecipe
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width >= 2&&height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean isSpecial()
 	{
 		return true;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.RGB_SERIALIZER.get();
 	}
 
-	@Override
 	public CraftingBookCategory category()
 	{
 		return CraftingBookCategory.MISC;

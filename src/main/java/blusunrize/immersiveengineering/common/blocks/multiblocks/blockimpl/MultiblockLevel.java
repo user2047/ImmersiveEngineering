@@ -34,58 +34,49 @@ public record MultiblockLevel(
 		this(getLevel, orientation, () -> origin);
 	}
 
-	@Override
 	public BlockState getBlockState(BlockPos relativePosition)
 	{
 		return SafeChunkUtils.getBlockState(level(), toAbsolute(relativePosition));
 	}
 
-	@Override
 	public void setBlock(BlockPos relativePosition, BlockState state)
 	{
 		level().setBlock(toAbsolute(relativePosition), state, Block.UPDATE_ALL);
 	}
 
 	@Nullable
-	@Override
 	public BlockEntity getBlockEntity(BlockPos relativePosition)
 	{
 		return SafeChunkUtils.getSafeBE(level(), toAbsolute(relativePosition));
 	}
 
 	@Nullable
-	@Override
 	public BlockEntity forciblyGetBlockEntity(BlockPos relativePosition)
 	{
 		return level().getBlockEntity(toAbsolute(relativePosition));
 	}
 
-	@Override
 	public boolean shouldTickModulo(int interval)
 	{
 		final int posRandom = 0x7f_ff_ff_ff&origin.hashCode();
 		return posRandom%interval==level().getGameTime()%interval;
 	}
 
-	@Override
 	public BlockPos getAbsoluteOrigin()
 	{
 		return origin.get();
 	}
 
-	@Override
 	public MultiblockOrientation getOrientation()
 	{
 		return orientation;
 	}
 
-	@Override
 	public BlockPos toAbsolute(BlockPos relative)
 	{
 		return getAbsoluteOrigin().offset(orientation.getAbsoluteOffset(relative));
 	}
 
-	@Override
 	public @Nullable Direction toAbsolute(@Nullable RelativeBlockFace relative)
 	{
 		if(relative!=null)
@@ -94,7 +85,6 @@ public record MultiblockLevel(
 			return null;
 	}
 
-	@Override
 	public AABB toAbsolute(AABB relative)
 	{
 		final Vec3 minPos = new Vec3(relative.minX, relative.minY, relative.minZ);
@@ -102,50 +92,42 @@ public record MultiblockLevel(
 		return new AABB(toAbsolute(minPos), toAbsolute(maxPos));
 	}
 
-	@Override
 	public Vec3 toAbsolute(Vec3 relative)
 	{
 		return Vec3.atLowerCornerOf(getAbsoluteOrigin()).add(orientation.getAbsoluteOffset(relative));
 	}
 
-	@Override
 	public BlockPos toRelative(BlockPos absolute)
 	{
 		final BlockPos absoluteOffset = absolute.subtract(getAbsoluteOrigin());
 		return orientation.getPosInMB(absoluteOffset);
 	}
 
-	@Override
 	public RelativeBlockFace toRelative(Direction absolute)
 	{
 		return RelativeBlockFace.from(orientation, absolute);
 	}
 
-	@Override
 	public boolean isThundering()
 	{
 		return level().isThundering();
 	}
 
-	@Override
 	public boolean isRaining()
 	{
 		return level().isRaining();
 	}
 
-	@Override
 	public int getMaxBuildHeight()
 	{
-		return level().getMaxBuildHeight();
+		return level().getMaxY();
 	}
 
-	@Override
 	public Level getRawLevel()
 	{
 		return level();
 	}
 
-	@Override
 	public void updateNeighbourForOutputSignal(BlockPos posInMultiblock)
 	{
 		final BlockPos absolutePos = toAbsolute(posInMultiblock);

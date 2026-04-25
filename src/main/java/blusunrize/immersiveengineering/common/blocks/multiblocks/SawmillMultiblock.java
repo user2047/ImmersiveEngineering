@@ -20,7 +20,6 @@ public class SawmillMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.SAWMILL);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

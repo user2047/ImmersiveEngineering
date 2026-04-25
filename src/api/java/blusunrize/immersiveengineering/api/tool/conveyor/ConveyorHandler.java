@@ -58,7 +58,7 @@ public class ConveyorHandler
 	{
 		MutableLong currentTick;
 		IntSet entitiesHandledInCurrentTick;
-		if(e.level().isClientSide)
+		if(e.level().isClientSide())
 		{
 			currentTick = currentTickClient;
 			entitiesHandledInCurrentTick = entitiesHandledInCurrentTickClient;

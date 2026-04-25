@@ -38,7 +38,7 @@ public record PositionedItemStack(List<ItemStack> displayList, int x, int y, Str
 
 	public PositionedItemStack(Ingredient ingredient, int x, int y)
 	{
-		this(ingredient.getItems(), x, y);
+		this(ingredient.items().map(holder -> new ItemStack(holder.value())).toList(), x, y);
 	}
 
 	public ItemStack getStackAtCurrentTime()

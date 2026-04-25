@@ -31,7 +31,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,37 +58,31 @@ public class BlueprintShelfBlockEntity extends IEBaseBlockEntity implements IIEI
 		super(IEBlockEntities.BLUEPRINT_SHELF.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_INVERTED_NO_DOWN;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return placer.isShiftKeyDown();
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.loadAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.saveAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -96,33 +90,28 @@ public class BlueprintShelfBlockEntity extends IEBaseBlockEntity implements IIEI
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
 		if(stack.has(IEDataComponents.GENERIC_ITEMS))
-			inventory = ListUtils.fromStream(stack.get(IEDataComponents.GENERIC_ITEMS).stream(), inventory.size());
+			inventory = ListUtils.fromStream(stack.get(IEDataComponents.GENERIC_ITEMS).allItemsCopyStream(), inventory.size());
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return stack.getItem() instanceof EngineersBlueprintItem;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 1;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -142,8 +131,7 @@ public class BlueprintShelfBlockEntity extends IEBaseBlockEntity implements IIEI
 		return (int)Math.floor(targetU*3)+(targetV < 0.33?6: targetV < 0.66?3: 0);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		int targetedSlot = getTargetedSlot(side, hitX, hitY, hitZ);
 		ItemStack stackInSlot = this.inventory.get(targetedSlot);
@@ -152,24 +140,23 @@ public class BlueprintShelfBlockEntity extends IEBaseBlockEntity implements IIEI
 		{
 			if(heldItem.isEmpty())
 				player.setItemInHand(hand, stackInSlot);
-			else if(!getLevelNonnull().isClientSide())
-				player.spawnAtLocation(stackInSlot, 0);
+			else if(getLevelNonnull() instanceof net.minecraft.server.level.ServerLevel serverLevel)
+				player.spawnAtLocation(serverLevel, stackInSlot);
 			this.inventory.set(targetedSlot, ItemStack.EMPTY);
 			this.setState(state.setValue(BlueprintShelfBlock.BLUEPRINT_SLOT_FILLED[targetedSlot], false));
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else if(isStackValid(targetedSlot, heldItem))
 		{
 			this.inventory.set(targetedSlot, heldItem.copyWithCount(1));
 			heldItem.shrink(1);
 			this.setState(state.setValue(BlueprintShelfBlock.BLUEPRINT_SLOT_FILLED[targetedSlot], true));
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 
 	@Nullable
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(mop instanceof BlockHitResult bhr)

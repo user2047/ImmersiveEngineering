@@ -45,19 +45,16 @@ public class MixingProcess extends MultiblockProcessInMachine<MixerRecipe>
 		this.tank = tank;
 	}
 
-	@Override
 	protected List<FluidStack> getRecipeFluidOutputs(Level level)
 	{
 		return Collections.emptyList();
 	}
 
-	@Override
 	protected List<SizedFluidIngredient> getRecipeFluidInputs(ProcessContextInMachine<MixerRecipe> context, Level level)
 	{
 		return Collections.emptyList();
 	}
 
-	@Override
 	public void doProcessTick(ProcessContextInMachine<MixerRecipe> context, IMultiblockLevel level)
 	{
 		LevelDependentData<MixerRecipe> levelData = getLevelData(level.getRawLevel());
@@ -100,7 +97,6 @@ public class MixingProcess extends MultiblockProcessInMachine<MixerRecipe>
 		}
 	}
 
-	@Override
 	public boolean canProcess(ProcessContextInMachine<MixerRecipe> context, Level level)
 	{
 		LevelDependentData<MixerRecipe> levelData = getLevelData(level);

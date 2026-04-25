@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -39,7 +39,7 @@ import java.util.Map;
 public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBasedDirectional, IBlockBounds, IFluidPipe
 {
 	public final Map<Direction, IEBlockCapabilityCache<IFluidHandler>> blockFluidHandlers = IEBlockCapabilityCaches.allNeighbors(
-			FluidHandler.BLOCK, this
+			Capabilities.Fluid.BLOCK, this
 	);
 	VoxelShape SHAPE_X = Shapes.join(Shapes.box(0f, 0.125f, 0.125f, 0.125f, 0.875f, 0.875f),
 			Shapes.join(Shapes.box(0.125f, 0.25f, 0.25f, 0.3125f, 0.75f, 0.75f),
@@ -65,19 +65,16 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 		super(IEBlockEntities.PIPE_VALVE.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED_INVERTED;
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(ctx==null) return Shapes.block();
@@ -89,25 +86,22 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 				};
 	}
 
-	@Override
 	public boolean canOutputPressurized(boolean consumePower)
 	{
 		return true;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
 	public static void registerCapabilities(BECapabilityRegistrar<? extends PipeValveBlockEntity> registrar)
 	{
-		registrar.register(FluidHandler.BLOCK, (be, side) ->
+		registrar.register(Capabilities.Fluid.BLOCK, (be, side) ->
 				(side==be.getFacing()?new SidedFluidHandler(be, be.getFacing()):
 						(side==be.getFacing().getOpposite()?new SidedFluidHandler(be, be.getFacing().getOpposite()): null)));
 	}
@@ -125,7 +119,6 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 			this.side = side;
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction doFill)
 		{
 			if(inUse||valve.isRSPowered()||resource.isEmpty()||side==null||(!side.equals(valve.getFacing().getOpposite())))
@@ -140,7 +133,6 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 			return filled;
 		}
 
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction doDrain)
 		{
 			if(inUse||valve.isRSPowered()||resource.isEmpty()||side==null||(!side.equals(valve.getFacing())))
@@ -152,7 +144,6 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 			return drained;
 		}
 
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction doDrain)
 		{
 			if(inUse||valve.isRSPowered()||side==null||(!side.equals(valve.getFacing())))
@@ -164,26 +155,22 @@ public class PipeValveBlockEntity extends IEBaseBlockEntity implements IStateBas
 			return drained;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return FluidStack.EMPTY;
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return 0;
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			return true;

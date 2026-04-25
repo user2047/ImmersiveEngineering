@@ -9,6 +9,7 @@
 package blusunrize.immersiveengineering.common.crafting;
 
 import blusunrize.immersiveengineering.common.util.RecipeSerializers;
+import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -19,11 +20,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DamageToolRecipe extends ShapelessRecipe
+public class DamageToolRecipe implements IECraftingRecipe
 {
+	private final String group;
+	private final ItemStack result;
+	private final NonNullList<Ingredient> ingredients;
+
 	public DamageToolRecipe(String group, ItemStack result, Ingredient tool, NonNullList<Ingredient> input)
 	{
-		super(group, CraftingBookCategory.MISC, result, addTo(tool, input));
+		this.group = group;
+		this.result = result;
+		this.ingredients = addTo(tool, input);
 	}
 
 	private static NonNullList<Ingredient> addTo(Ingredient additional, NonNullList<Ingredient> old)
@@ -33,10 +40,9 @@ public class DamageToolRecipe extends ShapelessRecipe
 	}
 
 	@Nonnull
-	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
-		NonNullList<ItemStack> remains = super.getRemainingItems(inv);
+		NonNullList<ItemStack> remains = NonNullList.withSize(inv.size(), ItemStack.EMPTY);
 		for(int i = 0; i < remains.size(); i++)
 		{
 			ItemStack s = inv.getItem(i);
@@ -58,7 +64,6 @@ public class DamageToolRecipe extends ShapelessRecipe
 		return remains;
 	}
 
-	@Override
 	public boolean matches(CraftingInput matrix, Level world)
 	{
 		List<Ingredient> required = new LinkedList<>(getIngredients());
@@ -88,8 +93,31 @@ public class DamageToolRecipe extends ShapelessRecipe
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public NonNullList<Ingredient> getIngredients()
+	{
+		return ingredients;
+	}
+
+	@Nonnull
+	public ItemStack getResultItem(Provider access)
+	{
+		return result;
+	}
+
+	@Nonnull
+	public ItemStack assemble(@Nonnull CraftingInput inv)
+	{
+		return result.copy();
+	}
+
+	@Nonnull
+	public String group()
+	{
+		return group;
+	}
+
+	@Nonnull
+	public RecipeSerializer<DamageToolRecipe> getSerializer()
 	{
 		return RecipeSerializers.DAMAGE_TOOL_SERIALIZER.get();
 	}

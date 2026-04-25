@@ -34,7 +34,6 @@ public class SqueezerScreen extends IEContainerScreen<SqueezerMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(

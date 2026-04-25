@@ -49,7 +49,6 @@ public class MultiblockCallbackWrapper<S extends IMultiblockState> extends Callb
 		return imbe -> imbe.getHelper().getState();
 	}
 
-	@Override
 	public boolean canAttachTo(IMultiblockBE<S> candidate)
 	{
 		final IMultiblockBEHelper<S> helper = candidate.getHelper();

@@ -23,7 +23,6 @@ public class CraftingTableScreen extends IEContainerScreen<CraftingTableMenu>
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		super.renderLabels(graphics, mouseX, mouseY);

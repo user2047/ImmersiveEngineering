@@ -45,7 +45,7 @@ import java.util.function.Function;
 
 public class ThermoelectricSource extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<ThermoelectricSource>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ThermoelectricSource>> SERIALIZER;
 
 	public static final CachedRecipeList<ThermoelectricSource> ALL_SOURCES = new CachedRecipeList<>(IERecipeTypes.THERMOELECTRIC_SOURCE);
 
@@ -75,13 +75,12 @@ public class ThermoelectricSource extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<?> getIESerializer()
+	protected RecipeSerializer<?> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;
@@ -90,7 +89,7 @@ public class ThermoelectricSource extends IESerializableRecipe
 	public Block getExample()
 	{
 		return blocks.map(
-				tagKey -> BuiltInRegistries.BLOCK.getTag(tagKey)
+				tagKey -> BuiltInRegistries.BLOCK.get(tagKey)
 						.flatMap(t -> t.getRandomElement(ApiUtils.RANDOM_SOURCE))
 						.map(Holder::value)
 						.orElse(Blocks.AIR),

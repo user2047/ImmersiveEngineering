@@ -52,13 +52,11 @@ public class AssemblerMenu extends IEContainerMenu
 		for(final CrafterPatternInventory pattern : state.patterns)
 			patterns.add(new ItemStackHandler(pattern.inv)
 			{
-				@Override
 				protected void onContentsChanged(int slot)
 				{
 					pattern.recalculateOutput(ctx.mbContext().getLevel().getRawLevel());
 				}
 
-				@Override
 				public int getSlotLimit(int slot)
 				{
 					return 1;
@@ -129,7 +127,6 @@ public class AssemblerMenu extends IEContainerMenu
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack stack = ItemStack.EMPTY;
@@ -162,13 +159,12 @@ public class AssemblerMenu extends IEContainerMenu
 		return stack;
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
 		super.receiveMessageFromScreen(nbt);
-		if(nbt.contains("buttonID", Tag.TAG_INT))
+		if(nbt.contains("buttonID"))
 		{
-			int id = nbt.getInt("buttonID");
+			int id = nbt.getIntOr("buttonID", 0);
 			if(id >= 0&&id < patterns.size())
 			{
 				IItemHandlerModifiable pattern = patterns.get(id);
@@ -178,17 +174,17 @@ public class AssemblerMenu extends IEContainerMenu
 			else if(id==3)
 				recursiveIngredients.set(!recursiveIngredients.get());
 		}
-		else if(nbt.contains("patternSync", Tag.TAG_INT))
+		else if(nbt.contains("patternSync"))
 		{
-			int r = nbt.getInt("recipe");
-			ListTag list = nbt.getList("patternSync", 10);
+			int r = nbt.getIntOr("recipe", 0);
+			ListTag list = nbt.getListOrEmpty("patternSync");
 			IItemHandlerModifiable pattern = patterns.get(r);
 			for(int i = 0; i < list.size(); i++)
 			{
-				CompoundTag itemTag = list.getCompound(i);
+				CompoundTag itemTag = list.getCompoundOrEmpty(i);
 				pattern.setStackInSlot(
-						itemTag.getInt("slot"),
-						ItemStack.parseOptional(Minecraft.getInstance().level.registryAccess(), itemTag)
+						itemTag.getIntOr("slot", 0),
+						blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(Minecraft.getInstance().level.registryAccess(), itemTag)
 				);
 			}
 		}

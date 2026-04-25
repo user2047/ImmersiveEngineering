@@ -32,7 +32,6 @@ public record FluidSplashOptions(Fluid fluid) implements ParticleOptions
 			.map(FluidSplashOptions::new, FluidSplashOptions::fluid);
 
 	@Nonnull
-	@Override
 	public ParticleType<?> getType()
 	{
 		return IEParticles.FLUID_SPLASH.get();

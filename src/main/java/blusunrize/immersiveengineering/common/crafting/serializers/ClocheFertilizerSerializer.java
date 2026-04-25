@@ -25,13 +25,11 @@ public class ClocheFertilizerSerializer extends IERecipeSerializer<ClocheFertili
 			ClocheFertilizer::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, ClocheFertilizer> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(Items.BONE_MEAL);

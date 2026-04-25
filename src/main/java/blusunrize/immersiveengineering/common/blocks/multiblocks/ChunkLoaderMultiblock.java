@@ -23,7 +23,6 @@ public class ChunkLoaderMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.CHUNK_LOADER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

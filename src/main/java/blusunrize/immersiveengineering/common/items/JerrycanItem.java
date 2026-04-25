@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
@@ -40,10 +40,9 @@ public class JerrycanItem extends IEBaseItem
 
 	public JerrycanItem()
 	{
-		super(new Properties().stacksTo(1).component(GENERIC_FLUID, SimpleFluidContent.EMPTY));
+		super(itemProperties().stacksTo(1).component(GENERIC_FLUID, SimpleFluidContent.EMPTY));
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		Optional<FluidStack> fsCap = FluidUtil.getFluidContained(stack);
@@ -51,13 +50,12 @@ public class JerrycanItem extends IEBaseItem
 	}
 
 	@Nonnull
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
 		ItemStack stack = ctx.getItemInHand();
-		if(world.getCapability(FluidHandler.BLOCK, pos, null)==null)
+		if(world.getCapability(Capabilities.Fluid.BLOCK, pos, null)==null)
 		{
 			FluidStack content = stack.getOrDefault(GENERIC_FLUID, SimpleFluidContent.EMPTY).copy();
 			if(!content.isEmpty()&&Utils.placeFluidBlock(world, pos.relative(ctx.getClickedFace()), content))
@@ -69,13 +67,11 @@ public class JerrycanItem extends IEBaseItem
 		return InteractionResult.PASS;
 	}
 
-	@Override
 	public boolean hasCraftingRemainingItem(ItemStack stack)
 	{
 		return stack.has(JERRYCAN_DRAIN)||FluidUtil.getFluidContained(stack).isPresent();
 	}
 
-	@Override
 	public ItemStack getCraftingRemainingItem(ItemStack stack)
 	{
 		if(stack.has(JERRYCAN_DRAIN))
@@ -99,7 +95,7 @@ public class JerrycanItem extends IEBaseItem
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
 		registrar.register(
-				FluidHandler.ITEM, (stack, $) -> new FluidHandlerItemStack(GENERIC_FLUID, stack, jerrycanMaxMB)
+				Capabilities.Fluid.ITEM, (stack, $) -> new FluidHandlerItemStack(GENERIC_FLUID, stack, jerrycanMaxMB)
 		);
 	}
 }

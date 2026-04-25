@@ -41,7 +41,6 @@ public abstract class IERecipeCategory<T extends Recipe<?>> implements IRecipeCa
 		this.title = Component.translatable(localKey);
 	}
 
-	@Override
 	public IDrawable getBackground()
 	{
 		return this.background;
@@ -53,7 +52,6 @@ public abstract class IERecipeCategory<T extends Recipe<?>> implements IRecipeCa
 	}
 
 	@Nullable
-	@Override
 	public IDrawable getIcon()
 	{
 		return this.icon;
@@ -69,19 +67,26 @@ public abstract class IERecipeCategory<T extends Recipe<?>> implements IRecipeCa
 		this.icon = icon;
 	}
 
-	@Override
 	public Component getTitle()
 	{
 		return this.title;
 	}
 
-	@Override
 	public final RecipeType<RecipeHolder<T>> getRecipeType()
 	{
 		return type;
 	}
 
-	@Override
+	public int getWidth()
+	{
+		return 160;
+	}
+
+	public int getHeight()
+	{
+		return 80;
+	}
+
 	public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<T> recipe, IFocusGroup focuses)
 	{
 		setRecipe(builder, recipe.value(), focuses);
@@ -91,7 +96,6 @@ public abstract class IERecipeCategory<T extends Recipe<?>> implements IRecipeCa
 	{
 	}
 
-	@Override
 	public void draw(RecipeHolder<T> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		draw(recipe.value(), recipeSlotsView, graphics, mouseX, mouseY);

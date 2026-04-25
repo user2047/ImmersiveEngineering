@@ -39,7 +39,6 @@ public class SirenScreen extends ClientBlockEntityScreen<SirenBlockEntity>
 
 	private GuiButtonBoolean[] colorButtons;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -71,7 +70,6 @@ public class SirenScreen extends ClientBlockEntityScreen<SirenBlockEntity>
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		ArrayList<Component> tooltip = new ArrayList<>();
@@ -90,7 +88,6 @@ public class SirenScreen extends ClientBlockEntityScreen<SirenBlockEntity>
 			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
-	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);

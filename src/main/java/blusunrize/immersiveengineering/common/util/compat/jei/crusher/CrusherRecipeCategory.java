@@ -36,11 +36,10 @@ public class CrusherRecipeCategory extends IERecipeCategory<CrusherRecipe>
 		setIcon(IEMultiblockLogic.CRUSHER.iconStack());
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, CrusherRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 2, 20)
-				.addItemStacks(Arrays.asList(recipe.input.getItems()))
+				.addItemStacks(java.util.List.of())
 				.setBackground(JEIHelper.slotDrawable, -1, -1);
 
 		List<StackWithChance> validSecondaries = getValidSecondaryOutputs(recipe);
@@ -55,7 +54,6 @@ public class CrusherRecipeCategory extends IERecipeCategory<CrusherRecipe>
 					.setBackground(JEIHelper.slotDrawable, -1, -1);
 	}
 
-	@Override
 	public void draw(CrusherRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		List<StackWithChance> validSecondaries = getValidSecondaryOutputs(recipe);

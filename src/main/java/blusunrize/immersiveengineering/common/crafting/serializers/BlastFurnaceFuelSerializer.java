@@ -25,13 +25,11 @@ public class BlastFurnaceFuelSerializer extends IERecipeSerializer<BlastFurnaceF
 			BlastFurnaceFuel::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, BlastFurnaceFuel> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(IEItems.Ingredients.COAL_COKE);

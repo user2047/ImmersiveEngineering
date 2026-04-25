@@ -12,8 +12,9 @@ package blusunrize.immersiveengineering.api.wires;
 import blusunrize.immersiveengineering.api.wires.utils.WireUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
@@ -33,11 +34,12 @@ public class ConnectorBlockEntityHelper
 	public static void remove(Level world, IImmersiveConnectable iic)
 	{
 		GlobalWireNetwork globalNet = GlobalWireNetwork.getNetwork(world);
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 		{
 			BlockPos pos = iic.getPosition();
 			Consumer<Connection> dropHandler;
-			if(world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+			ServerLevel serverLevel = (ServerLevel)world;
+			if(serverLevel.getGameRules().get(GameRules.BLOCK_DROPS))
 				dropHandler = (c) -> {
 					if(!c.isInternal())
 					{
@@ -54,7 +56,7 @@ public class ConnectorBlockEntityHelper
 			for(ConnectionPoint cp : iic.getConnectionPoints())
 				globalNet.removeAllConnectionsAt(cp, dropHandler);
 		}
-		if(world.isClientSide&&WireUtils.hasAnyConnections(globalNet, iic))
+		if(world.isClientSide()&&WireUtils.hasAnyConnections(globalNet, iic))
 			globalNet.onConnectorUnload(iic);
 		else
 			globalNet.removeConnector(iic);

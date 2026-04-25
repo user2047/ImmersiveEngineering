@@ -13,9 +13,11 @@ import blusunrize.immersiveengineering.api.shader.IShaderItem;
 import blusunrize.immersiveengineering.api.tool.upgrade.UpgradeEffect;
 import blusunrize.immersiveengineering.api.wires.Connection;
 import blusunrize.immersiveengineering.api.wires.Connection.CatenaryData;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.PowerpackCallbacks;
 import blusunrize.immersiveengineering.client.render.ConnectionRenderer;
 import blusunrize.immersiveengineering.client.render.tile.ShaderBannerRenderer;
+import blusunrize.immersiveengineering.client.utils.RenderTypeCompat;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.items.PowerpackItem;
 import blusunrize.immersiveengineering.common.util.EnergyHelper;
@@ -28,21 +30,21 @@ import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
@@ -50,7 +52,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -104,27 +105,9 @@ public class ModelPowerpack
 		ModelPart rightArm = null;
 		if(baseModel instanceof HumanoidModel humanoidModel)
 		{
-			isCrouching = humanoidModel.crouching;
 			leftArm = humanoidModel.leftArm;
 			rightArm = humanoidModel.rightArm;
 		}
-		else if(baseModel instanceof HierarchicalModel hierarchicalModel)
-		{
-			// Attempt to find limbs for illagers or similar
-			try
-			{
-				leftArm = hierarchicalModel.root().getChild("left_arm");
-				rightArm = hierarchicalModel.root().getChild("right_arm");
-			} catch(NoSuchElementException ignored)
-			{
-			}
-		}
-		if(baseModel instanceof AgeableListModel ageable&&baseModel.young)
-		{
-			matrixStackIn.scale(.5f, .5f, .5f);
-			matrixStackIn.translate(0, 1.5f, 0);
-		}
-
 		if(powerpack!=null)
 		{
 			float max = EnergyHelper.getMaxEnergyStored(powerpack);
@@ -132,7 +115,7 @@ public class ModelPowerpack
 			//model.meterNeedle.zRot = 0.5235987f-(1.047197f*storage);
 		}
 
-		ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+		ItemRenderer renderer = ClientUtils.getItemRenderer();
 		matrixStackIn.pushPose();
 		matrixStackIn.mulPose(new Quaternionf().rotateXYZ((float)Math.PI, 0, 0));
 		if(isCrouching)
@@ -154,11 +137,10 @@ public class ModelPowerpack
 			{
 				// set up to render the large-texture banner
 				PowerpackCallbacks.THIRD_PERSON_PASS = 3;
-				BakedModel bakedModel = renderer.getModel(powerpack, toRender.level(), toRender, 0);
-				bakedModel = ClientHooks.handleCameraTransforms(matrixStackIn, bakedModel, ItemDisplayContext.FIXED, false);
+				BakedModel bakedModel = renderer.getModel(powerpack, toRender.level() instanceof ClientLevel clientLevel?clientLevel: null, toRender, 0);
 				matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
-				VertexConsumer consumer = buffers.getBuffer(RenderType.entitySolid(shaderTexture));
-				Minecraft.getInstance().getItemRenderer().renderModelLists(
+				VertexConsumer consumer = buffers.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entitySolid(shaderTexture));
+				ClientUtils.getItemRenderer().renderModelLists(
 						bakedModel, powerpack, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, consumer
 				);
 			}
@@ -166,27 +148,21 @@ public class ModelPowerpack
 			{
 				// set up to render the small-texture banner
 				PowerpackCallbacks.THIRD_PERSON_PASS = 2;
-				BakedModel bakedModel = renderer.getModel(powerpack, toRender.level(), toRender, 0);
-				bakedModel = ClientHooks.handleCameraTransforms(matrixStackIn, bakedModel, ItemDisplayContext.FIXED, false);
+				BakedModel bakedModel = renderer.getModel(powerpack, toRender.level() instanceof ClientLevel clientLevel?clientLevel: null, toRender, 0);
 				matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
 				for(BannerLayer layer : getBannerLayers(banner, bakedModel))
 				{
 					VertexConsumer consumer = layer.getConsumer.apply(buffers);
-					for(BakedQuad quad : layer.bakedQuads())
-						consumer.putBulkData(
-								matrixStackIn.last(), quad, layer.red(), layer.green(), layer.blue(), 1,
-								packedLightIn, OverlayTexture.NO_OVERLAY, false
-						);
 				}
 			}
 			matrixStackIn.popPose();
 			PowerpackCallbacks.THIRD_PERSON_PASS = 1;
 		}
-		Minecraft.getInstance().getItemRenderer().render(
+		ClientUtils.getItemRenderer().render(
 				powerpack, ItemDisplayContext.FIXED, false,
 				matrixStackIn, buffers,
 				packedLightIn, OverlayTexture.NO_OVERLAY,
-				renderer.getModel(powerpack, toRender.level(), toRender, 0)
+				renderer.getModel(powerpack, toRender.level() instanceof ClientLevel clientLevel?clientLevel: null, toRender, 0)
 		);
 		PowerpackCallbacks.THIRD_PERSON_PASS = 0;
 		matrixStackIn.popPose();
@@ -208,7 +184,7 @@ public class ModelPowerpack
 				matrixStackIn.pushPose();
 				matrixStackIn.scale(1, -1, 1);
 				TransformingVertexBuilder builder = new TransformingVertexBuilder(
-						buffers, RenderType.entitySolid(InventoryMenu.BLOCK_ATLAS), matrixStackIn
+						buffers, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entitySolid(TextureAtlas.LOCATION_BLOCKS), matrixStackIn
 				);
 				ConnectionRenderer.renderConnection(
 						builder,
@@ -244,7 +220,7 @@ public class ModelPowerpack
 			matrixStackIn.scale(-1.0F, 1.0F, 1.0F);
 			CatenaryData renderCat = Connection.makeCatenaryData(antennaBase, antennaTip, 1.0+distFromWire*0.005);
 			ConnectionRenderer.renderConnection(
-					new TransformingVertexBuilder(buffers, RenderType.entitySolid(InventoryMenu.BLOCK_ATLAS), matrixStackIn),
+					new TransformingVertexBuilder(buffers, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entitySolid(TextureAtlas.LOCATION_BLOCKS), matrixStackIn),
 					renderCat, -.03125, 0xa4afb0, packedLightIn
 			);
 			matrixStackIn.popPose();
@@ -263,6 +239,8 @@ public class ModelPowerpack
 
 	private static List<BannerLayer> getBannerLayers(ItemStack banner, BakedModel bakedModel)
 	{
+		if(banner!=null)
+			return List.of();
 		DyeColor baseCol = DyeColor.WHITE;
 		if(banner.getItem() instanceof BlockItem&&((BlockItem)banner.getItem()).getBlock() instanceof AbstractBannerBlock bannerBlock)
 			baseCol = bannerBlock.getColor();
@@ -276,15 +254,6 @@ public class ModelPowerpack
 		cached = new ArrayList<>(quads.size()*patternList.size());
 		for(int i = 0; i < 17&&i < patternList.size(); ++i)
 		{
-			Layer layer = patternList.get(i);
-			Holder<BannerPattern> bannerpattern = layer.pattern();
-			Material material = Sheets.getShieldMaterial(bannerpattern);
-			var colour = Utils.vec4fFromDye(layer.color());
-			cached.add(new BannerLayer(
-					mbs -> material.buffer(mbs, RenderType::entityCutoutNoCullZOffset),
-					colour.x, colour.y, colour.z,
-					quads
-			));
 		}
 		bannerCache.put(key, cached);
 		return cached;
@@ -292,7 +261,6 @@ public class ModelPowerpack
 
 	private record CatenaryKey(ModelPart arm, boolean crouched, boolean right, int hash)
 	{
-		@Override
 		public int hashCode()
 		{
 			return hash;
@@ -326,7 +294,7 @@ public class ModelPowerpack
 
 		public ArmorModel(ModelPart part)
 		{
-			super(part, RenderType::entityTranslucent);
+			super(part, RenderTypeCompat::entityTranslucent);
 			//this.meterNeedle = part.getChild("body").getChild("meterNeedle");
 		}
 	}

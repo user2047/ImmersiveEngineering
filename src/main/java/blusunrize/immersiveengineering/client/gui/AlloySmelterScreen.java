@@ -26,7 +26,6 @@ public class AlloySmelterScreen extends IEContainerScreen<AlloySmelterMenu>
 		super(container, inventoryPlayer, title, TEXTURE);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		ContainerData state = menu.getStateView();

@@ -27,7 +27,6 @@ public class ExcavatorMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.EXCAVATOR);
 	}
 
-	@Override
 	public boolean createStructure(Level world, BlockPos pos, Direction side, Player player)
 	{
 		final boolean excavatorFormed = super.createStructure(world, pos, side, player);
@@ -45,7 +44,6 @@ public class ExcavatorMultiblock extends IETemplateMultiblock
 		return excavatorFormed;
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

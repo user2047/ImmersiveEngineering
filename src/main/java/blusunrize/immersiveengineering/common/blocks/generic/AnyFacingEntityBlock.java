@@ -25,7 +25,6 @@ public class AnyFacingEntityBlock<T extends BlockEntity> extends IEEntityBlock<T
 		super(tileType, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

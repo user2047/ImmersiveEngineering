@@ -11,7 +11,6 @@ package blusunrize.immersiveengineering.api.fluid;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -54,7 +53,7 @@ public class FluidUtils
 	)
 	{
 		ItemStack containerCopy = container.copyWithCount(1);
-		IFluidHandlerItem handler = containerCopy.getCapability(FluidHandler.ITEM);
+		IFluidHandlerItem handler = FluidUtil.getFluidHandler(containerCopy).orElse(null);
 		if(handler==null)
 			return FluidActionResult.FAILURE;
 		final FluidStack simulatedMoved = FluidUtil.tryFluidTransfer(

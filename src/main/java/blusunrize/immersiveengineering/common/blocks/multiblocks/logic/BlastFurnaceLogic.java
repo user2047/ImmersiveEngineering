@@ -46,7 +46,6 @@ public class BlastFurnaceLogic implements IMultiblockLogic<State>, IServerTickab
 {
 	public static final int NUM_SLOTS = 4;
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -57,19 +56,16 @@ public class BlastFurnaceLogic implements IMultiblockLogic<State>, IServerTickab
 			NonMirrorableWithActiveBlock.setActive(level, IEMultiblocks.BLAST_FURNACE, active);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return $ -> Shapes.block();
@@ -103,33 +99,28 @@ public class BlastFurnaceLogic implements IMultiblockLogic<State>, IServerTickab
 			);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.put("furnace", furnace.toNBT());
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 			furnace.readNBT(nbt.get("furnace"));
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return inventory;
 		}
 
-		@Override
 		public @Nullable BlastFurnaceRecipe getRecipeForInput()
 		{
 			return cachedRecipe.get();
 		}
 
-		@Override
 		public int getBurnTimeOf(Level level, ItemStack fuel)
 		{
 			return BlastFurnaceFuel.getBlastFuelTime(level, fuel);

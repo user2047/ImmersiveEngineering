@@ -36,20 +36,17 @@ public class PostTransformerBlock extends ConnectorBlock<PostTransformerBlockEnt
 		super(props, IEBlockEntities.POST_TRANSFORMER);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public Item asItem()
 	{
 		return Connectors.TRANSFORMER.get().asItem();
 	}
 
-	@Override
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn,
 										  BlockPos currentPos, BlockPos facingPos)
 	{
@@ -58,7 +55,6 @@ public class PostTransformerBlock extends ConnectorBlock<PostTransformerBlockEnt
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState baseState = super.getStateForPlacement(context);

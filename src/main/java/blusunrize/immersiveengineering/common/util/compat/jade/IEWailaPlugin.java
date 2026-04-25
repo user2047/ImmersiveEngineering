@@ -20,7 +20,6 @@ import snownee.jade.api.WailaPlugin;
 @WailaPlugin
 public class IEWailaPlugin implements IWailaPlugin
 {
-	@Override
 	public void registerClient(IWailaClientRegistration registration)
 	{
 		registration.registerBlockIcon(new MultiblockIconProvider(), MultiblockPartBlock.class);
@@ -29,7 +28,6 @@ public class IEWailaPlugin implements IWailaPlugin
 		registration.registerItemStorageClient(new MultiblockInventoryDataProvider());
 	}
 
-	@Override
 	public void register(IWailaCommonRegistration registration)
 	{
 		registration.registerFluidStorage(new MultiblockTankDataProvider(), MultiblockBlockEntityDummy.class);

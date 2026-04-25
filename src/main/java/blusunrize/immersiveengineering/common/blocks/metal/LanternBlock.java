@@ -19,7 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -57,28 +57,24 @@ public class LanternBlock extends IEBaseBlock implements IBlockOverlayText
 		super(props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(FACING, BlockStateProperties.WATERLOGGED, IEProperties.INT_16);
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		return super.getInitDefaultState().setValue(IEProperties.INT_16, 14);
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level level, BlockPos pos, BlockHitResult hit)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level level, BlockPos pos, BlockHitResult hit)
 	{
 		if(level instanceof ServerLevel)
 			level.setBlock(pos, level.getBlockState(pos).cycle(IEProperties.INT_16), 3);
-		return ItemInteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(blockState!=null&&Utils.isScrewdriver(player.getMainHandItem()))
@@ -95,14 +91,12 @@ public class LanternBlock extends IEBaseBlock implements IBlockOverlayText
 			.put(Direction.WEST, Shapes.box(0.25, 0.0625, 0.25, 1, 0.875, 0.75))
 			.build();
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(FACING));
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		return defaultBlockState().setValue(FACING, context.getClickedFace());

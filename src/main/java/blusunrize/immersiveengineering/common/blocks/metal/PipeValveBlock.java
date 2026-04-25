@@ -29,7 +29,6 @@ public class PipeValveBlock extends IEEntityBlock<PipeValveBlockEntity>
 		super(IEBlockEntities.PIPE_VALVE, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -43,14 +42,12 @@ public class PipeValveBlock extends IEEntityBlock<PipeValveBlockEntity>
 		builder.add(IEProperties.EAST);
 	}
 
-	@Override
 	@Deprecated
 	public VoxelShape getBlockSupportShape(BlockState state, BlockGetter getter, BlockPos pos)
 	{
 		return Shapes.block();
 	}
 
-	@Override
 	@Deprecated
 	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
 	{

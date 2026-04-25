@@ -17,7 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 public abstract class UpgradeableToolItem extends InternalStorageItem implements IUpgradeableTool
@@ -30,13 +30,11 @@ public abstract class UpgradeableToolItem extends InternalStorageItem implements
 		this.upgradeType = upgradeType;
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		return !ItemStack.matches(oldStack, newStack);
 	}
 
-	@Override
 	public final UpgradeData getUpgrades(ItemStack stack)
 	{
 		return getUpgradesStatic(stack);
@@ -47,24 +45,21 @@ public abstract class UpgradeableToolItem extends InternalStorageItem implements
 		return stack.getOrDefault(IEDataComponents.UPGRADE_DATA, UpgradeData.EMPTY);
 	}
 
-	@Override
 	public void clearUpgrades(ItemStack stack)
 	{
 		stack.remove(IEDataComponents.UPGRADE_DATA);
 	}
 
-	@Override
 	public void finishUpgradeRecalculation(ItemStack stack, RegistryAccess registries)
 	{
 	}
 
-	@Override
 	public void recalculateUpgrades(ItemStack stack, Level w, Player player)
 	{
-		if(w.isClientSide)
+		if(w.isClientSide())
 			return;
 		clearUpgrades(stack);
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null)
 		{
 			var upgrades = getUpgradeBase(stack);
@@ -87,13 +82,11 @@ public abstract class UpgradeableToolItem extends InternalStorageItem implements
 		return UpgradeData.EMPTY;
 	}
 
-	@Override
 	public boolean canTakeFromWorkbench(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
 	}

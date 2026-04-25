@@ -45,7 +45,7 @@ public class JEIIngredientStackListBuilder
 	public JEIIngredientStackListBuilder add(Ingredient... ingredientStacks)
 	{
 		for(Ingredient ingr : ingredientStacks)
-			this.list.add(Arrays.asList(ingr.getItems()));
+			this.list.add(ingr.items().map(ItemStack::new).toList());
 		return this;
 	}
 

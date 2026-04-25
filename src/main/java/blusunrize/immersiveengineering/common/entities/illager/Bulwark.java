@@ -28,10 +28,10 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.AbstractIllager;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.monster.illager.AbstractIllager;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +49,6 @@ public class Bulwark extends EngineerIllager
 		super(entityType, level);
 	}
 
-	@Override
 	protected void registerGoals()
 	{
 		super.registerGoals();
@@ -77,7 +76,6 @@ public class Bulwark extends EngineerIllager
 				.add(Attributes.FOLLOW_RANGE, 32.0D);
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -95,38 +93,32 @@ public class Bulwark extends EngineerIllager
 	}
 
 	@Nullable
-	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData)
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData)
 	{
 		this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Weapons.CHEMTHROWER));
 		this.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Misc.SHIELD));
 		return super.finalizeSpawn(level, difficulty, reason, spawnData);
 	}
 
-	@Override
 	public void applyRaidBuffs(ServerLevel p_348605_, int p_37844_, boolean p_37845_)
 	{
 	}
 
-	@Override
 	protected SoundEvent getAmbientSound()
 	{
 		return SoundEvents.VINDICATOR_AMBIENT;
 	}
 
-	@Override
 	protected SoundEvent getDeathSound()
 	{
 		return SoundEvents.VINDICATOR_DEATH;
 	}
 
-	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSource)
 	{
 		return SoundEvents.VINDICATOR_DEATH;
 	}
 
-	@Override
 	public SoundEvent getCelebrateSound()
 	{
 		return SoundEvents.VINDICATOR_CELEBRATE;

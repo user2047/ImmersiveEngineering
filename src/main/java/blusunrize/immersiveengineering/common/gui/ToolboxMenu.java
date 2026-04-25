@@ -16,11 +16,11 @@ import blusunrize.immersiveengineering.common.items.ToolboxItem;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -44,7 +44,7 @@ public class ToolboxMenu extends IEContainerMenu implements ICallbackContainer
 		return new ToolboxMenu(
 				itemCtx(type, id, invPlayer, slot, stack),
 				invPlayer,
-				Objects.requireNonNull(stack.getCapability(ItemHandler.ITEM))
+				Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM))
 		).setBlockedSlot(invPlayer);
 	}
 
@@ -61,7 +61,7 @@ public class ToolboxMenu extends IEContainerMenu implements ICallbackContainer
 
 	public ToolboxMenu setBlockedSlot(Inventory invPlayer)
 	{
-		this.blockedSlot = (invPlayer.selected+27+ToolboxItem.SLOT_COUNT);
+		this.blockedSlot = (invPlayer.getSelectedSlot()+27+ToolboxItem.SLOT_COUNT);
 		return this;
 	}
 
@@ -94,7 +94,6 @@ public class ToolboxMenu extends IEContainerMenu implements ICallbackContainer
 			addSlot(new Slot(inventoryPlayer, i, 8+i*18, 215));
 	}
 
-	@Override
 	public boolean canInsert(ItemStack stack, int slotNumber, Slot slotObject)
 	{
 		return canInsert(stack, slotNumber);
@@ -116,15 +115,13 @@ public class ToolboxMenu extends IEContainerMenu implements ICallbackContainer
 			return true;
 	}
 
-	@Override
-	public void clicked(int par1, int par2, ClickType par3, Player par4EntityPlayer)
+	public void clicked(int par1, int par2, ContainerInput par3, Player par4EntityPlayer)
 	{
-		if(blockedSlot >= 0&&(par1==this.blockedSlot||(par3==ClickType.SWAP&&par2==par4EntityPlayer.getInventory().selected)))
+		if(blockedSlot >= 0&&(par1==this.blockedSlot||(par3==ContainerInput.SWAP&&par2==par4EntityPlayer.getInventory().getSelectedSlot())))
 			return;
 		super.clicked(par1, par2, par3, par4EntityPlayer);
 	}
 
-	@Override
 	public boolean canTake(ItemStack stack, int slotNumer, Slot slotObject)
 	{
 		return true;

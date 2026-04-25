@@ -21,7 +21,6 @@ public class CrusherMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.CRUSHER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

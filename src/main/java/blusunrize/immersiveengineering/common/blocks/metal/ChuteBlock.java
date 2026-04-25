@@ -24,7 +24,6 @@ public class ChuteBlock extends IEEntityBlock<ChuteBlockEntity>
 		super(IEBlockEntities.CHUTE, properties);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

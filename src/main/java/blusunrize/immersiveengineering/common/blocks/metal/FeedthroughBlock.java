@@ -48,7 +48,6 @@ public class FeedthroughBlock extends ConnectorBlock<FeedthroughBlockEntity>
 		super(props, IEBlockEntities.FEEDTHROUGH);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -56,7 +55,6 @@ public class FeedthroughBlock extends ConnectorBlock<FeedthroughBlockEntity>
 		builder.add(IEProperties.FACING_ALL, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos)
 	{
 		BlockEntity tile = level.getBlockEntity(pos);
@@ -65,11 +63,10 @@ public class FeedthroughBlock extends ConnectorBlock<FeedthroughBlockEntity>
 		return super.getDestroyProgress(state, player, level, pos);
 	}
 
-	@Override
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving)
 	{
 		BlockEntity tile = world.getBlockEntity(pos);
-		if(tile instanceof FeedthroughBlockEntity&&!world.isClientSide&&newState.getBlock()!=state.getBlock())
+		if(tile instanceof FeedthroughBlockEntity&&!world.isClientSide()&&newState.getBlock()!=state.getBlock())
 		{
 			FeedthroughBlockEntity feedthrough = (FeedthroughBlockEntity)tile;
 			if(!feedthrough.currentlyDisassembling)
@@ -108,10 +105,8 @@ public class FeedthroughBlock extends ConnectorBlock<FeedthroughBlockEntity>
 				}
 			}
 		}
-		super.onRemove(state, world, pos, newState, isMoving);
 	}
 
-	@Override
 	public void fillCreativeTab(Output out)
 	{
 		// Feedthrough item is only for display

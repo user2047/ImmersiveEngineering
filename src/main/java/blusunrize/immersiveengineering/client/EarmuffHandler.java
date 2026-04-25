@@ -21,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import java.util.EnumMap;
@@ -30,7 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class EarmuffHandler
 {
 	private static final Map<SoundSource, Float> LAST_MULTIPLIERS = makeDefaultMultipliers();
@@ -63,7 +62,7 @@ public class EarmuffHandler
 			if(LAST_MULTIPLIERS.get(source).floatValue()!=newMultipliers.get(source))
 			{
 				LAST_MULTIPLIERS.put(source, newMultipliers.get(source));
-				Minecraft.getInstance().getSoundManager().updateSourceVolume(
+				Minecraft.getInstance().getSoundManager().updateCategoryVolume(
 						source, Minecraft.getInstance().options.getSoundSourceVolume(source)
 				);
 			}
@@ -71,7 +70,7 @@ public class EarmuffHandler
 
 	public static float getVolumeMultiplier(SoundInstance sound)
 	{
-		if(IGNORED_SOUNDS.contains(sound.getLocation()))
+		if(IGNORED_SOUNDS.contains(sound.getIdentifier()))
 			return 1;
 		else
 			return LAST_MULTIPLIERS.get(sound.getSource());

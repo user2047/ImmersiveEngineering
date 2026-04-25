@@ -32,7 +32,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +47,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -65,32 +65,29 @@ public class ToolboxBlockEntity extends IEBaseBlockEntity implements IStateBased
 		super(IEBlockEntities.TOOLBOX.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		if(nbt.contains("name", Tag.TAG_STRING))
-			this.name = Component.Serializer.fromJson(nbt.getString("name"), provider);
+		if(nbt.contains("name"))
+			this.name = Component.literal(nbt.getStringOr("name", ""));
 		this.enchantments = IECodecs.fromNbtOrThrow(ItemEnchantments.CODEC, nbt.get("enchantments"));
 		if(!descPacket)
-			ContainerHelper.loadAllItems(nbt, inventory, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(this.name!=null)
-			nbt.putString("name", Component.Serializer.toJson(this.name, provider));
+			nbt.putString("name", this.name.getString());
 		nbt.put("enchantments", IECodecs.toNbtOrThrow(ItemEnchantments.CODEC, this.enchantments));
 		if(!descPacket)
-			ContainerHelper.saveAllItems(nbt, inventory, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(player.isShiftKeyDown())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				ItemEntity entityitem = new ItemEntity(level, player.getX(), player.getY(), player.getZ(),
 				    getPickBlock(player, getBlockState(), new BlockHitResult(new Vec3(hitX, hitY, hitZ), side, worldPosition, false)),
@@ -98,60 +95,51 @@ public class ToolboxBlockEntity extends IEBaseBlockEntity implements IStateBased
 				level.removeBlock(getBlockPos(), false);
 				level.addFreshEntity(entityitem);
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public Component getDisplayName()
 	{
 		return name!=null?name: Component.translatable("item.immersiveengineering.toolbox.name");
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public ToolboxBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<ToolboxBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.TOOLBOX_BLOCK;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return IEApi.isAllowedInCrate(stack);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(Tools.TOOLBOX);
@@ -163,13 +151,12 @@ public class ToolboxBlockEntity extends IEBaseBlockEntity implements IStateBased
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
 		if(stack.getItem() instanceof InternalStorageItem)
 		{
-			IItemHandler inv = stack.getCapability(ItemHandler.ITEM, null);
+			IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 			if(inv!=null)
 			{
 				for(int i = 0; i < inv.getSlots(); i++)
@@ -183,25 +170,21 @@ public class ToolboxBlockEntity extends IEBaseBlockEntity implements IStateBased
 		}
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
@@ -210,7 +193,6 @@ public class ToolboxBlockEntity extends IEBaseBlockEntity implements IStateBased
 	private static final VoxelShape boundsZ = Shapes.box(.125f, 0, .25f, .875f, .625f, .75f);
 	private static final VoxelShape boundsX = Shapes.box(.25f, 0, .125f, .75f, .625f, .875f);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return getFacing().getAxis()==Axis.Z?boundsZ: boundsX;

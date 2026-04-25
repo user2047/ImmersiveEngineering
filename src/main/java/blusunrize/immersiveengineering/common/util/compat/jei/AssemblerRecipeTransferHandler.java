@@ -47,25 +47,21 @@ public class AssemblerRecipeTransferHandler implements IRecipeTransferHandler<As
 		this.transferHandlerHelper = transferHandlerHelper;
 	}
 
-	@Override
 	public Class<AssemblerMenu> getContainerClass()
 	{
 		return AssemblerMenu.class;
 	}
 
-	@Override
 	public Optional<MenuType<AssemblerMenu>> getMenuType()
 	{
 		return Optional.of(IEMenuTypes.ASSEMBLER.getType());
 	}
 
-	@Override
 	public RecipeType<RecipeHolder<CraftingRecipe>> getRecipeType()
 	{
-		return RecipeTypes.CRAFTING;
+		return null;
 	}
 
-	@Override
 	@Nullable
 	public IRecipeTransferError transferRecipe(AssemblerMenu container, RecipeHolder<CraftingRecipe> recipe, IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer)
 	{

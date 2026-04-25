@@ -21,7 +21,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -57,7 +57,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 
 	private DyeColor clickedInput;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -160,7 +159,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 	}
 
 
-	@Override
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderBackground(graphics, mouseX, mouseY, partialTicks);
@@ -174,7 +172,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		}
 	}
 
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int modifier)
 	{
 		boolean ret = super.mouseClicked(mouseX, mouseY, modifier);
@@ -186,7 +183,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		return ret;
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.input"), guiLeft+8, guiTop+4, DyeColor.GRAY.getTextColor());
@@ -244,7 +240,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		{
 			Matrix4f matrix4f = graphics.pose().last().pose();
 			// Quad
-			VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(RenderType.debugQuads());
+			VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.debugQuads());
 			vertexconsumer.addVertex(matrix4f, topLeft.x, topLeft.y, 1)
 					.setColor(colour);
 			vertexconsumer.addVertex(matrix4f, botLeft.x, botLeft.y, 1)
@@ -271,7 +267,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 			this.active = false;
 		}
 
-		@Override
 		protected void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			// input plug
@@ -282,7 +277,6 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 			this.quad.draw(graphics);
 		}
 
-		@Override
 		protected void updateWidgetNarration(NarrationElementOutput p_259858_)
 		{
 		}

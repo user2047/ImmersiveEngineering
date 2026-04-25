@@ -96,7 +96,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 		super(type, pos, state);
 	}
 
-	@Override
 	public void tickClient()
 	{
 		rotation += speed;
@@ -104,7 +103,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 		ImmersiveEngineering.proxy.handleTileSound(IESounds.mill_creaking, this, Math.abs(speed) > 0, 0.5f, 1f);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		//Update rotation to make sure we sync it with client correctly
@@ -121,7 +119,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 			handleUpdate(null);
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
@@ -130,7 +127,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 				master.setShouldUpdate();
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos pos)
 	{
 		super.onNeighborBlockChange(pos);
@@ -379,18 +375,16 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return (resistanceTorque.length() > torque.length())?torque.scale(-0.9): resistanceTorque;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		offset = nbt.getIntArray("offset");
-		rotation = nbt.getDouble("rotation");
-		speed = nbt.getDouble("speed");
+		offset = nbt.getIntArray("offset").orElse(new int[0]);
+		rotation = nbt.getDoubleOr("rotation", 0);
+		speed = nbt.getDoubleOr("speed", 0);
 
 		if(offset==null||offset.length < 2)
 			offset = new int[]{0, 0};
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putIntArray("offset", offset);
@@ -400,38 +394,32 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public AABB renderAABB;
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_PREFER_SIDE;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return offset[0]!=0||offset[1]!=0;
 	}
 
 	@Nullable
-	@Override
 	public IGeneralMultiblock master()
 	{
 		if(!isDummy())
@@ -441,7 +429,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return this.getClass().isInstance(te)?(IGeneralMultiblock)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
@@ -457,7 +444,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 				}
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		if(beingBroken)
@@ -476,7 +462,6 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 				}
 	}
 
-	@Override
 	public boolean shouldPlaySound(String sound)
 	{
 		return Math.abs(speed) > 0;

@@ -50,43 +50,36 @@ public class FeedthroughMultiblock implements IMultiblock
 		return Connectors.getEnergyConnector(WireType.LV_CATEGORY, false).get();
 	}
 
-	@Override
 	public Vec3i getSize(@Nullable Level world)
 	{
 		return new Vec3i(3, 1, 1);
 	}
 
-	@Override
 	public void disassemble(Level world, BlockPos startPos, boolean mirrored, Direction clickDirectionAtCreation)
 	{
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public BlockPos getTriggerOffset()
 	{
 		return new BlockPos(-1, 0, 0);
 	}
 
-	@Override
 	public void initializeClient(Consumer<MultiblockManualData> consumer)
 	{
 		consumer.accept(new FeedthroughManualData());
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;
 	}
 
-	@Override
 	public Identifier getUniqueName()
 	{
 		return IEApi.ieLoc("feedthrough");
 	}
 
-	@Override
 	public boolean isBlockTrigger(BlockState state, Direction side, @Nullable Level world)
 	{
 		return WireApi.getWireType(state)!=null;
@@ -110,7 +103,6 @@ public class FeedthroughMultiblock implements IMultiblock
 		return WireApi.getWireType(state);
 	}
 
-	@Override
 	public boolean createStructure(Level world, BlockPos pos, Direction side, Player player)
 	{
 		GlobalWireNetwork globalNet = GlobalWireNetwork.getNetwork(world);
@@ -146,7 +138,7 @@ public class FeedthroughMultiblock implements IMultiblock
 				return false;
 		}
 		//Form
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 		{
 			BlockState state = Connectors.FEEDTHROUGH.defaultBlockState().setValue(FACING_ALL, side);
 			BlockPos masterPos = pos.relative(side);
@@ -162,7 +154,6 @@ public class FeedthroughMultiblock implements IMultiblock
 		return true;
 	}
 
-	@Override
 	public List<StructureBlockInfo> getStructure(@Nullable Level world)
 	{
 		if(structure.isEmpty())
@@ -211,7 +202,6 @@ public class FeedthroughMultiblock implements IMultiblock
 		return null;
 	}
 
-	@Override
 	public Component getDisplayName()
 	{
 		return Connectors.FEEDTHROUGH.get().getName();

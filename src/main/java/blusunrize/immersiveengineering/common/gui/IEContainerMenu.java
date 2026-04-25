@@ -22,7 +22,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
 
 import javax.annotation.Nonnull;
@@ -39,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public abstract class IEContainerMenu extends AbstractContainerMenu implements IScreenMessageReceive
 {
 	private final List<GenericContainerData<?>> genericData = new ArrayList<>();
@@ -60,7 +59,6 @@ public abstract class IEContainerMenu extends AbstractContainerMenu implements I
 		genericData.add(newData);
 	}
 
-	@Override
 	public void broadcastChanges()
 	{
 		super.broadcastChanges();
@@ -82,13 +80,12 @@ public abstract class IEContainerMenu extends AbstractContainerMenu implements I
 			genericData.get(syncElement.getFirst()).processSync(syncElement.getSecond().data());
 	}
 
-	@Override
-	public void clicked(int id, int dragType, ClickType clickType, Player player)
+	public void clicked(int id, int dragType, ContainerInput ContainerInput, Player player)
 	{
 		Slot slot = id < 0?null: this.slots.get(id);
 		if(!(slot instanceof IESlot.ItemHandlerGhost))
 		{
-			super.clicked(id, dragType, clickType, player);
+			super.clicked(id, dragType, ContainerInput, player);
 			return;
 		}
 		//Spooky Ghost Slots!!!!
@@ -130,7 +127,6 @@ public abstract class IEContainerMenu extends AbstractContainerMenu implements I
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
@@ -263,14 +259,12 @@ public abstract class IEContainerMenu extends AbstractContainerMenu implements I
 		return this.moveItemStackTo(stack, startIndex, Math.max(lastMatchingSlot, endIndex), true);
 	}
 
-	@Override
 	public void removed(@Nonnull Player player)
 	{
 		super.removed(player);
 		setChanged.run();
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player pPlayer)
 	{
 		return isValid.test(pPlayer);

@@ -26,6 +26,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -102,7 +103,6 @@ public class RevolvershotEntity extends IEProjectileEntity
 		setDeltaMovement(Vec3.ZERO);
 	}
 
-	@Override
 	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		double d1 = this.getBoundingBox().getSize()*4.0D;
@@ -110,7 +110,6 @@ public class RevolvershotEntity extends IEProjectileEntity
 		return distance < d1*d1;
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -119,13 +118,12 @@ public class RevolvershotEntity extends IEProjectileEntity
 
 	public BulletData<?> getBullet()
 	{
-		if(level().isClientSide)
+		if(level().isClientSide())
 			return entityData.get(DATAMARKER_BULLET);
 		else
 			return bullet;
 	}
 
-	@Override
 	public void onHit(HitResult mop)
 	{
 		boolean headshot = false;
@@ -149,12 +147,12 @@ public class RevolvershotEntity extends IEProjectileEntity
 					Player shooter = level().getPlayerByUUID(shooterUUID);
 					if(shooter!=null)
 						Utils.unlockIEAdvancement(shooter, "tools/secret_birthdayparty");
-					level().playSound(null, getX(), getY(), getZ(), IESounds.birthdayParty.value(), SoundSource.PLAYERS, 1.0F, 1.2F/(this.random.nextFloat()*0.2F+0.9F));
+					level().playSound(null, getX(), getY(), getZ(), IESounds.birthdayParty.value(), SoundSource.PLAYERS, 1.0F, 1.2F/(this.getRandom().nextFloat()*0.2F+0.9F));
 					PacketDistributor.sendToPlayersTrackingEntity(hitEntity, new MessageBirthdayParty(hitEntity.getId()));
 				}
 			}
 		}
-		if(!this.level().isClientSide)
+		if(!this.level().isClientSide())
 			this.secondaryImpact(mop);
 		if(mop instanceof BlockHitResult)
 			this.onHitBlock((BlockHitResult)mop);
@@ -173,7 +171,7 @@ public class RevolvershotEntity extends IEProjectileEntity
 		{
 			Player shooter = level().getPlayerByUUID(shooterUUID);
 			float percentualDrain = .15f/(bullet==null?1: bullet.bullet.getProjectileCount(shooter));
-			((LivingEntity)hitEntity).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 4));
+			((LivingEntity)hitEntity).addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 15, 4));
 			for(EquipmentSlot slot : EquipmentSlot.values())
 			{
 				ItemStack stack = ((LivingEntity)hitEntity).getItemBySlot(slot);
@@ -193,42 +191,34 @@ public class RevolvershotEntity extends IEProjectileEntity
 		}
 	}
 
-	@Override
 	public void addAdditionalSaveData(CompoundTag nbt)
 	{
-		super.addAdditionalSaveData(nbt);
-		nbt.putByte("inGround", (byte)(this.inGround?1: 0));
+		nbt.putByte("inGround", (byte)(this.isInGround()?1: 0));
 		nbt.put("bullet", BulletData.CODECS.toNBT(bullet));
 	}
 
-	@Override
 	public void readAdditionalSaveData(CompoundTag nbt)
 	{
-		super.readAdditionalSaveData(nbt);
 		this.bullet = BulletData.CODECS.fromNBT(nbt.get("bullet"));
 	}
 
-	@Override
 	public float getPickRadius()
 	{
 		return 1.0F;
 	}
 
-	@Override
 	public boolean isPickable()
 	{
 		return false;
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getDefaultPickupItem()
 	{
 		return BulletHandler.getBulletStack(IEBullets.CASULL);
 	}
 
-	@Override
-	public boolean hurt(DamageSource source, float amount)
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount)
 	{
 		return false;
 	}
@@ -238,7 +228,6 @@ public class RevolvershotEntity extends IEProjectileEntity
 		this.gravity = gravity;
 	}
 
-	@Override
 	public double getDefaultGravity()
 	{
 		return gravity;
@@ -249,7 +238,6 @@ public class RevolvershotEntity extends IEProjectileEntity
 		this.movementDecay = movementDecay;
 	}
 
-	@Override
 	protected float getMotionDecayFactor()
 	{
 		return movementDecay;
@@ -257,7 +245,7 @@ public class RevolvershotEntity extends IEProjectileEntity
 
 	public record BulletData<T>(IBullet<T> bullet, T data)
 	{
-		public static final DualCodec<RegistryFriendlyByteBuf, BulletData<?>> CODECS = DualCodecs.RESOURCE_LOCATION
+		public static final DualCodec<RegistryFriendlyByteBuf, BulletData<?>> CODECS = blusunrize.immersiveengineering.api.utils.codec.IEDualCodecs.IDENTIFIER
 				.<RegistryFriendlyByteBuf>castStream()
 				.dispatch(
 						bd -> BulletHandler.findRegistryName(bd.bullet),

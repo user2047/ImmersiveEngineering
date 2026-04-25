@@ -24,7 +24,6 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.*;
@@ -36,7 +35,7 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 @SuppressWarnings("WeakerAccess")
-@EventBusSubscriber(modid = ImmersiveEngineering.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = ImmersiveEngineering.MODID)
 public class IEServerConfig
 {
 	public static class Wires

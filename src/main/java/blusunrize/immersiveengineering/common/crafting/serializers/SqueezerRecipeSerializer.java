@@ -32,13 +32,11 @@ public class SqueezerRecipeSerializer extends IERecipeSerializer<SqueezerRecipe>
 			SqueezerRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, SqueezerRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.SQUEEZER.iconStack();

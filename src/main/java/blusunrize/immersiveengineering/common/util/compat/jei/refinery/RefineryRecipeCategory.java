@@ -38,23 +38,22 @@ public class RefineryRecipeCategory extends IERecipeCategory<RefineryRecipe>
 		tankOverlay = helper.createDrawable(background, 179, 33, 16, 47);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, RefineryRecipe recipe, IFocusGroup focuses)
 	{
 		if(recipe.input0!=null)
 			builder.addSlot(RecipeIngredientRole.INPUT, 7, 10)
 					.setFluidRenderer(FluidType.BUCKET_VOLUME/20, false, 16, 47)
-					.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(recipe.input0.getFluids()))
+					.addIngredients(NeoForgeTypes.FLUID_STACK, java.util.List.of())
 					.setOverlay(tankOverlay, 0, 0);
 		if(recipe.input1!=null)
 			builder.addSlot(RecipeIngredientRole.INPUT, 34, 10)
 					.setFluidRenderer(FluidType.BUCKET_VOLUME/20, false, 16, 47)
 					.setOverlay(tankOverlay, 0, 0)
-					.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(recipe.input1.getFluids()));
-		if(!recipe.catalyst.isEmpty())
+					.addIngredients(NeoForgeTypes.FLUID_STACK, java.util.List.of());
+		if(recipe.catalyst.isPresent())
 		{
-			builder.addSlot(RecipeIngredientRole.CATALYST, 67, 16)
-					.addItemStacks(Arrays.asList(recipe.catalyst.getItems()));
+			builder.addSlot(RecipeIngredientRole.INPUT, 67, 16)
+					.addItemStacks(java.util.List.of());
 		}
 		builder.addSlot(RecipeIngredientRole.OUTPUT, 103, 10)
 				.setFluidRenderer(FluidType.BUCKET_VOLUME/20, false, 16, 47)

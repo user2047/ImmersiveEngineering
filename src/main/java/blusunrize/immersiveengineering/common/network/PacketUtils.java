@@ -44,7 +44,7 @@ public class PacketUtils
 
 	public static <T> T readRegistryElement(FriendlyByteBuf buffer, Registry<T> registry) {
 		ResourceKey<T> key = buffer.readResourceKey(registry.key());
-		return registry.get(key);
+		return registry.get(key).map(reference -> reference.value()).orElse(null);
 	}
 
 	public static <T> void writeRegistryElement(FriendlyByteBuf buffer, Registry<T> registry, T entry) {

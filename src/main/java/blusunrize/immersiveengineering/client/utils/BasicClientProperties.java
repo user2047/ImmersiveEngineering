@@ -21,7 +21,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -65,7 +65,6 @@ public class BasicClientProperties implements MultiblockManualData
 				MODELS.put(mb.getUniqueName(), new DynamicModel(ieMB.getBlockName().getPath()));
 	}
 
-	@Override
 	public NonNullList<ItemStack> getTotalMaterials()
 	{
 		if(materials==null)
@@ -93,7 +92,6 @@ public class BasicClientProperties implements MultiblockManualData
 		return materials;
 	}
 
-	@Override
 	public void renderFormedStructure(PoseStack transform, MultiBufferSource bufferSource)
 	{
 		transform.pushPose();
@@ -105,15 +103,9 @@ public class BasicClientProperties implements MultiblockManualData
 			transform.mulPose(rotation.get());
 			transform.translate(-0.5, 0, -0.5);
 		}
-		List<BakedQuad> nullQuads = model.get().getNullQuads();
-		VertexConsumer buffer = bufferSource.getBuffer(IERenderTypes.TRANSLUCENT_FULLBRIGHT);
-		nullQuads.forEach(quad -> buffer.putBulkData(
-				transform.last(), quad, 1, 1, 1, 1, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
-		));
 		transform.popPose();
 	}
 
-	@Override
 	public boolean canRenderFormedStructure()
 	{
 		return true;

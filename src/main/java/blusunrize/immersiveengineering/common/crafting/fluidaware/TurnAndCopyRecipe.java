@@ -11,11 +11,11 @@ package blusunrize.immersiveengineering.common.crafting.fluidaware;
 
 import blusunrize.immersiveengineering.common.crafting.fluidaware.TurnAndCopyRecipe.MatchLocation;
 import blusunrize.immersiveengineering.common.util.RecipeSerializers;
-import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import javax.annotation.Nonnull;
@@ -57,10 +57,9 @@ public class TurnAndCopyRecipe extends AbstractShapedRecipe<MatchLocation>
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(@Nonnull CraftingInput matrix, Provider access)
+	public ItemStack assemble(@Nonnull CraftingInput matrix)
 	{
-		ItemStack out = super.assemble(matrix, access);
+		ItemStack out = super.assemble(matrix);
 		for(int targetSlot : nbtCopyTargetSlot)
 			// TODO this really needs filtering to specific components!
 			out.applyComponents(matrix.getItem(targetSlot).getComponents());
@@ -68,7 +67,6 @@ public class TurnAndCopyRecipe extends AbstractShapedRecipe<MatchLocation>
 	}
 
 	@Nullable
-	@Override
 	public MatchLocation findMatch(CraftingInput inv)
 	{
 		for(int xOffset = 0; xOffset <= inv.width()-this.getWidth(); ++xOffset)
@@ -90,22 +88,21 @@ public class TurnAndCopyRecipe extends AbstractShapedRecipe<MatchLocation>
 		for(int x = 0; x < inv.width(); x++)
 			for(int y = 0; y < inv.height(); y++)
 			{
-				Ingredient target = Ingredient.EMPTY;
+				Ingredient target = emptyIngredient();
 
 				int index = loc.getListIndex(x, y);
 				if(index >= 0)
 					target = getIngredients().get(index);
 
 				ItemStack slot = inv.getItem(x+y*inv.width());
-				if(!target.test(slot))
+				if(isEmptyIngredient(target)?!slot.isEmpty(): !target.test(slot))
 					return false;
 			}
 		return true;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.TURN_AND_COPY_SERIALIZER.get();
 	}
@@ -146,7 +143,6 @@ public class TurnAndCopyRecipe extends AbstractShapedRecipe<MatchLocation>
 			this.recipeHeight = recipeHeight;
 		}
 
-		@Override
 		public int getListIndex(int x, int y)
 		{
 			x -= offsetX;

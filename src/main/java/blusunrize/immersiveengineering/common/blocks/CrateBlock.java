@@ -24,11 +24,10 @@ public class CrateBlock extends IEEntityBlock<WoodenCrateBlockEntity>
 		super(IEBlockEntities.WOODEN_CRATE, blockProps, false);
 	}
 
-	@Override
 	public void attack(BlockState blockState, Level level, BlockPos pos, Player player)
 	{
 		if(level.getBlockEntity(pos) instanceof WoodenCrateBlockEntity crate&&!crate.isSealed())
-			player.displayClientMessage(Component.translatable(Lib.CHAT_WARN+"crate_unsealed"), true);
+			player.sendOverlayMessage(Component.translatable(Lib.CHAT_WARN+"crate_unsealed"));
 	}
 }
 

@@ -10,6 +10,7 @@
 package blusunrize.immersiveengineering.common.crafting.fluidaware;
 
 import blusunrize.immersiveengineering.common.crafting.fluidaware.BasicShapedRecipe.MatchLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -32,7 +33,7 @@ public class BasicShapedRecipe extends AbstractShapedRecipe<MatchLocation>
 			{
 				int recX = invX-loc.xOffset;
 				int recY = invY-loc.yOffset;
-				Ingredient expectedContent = Ingredient.EMPTY;
+				Ingredient expectedContent = emptyIngredient();
 				if(recX >= 0&&recY >= 0&&recX < this.getWidth()&&recY < this.getHeight())
 				{
 					int recipeSlot;
@@ -43,7 +44,8 @@ public class BasicShapedRecipe extends AbstractShapedRecipe<MatchLocation>
 					expectedContent = getIngredients().get(recipeSlot);
 				}
 
-				if(!expectedContent.test(craftingInventory.getItem(invX+invY*craftingInventory.width())))
+				ItemStack slot = craftingInventory.getItem(invX+invY*craftingInventory.width());
+				if(isEmptyIngredient(expectedContent)?!slot.isEmpty(): !expectedContent.test(slot))
 					return false;
 			}
 
@@ -51,7 +53,6 @@ public class BasicShapedRecipe extends AbstractShapedRecipe<MatchLocation>
 	}
 
 	@Nullable
-	@Override
 	public MatchLocation findMatch(CraftingInput inv)
 	{
 		for(int xOffset = 0; xOffset <= inv.width()-this.getWidth(); ++xOffset)
@@ -81,7 +82,6 @@ public class BasicShapedRecipe extends AbstractShapedRecipe<MatchLocation>
 			this.recipeWidth = recipeWidth;
 		}
 
-		@Override
 		public int getListIndex(int x, int y)
 		{
 			int localX = x-xOffset;

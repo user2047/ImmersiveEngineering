@@ -21,7 +21,7 @@ import blusunrize.immersiveengineering.common.items.RevolverItem.SpecialRevolver
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
@@ -64,7 +64,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 		return rl("item/revolvers/"+revolverName);
 	}
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = RevolverItem.getUpgradesStatic(stack);
@@ -81,7 +80,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 		);
 	}
 
-	@Override
 	public TextureAtlasSprite getTextureReplacement(Key stack, String group, String material)
 	{
 		if(!stack.elite().isEmpty())
@@ -90,7 +88,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 			return revolverDefaultTexture;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key stack, String group, RenderType layer)
 	{
 		if(group.equals("frame")||group.equals("cylinder"))
@@ -135,7 +132,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 		return render.contains(group);
 	}
 
-	@Override
 	public void handlePerspective(Key key, LivingEntity holder, ItemDisplayContext cameraItemDisplayContext, PoseStack mat)
 	{
 		if(ZoomHandler.isZooming && (cameraItemDisplayContext==ItemDisplayContext.FIRST_PERSON_LEFT_HAND||cameraItemDisplayContext==ItemDisplayContext.FIRST_PERSON_RIGHT_HAND))
@@ -151,7 +147,7 @@ public class RevolverCallbacks implements ItemCallback<Key>
 			boolean left = cameraItemDisplayContext==ItemDisplayContext.FIRST_PERSON_LEFT_HAND||cameraItemDisplayContext==ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
 			if(key.fancyAnimation()&&main)
 			{
-				float f = player.getAttackStrengthScale(ClientUtils.mc().getTimer().getGameTimeDeltaTicks());
+				float f = player.getAttackStrengthScale(ClientUtils.partialTicks());
 				if(f < 1)
 				{
 					float angle = f*-6.28318f;
@@ -208,7 +204,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 			List.of("player_electro_0", "player_electro_1")
 	);
 
-	@Override
 	public List<List<String>> getSpecialGroups(ItemStack stack, ItemDisplayContext transform, LivingEntity entity)
 	{
 		return SPECIAL_GROUPS;
@@ -221,7 +216,6 @@ public class RevolverCallbacks implements ItemCallback<Key>
 	private static final Transformation MAT_SNUB_ELECTRO = new Transformation(new Vector3f(1.4375f, -.1875f, 0.125f), null, null, null);
 
 	@Nonnull
-	@Override
 	public Transformation getTransformForGroups(ItemStack stack, List<String> groups, ItemDisplayContext transform, LivingEntity entity,
 												float partialTicks)
 	{
@@ -278,11 +272,10 @@ public class RevolverCallbacks implements ItemCallback<Key>
 		{
 			case "frame" -> MAT_CLOSE;
 			case "cylinder" -> MAT_CYLINDER;
-			default -> Transformation.identity();
+			default -> Transformation.IDENTITY;
 		};
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key("", "", false, false, false, false, false, 0, false);

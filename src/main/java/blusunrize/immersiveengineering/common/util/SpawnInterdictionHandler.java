@@ -27,22 +27,22 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
 import java.util.*;
 
-@EventBusSubscriber(modid = ImmersiveEngineering.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = ImmersiveEngineering.MODID)
 public class SpawnInterdictionHandler
 {
 	private static final Map<ResourceKey<Level>, Set<ISpawnInterdiction>> interdictionTiles = new HashMap<>();
 
 	@SubscribeEvent
-	public static void onEnderTeleport(EntityTeleportEvent.EnderEntity event)
+	public static void onEnderTeleport(EntityTeleportEvent event)
 	{
-		LivingEntity living = event.getEntityLiving();
+		if(!(event.getEntity() instanceof LivingEntity living))
+			return;
 		if(shouldCancel(living)||living.getEffect(IEPotions.STUNNED)!=null)
 			event.setCanceled(true);
 		else if(checkForLeadedBlocks(event, living))
@@ -50,16 +50,16 @@ public class SpawnInterdictionHandler
 	}
 
 	@SubscribeEvent
-	public static void onEnderpearlTeleport(EntityTeleportEvent.EnderPearl event)
+	public static void onEnderpearlTeleport(EntityTeleportEvent event)
 	{
-		if(checkForLeadedBlocks(event, event.getPlayer()))
+		if(event.getEntity() instanceof LivingEntity living&&checkForLeadedBlocks(event, living))
 			event.setCanceled(true);
 	}
 
 	@SubscribeEvent
-	public static void onChorusTeleport(EntityTeleportEvent.ChorusFruit event)
+	public static void onChorusTeleport(EntityTeleportEvent event)
 	{
-		if(checkForLeadedBlocks(event, event.getEntityLiving()))
+		if(event.getEntity() instanceof LivingEntity living&&checkForLeadedBlocks(event, living))
 			event.setCanceled(true);
 	}
 
@@ -126,7 +126,7 @@ public class SpawnInterdictionHandler
 	void removeFromInterdictionTiles(T tile)
 	{
 		Level level = tile.getLevel();
-		if(level!=null&&!level.isClientSide)
+		if(level!=null&&!level.isClientSide())
 			synchronized(interdictionTiles)
 			{
 				Set<ISpawnInterdiction> inDimension = interdictionTiles.get(level.dimension());

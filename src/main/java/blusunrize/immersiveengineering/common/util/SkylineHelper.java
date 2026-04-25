@@ -52,7 +52,7 @@ public class SkylineHelper
 	public static void spawnHook(LivingEntity player, Connection connection, InteractionHand hand,
 								 boolean limitSpeed, float slopeModifier)
 	{
-		if(!player.level().isClientSide)
+		if(!player.level().isClientSide())
 		{
 			GlobalWireNetwork global = GlobalWireNetwork.getNetwork(player.level());
 			ConnectionPoint cpA = connection.getEndA();

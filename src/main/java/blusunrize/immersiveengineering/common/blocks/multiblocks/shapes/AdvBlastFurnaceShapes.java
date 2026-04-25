@@ -23,7 +23,6 @@ public class AdvBlastFurnaceShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if((posInMultiblock.getX()==1&&posInMultiblock.getZ()==1)||Set.of(

@@ -42,7 +42,7 @@ public class GuiButtonManualLink extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
+	protected void extractContents(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		isHovered = mx >= this.getX()&&my >= this.getY()&&mx < this.getX()+this.width&&my < this.getY()+this.height;
 		if(isHovered)
@@ -57,13 +57,13 @@ public class GuiButtonManualLink extends Button
 	private void drawHovered(GuiGraphicsExtractor graphics, int mx, int my)
 	{
 		Font font = gui.manual.fontRenderer();
-		graphics.drawString(font, localized, getX(), getY(), gui.manual.getHighlightColour(), false);
+		graphics.text(font, localized, getX(), getY(), gui.manual.getHighlightColour(), false);
 		String tooltip;
 		if(link!=null)
 			tooltip = gui.manual.formatLink(link);
 		else
 			tooltip = "Invalid link";
-		graphics.renderTooltip(font, Language.getInstance().getVisualOrder(
+		graphics.setTooltipForNextFrame(font, Language.getInstance().getVisualOrder(
 				ImmutableList.of(Component.literal(tooltip))
 		), mx+8, my+4);
 	}

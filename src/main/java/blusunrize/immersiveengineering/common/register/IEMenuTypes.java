@@ -250,14 +250,12 @@ public class IEMenuTypes
 			return new MenuProvider()
 			{
 				@Nonnull
-				@Override
 				public Component getDisplayName()
 				{
 					return Component.empty();
 				}
 
 				@Nullable
-				@Override
 				public AbstractContainerMenu createMenu(
 						int containerId, @Nonnull Inventory inventory, @Nonnull Player player
 				)

@@ -13,9 +13,9 @@ import blusunrize.immersiveengineering.common.items.RevolverItem.Perks;
 import blusunrize.immersiveengineering.common.items.RevolverItem.RevolverPerk;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import blusunrize.immersiveengineering.common.util.RecipeSerializers;
-import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
@@ -31,19 +31,17 @@ public class RevolverAssemblyRecipe extends TurnAndCopyRecipe
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.REVOLVER_ASSEMBLY_SERIALIZER.get();
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(@Nonnull CraftingInput matrix, Provider access)
+	public ItemStack assemble(@Nonnull CraftingInput matrix)
 	{
 		if(nbtCopyTargetSlot!=null)
 		{
-			ItemStack out = getResultItem(access).copy();
+			ItemStack out = getResultItem(null).copy();
 			EnumMap<RevolverPerk, Double> mergedPerks = new EnumMap<>(RevolverPerk.class);
 			for(int targetSlot : nbtCopyTargetSlot)
 			{
@@ -57,6 +55,6 @@ public class RevolverAssemblyRecipe extends TurnAndCopyRecipe
 			return out;
 		}
 		else
-			return super.assemble(matrix, access);
+			return super.assemble(matrix);
 	}
 }

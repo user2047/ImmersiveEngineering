@@ -33,12 +33,13 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.shapes.ArcFurna
 import blusunrize.immersiveengineering.common.blocks.multiblocks.shapes.ArcFurnaceShapes;
 import blusunrize.immersiveengineering.common.register.IEParticles;
 import blusunrize.immersiveengineering.common.util.IESounds;
+import blusunrize.immersiveengineering.common.util.NBTCompat;
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.inventory.WrappingItemHandler;
 import blusunrize.immersiveengineering.common.util.inventory.WrappingItemHandler.IntRange;
 import blusunrize.immersiveengineering.common.util.sound.MultiblockSound;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
@@ -54,8 +55,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -121,7 +122,6 @@ public class ArcFurnaceLogic
 		MachineInterfaceHandler.register(MIF_CONDITION_ELECTRODES, MachineInterfaceHandler.buildComparativeConditions(State::getElectrodeComparatorValue));
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -145,7 +145,7 @@ public class ArcFurnaceLogic
 		if(level.shouldTickModulo(8))
 			outputItems(state);
 
-		if(tickedAny&&ApiUtils.RANDOM.nextInt(10)==0)
+		if(tickedAny&&ApiUtils.getRandom().nextInt(10)==0)
 		{
 			final Level rawLevel = level.getRawLevel();
 			final Vec3 soundPos = level.toAbsolute(new Vec3(1.5, 1.5, 1.5));
@@ -153,12 +153,11 @@ public class ArcFurnaceLogic
 					null,
 					soundPos.x, soundPos.y, soundPos.z,
 					SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.BLOCKS,
-					0.6F+ApiUtils.RANDOM.nextFloat()*0.4F, 1.0f
+					0.6F+ApiUtils.getRandom().nextFloat()*0.4F, 1.0f
 			);
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -177,7 +176,7 @@ public class ArcFurnaceLogic
 		final Level rawLevel = level.getRawLevel();
 		for(int i = 0; i < Math.max(1, state.queueSize*0.51); i++)
 		{
-			if(ApiUtils.RANDOM.nextInt(6)==0)
+			if(ApiUtils.getRandom().nextInt(6)==0)
 				for(final Vec3 offset : ELECTRODE_OFFSETS)
 				{
 					final Vec3 absPos = level.toAbsolute(offset);
@@ -201,7 +200,7 @@ public class ArcFurnaceLogic
 
 	private static double particleSpeed(double max)
 	{
-		return ApiUtils.RANDOM.nextDouble(-max, max);
+		return ApiUtils.getRandom().nextDouble(-max, max);
 	}
 
 	private void enqueueProcesses(State state, Level level)
@@ -241,7 +240,7 @@ public class ArcFurnaceLogic
 			if(recipe==null)
 				continue;
 			ArcFurnaceProcess process = new ArcFurnaceProcess(
-					recipe, ApiUtils.RANDOM.nextLong(), slot, 12, 13, 14, 15
+					recipe, ApiUtils.getRandom().nextLong(), slot, 12, 13, 14, 15
 			);
 			if(state.processor.addProcessToQueue(process, level, false))
 			{
@@ -286,14 +285,13 @@ public class ArcFurnaceLogic
 		}
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
 		register.register(
-				EnergyStorage.BLOCK,
+				Energy.BLOCK,
 				(state, pos) -> pos.side()==null||ENERGY_INPUTS.contains(pos)?state.energy: null
 		);
-		register.register(ItemHandler.BLOCK, (state, pos) -> {
+		register.register(Capabilities.Item.BLOCK, (state, pos) -> {
 			if(MAIN_CAP_POS.equals(pos))
 				return state.outputHandler;
 			else if(SLAG_CAP_POS.equals(pos))
@@ -309,19 +307,16 @@ public class ArcFurnaceLogic
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		if(forType==ShapeType.SELECTION)
@@ -348,7 +343,6 @@ public class ArcFurnaceLogic
 	{
 		private final AveragingEnergyStorage energy = new AveragingEnergyStorage(ENERGY_CAPACITY);
 		public ItemStackHandler inventory = new ItemStackHandler(NUM_SLOTS){
-			@Override
 			public int getSlotLimit(int slot)
 			{
 				return 64;
@@ -378,8 +372,8 @@ public class ArcFurnaceLogic
 			this.processor = new InMachineProcessor<>(
 					12, $ -> 0, 12, ctx.getMarkDirtyRunnable(), ctx.getSyncRunnable(), ArcFurnaceRecipe.RECIPES::getById
 			);
-			this.output = ctx.getCapabilityAt(Capabilities.ItemHandler.BLOCK, MAIN_OUT_POS);
-			this.slagOutput = ctx.getCapabilityAt(Capabilities.ItemHandler.BLOCK, SLAG_OUT_POS);
+			this.output = ctx.getCapabilityAt(Capabilities.Item.BLOCK, MAIN_OUT_POS);
+			this.slagOutput = ctx.getCapabilityAt(Capabilities.Item.BLOCK, SLAG_OUT_POS);
 			this.insertionHandler = new ArcFurnaceInputHandler(
 					this.inventory, ctx.getMarkDirtyRunnable()
 			);
@@ -403,23 +397,24 @@ public class ArcFurnaceLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("energy", energy.serializeNBT(provider));
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			var energyOutput = NBTCompat.createOutput(provider);
+			energy.serialize(energyOutput);
+			nbt.put("energy", energyOutput.buildResult());
+			var inventoryOutput = NBTCompat.createOutput(provider);
+			inventory.serialize(inventoryOutput);
+			nbt.put("inventory", inventoryOutput.buildResult());
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			energy.deserializeNBT(provider, nbt.get("energy"));
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			energy.deserialize(NBTCompat.createInput(provider, nbt.getCompoundOrEmpty("energy")));
+			inventory.deserialize(NBTCompat.createInput(provider, nbt.getCompoundOrEmpty("inventory")));
 			processor.fromNBT(nbt.get("processor"), (getRecipe, data, p) -> new ArcFurnaceProcess(getRecipe, data), provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putByte("electrodeMask", electrodePresence);
@@ -428,13 +423,12 @@ public class ArcFurnaceLogic
 			nbt.putInt("queueSize", processor.getQueueSize());
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			electrodePresence = nbt.getByte("electrodeMask");
-			active = nbt.getBoolean("active");
-			pouringMetal = nbt.getInt("pouringMetal");
-			queueSize = nbt.getInt("queueSize");
+			electrodePresence = nbt.getByteOr("electrodeMask", (byte)0);
+			active = nbt.getBooleanOr("active", false);
+			pouringMetal = nbt.getIntOr("pouringMetal", 0);
+			queueSize = nbt.getIntOr("queueSize", 0);
 		}
 
 		private boolean updateElectrodePresence()
@@ -451,19 +445,16 @@ public class ArcFurnaceLogic
 			return false;
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public ItemStackHandler getInventory()
 		{
 			return inventory;
 		}
 
-		@Override
 		public int[] getOutputSlots()
 		{
 			return OUTPUT_SLOTS;
@@ -497,7 +488,6 @@ public class ArcFurnaceLogic
 			return true;
 		}
 
-		@Override
 		public boolean additionalCanProcessCheck(MultiblockProcess<ArcFurnaceRecipe, ?> process, Level level)
 		{
 			if(!hasElectrodes())
@@ -511,7 +501,6 @@ public class ArcFurnaceLogic
 			return ItemStack.isSameItemSameComponents(slag, recipe.slag.get())&&slag.getCount()+recipe.slag.get().getCount() <= 64;
 		}
 
-		@Override
 		public void onProcessFinish(MultiblockProcess<ArcFurnaceRecipe, ?> process, Level level)
 		{
 			ArcFurnaceRecipe recipe = process.getRecipe(level);

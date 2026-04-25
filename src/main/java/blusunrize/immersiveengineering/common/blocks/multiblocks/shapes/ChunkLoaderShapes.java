@@ -19,7 +19,6 @@ public class ChunkLoaderShapes implements Function<BlockPos, VoxelShape>
 {
 	public static final Function<BlockPos, VoxelShape> SHAPE_GETTER = new ChunkLoaderShapes();
 
-	@Override
 	public VoxelShape apply(BlockPos pos)
 	{
 		// Base

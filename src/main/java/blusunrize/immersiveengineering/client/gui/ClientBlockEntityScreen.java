@@ -27,7 +27,6 @@ public abstract class ClientBlockEntityScreen<T extends BlockEntity> extends Scr
 		this.blockEntity = blockEntity;
 	}
 
-	@Override
 	protected void init()
 	{
 		super.init();
@@ -37,7 +36,6 @@ public abstract class ClientBlockEntityScreen<T extends BlockEntity> extends Scr
 
 	protected abstract void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick);
 
-	@Override
 	public void render(GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		// Background & widgets
@@ -46,7 +44,6 @@ public abstract class ClientBlockEntityScreen<T extends BlockEntity> extends Scr
 		drawGuiContainerForegroundLayer(graphics, mx, my, partial);
 	}
 
-	@Override
 	public boolean isPauseScreen()
 	{
 		return false;

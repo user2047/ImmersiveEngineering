@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client.utils;
 
+import blusunrize.immersiveengineering.ImmersiveEngineering;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -18,7 +19,7 @@ import net.minecraft.resources.Identifier;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.mojang.blaze3d.platform.GlConst.*;
+import org.lwjgl.opengl.GL11;
 
 public class WhiteTexture implements AutoCloseable
 {
@@ -30,15 +31,16 @@ public class WhiteTexture implements AutoCloseable
 
 	private WhiteTexture()
 	{
-		this.whiteTexture = new DynamicTexture(16, 16, false);
-		this.whiteTextureLocation = Minecraft.getInstance().getTextureManager().register("ie_light_map", this.whiteTexture);
+		this.whiteTexture = new DynamicTexture("ie_light_map", 16, 16, false);
+		this.whiteTextureLocation = ImmersiveEngineering.rl("ie_light_map");
+		Minecraft.getInstance().getTextureManager().register(this.whiteTextureLocation, this.whiteTexture);
 		NativeImage lightPixels = Objects.requireNonNull(this.whiteTexture.getPixels());
 
 		for(int i = 0; i < 16; ++i)
 		{
 			for(int j = 0; j < 16; ++j)
 			{
-				lightPixels.setPixelRGBA(j, i, -1);
+				lightPixels.setPixel(j, i, -1);
 			}
 		}
 
@@ -48,9 +50,8 @@ public class WhiteTexture implements AutoCloseable
 	public void bind()
 	{
 		RenderSystem.setShaderTexture(2, this.whiteTextureLocation);
-		Minecraft.getInstance().getTextureManager().bindForSetup(this.whiteTextureLocation);
-		RenderSystem.texParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		RenderSystem.texParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 	}
 
 	public Identifier getTextureLocation()
@@ -58,7 +59,6 @@ public class WhiteTexture implements AutoCloseable
 		return whiteTextureLocation;
 	}
 
-	@Override
 	public void close() throws Exception
 	{
 		whiteTexture.close();

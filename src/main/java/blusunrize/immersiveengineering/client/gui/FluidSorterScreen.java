@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Direction;
@@ -31,7 +32,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -52,7 +52,6 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
@@ -63,7 +62,6 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 						FluidInfoArea.fillTooltip(menu.getFilter(side, i), -1, addLine);
 	}
 
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
 		super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -80,11 +78,10 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 		return false;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		MultiBufferSource.BufferSource buffers = graphics.bufferSource();
-		VertexConsumer builder = buffers.getBuffer(IERenderTypes.getGui(InventoryMenu.BLOCK_ATLAS));
+		VertexConsumer builder = buffers.getBuffer(IERenderTypes.getGui(TextureAtlas.LOCATION_BLOCKS));
 		for(int side = 0; side < 6; side++)
 			for(int i = 0; i < 8; i++)
 			{
@@ -114,7 +111,6 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 		}
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -159,7 +155,7 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 			if(fluid.isEmpty())
 				tag.remove("filter");
 			else
-				tag.put("filter", fluid.save(provider));
+				tag.put("filter", blusunrize.immersiveengineering.common.util.FluidStackCompat.save(fluid, provider));
 		sendUpdateToServer(tag);
 	}
 

@@ -35,21 +35,18 @@ public class EnergyMeterBlock extends ConnectorBlock<EnergyMeterBlockEntity>
 		super(props, IEBlockEntities.ENERGY_METER);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(DUMMY, FACING, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		Direction newFacing = rot.rotate(state.getValue(FACING));
 		return state.setValue(FACING, newFacing);
 	}
 
-	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn)
 	{
 		if(mirrorIn==Mirror.NONE)
@@ -59,7 +56,6 @@ public class EnergyMeterBlock extends ConnectorBlock<EnergyMeterBlockEntity>
 		return state.setValue(FACING, newFacing);
 	}
 
-	@Override
 	public BlockState updateShape(BlockState stateIn, Direction updateSide, BlockState updatedState,
 										  LevelAccessor worldIn, BlockPos currentPos, BlockPos updatedPos)
 	{
@@ -76,7 +72,6 @@ public class EnergyMeterBlock extends ConnectorBlock<EnergyMeterBlockEntity>
 		return Blocks.AIR.defaultBlockState();
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		return areAllReplaceable(

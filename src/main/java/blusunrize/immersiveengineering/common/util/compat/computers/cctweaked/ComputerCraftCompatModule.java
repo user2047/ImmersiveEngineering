@@ -35,7 +35,6 @@ public class ComputerCraftCompatModule extends EarlyIECompatModule
 		this.modBus = modBus;
 	}
 
-	@Override
 	public void init()
 	{
 		ComputerCraftAPI.registerBundledRedstoneProvider((world, pos, direction) -> {
@@ -70,23 +69,5 @@ public class ComputerCraftCompatModule extends EarlyIECompatModule
 
 	private static void registerCapabilities(RegisterCapabilitiesEvent event)
 	{
-		for(Entry<Identifier, CallbackOwner<?>> entry : Callbacks.getCallbacks().entrySet())
-		{
-
-			PeripheralCreator<?> creator;
-			try
-			{
-				creator = new PeripheralCreator<>((CallbackOwner<? extends BlockEntity>)entry.getValue());
-			} catch(IllegalAccessException e)
-			{
-				throw new RuntimeException("Failed to get peripheral methods for "+entry.getKey(), e);
-			}
-
-			event.registerBlockEntity(
-					PeripheralCapability.get(),
-					Objects.requireNonNull(BuiltInRegistries.BLOCK_ENTITY_TYPE.get(entry.getKey())),
-					(be, direction) -> creator.make(be)
-			);
-		}
 	}
 }

@@ -21,7 +21,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class ClocheFertilizer extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<ClocheFertilizer>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ClocheFertilizer>> SERIALIZER;
 
 	public static final CachedRecipeList<ClocheFertilizer> RECIPES = new CachedRecipeList<>(IERecipeTypes.FERTILIZER);
 
@@ -41,12 +41,10 @@ public class ClocheFertilizer extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<ClocheFertilizer> getIESerializer()
+	protected RecipeSerializer<ClocheFertilizer> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;

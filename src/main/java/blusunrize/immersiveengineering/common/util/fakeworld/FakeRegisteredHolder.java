@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.common.util.fakeworld;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -23,68 +24,67 @@ public record FakeRegisteredHolder<T>(
 		T value, ResourceKey<T> key
 ) implements Holder<T>
 {
-	@Override
 	public boolean isBound()
 	{
 		return true;
 	}
 
-	@Override
-	public boolean is(Identifier p_205713_)
+	public boolean areComponentsBound()
 	{
-		return this.key.location().equals(p_205713_);
+		return true;
 	}
 
-	@Override
+	public boolean is(Identifier p_205713_)
+	{
+		return this.key.identifier().equals(p_205713_);
+	}
+
 	public boolean is(ResourceKey<T> p_205712_)
 	{
 		return this.key==p_205712_;
 	}
 
-	@Override
 	public boolean is(Predicate<ResourceKey<T>> p_205711_)
 	{
 		return p_205711_.test(this.key);
 	}
 
-	@Override
 	public boolean is(TagKey<T> p_205705_)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean is(Holder<T> p_316447_)
 	{
 		// TODO is this right? Is this even critical?
 		return p_316447_==this;
 	}
 
-	@Override
 	public Stream<TagKey<T>> tags()
 	{
 		return Stream.empty();
 	}
 
-	@Override
+	public DataComponentMap components()
+	{
+		return DataComponentMap.EMPTY;
+	}
+
 	public Either<ResourceKey<T>, T> unwrap()
 	{
 		return Either.right(value);
 	}
 
-	@Override
 	public Optional<ResourceKey<T>> unwrapKey()
 	{
 		return Optional.of(key);
 	}
 
-	@Override
 	public Kind kind()
 	{
 		return Kind.DIRECT;
 	}
 
-	@Override
 	public boolean canSerializeIn(HolderOwner<T> p_255833_)
 	{
 		return false;

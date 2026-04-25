@@ -10,6 +10,7 @@ package blusunrize.immersiveengineering.api;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
@@ -84,7 +85,11 @@ public class ComparableItemStack
 
 	public CompoundTag writeToNBT(HolderLookup.Provider provider, CompoundTag nbt)
 	{
-		nbt.put("stack", stack.save(provider));
+		nbt.put(
+				"stack",
+				ItemStack.OPTIONAL_CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), stack)
+						.result().orElseThrow()
+		);
 		nbt.putBoolean("useNBT", compareComponents);
 		return nbt;
 	}
@@ -92,9 +97,11 @@ public class ComparableItemStack
 	public static ComparableItemStack readFromNBT(HolderLookup.Provider provider, CompoundTag nbt)
 	{
 		ComparableItemStack comp = new ComparableItemStack(
-				ItemStack.parse(provider, nbt.getCompound("stack")).orElseThrow(), false
+				ItemStack.OPTIONAL_CODEC.parse(
+						provider.createSerializationContext(NbtOps.INSTANCE), nbt.getCompoundOrEmpty("stack")
+				).result().orElseThrow(), false
 		);
-		comp.compareComponents = nbt.getBoolean("useNBT");
+		comp.compareComponents = nbt.getBooleanOr("useNBT", false);
 		return comp;
 	}
 }

@@ -48,13 +48,11 @@ public class ThermoelectricSourceSerializer extends IERecipeSerializer<Thermoele
 	);
 	public static final DualMapCodec<RegistryFriendlyByteBuf, ThermoelectricSource> CODECS = new DualMapCodec<>(CODEC, STREAM_CODEC);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, ThermoelectricSource> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(MetalDevices.THERMOELECTRIC_GEN);

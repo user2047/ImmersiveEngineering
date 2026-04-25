@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.common.register;
 
+import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistration;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.ComparatorManager;
@@ -21,6 +22,8 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.bottling_
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.mixer.MixerLogic;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.sawmill.SawmillLogic;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -201,7 +204,9 @@ public class IEMultiblockLogic
 				.notMirrored()
 				.customBlock(
 						BLOCK_REGISTER, ITEM_REGISTER,
-						r -> new NonMirrorableWithActiveBlock<>(properties, r),
+						r -> new NonMirrorableWithActiveBlock<>(
+								properties.setId(ResourceKey.create(Registries.BLOCK, IEApi.ieLoc(name))), r
+						),
 						MultiblockItem::new
 				)
 				.defaultBEs(BE_REGISTER);

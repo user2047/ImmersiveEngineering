@@ -24,7 +24,6 @@ public class LogicUnitScreen extends IEContainerScreen<LogicUnitMenu>
 		super(container, inventoryPlayer, title, TEXTURE);
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		for(int i = 0; i < 10; i++)

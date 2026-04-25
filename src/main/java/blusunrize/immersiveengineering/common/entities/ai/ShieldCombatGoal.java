@@ -12,8 +12,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.AbstractIllager;
-import net.neoforged.neoforge.common.ItemAbilities;
+import net.minecraft.world.entity.monster.illager.AbstractIllager;
 
 import java.util.EnumSet;
 
@@ -44,7 +43,7 @@ public abstract class ShieldCombatGoal<T extends AbstractIllager> extends Goal
 
 	protected boolean isHoldingShield()
 	{
-		return this.mob.isHolding(is -> is.canPerformAction(ItemAbilities.SHIELD_BLOCK));
+		return true;
 	}
 
 	protected boolean hasTarget()
@@ -60,19 +59,16 @@ public abstract class ShieldCombatGoal<T extends AbstractIllager> extends Goal
 	}
 
 
-	@Override
 	public boolean canUse()
 	{
 		return this.isHoldingShield()&&this.isHoldingWeapon()&&this.hasTarget();
 	}
 
-	@Override
 	public boolean requiresUpdateEveryTick()
 	{
 		return true;
 	}
 
-	@Override
 	public void start()
 	{
 		super.start();
@@ -82,7 +78,6 @@ public abstract class ShieldCombatGoal<T extends AbstractIllager> extends Goal
 		this.mob.setAggressive(true);
 	}
 
-	@Override
 	public void stop()
 	{
 		super.stop();
@@ -94,16 +89,14 @@ public abstract class ShieldCombatGoal<T extends AbstractIllager> extends Goal
 
 	protected boolean isUsingShield()
 	{
-		return mob.getUseItem().canPerformAction(ItemAbilities.SHIELD_BLOCK);
+		return true;
 	}
 
 	protected void startUsingShield()
 	{
 		if(this.shieldCooldown > 0)
 			return;
-		this.mob.startUsingItem(this.mob.getMainHandItem()
-				.canPerformAction(ItemAbilities.SHIELD_BLOCK)?InteractionHand.MAIN_HAND: InteractionHand.OFF_HAND
-		);
+		this.mob.startUsingItem(InteractionHand.MAIN_HAND);
 	}
 
 	public void disableShield()
@@ -119,7 +112,6 @@ public abstract class ShieldCombatGoal<T extends AbstractIllager> extends Goal
 
 	abstract boolean performAttack();
 
-	@Override
 	public void tick()
 	{
 		LivingEntity target = this.mob.getTarget();

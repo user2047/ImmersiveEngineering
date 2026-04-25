@@ -62,7 +62,6 @@ public class ArcFurnaceRecipeCategory extends IERecipeCategory<ArcFurnaceRecipe>
 		return cat;
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, ArcFurnaceRecipe recipe, IFocusGroup focuses)
 	{
 		int x = (148-getWidth(recipe))/2+1;
@@ -100,7 +99,6 @@ public class ArcFurnaceRecipeCategory extends IERecipeCategory<ArcFurnaceRecipe>
 		return w;
 	}
 
-	@Override
 	public void draw(ArcFurnaceRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		int x = (148-getWidth(recipe))/2;
@@ -128,7 +126,6 @@ public class ArcFurnaceRecipeCategory extends IERecipeCategory<ArcFurnaceRecipe>
 		JEIHelper.slotDrawable.draw(graphics, x+68, 36);
 	}
 
-	@Override
 	public void getTooltip(ITooltipBuilder tooltip, RecipeHolder<ArcFurnaceRecipe> holder, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY)
 	{
 		ArcFurnaceRecipe recipe = holder.value();

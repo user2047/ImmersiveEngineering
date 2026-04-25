@@ -25,14 +25,12 @@ public class TransformerHVBlock extends ConnectorBlock<TransformerHVBlockEntity>
 		super(props, IEBlockEntities.TRANSFORMER_HV);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, IEProperties.MULTIBLOCKSLAVE, IEProperties.MIRRORED, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		return areAllReplaceable(context.getClickedPos(), context.getClickedPos().above(2), context);

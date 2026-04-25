@@ -11,7 +11,6 @@ package blusunrize.immersiveengineering.api.client.ieobj;
 import blusunrize.immersiveengineering.api.utils.SetRestrictedField;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -22,15 +21,8 @@ import java.util.List;
 
 public interface ItemCallback<Key> extends IEOBJCallback<Key>
 {
-	SetRestrictedField<BlockEntityWithoutLevelRenderer> DYNAMIC_IEOBJ_RENDERER = SetRestrictedField.client();
-	IClientItemExtensions USE_IEOBJ_RENDER = new IClientItemExtensions()
-	{
-		@Override
-		public BlockEntityWithoutLevelRenderer getCustomRenderer()
-		{
-			return DYNAMIC_IEOBJ_RENDERER.get();
-		}
-	};
+	SetRestrictedField<Object> DYNAMIC_IEOBJ_RENDERER = SetRestrictedField.client();
+	IClientItemExtensions USE_IEOBJ_RENDER = new IClientItemExtensions() {};
 
 	default List<List<String>> getSpecialGroups(ItemStack stack, ItemDisplayContext transform, LivingEntity entity)
 	{
@@ -42,7 +34,7 @@ public interface ItemCallback<Key> extends IEOBJCallback<Key>
 			ItemStack stack, List<String> groups, ItemDisplayContext transform, LivingEntity entity, float partialTicks
 	)
 	{
-		return Transformation.identity();
+		return Transformation.IDENTITY;
 	}
 
 	default boolean areGroupsFullbright(ItemStack stack, List<String> groups)

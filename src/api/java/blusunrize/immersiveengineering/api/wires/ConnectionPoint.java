@@ -14,7 +14,6 @@ import malte0811.dualcodecs.DualCodecs;
 import malte0811.dualcodecs.DualCompositeCodecs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 
 import javax.annotation.Nonnull;
 
@@ -28,15 +27,25 @@ public record ConnectionPoint(@Nonnull BlockPos position, int index) implements 
 
 	public ConnectionPoint(CompoundTag nbt)
 	{
-		this(NbtUtils.readBlockPos(nbt, "position").orElseThrow(), nbt.getInt("index"));
+		this(readPosition(nbt), nbt.getIntOr("index", 0));
 	}
 
 	public CompoundTag createTag()
 	{
 		CompoundTag ret = new CompoundTag();
-		ret.put("position", NbtUtils.writeBlockPos(position));
+		CompoundTag posTag = new CompoundTag();
+		posTag.putInt("x", position.getX());
+		posTag.putInt("y", position.getY());
+		posTag.putInt("z", position.getZ());
+		ret.put("position", posTag);
 		ret.putInt("index", index);
 		return ret;
+	}
+
+	private static BlockPos readPosition(CompoundTag nbt)
+	{
+		CompoundTag pos = nbt.getCompoundOrEmpty("position");
+		return new BlockPos(pos.getIntOr("x", 0), pos.getIntOr("y", 0), pos.getIntOr("z", 0));
 	}
 
 	@Override

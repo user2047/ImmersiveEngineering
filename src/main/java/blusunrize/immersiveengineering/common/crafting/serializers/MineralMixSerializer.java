@@ -54,13 +54,11 @@ public class MineralMixSerializer extends IERecipeSerializer<MineralMix>
 			FROM_CODEC_DATA
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, MineralMix> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.CRUSHER.iconStack();

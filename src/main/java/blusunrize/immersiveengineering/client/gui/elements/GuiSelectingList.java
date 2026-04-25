@@ -25,7 +25,6 @@ public class GuiSelectingList extends GuiReactiveList<String>
 		super(x, y, w, h, handler, () -> Arrays.asList(entries), s->s);
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		super.renderWidget(graphics, mx, my, partialTicks);
@@ -54,7 +53,6 @@ public class GuiSelectingList extends GuiReactiveList<String>
 		return null;
 	}
 
-	@Override
 	public boolean mouseClicked(double mx, double my, int key)
 	{
 		int curSel = selectedOption;

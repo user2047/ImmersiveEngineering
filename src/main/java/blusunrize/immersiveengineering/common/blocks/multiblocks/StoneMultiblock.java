@@ -19,7 +19,6 @@ public abstract class StoneMultiblock extends IETemplateMultiblock
 		super(loc, masterFromOrigin, triggerFromOrigin, size, logic);
 	}
 
-	@Override
 	public boolean canBeMirrored()
 	{
 		return false;

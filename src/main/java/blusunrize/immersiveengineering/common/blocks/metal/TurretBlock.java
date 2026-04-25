@@ -24,14 +24,12 @@ public class TurretBlock<T extends TurretBlockEntity<T>> extends IEEntityBlock<T
 		super(tileType, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, IEProperties.MULTIBLOCKSLAVE);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		return areAllReplaceable(context.getClickedPos(), context.getClickedPos().above(), context);

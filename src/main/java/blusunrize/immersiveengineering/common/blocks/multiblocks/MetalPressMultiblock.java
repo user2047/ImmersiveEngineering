@@ -20,7 +20,6 @@ public class MetalPressMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.METAL_PRESS);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 13;

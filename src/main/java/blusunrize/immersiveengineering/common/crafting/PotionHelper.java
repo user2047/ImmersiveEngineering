@@ -16,9 +16,7 @@ import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.mixin.accessors.PotionBrewingAccess;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -26,10 +24,10 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.brewing.BrewingRecipe;
 import net.neoforged.neoforge.common.brewing.IBrewingRecipe;
 import net.neoforged.neoforge.fluids.crafting.CompoundFluidIngredient;
-import net.neoforged.neoforge.fluids.crafting.DataComponentFluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -44,13 +42,10 @@ public class PotionHelper
 	public static SizedFluidIngredient getFluidIngredientForType(Holder<Potion> type, int amount, PotionBottleType potionBottleType)
 	{
 		if((type==Potions.WATER||type==null)&&potionBottleType==PotionBottleType.REGULAR)
-			return SizedFluidIngredient.of(FluidTags.WATER, amount);
+			return SizedFluidIngredient.of(Fluids.WATER, amount);
 		else
 		{
-			DataComponentPredicate.Builder pred = DataComponentPredicate.builder().expect(DataComponents.POTION_CONTENTS, new PotionContents(type));
-			if(potionBottleType!=null)
-				pred.expect(IEDataComponents.POTION_BOTTLE_TYPE.get(), potionBottleType);
-			FluidIngredient fluidIngredient = DataComponentFluidIngredient.of(false, pred.build(), IEFluids.POTION);
+			FluidIngredient fluidIngredient = FluidIngredient.of(IEFluids.POTION.get());
 
 			// Support Create if installed
 			if(CREATE_POTION_BUILDER!=null)
@@ -85,8 +80,8 @@ public class PotionHelper
 				IngredientWithSize ingredient = new IngredientWithSize(brewingRecipe.getIngredient());
 				Ingredient input = brewingRecipe.getInput();
 				ItemStack output = brewingRecipe.getOutput();
-				if(output.getItem()==Items.POTION&&input.getItems().length > 0)
-					out.apply(getPotion(output), getPotion(input.getItems()[0]), ingredient);
+				if(output.getItem()==Items.POTION)
+					out.apply(getPotion(output), Potions.WATER, ingredient);
 			}
 	}
 

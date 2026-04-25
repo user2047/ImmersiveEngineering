@@ -36,7 +36,6 @@ public class CokeOvenScreen extends IEContainerScreen<CokeOvenMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -44,7 +43,6 @@ public class CokeOvenScreen extends IEContainerScreen<CokeOvenMenu>
 		);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		int processMax = menu.data.get(CokeOvenLogic.State.MAX_BURN_TIME);

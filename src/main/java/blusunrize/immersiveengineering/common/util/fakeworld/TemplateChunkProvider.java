@@ -42,45 +42,39 @@ public class TemplateChunkProvider extends ChunkSource
 		this.lightManager = new LevelLightEngine(this, true, true);
 		Map<ChunkPos, List<StructureBlockInfo>> byChunk = new HashMap<>();
 		for(StructureBlockInfo info : blocks)
-			byChunk.computeIfAbsent(new ChunkPos(info.pos()), $ -> new ArrayList<>()).add(info);
+			byChunk.computeIfAbsent(new ChunkPos(info.pos().getX() >> 4, info.pos().getZ() >> 4), $ -> new ArrayList<>()).add(info);
 		chunks = byChunk.entrySet().stream()
 				.map(e -> Pair.of(e.getKey(), new TemplateChunk(world, e.getKey(), e.getValue(), shouldShow)))
 				.collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 	}
 
 	@Nullable
-	@Override
 	public ChunkAccess getChunk(int chunkX, int chunkZ, @Nonnull ChunkStatus requiredStatus, boolean load)
 	{
 		return chunks.computeIfAbsent(new ChunkPos(chunkX, chunkZ), p -> new EmptyLevelChunk(world, p, world.getUncachedNoiseBiome(0, 0, 0)));
 	}
 
-	@Override
 	public void tick(BooleanSupplier p_202162_, boolean p_202163_)
 	{}
 
 	@Nonnull
-	@Override
 	public String gatherStats()
 	{
 		return "?";
 	}
 
-	@Override
 	public int getLoadedChunksCount()
 	{
 		return 0;
 	}
 
 	@Nonnull
-	@Override
 	public LevelLightEngine getLightEngine()
 	{
 		return lightManager;
 	}
 
 	@Nonnull
-	@Override
 	public BlockGetter getLevel()
 	{
 		return world;

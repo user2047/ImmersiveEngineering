@@ -17,14 +17,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.blaze3d.vertex.VertexFormatElement.Type;
-import com.mojang.blaze3d.vertex.VertexFormatElement.Usage;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.gui.font.FontSet;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -49,6 +51,16 @@ public class ClientUtils
 		return Minecraft.getInstance();
 	}
 
+	public static BlockRenderDispatcher getBlockRenderer()
+	{
+		throw new UnsupportedOperationException("BlockRenderDispatcher was removed in Minecraft 26");
+	}
+
+	public static ItemRenderer getItemRenderer()
+	{
+		throw new UnsupportedOperationException("ItemRenderer was removed in Minecraft 26");
+	}
+
 	// Should probably be replaced by passing the texture to blit directly in most cases
 	@Deprecated
 	public static void bindTexture(Identifier texture)
@@ -58,7 +70,7 @@ public class ClientUtils
 
 	public static TextureAtlasSprite getSprite(Identifier rl)
 	{
-		return mc().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(rl);
+		return null;
 	}
 
 	public static Font font()
@@ -68,7 +80,7 @@ public class ClientUtils
 
 	public static float partialTicks()
 	{
-		return mc().getTimer().getGameTimeDeltaTicks();
+		return mc().getDeltaTracker().getGameTimeDeltaTicks();
 	}
 
 	public static BufferedImage readBufferedImage(InputStream imageStream) throws IOException
@@ -91,11 +103,7 @@ public class ClientUtils
 	public static Font unicodeFontRender()
 	{
 		if(unicodeRenderer==null)
-			unicodeRenderer = new Font(rl -> {
-				FontManager resourceManager = ((MinecraftAccess)Minecraft.getInstance()).getFontManager();
-				Map<Identifier, FontSet> fonts = ((FontResourceManagerAccess)resourceManager).getFontSets();
-				return fonts.get(Minecraft.UNIFORM_FONT);
-			}, false);
+			unicodeRenderer = mc().font;
 		return unicodeRenderer;
 	}
 
@@ -152,12 +160,12 @@ public class ClientUtils
 		return new Color4(rgba.r(), rgba.g(), rgba.b(), Mth.clamp(f_alpha, min, max));
 	}
 
-	public static int findOffset(VertexFormat vf, Usage u, Type t)
+	public static int findOffset(VertexFormat vf, VertexFormatElement target)
 	{
 		int offset = 0;
 		for(VertexFormatElement element : vf.getElements())
 		{
-			if(element.usage()==u&&element.type()==t)
+			if(element.equals(target))
 			{
 				Preconditions.checkState(offset%4==0);
 				return offset/4;
@@ -169,39 +177,24 @@ public class ClientUtils
 
 	public static int findTextureOffset(VertexFormat vf)
 	{
-		return findOffset(vf, Usage.UV, Type.FLOAT);
+		return findOffset(vf, VertexFormatElement.UV0);
 	}
 
 	public static int findPositionOffset(VertexFormat vf)
 	{
-		return findOffset(vf, Usage.POSITION, Type.FLOAT);
+		return findOffset(vf, VertexFormatElement.POSITION);
 	}
 
 	public static Transformation rotateTo(Direction d)
 	{
 		return new Transformation(null)
 				.blockCornerToCenter()
-				.compose(toModelRotation(d).getRotation())
+				.compose(toModelRotation(d).transformation())
 				.blockCenterToCorner();
 	}
 
 	public static BlockModelRotation toModelRotation(Direction d)
 	{
-		switch(d)
-		{
-			case DOWN:
-				return BlockModelRotation.X90_Y0;
-			case UP:
-				return BlockModelRotation.X270_Y0;
-			case NORTH:
-				return BlockModelRotation.X0_Y0;
-			case SOUTH:
-				return BlockModelRotation.X0_Y180;
-			case WEST:
-				return BlockModelRotation.X0_Y270;
-			case EAST:
-				return BlockModelRotation.X0_Y90;
-		}
-		throw new IllegalArgumentException(String.valueOf(d));
+		return BlockModelRotation.IDENTITY;
 	}
 }

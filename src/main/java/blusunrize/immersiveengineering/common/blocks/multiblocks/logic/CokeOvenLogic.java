@@ -38,8 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.IFluidTank;
@@ -64,13 +63,11 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 	public static final int NUM_SLOTS = 4;
 	public static final int TANK_CAPACITY = 12*FluidType.BUCKET_VOLUME;
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -154,7 +151,7 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 		))
 			context.markMasterDirty();
 
-		if(active&&ApiUtils.RANDOM.nextInt(24)==0)
+		if(active&&ApiUtils.getRandom().nextInt(24)==0)
 		{
 			final IMultiblockLevel level = context.getLevel();
 			final Level rawLevel = level.getRawLevel();
@@ -163,7 +160,7 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 					null,
 					soundPos.x, soundPos.y, soundPos.z,
 					SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS,
-					0.5F+ApiUtils.RANDOM.nextFloat()*0.5F, ApiUtils.RANDOM.nextFloat()*0.7F+0.3F
+					0.5F+ApiUtils.getRandom().nextFloat()*0.5F, ApiUtils.getRandom().nextFloat()*0.7F+0.3F
 			);
 		}
 		if(activeBeforeTick!=active)
@@ -191,20 +188,17 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 		return null;
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerEverywhere(ItemHandler.BLOCK, state -> state.inventory);
-		register.registerEverywhere(FluidHandler.BLOCK, state -> state.fluidCap);
+		register.registerEverywhere(Capabilities.Item.BLOCK, state -> state.inventory);
+		register.registerEverywhere(Capabilities.Fluid.BLOCK, state -> state.fluidCap);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return $ -> Shapes.block();
@@ -243,25 +237,22 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 			this.fluidCap = new ArrayFluidHandler(new IFluidTank[]{tank}, true, false, ctx.getMarkDirtyRunnable());
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			nbt.putInt("process", process);
 			nbt.putInt("processMax", processMax);
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			process = nbt.getInt("process");
-			processMax = nbt.getInt("processMax");
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			process = nbt.getIntOr("process", 0);
+			processMax = nbt.getIntOr("processMax", 0);
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 		}
 
-		@Override
 		public int get(int index)
 		{
 			return switch(index)
@@ -272,7 +263,6 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 			};
 		}
 
-		@Override
 		public void set(int index, int value)
 		{
 			switch(index)
@@ -283,7 +273,6 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 			}
 		}
 
-		@Override
 		public int getCount()
 		{
 			return NUM_SLOTS;

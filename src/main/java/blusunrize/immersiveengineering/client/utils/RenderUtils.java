@@ -13,14 +13,14 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.mixin.accessors.client.PlayerControllerAccess;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -79,7 +79,7 @@ public class RenderUtils
 				// Calculate surrounding brighness and split into block and sky light
 				for(Direction f : DirectionUtils.VALUES)
 				{
-					int val = LevelRenderer.getLightColor(world, pos.relative(f));
+					int val = world.getRawBrightness(pos.relative(f), 0);
 					neighbourBrightness[0][f.get3DDataValue()] = (val>>16)&255;
 					neighbourBrightness[1][f.get3DDataValue()] = val&255;
 				}
@@ -199,8 +199,6 @@ public class RenderUtils
 			green = (color>>8&255)/255F;
 			blue = (color&255)/255F;
 		}
-		for(BakedQuad quad : quads)
-			renderer.putBulkData(transform.last(), quad, red, green, blue, 1, light, overlay);
 	}
 
 	//Cheers boni =P
@@ -210,7 +208,7 @@ public class RenderUtils
 		int progress = (int)(((PlayerControllerAccess)controller).getDestroyProgress()*10f)-1; // 0-10
 		if(progress < 0||progress >= ModelBakery.DESTROY_TYPES.size())
 			return;
-		BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
+		BlockRenderDispatcher blockrendererdispatcher = ClientUtils.getBlockRenderer();
 		for(BlockPos blockpos : blocks)
 		{
 			matrix.pushPose();
@@ -223,8 +221,6 @@ public class RenderUtils
 			if(!hasBreak)
 			{
 				BlockState iblockstate = world.getBlockState(blockpos);
-				if(!iblockstate.isAir())
-					blockrendererdispatcher.renderBreakingTexture(iblockstate, blockpos, world, matrix, worldRendererIn);
 			}
 			matrix.popPose();
 		}

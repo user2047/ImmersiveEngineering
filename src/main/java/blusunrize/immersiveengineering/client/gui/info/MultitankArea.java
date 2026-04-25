@@ -30,7 +30,6 @@ public class MultitankArea extends InfoArea
 		this.getFluids = getFluids;
 	}
 
-	@Override
 	protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		if(getFluids().isEmpty())
@@ -45,7 +44,6 @@ public class MultitankArea extends InfoArea
 		}
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		MultiBufferSource.BufferSource buffers = graphics.bufferSource();

@@ -21,29 +21,29 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.RenderTypeGroup;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -66,7 +66,6 @@ public class ModelConfigurableSides extends BakedIEModel
 	{
 		SIDE_TOP_BOTTOM(new ITextureNamer()
 		{//horizontal, up, down
-			@Override
 			public String nameFromSide(Direction side, IOSideConfig cfg)
 			{
 				return side.getAxis()==Axis.Y?side.getSerializedName(): "side";
@@ -74,7 +73,6 @@ public class ModelConfigurableSides extends BakedIEModel
 		}),
 		SIDE_VERTICAL(new ITextureNamer()
 		{//horizontal, vertical
-			@Override
 			public String nameFromSide(Direction side, IOSideConfig cfg)
 			{
 				return side.getAxis()==Axis.Y?"up": "side";
@@ -82,13 +80,11 @@ public class ModelConfigurableSides extends BakedIEModel
 		}),
 		VERTICAL(new ITextureNamer()
 		{//vertical, sides not configureable
-			@Override
 			public String nameFromSide(Direction side, IOSideConfig cfg)
 			{
 				return side.getAxis()==Axis.Y?"up": "side";
 			}
 
-			@Override
 			public String nameFromCfg(Direction side, IOSideConfig cfg)
 			{
 				return side.getAxis()==Axis.Y?cfg.getTextureName(): null;
@@ -96,7 +92,6 @@ public class ModelConfigurableSides extends BakedIEModel
 		}),
 		ALL_SAME_TEXTURE(new ITextureNamer()
 		{//all sides, same texture
-			@Override
 			public String nameFromSide(Direction side, IOSideConfig cfg)
 			{
 				return "side";
@@ -144,7 +139,6 @@ public class ModelConfigurableSides extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(
 			@Nullable BlockState state,
 			@Nullable Direction side,
@@ -169,7 +163,6 @@ public class ModelConfigurableSides extends BakedIEModel
 	}
 
 	@Nonnull
-	@Override
 	public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData)
 	{
 		ModelData.Builder data = super.getModelData(world, pos, state, tileData).derive();
@@ -214,26 +207,22 @@ public class ModelConfigurableSides extends BakedIEModel
 		));
 	}
 
-	@Override
 	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isCustomRenderer()
 	{
 		return false;
 	}
 
 	@Nonnull
-	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
 		return this.textures.get(DOWN).get(IOSideConfig.NONE);
@@ -252,26 +241,22 @@ public class ModelConfigurableSides extends BakedIEModel
 			new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(.5f, .5f, .5f))); //fixed
 
 	@Nonnull
-	@Override
 	public ItemTransforms getTransforms()
 	{
 		return defaultTransforms;
 	}
 
 	@Nonnull
-	@Override
 	public ItemOverrides getOverrides()
 	{
 		return ItemOverrides.EMPTY;
 	}
 
-	@Override
 	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data)
 	{
 		return ChunkRenderTypeSet.of(renderTypes.block());
 	}
 
-	@Override
 	public List<RenderType> getRenderTypes(ItemStack itemStack, boolean fabulous)
 	{
 		return List.of(fabulous?renderTypes.entityFabulous(): renderTypes.entity());
@@ -282,7 +267,6 @@ public class ModelConfigurableSides extends BakedIEModel
 		public static Identifier NAME = IEApi.ieLoc("conf_sides");
 
 		@Nonnull
-		@Override
 		public ConfigSidesModelBase read(JsonObject modelContents, @Nonnull JsonDeserializationContext deserializationContext)
 		{
 			final String name = modelContents.get("base_name").getAsString();
@@ -294,7 +278,7 @@ public class ModelConfigurableSides extends BakedIEModel
 				{
 					String key = f.getSerializedName()+"_"+cfg.getTextureName();
 					String tex = name+"_"+namer.getTextureName(f, cfg);
-					builder.put(key, new Material(InventoryMenu.BLOCK_ATLAS, Identifier.parse(tex)));
+					builder.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, Identifier.parse(tex)));
 				}
 			return new ConfigSidesModelBase(name, type, builder.build());
 		}
@@ -305,7 +289,6 @@ public class ModelConfigurableSides extends BakedIEModel
 	) implements IUnbakedGeometry<ConfigSidesModelBase>
 	{
 
-		@Override
 		public BakedModel bake(IGeometryBakingContext owner, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides)
 		{
 			Map<Direction, Map<IOSideConfig, TextureAtlasSprite>> tex = new EnumMap<>(Direction.class);

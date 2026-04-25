@@ -24,18 +24,15 @@ public class TurntableBlock extends IEEntityBlock<TurntableBlockEntity>
 		super(IEBlockEntities.TURNTABLE, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_ALL);
 	}
 
-	@Override
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving)
 	{
 		if(state.hasProperty(IEProperties.FACING_ALL) && newState.hasProperty(IEProperties.FACING_ALL))
 			((TurntableBlockEntity)world.getBlockEntity(pos)).verticalTransitionRotationMap(state.getValue(IEProperties.FACING_ALL), newState.getValue(IEProperties.FACING_ALL));
-		super.onRemove(state, world, pos, newState, isMoving);
 	}
 }

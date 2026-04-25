@@ -31,10 +31,10 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.AbstractIllager;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.monster.illager.AbstractIllager;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.entity.raid.Raider;
@@ -53,7 +53,6 @@ public class Fusilier extends EngineerIllager
 		super(entityType, level);
 	}
 
-	@Override
 	protected void registerGoals()
 	{
 		super.registerGoals();
@@ -78,7 +77,6 @@ public class Fusilier extends EngineerIllager
 				.add(Attributes.FOLLOW_RANGE, 32.0D);
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -96,7 +94,6 @@ public class Fusilier extends EngineerIllager
 	}
 
 
-	@Override
 	public AbstractIllager.IllagerArmPose getArmPose()
 	{
 		if(this.isAimingRailgun())
@@ -105,7 +102,7 @@ public class Fusilier extends EngineerIllager
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData)
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData)
 	{
 		SpawnGroupData spawnGroupData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Weapons.RAILGUN));
@@ -115,11 +112,10 @@ public class Fusilier extends EngineerIllager
 		return spawnGroupData;
 	}
 
-	@Override
 	public void applyRaidBuffs(ServerLevel p_348605_, int p_37844_, boolean p_37845_)
 	{
 		Raid raid = this.getCurrentRaid();
-		boolean flag = this.random.nextFloat() <= raid.getEnchantOdds();
+		boolean flag = this.getRandom().nextFloat() <= raid.getEnchantOdds();
 		if(flag)
 		{
 			ItemStack railgun = new ItemStack(Weapons.RAILGUN);
@@ -129,25 +125,21 @@ public class Fusilier extends EngineerIllager
 
 	}
 
-	@Override
 	protected SoundEvent getAmbientSound()
 	{
 		return SoundEvents.PILLAGER_AMBIENT;
 	}
 
-	@Override
 	protected SoundEvent getDeathSound()
 	{
 		return SoundEvents.PILLAGER_DEATH;
 	}
 
-	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSource)
 	{
 		return SoundEvents.PILLAGER_DEATH;
 	}
 
-	@Override
 	public SoundEvent getCelebrateSound()
 	{
 		return SoundEvents.PILLAGER_CELEBRATE;

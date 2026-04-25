@@ -28,10 +28,9 @@ public class SpeedloaderLoadRecipe extends CustomRecipe
 
 	public SpeedloaderLoadRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		ItemStack stackInSlot;
@@ -85,8 +84,7 @@ public class SpeedloaderLoadRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		ItemStack speedloader = null;
 		int speedloaderX = -1;
@@ -123,15 +121,13 @@ public class SpeedloaderLoadRecipe extends CustomRecipe
 		return out;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= 2;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.SPEEDLOADER_LOAD.get();
 	}

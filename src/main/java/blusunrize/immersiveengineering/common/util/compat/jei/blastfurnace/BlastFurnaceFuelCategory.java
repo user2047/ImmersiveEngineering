@@ -48,14 +48,12 @@ public class BlastFurnaceFuelCategory extends IERecipeCategory<BlastFurnaceFuel>
 		this.flame = helper.createAnimatedDrawable(flameStatic, 20*4, IDrawableAnimated.StartDirection.TOP, true);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, BlastFurnaceFuel recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 1, 17)
-				.addItemStacks(Arrays.asList(recipe.input.getItems()));
+				.addItemStacks(java.util.List.of());
 	}
 
-	@Override
 	public void draw(BlastFurnaceFuel recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		this.flame.draw(graphics, 1, 0);

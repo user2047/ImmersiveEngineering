@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -44,7 +44,7 @@ public abstract class ItemContainer extends AbstractContainerMenu implements Sup
 
 	protected void updateSlots(){
 		this.internalSlots = this.addSlots();
-		this.blockedSlot = (this.inventoryPlayer.selected+27+internalSlots);
+		this.blockedSlot = (this.inventoryPlayer.getSelectedSlot()+27+internalSlots);
 	}
 
 	abstract int addSlots();
@@ -55,7 +55,6 @@ public abstract class ItemContainer extends AbstractContainerMenu implements Sup
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player par1EntityPlayer, int slot)
 	{
 		ItemStack oldStackInSlot = ItemStack.EMPTY;
@@ -119,22 +118,19 @@ public abstract class ItemContainer extends AbstractContainerMenu implements Sup
 		return true;
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player entityplayer)
 	{
 		return ItemStack.isSameItem(player.getItemBySlot(equipmentSlot), heldItem);
 	}
 
-	@Override
-	public void clicked(int par1, int par2, ClickType par3, Player par4EntityPlayer)
+	public void clicked(int par1, int par2, ContainerInput par3, Player par4EntityPlayer)
 	{
-		if(par1==this.blockedSlot||(par3==ClickType.SWAP&&par2==par4EntityPlayer.getInventory().selected))
+		if(par1==this.blockedSlot||(par3==ContainerInput.SWAP&&par2==par4EntityPlayer.getInventory().getSelectedSlot()))
 			return;
 		super.clicked(par1, par2, par3, par4EntityPlayer);
 		broadcastChanges();
 	}
 
-	@Override
 	public Level get()
 	{
 		return world;

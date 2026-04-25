@@ -19,30 +19,26 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.FontContext;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -51,10 +47,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static blusunrize.lib.manual.utils.ManualLogger.LOGGER;
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class ManualUtils
 {
@@ -73,27 +65,7 @@ public class ManualUtils
 
 	public static void drawTexturedRect(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, int w, int h, float... uv)
 	{
-		// TODO replace by graphics.blit?
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, ONE, ZERO);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShaderTexture(0, texture);
-		Matrix4f mat = graphics.pose().last().pose();
-		BufferBuilder buffer = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		buffer.addVertex(mat, x, y+h, 0)
-				.setColor(1F, 1F, 1F, 1F)
-				.setUv(uv[0], uv[3]);
-		buffer.addVertex(mat, x+w, y+h, 0)
-				.setColor(1F, 1F, 1F, 1F)
-				.setUv(uv[1], uv[3]);
-		buffer.addVertex(mat, x+w, y, 0)
-				.setColor(1F, 1F, 1F, 1F)
-				.setUv(uv[1], uv[2]);
-		buffer.addVertex(mat, x, y, 0)
-				.setColor(1F, 1F, 1F, 1F)
-				.setUv(uv[0], uv[2]);
-		BufferUploader.drawWithShader(buffer.buildOrThrow());
+		graphics.blit(texture, x, y, x+w, y+h, uv[0], uv[1], uv[2], uv[3]);
 	}
 
 	public static <T> List<T> getPrimitiveSpellingCorrections
@@ -224,7 +196,6 @@ public class ManualUtils
 	@Deprecated
 	public static void bindTexture(Identifier path)
 	{
-		RenderSystem.setShaderTexture(0, path);
 	}
 
 	/**
@@ -234,7 +205,7 @@ public class ManualUtils
 	{
 		for(String s : text)
 		{
-			graphics.drawString(fontRenderer, s, x, y, colour, false);
+			graphics.text(fontRenderer, s, x, y, colour, false);
 			y += fontRenderer.lineHeight;
 		}
 	}
@@ -319,10 +290,24 @@ public class ManualUtils
 		if(jsonEle.isJsonPrimitive())
 		{
 			Identifier itemName = getLocationForManual(jsonEle.getAsString(), m);
-			return new ItemStack(BuiltInRegistries.ITEM.get(itemName));
+			return BuiltInRegistries.ITEM.getOptional(itemName).map(ItemStack::new).orElse(ItemStack.EMPTY);
 		}
 		else
 			return readItemStack(jsonEle.getAsJsonObject());
+	}
+
+	public static ItemStack getRecipeResult(Recipe<?> recipe)
+	{
+		if(Minecraft.getInstance().level==null)
+			return ItemStack.EMPTY;
+		var context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
+		for(RecipeDisplay display : recipe.display())
+		{
+			ItemStack result = display.result().resolveForFirstStack(context);
+			if(!result.isEmpty())
+				return result;
+		}
+		return ItemStack.EMPTY;
 	}
 
 	public static ManualRecipeRef getRecipeObjFromJson(ManualInstance m, JsonElement jsonEle)
@@ -368,13 +353,13 @@ public class ManualUtils
 	{
 		if(stack.isEmpty())
 			return;
-		graphics.renderItem(stack, x, y);
+		graphics.item(stack, x, y);
 		if(overlay)
 		{
 			// Use the Item's font renderer, if available
 			Font font = IClientItemExtensions.of(stack.getItem()).getFont(stack, FontContext.ITEM_COUNT);
 			font = font!=null?font: Minecraft.getInstance().font;
-			graphics.renderItemDecorations(font, stack, x, y, count);
+			graphics.itemDecorations(font, stack, x, y, count);
 		}
 	}
 

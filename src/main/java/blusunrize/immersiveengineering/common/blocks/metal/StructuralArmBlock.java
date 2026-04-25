@@ -27,7 +27,6 @@ public class StructuralArmBlock extends IEEntityBlock<StructuralArmBlockEntity>
 		super(IEBlockEntities.STRUCTURAL_ARM, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

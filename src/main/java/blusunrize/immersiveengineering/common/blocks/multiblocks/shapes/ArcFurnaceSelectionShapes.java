@@ -27,7 +27,6 @@ public class ArcFurnaceSelectionShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(new BlockPos(0, 0, 4).equals(posInMultiblock))

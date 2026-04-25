@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.client.models.obj.callback.block.BalloonC
 import blusunrize.immersiveengineering.common.blocks.cloth.BalloonBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -27,7 +27,6 @@ public class BalloonCallbacks implements BlockCallback<Key>
 	public static final BalloonCallbacks INSTANCE = new BalloonCallbacks();
 	private static final Key INVALID = new Key(0, DyeColor.BLACK, DyeColor.PURPLE);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof BalloonBlockEntity balloon))
@@ -35,13 +34,11 @@ public class BalloonCallbacks implements BlockCallback<Key>
 		return new Key(balloon.style, balloon.colour0, balloon.colour1);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public Color4 getRenderColor(Key key, String group, String material, ShaderCase shaderCase, Color4 original)
 	{
 		if(shaderCase!=null)

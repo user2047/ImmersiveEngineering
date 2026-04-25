@@ -10,10 +10,10 @@ package blusunrize.immersiveengineering.api.tool.conveyor;
 
 import blusunrize.immersiveengineering.api.tool.conveyor.ConveyorHandler.ConveyorDirection;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

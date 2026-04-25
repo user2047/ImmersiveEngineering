@@ -15,11 +15,11 @@ import blusunrize.immersiveengineering.client.models.obj.callback.block.Floodlig
 import blusunrize.immersiveengineering.common.blocks.metal.FloodlightBlockEntity;
 import com.mojang.math.Transformation;
 import org.joml.Vector3f;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -30,7 +30,6 @@ public class FloodlightCallbacks implements BlockCallback<Key>
 	public static final FloodlightCallbacks INSTANCE = new FloodlightCallbacks();
 	private static final Key INVALID = new Key(Direction.NORTH, Direction.DOWN, 0, 0);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof FloodlightBlockEntity floodlight))
@@ -40,28 +39,24 @@ public class FloodlightCallbacks implements BlockCallback<Key>
 		);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public boolean dependsOnLayer()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key object, String group, RenderType layer)
 	{
 		if("glass".equals(group))
-			return layer==RenderType.translucent();
+			return layer==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent();
 		else
-			return layer==RenderType.solid();
+			return layer==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid();
 	}
 
-	@Override
 	public Transformation applyTransformations(Key object, String group, Transformation transform)
 	{
 		Vector3f transl = new Vector3f(.5f, .5f, .5f);

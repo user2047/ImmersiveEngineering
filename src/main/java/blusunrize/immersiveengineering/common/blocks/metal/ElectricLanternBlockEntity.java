@@ -52,7 +52,6 @@ public class ElectricLanternBlockEntity extends ImmersiveConnectableBlockEntity 
 		super(IEBlockEntities.ELECTRIC_LANTERN.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		boolean activeBeforeTick = getIsActive();
@@ -69,48 +68,41 @@ public class ElectricLanternBlockEntity extends ImmersiveConnectableBlockEntity 
 			checkLight();
 	}
 
-	@Override
 	public double getInterdictionRangeSquared()
 	{
 		return getIsActive()?1024: 0;
 	}
 
-	@Override
 	public void setRemovedIE()
 	{
 		SpawnInterdictionHandler.removeFromInterdictionTiles(this);
 		super.setRemovedIE();
 	}
 
-	@Override
 	public void onChunkUnloaded()
 	{
 		SpawnInterdictionHandler.removeFromInterdictionTiles(this);
 		super.onChunkUnloaded();
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
 		SpawnInterdictionHandler.addInterdictionTile(this);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		energyStorage = nbt.getInt("energyStorage");
+		energyStorage = nbt.getIntOr("energyStorage", 0);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		nbt.putInt("energyStorage", energyStorage);
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==1)
@@ -122,13 +114,11 @@ public class ElectricLanternBlockEntity extends ImmersiveConnectableBlockEntity 
 		return super.triggerEvent(id, arg);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return WireType.LV_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		BlockPos otherPos = other.position();
@@ -140,35 +130,30 @@ public class ElectricLanternBlockEntity extends ImmersiveConnectableBlockEntity 
 		return new Vec3(.5, flipped?.9375: .0625, zDif < 0?.25: zDif > 0?.75: .5);
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return Shapes.box(.1875f, 0, .1875f, .8125f, 1, .8125f);
 	}
 
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_TOP_DOWN;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.FIXED_DOWN;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			setFacing(getFacing().getOpposite());
 			for(ConnectionPoint cp : getConnectionPoints())
@@ -181,25 +166,21 @@ public class ElectricLanternBlockEntity extends ImmersiveConnectableBlockEntity 
 		return true;
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return true;
 	}
 
-	@Override
 	public int getRequestedEnergy()
 	{
 		return maximumStorage-energyStorage;
 	}
 
-	@Override
 	public void insertEnergy(int amount)
 	{
 		energyStorage += amount;

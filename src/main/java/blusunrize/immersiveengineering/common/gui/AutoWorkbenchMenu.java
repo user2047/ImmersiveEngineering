@@ -93,7 +93,6 @@ public class AutoWorkbenchMenu extends IEContainerMenu
 //	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack stack = ItemStack.EMPTY;
@@ -148,10 +147,9 @@ public class AutoWorkbenchMenu extends IEContainerMenu
 		return stack;
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
-		if(nbt.contains("recipe", Tag.TAG_INT))
-			this.selectedRecipe.set(nbt.getInt("recipe"));
+		if(nbt.contains("recipe"))
+			this.selectedRecipe.set(nbt.getIntOr("recipe", 0));
 	}
 }

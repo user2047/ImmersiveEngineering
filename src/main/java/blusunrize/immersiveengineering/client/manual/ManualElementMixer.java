@@ -31,7 +31,6 @@ public class ManualElementMixer extends ManualElementIECrafting
 		recalculateCraftingRecipes();
 	}
 
-	@Override
 	public void recalculateCraftingRecipes()
 	{
 		this.recipes.clear();
@@ -49,8 +48,7 @@ public class ManualElementMixer extends ManualElementIECrafting
 					PositionedItemStack[] pIngredients = new PositionedItemStack[recipe.itemInputs.size()+2];
 
 					// Fluid input
-					List<ItemStack> inputBucket = Arrays.stream(recipe.fluidInput.getFluids())
-							.map(fluidStack -> fluidStack.getFluid().getBucket().getDefaultInstance()).toList();
+					List<ItemStack> inputBucket = List.of();
 					String inputFraction = FluidUtils.getBucketFraction(recipe.fluidInput.amount());
 					pIngredients[0] = new PositionedItemStack(inputBucket, 8, middle-9, inputFraction);
 

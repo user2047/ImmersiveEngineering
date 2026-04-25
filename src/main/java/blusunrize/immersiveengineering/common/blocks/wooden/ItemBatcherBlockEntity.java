@@ -37,7 +37,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
@@ -60,29 +60,25 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 		super(IEBlockEntities.ITEM_BATCHER.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_LIKE;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return placer.isShiftKeyDown();
 	}
 
 	private final IEBlockCapabilityCache<IItemHandler> output = IEBlockCapabilityCaches.forNeighbor(
-			ItemHandler.BLOCK, this, this::getFacing
+			Capabilities.Item.BLOCK, this, this::getFacing
 	);
 
-	@Override
 	public void tickServer()
 	{
 		if(level.getGameTime()%8!=0||!isActive())
@@ -149,27 +145,25 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 		return map.keySet().stream().filter(map::get).collect(Collectors.toSet());
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(!descPacket)
 		{
 			NonNullList<ItemStack> merged = NonNullList.withSize(2*NUM_SLOTS, ItemStack.EMPTY);
-			ContainerHelper.loadAllItems(nbt, merged, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, merged, provider);
 			for(int i = 0; i < NUM_SLOTS; ++i)
 			{
 				this.buffers.set(i, merged.get(i+NUM_SLOTS));
 				this.filters.set(i, merged.get(i));
 			}
 		}
-		this.batchMode = BatchMode.values()[nbt.getByte("batchMode")];
-		int[] redstoneConfig = nbt.getIntArray("redstoneColors");
+		this.batchMode = BatchMode.values()[nbt.getByteOr("batchMode", (byte)0)];
+		int[] redstoneConfig = nbt.getIntArray("redstoneColors").orElse(new int[0]);
 		if(redstoneConfig.length >= NUM_SLOTS)
 			for(int i = 0; i < NUM_SLOTS; i++)
 				this.redstoneColors.set(i, DyeColor.byId(redstoneConfig[i]));
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(!descPacket)
@@ -180,7 +174,7 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 				merged.set(i+NUM_SLOTS, this.buffers.get(i));
 				merged.set(i, this.filters.get(i));
 			}
-			ContainerHelper.saveAllItems(nbt, merged, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, merged, provider);
 		}
 		nbt.putByte("batchMode", (byte)this.batchMode.ordinal());
 		int[] redstoneConfig = new int[NUM_SLOTS];
@@ -192,48 +186,41 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("batchMode"))
-			this.batchMode = BatchMode.values()[message.getByte("batchMode")];
+			this.batchMode = BatchMode.values()[message.getByteOr("batchMode", (byte)0)];
 		if(message.contains("redstoneColor_slot")&&message.contains("redstoneColor_val"))
-			this.redstoneColors.set(message.getInt("redstoneColor_slot"), DyeColor.byId(message.getInt("redstoneColor_val")));
+			this.redstoneColors.set(message.getIntOr("redstoneColor_slot", 0), DyeColor.byId(message.getIntOr("redstoneColor_val", 0)));
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public ItemBatcherBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<ItemBatcherBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.ITEM_BATCHER;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return buffers;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return ItemUtils.isSameIgnoreDurability(this.filters.get(slot), stack);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -244,7 +231,6 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 
 	private final RedstoneBundleConnection redstoneCap = new RedstoneBundleConnection()
 	{
-		@Override
 		public void updateInput(byte[] signals, Direction side)
 		{
 			Set<DyeColor> outputMap = calculateRedstoneOutputs();
@@ -257,7 +243,7 @@ public class ItemBatcherBlockEntity extends IEBaseBlockEntity implements IEServe
 	{
 		registrar.registerAllContexts(CapabilityRedstoneNetwork.REDSTONE_BUNDLE_CONNECTION, be -> be.redstoneCap);
 		registrar.register(
-				ItemHandler.BLOCK,
+				Capabilities.Item.BLOCK,
 				(be, facing) -> facing==be.getFacing().getOpposite()?be.insertionCap: null
 		);
 	}

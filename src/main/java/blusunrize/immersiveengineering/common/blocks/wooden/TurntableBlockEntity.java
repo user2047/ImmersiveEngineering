@@ -41,11 +41,10 @@ public class TurntableBlockEntity extends IEBaseBlockEntity implements IStateBas
 		super(IEBlockEntities.TURNTABLE.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		byte redstoneByte = nbt.getByte("redstone");
-		byte rotationMapValue = nbt.getByte("rotationMapping");
+		byte redstoneByte = nbt.getByteOr("redstone", (byte)0);
+		byte rotationMapValue = nbt.getByteOr("rotationMapping", (byte)0);
 		for(int i = 0; i < rotationMapping.length; i++)
 		{
 			rotationMapping[i] = intToRotation((rotationMapValue >> 2*i)&3);
@@ -53,7 +52,6 @@ public class TurntableBlockEntity extends IEBaseBlockEntity implements IStateBas
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		byte rotationMapValue = 0;
@@ -68,13 +66,12 @@ public class TurntableBlockEntity extends IEBaseBlockEntity implements IStateBas
 		nbt.putByte("rotationMapping", rotationMapValue);
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos otherPos)
 	{
 		super.onNeighborBlockChange(otherPos);
 		Direction facing = getFacing();
 		BlockPos difference = otherPos.subtract(worldPosition);
-		Direction otherDir = Direction.getNearest(difference.getX(), difference.getY(), difference.getZ());
+		Direction otherDir = Direction.getNearest(difference.getX(), difference.getY(), difference.getZ(), Direction.NORTH);
 		if(otherDir.getAxis()!=facing.getAxis())
 		{
 			boolean r = this.level.hasSignal(worldPosition.relative(otherDir), otherDir);
@@ -93,31 +90,27 @@ public class TurntableBlockEntity extends IEBaseBlockEntity implements IStateBas
 		}
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_LIKE;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return placer.isShiftKeyDown();
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return !entity.isShiftKeyDown();
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		Direction facing = getFacing();
 		if(player.isShiftKeyDown()&&side.getAxis()!=facing.getAxis())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				int directionIndex = getRotationDirectionIndexFromFacing(side, facing);
 				rotationMapping[directionIndex] = intToRotation((rotationToInt(rotationMapping[directionIndex])%3)+1); //looks strange, but made to avoid values of <1 and >3
@@ -129,7 +122,6 @@ public class TurntableBlockEntity extends IEBaseBlockEntity implements IStateBas
 		return false;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;

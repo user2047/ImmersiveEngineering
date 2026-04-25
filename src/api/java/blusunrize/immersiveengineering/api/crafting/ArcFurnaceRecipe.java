@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class ArcFurnaceRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<ArcFurnaceRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ArcFurnaceRecipe>> SERIALIZER;
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
 	public final IngredientWithSize input;
@@ -78,7 +78,7 @@ public class ArcFurnaceRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<ArcFurnaceRecipe> getIESerializer()
+	protected RecipeSerializer<ArcFurnaceRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

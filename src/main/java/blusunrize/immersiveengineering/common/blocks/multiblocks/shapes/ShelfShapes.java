@@ -18,7 +18,6 @@ public class ShelfShapes implements Function<BlockPos, VoxelShape>
 {
 	public static final Function<BlockPos, VoxelShape> SHAPE_GETTER = new ShelfShapes();
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		VoxelShape floor = posInMultiblock.getY()==0?Shapes.empty(): Shapes.box(

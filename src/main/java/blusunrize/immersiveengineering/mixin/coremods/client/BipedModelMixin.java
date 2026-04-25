@@ -11,22 +11,21 @@ package blusunrize.immersiveengineering.mixin.coremods.client;
 
 import blusunrize.immersiveengineering.client.render.IEBipedRotations;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidModel.class)
-public class BipedModelMixin<T extends LivingEntity>
+public class BipedModelMixin<T extends HumanoidRenderState>
 {
-	@Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("RETURN"))
+	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V", at = @At("RETURN"))
 	public void rotationAngleCallback(
-			T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch,
-			CallbackInfo info
+			T renderState, CallbackInfo info
 	)
 	{
 		//noinspection ConstantConditions (IntelliJ warns about the (admittedly crazy-looking) cast)
-		IEBipedRotations.handleBipedRotations((HumanoidModel<?>)(Object)this, entityIn);
+		IEBipedRotations.handleBipedRotations((HumanoidModel<?>)(Object)this, renderState);
 	}
 }

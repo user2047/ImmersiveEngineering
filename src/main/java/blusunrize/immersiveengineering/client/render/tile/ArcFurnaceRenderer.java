@@ -23,13 +23,11 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.InventoryMenu;
 
 import java.util.List;
 
@@ -43,7 +41,6 @@ public class ArcFurnaceRenderer extends IEMultiblockRenderer<State>
 	public static final Identifier HOT_METLA_STILL = IEApi.ieLoc("block/fluid/hot_metal_still");
 	public static final Identifier HOT_METLA_FLOW = IEApi.ieLoc("block/fluid/hot_metal_flow");
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn,
 					   int combinedLightIn, int combinedOverlayIn)
 	{
@@ -66,11 +63,11 @@ public class ArcFurnaceRenderer extends IEMultiblockRenderer<State>
 		matrixStack.pushPose();
 		List<BakedQuad> quads = ELECTRODES.get().getQuads(null, null, ApiUtils.RANDOM_SOURCE, ModelDataUtils.single(
 				DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(renderedParts)
-		), RenderType.cutout());
+		), blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout());
 		matrixStack.pushPose();
 		rotateForFacing(matrixStack, facing);
 		RenderUtils.renderModelTESRFast(
-				quads, bufferIn.getBuffer(RenderType.solid()), matrixStack, combinedLightIn, combinedOverlayIn
+				quads, bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), matrixStack, combinedLightIn, combinedOverlayIn
 		);
 		matrixStack.popPose();
 		matrixStack.translate(.5, .5, .5);
@@ -79,9 +76,8 @@ public class ArcFurnaceRenderer extends IEMultiblockRenderer<State>
 		{
 			if(hotMetal_flow==null)
 			{
-				TextureAtlas blockMap = ClientUtils.mc().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
-				hotMetal_still = blockMap.getSprite(HOT_METLA_STILL);
-				hotMetal_flow = blockMap.getSprite(HOT_METLA_FLOW);
+				hotMetal_still = ClientUtils.getSprite(HOT_METLA_STILL);
+				hotMetal_flow = ClientUtils.getSprite(HOT_METLA_FLOW);
 			}
 			rotateForFacingNoCentering(matrixStack, facing);
 			int process = 40;

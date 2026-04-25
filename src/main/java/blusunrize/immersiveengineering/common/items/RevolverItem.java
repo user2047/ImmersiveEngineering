@@ -48,7 +48,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -65,7 +65,7 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -89,7 +89,7 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 	public RevolverItem()
 	{
 		super(
-				new Properties().stacksTo(1)
+				itemProperties().stacksTo(1)
 						.component(IEDataComponents.REVOLVER_PERKS, Perks.EMPTY)
 						.component(IEDataComponents.REVOLVER_ELITE, "")
 						.component(REVOLVER_COOLDOWN, RevolverCooldowns.DEFAULT),
@@ -111,7 +111,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 
 	/* ------------- INTERNAL INVENTORY ------------- */
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]
@@ -121,16 +120,14 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 				};
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null&&!inv.getStackInSlot(18).isEmpty()&&!inv.getStackInSlot(19).isEmpty())
 			Utils.unlockIEAdvancement(player, "tools/upgrade_revolver");
 	}
@@ -138,7 +135,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 	/* ------------- NAME, TOOLTIP, SUB-ITEMS ------------- */
 
 	@Nonnull
-	@Override
 	public String getDescriptionId(@Nonnull ItemStack stack)
 	{
 		String tag = getRevolverDisplayTag(stack);
@@ -147,7 +143,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 		return super.getDescriptionId(stack);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		String tag = getRevolverDisplayTag(stack);
@@ -163,7 +158,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 	}
 
 	@Nonnull
-	@Override
 	public Optional<TooltipComponent> getTooltipImage(@Nonnull ItemStack pStack)
 	{
 		return Optional.of(new RevolverServerTooltip(getBullets(pStack), getBulletCount(pStack)));
@@ -171,7 +165,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 
 	/* ------------- ATTRIBUTES, UPDATE, RIGHTCLICK ------------- */
 
-	@Override
 	public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack)
 	{
 		var builder = ItemAttributeModifiers.builder();
@@ -204,7 +197,6 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 		return builder.build();
 	}
 
-	@Override
 	public void inventoryTick(@Nonnull ItemStack stack, @Nonnull Level world, @Nonnull Entity ent, int slot, boolean inHand)
 	{
 		super.inventoryTick(stack, world, ent, slot, inHand);
@@ -217,43 +209,41 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 	}
 
 	@Nonnull
-	@Override
-	public UseAnim getUseAnimation(@Nonnull ItemStack stack)
+	public ItemUseAnimation getUseAnimation(@Nonnull ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
 		ItemStack revolver = player.getItemInHand(hand);
 		if(player.isShiftKeyDown())
 		{
 			openGui(player, hand);
-			return InteractionResultHolder.sidedSuccess(revolver, world.isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 
 		// not yet fully drawn
 		if(player.getAttackStrengthScale(1) < 1)
-			return InteractionResultHolder.pass(revolver);
+			return InteractionResult.PASS;
 
 		if(this.getUpgrades(revolver).has(UpgradeEffect.NERF))
 		{
 			world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1f, 0.6f);
-			return InteractionResultHolder.sidedSuccess(revolver, world.isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 
 		// on cooldown, can't be used
-		if(player.getCooldowns().isOnCooldown(this))
-			return InteractionResultHolder.pass(revolver);
+		if(player.getCooldowns().isOnCooldown(revolver))
+			return InteractionResult.PASS;
 
 		NonNullList<ItemStack> bullets = getBullets(revolver);
 		// check if empty and try to use speedloader
 		if(bullets.stream().noneMatch(stack -> stack.getItem() instanceof BulletItem))
 		{
 			if(useSpeedloader(world, player, revolver, hand, bullets))
-				return InteractionResultHolder.sidedSuccess(revolver, world.isClientSide());
+				return InteractionResult.SUCCESS;
 		}
 
 		ItemStack bulletStack = bullets.get(0);
@@ -296,8 +286,8 @@ public class RevolverItem extends UpgradeableToolItem implements IBulletContaine
 						world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_HAT.value(), SoundSource.PLAYERS, 1f, 1f);
 
 		rotateCylinder(revolver, player, true, bullets);
-		player.getCooldowns().addCooldown(this, getMaxShootCooldown(revolver));
-		return InteractionResultHolder.sidedSuccess(revolver, world.isClientSide());
+		player.getCooldowns().addCooldown(revolver, getMaxShootCooldown(revolver));
+		return InteractionResult.SUCCESS;
 	}
 
 public boolean useSpeedloader(Level level, Player player, ItemStack revolver, InteractionHand hand, NonNullList<ItemStack> bullets)
@@ -322,7 +312,7 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 				// set cooldown & animation timer
 				var oldCooldowns = getCooldowns(revolver);
 				revolver.set(REVOLVER_COOLDOWN, new RevolverCooldowns(60, oldCooldowns.fireCooldown));
-				player.getCooldowns().addCooldown(this, 60);
+				player.getCooldowns().addCooldown(revolver, 60);
 				return true;
 			}
 		}
@@ -360,16 +350,14 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	/* ------------- IBulletContainer ------------- */
 
-	@Override
 	public int getBulletCount(ItemStack revolver)
 	{
 		return 8+this.getUpgrades(revolver).get(UpgradeEffect.BULLETS);
 	}
 
-	@Override
 	public NonNullList<ItemStack> getBullets(ItemStack revolver)
 	{
-		return ListUtils.fromStream(getContainedItems(revolver).stream(), getBulletCount(revolver));
+		return ListUtils.fromStream(getContainedItems(revolver).allItemsCopyStream(), getBulletCount(revolver));
 	}
 
 	/* ------------- BULLET UTILITY ------------- */
@@ -385,7 +373,7 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	public void setBullets(ItemStack revolver, NonNullList<ItemStack> bullets, boolean ignoreExtendedMag)
 	{
-		IItemHandlerModifiable inv = (IItemHandlerModifiable)revolver.getCapability(ItemHandler.ITEM);
+		IItemHandlerModifiable inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(revolver, Capabilities.Item.ITEM);
 		for(int i = 0; i < 18; i++)
 			inv.setStackInSlot(i, ItemStack.EMPTY);
 		if(ignoreExtendedMag&&getUpgrades(revolver).get(UpgradeEffect.BULLETS) > 0)
@@ -414,7 +402,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	/* ------------- UPGRADES & PERKS ------------- */
 
-	@Override
 	public UpgradeData getUpgradeBase(ItemStack stack)
 	{
 		return stack.getOrDefault(IEDataComponents.BASE_UPGRADES, UpgradeData.EMPTY);
@@ -438,7 +425,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 		return stack.getOrDefault(IEDataComponents.REVOLVER_PERKS, Perks.EMPTY);
 	}
 
-	@Override
 	public boolean canZoom(ItemStack stack, Player player)
 	{
 		return getUpgradesStatic(stack).has(UpgradeEffect.SCOPE);
@@ -446,7 +432,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	float[] zoomSteps = new float[]{.3125f, .4f, .5f, .625f};
 
-	@Override
 	public float[] getZoomSteps(ItemStack stack, Player player)
 	{
 		return zoomSteps;
@@ -454,7 +439,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	/* ------------- CRAFTING ------------- */
 
-	@Override
 	public void onCraftedBy(ItemStack stack, @Nonnull Level world, @Nonnull Player player)
 	{
 		if(stack.isEmpty()||player==null)
@@ -502,7 +486,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 	/* ------------- RENDERING ------------- */
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		if(slotChanged||CapabilityShader.shouldReequipDueToShader(oldStack, newStack))
@@ -512,7 +495,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 	}
 
 	@Nullable
-	@Override
 	protected ItemContainerType<?> getContainerType()
 	{
 		return IEMenuTypes.REVOLVER;
@@ -588,22 +570,22 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 		public static Component getFormattedName(Component name, Perks perks)
 		{
-			double averageTier = 0;
+			double averageToolMaterial = 0;
 			for(var entry : perks.perks.entrySet())
 			{
 				RevolverItem.RevolverPerk perk = entry.getKey();
 				double value = entry.getValue();
-				double dTier = (value-perk.generate_median)/perk.generate_deviation*3;
-				averageTier += dTier;
-				int iTier = (int)Mth.clamp((dTier < 0?Math.floor(dTier): Math.ceil(dTier)), -3, 3);
-				if(iTier==0)
-					iTier = 1;
-				String translate = Lib.DESC_INFO+"revolver.perk."+perk.name().toLowerCase(Locale.US)+".tier"+iTier;
+				double dToolMaterial = (value-perk.generate_median)/perk.generate_deviation*3;
+				averageToolMaterial += dToolMaterial;
+				int iToolMaterial = (int)Mth.clamp((dToolMaterial < 0?Math.floor(dToolMaterial): Math.ceil(dToolMaterial)), -3, 3);
+				if(iToolMaterial==0)
+					iToolMaterial = 1;
+				String translate = Lib.DESC_INFO+"revolver.perk."+perk.name().toLowerCase(Locale.US)+".tier"+iToolMaterial;
 				name = Component.translatable(translate, name);
 			}
 
-			int rarityTier = (int)Math.ceil(Mth.clamp(averageTier+3, 0, 6)/6*5);
-			Rarity rarity = switch(rarityTier)
+			int rarityToolMaterial = (int)Math.ceil(Mth.clamp(averageToolMaterial+3, 0, 6)/6*5);
+			Rarity rarity = switch(rarityToolMaterial)
 			{
 				case 5 -> Lib.RARITY_MASTERWORK.getValue();
 				case 4 -> Rarity.EPIC;
@@ -616,15 +598,15 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 
 		public static int calculateTier(Perks perks)
 		{
-			double averageTier = 0;
+			double averageToolMaterial = 0;
 			for(var entry : perks.perks.entrySet())
 			{
 				RevolverItem.RevolverPerk perk = entry.getKey();
 				double value = entry.getValue();
-				double dTier = (value-perk.generate_median)/perk.generate_deviation*3;
-				averageTier += dTier;
+				double dToolMaterial = (value-perk.generate_median)/perk.generate_deviation*3;
+				averageToolMaterial += dToolMaterial;
 			}
-			return (int)Math.ceil(Mth.clamp(averageTier+3, 0, 6)/6*5);
+			return (int)Math.ceil(Mth.clamp(averageToolMaterial+3, 0, 6)/6*5);
 		}
 
 		public double concat(double left, double right)
@@ -640,7 +622,6 @@ public boolean useSpeedloader(Level level, Player player, ItemStack revolver, In
 			return d;
 		}
 
-		@Override
 		public String toString()
 		{
 			return this.name().toLowerCase(Locale.US);

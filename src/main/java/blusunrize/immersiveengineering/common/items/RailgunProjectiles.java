@@ -25,10 +25,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.breeze.Breeze;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.ThrownEnderpearl;
-import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
+import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -67,21 +67,22 @@ public class RailgunProjectiles
 		);
 
 		// Graphite
-		RailgunHandler.registerStandardProjectile(new ItemStack(IEItems.Misc.GRAPHITE_ELECTRODE), 30, .9).setColorMap(
+		((RailgunHandler.StandardRailgunProjectile)RailgunHandler.registerProjectile(
+				() -> Ingredient.of(IEItems.Misc.GRAPHITE_ELECTRODE),
+				new RailgunHandler.StandardRailgunProjectile(30, .9)
+		)).setColorMap(
 				new RailgunRenderColors(0x242424, 0x242424, 0x242424, 0x171717, 0x171717, 0x0a0a0a)
 		);
 
 		// Blaze Rod
-		RailgunHandler.registerProjectile(() -> Ingredient.of(Tags.Items.RODS_BLAZE), new RailgunHandler.StandardRailgunProjectile(10, 1.05)
+		RailgunHandler.registerProjectile(() -> Ingredient.of(Items.BLAZE_ROD), new RailgunHandler.StandardRailgunProjectile(10, 1.05)
 		{
-			@Override
 			public void onHitTarget(Level world, HitResult target, @Nullable UUID shooter, Entity projectile)
 			{
 				if(target instanceof EntityHitResult)
 					((EntityHitResult)target).getEntity().igniteForSeconds(5);
 			}
 
-			@Override
 			public double getBreakChance(@Nullable UUID shooter, ItemStack ammo)
 			{
 				return 1;
@@ -89,9 +90,8 @@ public class RailgunProjectiles
 		}.setColorMap(new RailgunRenderColors(0xfff32d, 0xffc100, 0xb36b19, 0xbf5a00, 0xbf5a00, 0x953300)));
 
 		// Breeze Rod
-		RailgunHandler.registerProjectile(() -> Ingredient.of(Tags.Items.RODS_BREEZE), new RailgunHandler.StandardRailgunProjectile(16, .9)
+		RailgunHandler.registerProjectile(() -> Ingredient.of(Items.BREEZE_ROD), new RailgunHandler.StandardRailgunProjectile(16, .9)
 		{
-			@Override
 			public double getDamage(Level world, Entity target, @Nullable UUID shooter, Entity projectile)
 			{
 				double d = super.getDamage(world, target, shooter, projectile);
@@ -100,7 +100,6 @@ public class RailgunProjectiles
 				return d;
 			}
 
-			@Override
 			public void onHitTarget(Level world, HitResult target, @Nullable UUID shooter, Entity projectile)
 			{
 				if(target.getType()!=Type.MISS)
@@ -108,13 +107,10 @@ public class RailgunProjectiles
 							AbstractWindCharge.EXPLOSION_DAMAGE_CALCULATOR,
 							target.getLocation().x, target.getLocation().y, target.getLocation().z,
 							3.0F, false,
-							ExplosionInteraction.TRIGGER,
-							ParticleTypes.GUST_EMITTER_SMALL, ParticleTypes.GUST_EMITTER_LARGE,
-							SoundEvents.BREEZE_WIND_CHARGE_BURST
+							ExplosionInteraction.TRIGGER
 					);
 			}
 
-			@Override
 			public double getBreakChance(@Nullable UUID shooter, ItemStack ammo)
 			{
 				return 1;
@@ -124,7 +120,6 @@ public class RailgunProjectiles
 		// End Rod
 		RailgunHandler.registerProjectile(() -> Ingredient.of(Items.END_ROD), new RailgunHandler.StandardRailgunProjectile(10, 1.05)
 		{
-			@Override
 			public double getDamage(Level world, Entity target, @Nullable UUID shooter, Entity projectile)
 			{
 				double d = super.getDamage(world, target, shooter, projectile);
@@ -133,7 +128,6 @@ public class RailgunProjectiles
 				return d;
 			}
 
-			@Override
 			public DamageSource getDamageSource(Level world, Entity target, @Nullable UUID shooter, Entity projectile)
 			{
 				if(target instanceof EnderMan enderMan)
@@ -152,7 +146,6 @@ public class RailgunProjectiles
 		// Sawblade
 		RailgunHandler.registerProjectile(() -> Ingredient.of(IEItems.Tools.SAWBLADE), new RailgunHandler.IRailgunProjectile()
 		{
-			@Override
 			public Entity getProjectile(@Nullable Player shooter, ItemStack ammo, Entity defaultProjectile)
 			{
 				return new SawbladeEntity(defaultProjectile.level(), shooter, 20, 0, ammo);
@@ -162,13 +155,11 @@ public class RailgunProjectiles
 		// Trident
 		RailgunHandler.registerProjectile(() -> Ingredient.of(Items.TRIDENT), new RailgunHandler.IRailgunProjectile()
 		{
-			@Override
 			public boolean isValidForTurret()
 			{
 				return false;
 			}
 
-			@Override
 			public Entity getProjectile(@Nullable Player shooter, ItemStack ammo, Entity defaultProjectile)
 			{
 				if(shooter!=null)
@@ -187,19 +178,16 @@ public class RailgunProjectiles
 		// Enderpearl
 		RailgunHandler.registerProjectile(() -> Ingredient.of(Items.ENDER_PEARL), new RailgunHandler.IRailgunProjectile()
 		{
-			@Override
 			public boolean isValidForTurret()
 			{
 				return false;
 			}
 
-			@Override
 			public Entity getProjectile(@Nullable Player shooter, ItemStack ammo, Entity defaultProjectile)
 			{
 				if(shooter!=null)
 				{
-					ThrownEnderpearl pearl = new ThrownEnderpearl(shooter.level(), shooter);
-					pearl.setItem(ammo);
+					ThrownEnderpearl pearl = new ThrownEnderpearl(shooter.level(), shooter, ammo);
 					pearl.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 2.5F, 0);
 					return pearl;
 				}

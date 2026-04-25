@@ -9,8 +9,8 @@
 
 package blusunrize.immersiveengineering.api.utils.client;
 
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 public class ModelDataUtils
 {

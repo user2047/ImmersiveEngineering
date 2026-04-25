@@ -26,7 +26,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Map;
@@ -38,49 +38,43 @@ public class DynamoBlockEntity extends IEBaseBlockEntity implements IStateBasedD
 		super(IEBlockEntities.DYNAMO.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 	}
 
 	private final IRotationAcceptor rotationCap = new RotationAcceptor();
 	private final Map<Direction, IEBlockCapabilityCache<IEnergyStorage>> neighbors = IEBlockCapabilityCaches.allNeighbors(
-			EnergyStorage.BLOCK, this
+			Energy.BLOCK, this
 	);
 
 	public static void registerCapabilities(BECapabilityRegistrar<DynamoBlockEntity> registrar)
 	{
-		registrar.registerAllContexts(EnergyStorage.BLOCK, $ -> NullEnergyStorage.INSTANCE);
+		registrar.registerAllContexts(Energy.BLOCK, $ -> NullEnergyStorage.INSTANCE);
 		registrar.register(IRotationAcceptor.CAPABILITY, (be, side) -> side==be.getFacing()?be.rotationCap: null);
 	}
 
 	private class RotationAcceptor implements IRotationAcceptor
 	{
 
-		@Override
 		public void inputRotation(double rotation)
 		{
 			// TODO: Make this divisor one on next major (1.21?) update, whenever IEServerConfig mult is updated

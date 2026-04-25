@@ -52,10 +52,9 @@ public class ConnectorStructuralBlockEntity extends ImmersiveConnectableBlockEnt
 		super(type, pos, state);
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			rotation += player.isShiftKeyDown()?-22.5f: 22.5f;
 			rotation %= 360;
@@ -65,23 +64,20 @@ public class ConnectorStructuralBlockEntity extends ImmersiveConnectableBlockEnt
 		return true;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		nbt.putFloat("rotation", rotation);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		rotation = nbt.getFloat("rotation");
-		if(level!=null&&level.isClientSide)
+		rotation = nbt.getFloatOr("rotation", 0);
+		if(level!=null&&level.isClientSide())
 			this.markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -91,38 +87,32 @@ public class ConnectorStructuralBlockEntity extends ImmersiveConnectableBlockEnt
 				.5+side.getStepZ()*(-.125-conRadius));
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		//TODO are ropes and cables meant to be mixed?
 		return STRUCTURE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return EnergyConnectorBlockEntity.getConnectorBounds(getFacing(), .5F);
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;

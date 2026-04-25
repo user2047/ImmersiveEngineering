@@ -38,7 +38,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -47,7 +47,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -72,26 +72,23 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 		super(type, pos, state);
 	}
 
-	@Override
 	public boolean canTickAny()
 	{
 		return sample.isEmpty();
 	}
 
-	@Override
 	public void tickClient()
 	{
 		if(isRunning)
 		{
 			process++;
 			if (process <= 0.5*IEServerConfig.MACHINES.coredrill_time.get())
-				level.addAlwaysVisibleParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.COBBLESTONE)),
+				level.addAlwaysVisibleParticle(new ItemParticleOption(ParticleTypes.ITEM, Items.COBBLESTONE),
 						getBlockPos().getX()+0.5, getBlockPos().getY()+1.125, getBlockPos().getZ()+0.5,
-						ApiUtils.RANDOM.nextDouble()*.125-.0625, 0.0625, ApiUtils.RANDOM.nextDouble()*.125-.0625);
+						ApiUtils.getRandom().nextDouble()*.125-.0625, 0.0625, ApiUtils.getRandom().nextDouble()*.125-.0625);
 		}
 	}
 
-	@Override
 	public void tickServer()
 	{
 		final int consumption = IEServerConfig.MACHINES.coredrill_consumption.get();
@@ -166,7 +163,6 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 		return stack;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
@@ -174,18 +170,17 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 		nbt.putInt("process", process);
 		nbt.putBoolean("isRunning", isRunning);
 		if(!sample.isEmpty())
-			nbt.put("sample", sample.save(provider, new CompoundTag()));
+			nbt.put("sample", blusunrize.immersiveengineering.common.util.ItemStackCompat.save(sample, provider));
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
-		dummy = nbt.getInt("dummy");
-		process = nbt.getInt("process");
-		isRunning = nbt.getBoolean("isRunning");
-		if(nbt.contains("sample", Tag.TAG_COMPOUND))
-			sample = ItemStack.parseOptional(provider, nbt.getCompound("sample"));
+		dummy = nbt.getIntOr("dummy", 0);
+		process = nbt.getIntOr("process", 0);
+		isRunning = nbt.getBooleanOr("isRunning", false);
+		if(nbt.contains("sample"))
+			sample = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("sample"));
 		else
 			sample = ItemStack.EMPTY;
 	}
@@ -195,19 +190,17 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 	public static void registerCapabilities(BECapabilityRegistrar<SampleDrillBlockEntity> registrar)
 	{
 		registrar.register(
-				EnergyStorage.BLOCK,
+				Energy.BLOCK,
 				(be, side) -> side==null||be.dummy==0&&side.getAxis().isHorizontal()?be.energyCap.get(): null
 		);
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return dummy > 0;
 	}
 
 	@Nullable
-	@Override
 	public SampleDrillBlockEntity master()
 	{
 		if(!isDummy())
@@ -217,7 +210,6 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 		return te instanceof SampleDrillBlockEntity drill?drill: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
@@ -228,7 +220,6 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 		}
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		for(int i = 0; i <= 2; i++)
@@ -236,8 +227,7 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 				level.removeBlock(getBlockPos().offset(0, -dummy, 0).offset(0, i, 0), false);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(dummy!=0)
 		{
@@ -248,29 +238,29 @@ public class SampleDrillBlockEntity extends IEBaseBlockEntity implements IEServe
 
 		if(!this.sample.isEmpty())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
-				player.spawnAtLocation(this.sample.copy(), .5f);
+				if(level instanceof net.minecraft.server.level.ServerLevel serverLevel)
+					player.spawnAtLocation(serverLevel, this.sample.copy());
 				this.sample = ItemStack.EMPTY;
 				setChanged();
 				this.markContainingBlockForUpdate(null);
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else if(this.process <= 0)
 		{
-			if(!level.isClientSide&&energyStorage.getEnergyStored() >= IEServerConfig.MACHINES.coredrill_consumption.get())
+			if(!level.isClientSide()&&energyStorage.getEnergyStored() >= IEServerConfig.MACHINES.coredrill_consumption.get())
 			{
 				this.process = 1;
 				setChanged();
 				this.markContainingBlockForUpdate(null);
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		return new BlockPos(0, dummy, 0);

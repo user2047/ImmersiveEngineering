@@ -23,7 +23,6 @@ import java.util.function.Supplier;
  */
 public class OneProbeCompatModule extends StandardIECompatModule implements Function<ITheOneProbe, Void>
 {
-	@Override
 	public void sendIMCs()
 	{
 		Supplier<Function<ITheOneProbe, Void>> supplier = () -> this;
@@ -31,7 +30,6 @@ public class OneProbeCompatModule extends StandardIECompatModule implements Func
 	}
 
 	@Nullable
-	@Override
 	public Void apply(@Nullable ITheOneProbe input)
 	{
 		Preconditions.checkNotNull(input);

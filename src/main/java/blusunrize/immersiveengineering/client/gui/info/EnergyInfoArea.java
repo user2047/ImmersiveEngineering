@@ -25,13 +25,11 @@ public class EnergyInfoArea extends InfoArea
 		this.energy = energy;
 	}
 
-	@Override
 	protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		tooltip.add(Component.literal(energy.getEnergyStored()+"/"+energy.getMaxEnergyStored()+" IF"));
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		final int height = area.getHeight();

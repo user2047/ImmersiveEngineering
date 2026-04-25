@@ -28,14 +28,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -48,8 +49,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.HarvestCheck;
@@ -62,18 +62,17 @@ import java.util.function.Supplier;
 
 import static blusunrize.immersiveengineering.common.register.IEDataComponents.DRILL_SINGLEBLOCK;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public class DrillItem extends DieselToolItem
 {
 	public static final String TYPE = "DRILL";
 
 	public DrillItem()
 	{
-		super(new Properties().stacksTo(1).component(DRILL_SINGLEBLOCK, false), TYPE, 5);
+		super(itemProperties().stacksTo(1).component(DRILL_SINGLEBLOCK, false), TYPE, 5);
 	}
 
 	/* ------------- WORKBENCH & INVENTORY ------------- */
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{
@@ -84,10 +83,9 @@ public class DrillItem extends DieselToolItem
 		};
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null)
 		{
 			if(!inv.getStackInSlot(0).isEmpty()&&!inv.getStackInSlot(1).isEmpty()&&!inv.getStackInSlot(2).isEmpty()&&!inv.getStackInSlot(3).isEmpty())
@@ -96,13 +94,11 @@ public class DrillItem extends DieselToolItem
 	}
 
 
-	@Override
 	public void finishUpgradeRecalculation(ItemStack stack, RegistryAccess registries)
 	{
 		super.finishUpgradeRecalculation(stack, registries);
-		final var fortune = registries.registryOrThrow(Registries.ENCHANTMENT)
-				.getHolder(Enchantments.FORTUNE)
-				.orElseThrow();
+		final var fortune = registries.lookupOrThrow(Registries.ENCHANTMENT)
+				.getOrThrow(Enchantments.FORTUNE);
 		final var newEnchantments = new ItemEnchantments.Mutable(
 				stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
 		);
@@ -117,7 +113,6 @@ public class DrillItem extends DieselToolItem
 		EnchantmentHelper.setEnchantments(stack, newEnchantments.toImmutable());
 	}
 
-	@Override
 	public final ItemStack getHead(ItemStack drill)
 	{
 		return getHeadStatic(drill);
@@ -125,7 +120,7 @@ public class DrillItem extends DieselToolItem
 
 	public static ItemStack getHeadStatic(ItemStack drill)
 	{
-		IItemHandler cap = drill.getCapability(ItemHandler.ITEM);
+		IItemHandler cap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(drill, Capabilities.Item.ITEM);
 		if(cap!=null)
 		{
 			ItemStack head = cap.getStackInSlot(0);
@@ -134,7 +129,6 @@ public class DrillItem extends DieselToolItem
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public void setHead(ItemStack drill, ItemStack head)
 	{
 		setHeadStatic(drill, head);
@@ -146,7 +140,6 @@ public class DrillItem extends DieselToolItem
 		makeInternalItemHandler(drill).setStackInSlot(0, head);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		list.add(IEItemFluidHandler.fluidItemInfoFlavor(getFluid(stack), getCapacity(stack, CAPACITY)));
@@ -170,7 +163,6 @@ public class DrillItem extends DieselToolItem
 		}
 	}
 
-	@Override
 	protected double getAttackDamage(ItemStack stack, ItemStack head)
 	{
 		return ((IDrillHead)head.getItem()).getAttackDamage(head)+getUpgrades(stack).get(UpgradeEffect.DAMAGE);
@@ -182,20 +174,17 @@ public class DrillItem extends DieselToolItem
 		return stack.getOrDefault(DRILL_SINGLEBLOCK, false);
 	}
 
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public InteractionResult use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
 		if(player.isShiftKeyDown())
 		{
 			boolean mode = !isSingleBlockMode(stack);
 			stack.set(DRILL_SINGLEBLOCK, mode);
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"drill_mode."+(mode?"single": "multi")), true
-			);
-			return InteractionResultHolder.success(stack);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"drill_mode."+(mode?"single": "multi")));
+			return InteractionResult.SUCCESS;
 		}
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 
 	public boolean canToolBeUsed(ItemStack drill)
@@ -206,78 +195,67 @@ public class DrillItem extends DieselToolItem
 	@SubscribeEvent
 	public static void handleUnderwaterDrill(HarvestCheck ev)
 	{
-		ItemStack drill = ev.getEntity().getInventory().getSelected();
+		ItemStack drill = ev.getEntity().getInventory().getSelectedItem();
 		if(!(drill.getItem() instanceof DrillItem drillItem))
 			return;
-		if(ev.getEntity().isEyeInFluidType(NeoForgeMod.WATER_TYPE.value())&&!drillItem.getUpgrades(drill).has(UpgradeEffect.WATERPROOF))
+		if(ev.getEntity().isEyeInFluid(FluidTags.WATER)&&!drillItem.getUpgrades(drill).has(UpgradeEffect.WATERPROOF))
 			ev.setCanHarvest(false);
 	}
 
-	@Override
 	public int getMaxHeadDamage(ItemStack stack)
 	{
 		ItemStack head = getHead(stack);
 		return !head.isEmpty()?((IDrillHead)head.getItem()).getMaximumHeadDamage(head): 0;
 	}
 
-	@Override
 	public int getHeadDamage(ItemStack stack)
 	{
 		ItemStack head = getHead(stack);
 		return !head.isEmpty()?((IDrillHead)head.getItem()).getHeadDamage(head): 0;
 	}
 
-	@Override
 	protected void damageHead(ItemStack head, int amount, LivingEntity living)
 	{
 		((IDrillHead)head.getItem()).damageHead(head, amount);
 	}
 
-	@Override
 	public Holder<SoundEvent> getIdleSound(ItemStack stack)
 	{
 		return IESounds.drill_idle;
 	}
 
-	@Override
 	public Holder<SoundEvent> getBusySound(ItemStack stack)
 	{
 		return IESounds.drill_busy;
 	}
 
-	@Override
 	public Holder<SoundEvent> getFadingSound(ItemStack stack)
 	{
 		return IESounds.drill_fade;
 	}
 
 
-	@Override
 	public Holder<SoundEvent> getAttackSound(ItemStack stack)
 	{
 		return IESounds.drill_attack;
 	}
 
-	@Override
 	public Holder<SoundEvent> getHarvestSound(ItemStack stack)
 	{
 		return IESounds.drill_harvest;
 	}
 
-	@Override
 	public boolean ableToMakeNoise(ItemStack stack)
 	{
 		return canToolBeUsed(stack);
 	}
 
-	@Override
 	public boolean noisySameStack(ItemStack mainStack, ItemStack otherStack)
 	{
 		return mainStack.getItem() instanceof DrillItem drillItem&&drillItem.equals(otherStack.getItem());
 	}
 
-	@Override
-	public Tier getHarvestLevel(ItemStack stack, @Nullable Player player)
+	public ToolMaterial getHarvestLevel(ItemStack stack, @Nullable Player player)
 	{
 		ItemStack head = getHead(stack);
 		if(!head.isEmpty()&&canToolBeUsed(stack))
@@ -285,13 +263,11 @@ public class DrillItem extends DieselToolItem
 		return null;
 	}
 
-	@Override
 	public boolean isEffective(ItemStack stack, BlockState state)
 	{
 		return state.is(IETags.drillHarvestable);
 	}
 
-	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
 		ItemStack head = getHead(stack);
@@ -310,11 +286,10 @@ public class DrillItem extends DieselToolItem
 	}
 
 
-	@Override
 	public boolean mineBlock(ItemStack stack, Level world, BlockState centerState, BlockPos centerPos, LivingEntity entity)
 	{
 		// early exit for client
-		if(world.isClientSide||!(entity instanceof ServerPlayer player))
+		if(world.isClientSide()||!(entity instanceof ServerPlayer player))
 			return false;
 		// Damage head for center block
 		onBlockMined(centerState, world, centerPos, stack, entity);
@@ -345,7 +320,7 @@ public class DrillItem extends DieselToolItem
 
 				if(player.getAbilities().instabuild)
 				{
-					if(block.onDestroyedByPlayer(state, world, pos, player, false, state.getFluidState()))
+					if(block.onDestroyedByPlayer(state, world, pos, player, stack, false, state.getFluidState()))
 						block.destroy(world, pos, state);
 				}
 				else
@@ -353,7 +328,7 @@ public class DrillItem extends DieselToolItem
 					BlockEntity te = world.getBlockEntity(pos);
 					//implicitly damages head
 					onBlockMined(state, world, pos, stack, entity);
-					if(block.onDestroyedByPlayer(state, world, pos, player, true, state.getFluidState()))
+					if(block.onDestroyedByPlayer(state, world, pos, player, stack, true, state.getFluidState()))
 					{
 						block.destroy(world, pos, state);
 						block.playerDestroy(world, player, pos, state, te, stack);

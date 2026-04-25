@@ -19,13 +19,11 @@ public record MessageOpenManual() implements IMessage
 	public static final Type<MessageOpenManual> ID = IMessage.createType("open_manual");
 	public static final StreamCodec<ByteBuf, MessageOpenManual> CODEC = StreamCodec.unit(new MessageOpenManual());
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(ImmersiveEngineering.proxy::openManual);
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

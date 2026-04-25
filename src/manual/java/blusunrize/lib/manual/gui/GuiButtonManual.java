@@ -9,15 +9,9 @@
 package blusunrize.lib.manual.gui;
 
 import blusunrize.lib.manual.ManualUtils;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class GuiButtonManual extends Button
 {
@@ -44,20 +38,18 @@ public class GuiButtonManual extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
+	protected void extractContents(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		if(this.visible)
 		{
 			ManualUtils.bindTexture(gui.texture);
 			this.isHovered = mx >= this.getX()&&mx < (this.getX()+this.width)&&my >= this.getY()&&my < (this.getY()+this.height);
-			RenderSystem.enableBlend();
-			RenderSystem.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, ONE, ZERO);
 
 			int col = colour[isHovered?1: 0];
 			graphics.fill(getX(), getY(), getX()+width, getY()+height, col);
 			int txtCol = textColour[isHovered?1: 0];
 			int sw = gui.manual.fontRenderer().width(getMessage().getString());
-			graphics.drawString(
+			graphics.text(
 					gui.manual.fontRenderer(), getMessage().getString(), getX()+width/2-sw/2, getY()+height/2-gui.manual.fontRenderer().lineHeight/2, txtCol
 			);
 		}

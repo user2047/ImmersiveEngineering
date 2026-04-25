@@ -12,6 +12,7 @@ package blusunrize.immersiveengineering.common.util.orientation;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
@@ -57,7 +58,7 @@ public class RotationUtil
 			{
 				final BlockPos otherPos = pos.relative(d);
 				final BlockState otherState = world.getBlockState(otherPos);
-				final BlockState nextState = newState.updateShape(d, otherState, world, pos, otherPos);
+				final BlockState nextState = newState.updateShape(world, world, pos, d, otherPos, otherState, RandomSource.create());
 				if(nextState!=newState)
 				{
 					if(!nextState.isAir())
@@ -76,7 +77,7 @@ public class RotationUtil
 			{
 				final BlockPos otherPos = pos.relative(d);
 				final BlockState otherState = world.getBlockState(otherPos);
-				final BlockState nextOther = otherState.updateShape(d.getOpposite(), newState, world, otherPos, pos);
+				final BlockState nextOther = otherState.updateShape(world, world, otherPos, d.getOpposite(), pos, newState, RandomSource.create());
 				if(nextOther!=otherState)
 					world.setBlockAndUpdate(otherPos, nextOther);
 			}

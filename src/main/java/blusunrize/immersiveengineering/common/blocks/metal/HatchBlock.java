@@ -41,14 +41,12 @@ public class HatchBlock extends IEBaseBlock
 		super(props);
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		return super.getInitDefaultState();
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState state = super.getStateForPlacement(context);
@@ -58,14 +56,12 @@ public class HatchBlock extends IEBaseBlock
 		return state;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_ALL, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
 	{
 		if(!player.getMainHandItem().isEmpty())
@@ -79,7 +75,7 @@ public class HatchBlock extends IEBaseBlock
 				if(!extractItem.isEmpty())
 				{
 					player.setItemInHand(InteractionHand.MAIN_HAND, extractItem);
-					return InteractionResult.sidedSuccess(level.isClientSide);
+					return InteractionResult.SUCCESS;
 				}
 			}
 		return super.useWithoutItem(state, level, pos, player, hitResult);
@@ -94,7 +90,6 @@ public class HatchBlock extends IEBaseBlock
 			.put(Direction.EAST, Shapes.box(-.0625, .1875, .1875, .125, .8125, .8125))
 			.build();
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(IEProperties.FACING_ALL));

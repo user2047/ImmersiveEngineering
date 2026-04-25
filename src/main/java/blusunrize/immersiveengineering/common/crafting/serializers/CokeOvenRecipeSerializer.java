@@ -29,13 +29,11 @@ public class CokeOvenRecipeSerializer extends IERecipeSerializer<CokeOvenRecipe>
 			CokeOvenRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, CokeOvenRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.COKE_OVEN.iconStack();

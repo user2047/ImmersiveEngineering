@@ -29,13 +29,11 @@ public class BlastFurnaceRecipeSerializer extends IERecipeSerializer<BlastFurnac
 			BlastFurnaceRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, BlastFurnaceRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.BLAST_FURNACE.iconStack();

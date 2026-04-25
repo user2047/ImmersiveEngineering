@@ -32,7 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -70,7 +70,6 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		super(type, pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(rsDirty)
@@ -79,7 +78,6 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 					.updateValues();
 	}
 
-	@Override
 	public int getStrongRSOutput(@Nonnull Direction side)
 	{
 		if(side==this.getFacing().getOpposite())
@@ -87,7 +85,6 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return 0;
 	}
 
-	@Override
 	public int getWeakRSOutput(@Nonnull Direction side)
 	{
 		if(!isRSOutput()||side==this.getFacing())
@@ -95,16 +92,14 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return output;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return side!=getFacing().getOpposite();
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
-		if(!level.isClientSide&&SafeChunkUtils.isChunkSafe(level, worldPosition))
+		if(!level.isClientSide()&&SafeChunkUtils.isChunkSafe(level, worldPosition))
 		{
 			output = handler.getValue(redstoneChannel.getId());
 			if(!isRemoved()&&isRSOutput())
@@ -122,7 +117,6 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return ioMode==IOSideConfig.INPUT;
 	}
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		if(isRSInput())
@@ -144,7 +138,6 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return rsConnector.redstoneChannel!=this.redstoneChannel;
 	}
 
-	@Override
 	protected int getRSInput(Direction from)
 	{
 		if(acceptSignalFrom(from))
@@ -157,12 +150,11 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return ioMode==IOSideConfig.OUTPUT;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_RedstoneConnector, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	protected void updateAfterConfigure()
@@ -175,47 +167,40 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		level.blockEvent(getBlockPos(), this.getBlockState().getBlock(), 254, 0);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return REDSTONE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return ConnectorBlock.DEFAULT_FACING_PROP;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("ioMode"))
-			ioMode = IOSideConfig.VALUES[message.getInt("ioMode")];
+			ioMode = IOSideConfig.VALUES[message.getIntOr("ioMode", 0)];
 		if(message.contains("redstoneChannel"))
-			redstoneChannel = DyeColor.byId(message.getInt("redstoneChannel"));
+			redstoneChannel = DyeColor.byId(message.getIntOr("redstoneChannel", 0));
 		updateAfterConfigure();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -224,16 +209,14 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		nbt.putInt("output", output);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		ioMode = IOSideConfig.VALUES[nbt.getInt("ioMode")];
-		redstoneChannel = DyeColor.byId(nbt.getInt("redstoneChannel"));
-		output = nbt.getInt("output");
+		ioMode = IOSideConfig.VALUES[nbt.getIntOr("ioMode", 0)];
+		redstoneChannel = DyeColor.byId(nbt.getIntOr("redstoneChannel", 0));
+		output = nbt.getIntOr("output", 0);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -241,13 +224,11 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 		return new Vec3(.5-conRadius*side.getStepX(), .5-conRadius*side.getStepY(), .5-conRadius*side.getStepZ());
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return EnergyConnectorBlockEntity.getConnectorBounds(getFacing(), .625f);
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(!Utils.isScrewdriver(player.getItemInHand(InteractionHand.MAIN_HAND)))
@@ -266,13 +247,11 @@ public class ConnectorRedstoneBlockEntity extends ImmersiveConnectableBlockEntit
 				.append(Lib.getRedstoneColorComponent(channel));
 	}
 
-	@Override
 	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(RedstoneNetworkHandler.ID);
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos otherPos)
 	{
 		int oldRSIn = getMaxRSInput();

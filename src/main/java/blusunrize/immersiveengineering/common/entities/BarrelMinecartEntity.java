@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
@@ -56,16 +56,13 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 	public static <T extends BarrelMinecartEntity>
 	void registerCapabilities(RegisterCapabilitiesEvent ev, Supplier<EntityType<T>> type)
 	{
-		ev.registerEntity(FluidHandler.ENTITY, type.get(), (e, $) -> e.minecartFluidHandler);
 	}
 
-	@Override
 	public ItemStack getPickResult()
 	{
 		return new ItemStack(IEItems.Minecarts.CART_WOODEN_BARREL.get());
 	}
 
-	@Override
 	public void writeTileToItem(ItemStack itemStack)
 	{
 		itemStack.set(
@@ -74,14 +71,12 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 		);
 	}
 
-	@Override
 	public void readTileFromItem(LivingEntity placer, ItemStack itemStack)
 	{
 		this.containedBlockEntity.onBEPlaced(itemStack);
 	}
 
 	@Nonnull
-	@Override
 	public InteractionResult interact(@Nonnull Player player, @Nonnull InteractionHand hand)
 	{
 		if(super.interact(player, hand)==InteractionResult.SUCCESS)
@@ -95,13 +90,11 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 		return InteractionResult.PASS;
 	}
 
-	@Override
 	protected Supplier<WoodenBarrelBlockEntity> getTileProvider()
 	{
 		return () -> new WoodenBarrelBlockEntity(BlockPos.ZERO, WoodenDevices.WOODEN_BARREL.defaultBlockState());
 	}
 
-	@Override
 	public BlockState getDisplayBlockState()
 	{
 		return IEBlocks.WoodenDevices.WOODEN_BARREL.defaultBlockState();
@@ -117,31 +110,26 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 			this.minecart = minecart;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return this.minecart.containedBlockEntity.tank.getFluidInTank(tank);
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return this.minecart.containedBlockEntity.tank.getTankCapacity(tank);
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, FluidStack stack)
 		{
 			return this.minecart.containedBlockEntity.tank.isFluidValid(tank, stack);
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction action)
 		{
 			int filled = this.minecart.containedBlockEntity.tank.fill(resource, action);
@@ -149,7 +137,6 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 			return filled;
 		}
 
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction action)
 		{
 			FluidStack drained = this.minecart.containedBlockEntity.tank.drain(resource, action);
@@ -157,7 +144,6 @@ public class BarrelMinecartEntity extends IEMinecartEntity<WoodenBarrelBlockEnti
 			return drained;
 		}
 
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction action)
 		{
 			FluidStack drained = this.minecart.containedBlockEntity.tank.drain(maxDrain, action);

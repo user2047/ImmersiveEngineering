@@ -34,7 +34,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -60,7 +60,7 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 	 */
 	private static Set<BlockPos> usedRouters = null;
 	private final Map<Direction, IEBlockCapabilityCache<IFluidHandler>> neighborCaps = IEBlockCapabilityCaches.allNeighbors(
-			FluidHandler.BLOCK, this
+			Capabilities.Fluid.BLOCK, this
 	);
 
 	public FluidSorterBlockEntity(BlockPos pos, BlockState state)
@@ -71,7 +71,7 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 	public int routeFluid(Direction inputSide, FluidStack stack, FluidAction doFill)
 	{
 		int ret = 0;
-		if(!level.isClientSide&&canRoute())
+		if(!level.isClientSide()&&canRoute())
 		{
 			boolean first = startRouting();
 			Direction[][] validOutputs = getValidOutputs(inputSide, stack);
@@ -106,7 +106,7 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 		int lengthFiltered = sides.length;
 		while(lengthFiltered > 0&&available.getAmount() > 0)
 		{
-			int rand = ApiUtils.RANDOM.nextInt(lengthFiltered);
+			int rand = ApiUtils.getRandom().nextInt(lengthFiltered);
 			Direction currentSide = sides[rand];
 			IFluidHandler fluidOut = neighborCaps.get(currentSide).getCapability();
 			if(fluidOut!=null)
@@ -129,19 +129,16 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 		return false;
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public FluidSorterBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<FluidSorterBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.FLUID_SORTER;
@@ -189,19 +186,17 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 		};
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		sortWithNBT = nbt.getByteArray("sortWithNBT");
+		sortWithNBT = nbt.getByteArray("sortWithNBT").orElse(new byte[6]);
 		for(int side = 0; side < 6; side++)
 		{
-			ListTag filterList = nbt.getList("filter_"+side, 10);
+			ListTag filterList = nbt.getListOrEmpty("filter_"+side);
 			for(int i = 0; i < filterList.size(); i++)
-				filters[side][i] = FluidStack.parseOptional(provider, filterList.getCompound(i));
+				filters[side][i] = blusunrize.immersiveengineering.common.util.FluidStackCompat.parseOptional(provider, filterList.getCompoundOrEmpty(i));
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putByteArray("sortWithNBT", sortWithNBT);
@@ -209,27 +204,25 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 		{
 			ListTag filterList = new ListTag();
 			for(int i = 0; i < filters[side].length; i++)
-				filterList.add(filters[side][i].saveOptional(provider));
+				filterList.add(blusunrize.immersiveengineering.common.util.FluidStackCompat.saveOptional(filters[side][i], provider));
 			nbt.put("filter_"+side, filterList);
 		}
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
 		CompoundTag data = new CompoundTag();
 		writeCustomNBT(data, false, context.getLevel().registryAccess());
-		BlockItem.setBlockEntityData(stack, this.getType(), data);
+		stack.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(this.getType(), data));
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		var data = ctx.getItemInHand().get(DataComponents.BLOCK_ENTITY_DATA);
 		if(data!=null)
-			readCustomNBT(data.copyTag(), false, ctx.getLevel().registryAccess());
+			readCustomNBT(data.copyTagWithoutId(), false, ctx.getLevel().registryAccess());
 	}
 
 
@@ -242,7 +235,7 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 
 	public static void registerCapabilities(BECapabilityRegistrar<FluidSorterBlockEntity> registrar)
 	{
-		registrar.register(FluidHandler.BLOCK, (be, facing) -> facing!=null?be.insertionHandlers.get(facing): null);
+		registrar.register(Capabilities.Fluid.BLOCK, (be, facing) -> facing!=null?be.insertionHandlers.get(facing): null);
 	}
 
 	public static FluidStack[][] makeFilterArray()
@@ -264,7 +257,6 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 			this.facing = facing;
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction action)
 		{
 			if(resource.isEmpty())
@@ -272,38 +264,32 @@ public class FluidSorterBlockEntity extends IEBaseBlockEntity implements IIntera
 			return tile.routeFluid(facing, resource, action);
 		}
 
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction doDrain)
 		{
 			return FluidStack.EMPTY;
 		}
 
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction doDrain)
 		{
 			return FluidStack.EMPTY;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return FluidStack.EMPTY;
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return FluidType.BUCKET_VOLUME;
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			return true;

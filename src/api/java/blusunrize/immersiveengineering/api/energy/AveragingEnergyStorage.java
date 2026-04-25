@@ -9,9 +9,8 @@
 
 package blusunrize.immersiveengineering.api.energy;
 
-import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AveragingEnergyStorage extends MutableEnergyStorage
 {
@@ -68,22 +67,18 @@ public class AveragingEnergyStorage extends MutableEnergyStorage
 	}
 
 	@Override
-	public Tag serializeNBT(Provider provider)
+	public void serialize(ValueOutput output)
 	{
-		final CompoundTag compound = new CompoundTag();
-		compound.putInt("energy", energy);
-		compound.putInt("averageInsertion", averageInsertion);
-		compound.putInt("averageExtraction", averageExtraction);
-		return compound;
+		output.putInt("energy", energy);
+		output.putInt("averageInsertion", averageInsertion);
+		output.putInt("averageExtraction", averageExtraction);
 	}
 
 	@Override
-	public void deserializeNBT(Provider provider, Tag nbt)
+	public void deserialize(ValueInput input)
 	{
-		if(!(nbt instanceof CompoundTag compound))
-			return;
-		this.energy = compound.getInt("energy");
-		this.averageInsertion = compound.getInt("averageInsertion");
-		this.averageExtraction = compound.getInt("averageExtraction");
+		this.energy = input.getIntOr("energy", 0);
+		this.averageInsertion = input.getIntOr("averageInsertion", 0);
+		this.averageExtraction = input.getIntOr("averageExtraction", 0);
 	}
 }

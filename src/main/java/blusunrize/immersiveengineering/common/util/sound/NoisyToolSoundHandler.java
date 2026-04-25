@@ -23,7 +23,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -38,7 +37,7 @@ import java.util.Map;
 
 import static blusunrize.immersiveengineering.ImmersiveEngineering.MODID;
 
-@EventBusSubscriber(modid = MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = MODID)
 public class NoisyToolSoundHandler
 {
 	private static final Map<LivingEntity, Map<EquipmentSlot, NoisyToolSoundGroup>> noisyToolSoundGroups = new HashMap<>();
@@ -75,7 +74,7 @@ public class NoisyToolSoundHandler
 
 		NoisyToolSoundGroup soundGroup = ntsgs.get(slot);
 		ItemStack handItem = entity.getItemBySlot(slot);
-		int hotbarSlot = slot.equals(EquipmentSlot.MAINHAND)&&entity instanceof Player player?player.getInventory().selected: -1;
+		int hotbarSlot = slot.equals(EquipmentSlot.MAINHAND)&&entity instanceof Player player?player.getInventory().getSelectedSlot(): -1;
 
 		if(soundGroup!=null)
 		{

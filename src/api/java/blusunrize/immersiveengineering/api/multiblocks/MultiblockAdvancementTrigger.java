@@ -19,13 +19,13 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.critereon.CriterionValidator;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.ValidationContextSource;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
@@ -108,7 +108,7 @@ public class MultiblockAdvancementTrigger implements CriterionTrigger<Multiblock
 		}
 
 		@Override
-		public void validate(CriterionValidator validator)
+		public void validate(ValidationContextSource validator)
 		{
 		}
 	}

@@ -36,13 +36,11 @@ public class IEParticleType<T extends ParticleOptions> extends ParticleType<T>
 		this(alwaysShow, codecs.mapCodec(), codecs.streamCodec());
 	}
 
-	@Override
 	public MapCodec<T> codec()
 	{
 		return codec;
 	}
 
-	@Override
 	public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec()
 	{
 		return streamCodec;

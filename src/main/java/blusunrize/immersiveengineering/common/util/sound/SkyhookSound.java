@@ -34,21 +34,18 @@ public class SkyhookSound implements TickableSoundInstance
 		this.soundLoc = soundLoc;
 	}
 
-	@Override
 	public boolean isStopped()
 	{
 		return !hook.isAlive();
 	}
 
 	@Nonnull
-	@Override
-	public Identifier getLocation()
+	public Identifier getIdentifier()
 	{
 		return soundLoc;
 	}
 
 	@Nullable
-	@Override
 	public WeighedSoundEvents resolve(@Nonnull SoundManager handler)
 	{
 		WeighedSoundEvents soundEvent = handler.getSoundEvent(this.soundLoc);
@@ -60,69 +57,58 @@ public class SkyhookSound implements TickableSoundInstance
 	}
 
 	@Nonnull
-	@Override
 	public Sound getSound()
 	{
 		return sound;
 	}
 
 	@Nonnull
-	@Override
 	public SoundSource getSource()
 	{
 		return SoundSource.NEUTRAL;
 	}
 
-	@Override
 	public boolean isLooping()
 	{
 		return true;
 	}
 
-	@Override
 	public int getDelay()
 	{
 		return 0;
 	}
 
-	@Override
 	public float getVolume()
 	{
 		return Math.min(speed, .75F);
 	}
 
-	@Override
 	public float getPitch()
 	{
 		return Math.min(.5F*speed, .75F);
 	}
 
-	@Override
 	public double getX()
 	{
 		return (float)hook.getX();
 	}
 
-	@Override
 	public double getY()
 	{
 		return (float)hook.getY();
 	}
 
-	@Override
 	public double getZ()
 	{
 		return (float)hook.getZ();
 	}
 
 	@Nonnull
-	@Override
 	public Attenuation getAttenuation()
 	{
 		return Attenuation.LINEAR;
 	}
 
-	@Override
 	public void tick()
 	{
 		speed = (float)hook.getSpeed();
@@ -130,7 +116,6 @@ public class SkyhookSound implements TickableSoundInstance
 			speed = .01F;
 	}
 
-	@Override
 	public boolean isRelative()
 	{
 		return false;

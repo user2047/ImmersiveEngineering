@@ -32,7 +32,7 @@ public abstract class ShaderBannerBlock extends IEEntityBlock<ShaderBannerBlockE
 			.ignitedByLava()
 			.strength(1.0F)
 			.sound(SoundType.WOOL)
-			.noCollission()
+			.noCollision()
 			.noOcclusion();
 
 	private static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
@@ -42,20 +42,17 @@ public abstract class ShaderBannerBlock extends IEEntityBlock<ShaderBannerBlockE
 		super(IEBlockEntities.SHADER_BANNER, props);
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPE;
 	}
 
-	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return Shapes.empty();
 	}
 
 	@Nonnull
-	@Override
 	public Item asItem()
 	{
 		return Items.WHITE_BANNER;

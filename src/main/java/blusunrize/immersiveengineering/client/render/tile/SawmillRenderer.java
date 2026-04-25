@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.sawmill.S
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -31,7 +31,6 @@ public class SawmillRenderer extends IEMultiblockRenderer<State>
 	public static final String NAME = "sawmill_blade";
 	public static DynamicModel BLADE;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final IMultiblockLevel level = ctx.getLevel();
@@ -43,7 +42,7 @@ public class SawmillRenderer extends IEMultiblockRenderer<State>
 		bufferIn = BERenderUtils.mirror(level.getOrientation(), matrixStack, bufferIn);
 
 
-		VertexConsumer solidBuilder = bufferIn.getBuffer(RenderType.solid());
+		VertexConsumer solidBuilder = bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid());
 
 		Direction facing = level.getOrientation().front();
 		float dir = facing==Direction.SOUTH?Mth.PI: facing==Direction.NORTH?0: facing==Direction.EAST?-Mth.HALF_PI: Mth.HALF_PI;
@@ -84,7 +83,7 @@ public class SawmillRenderer extends IEMultiblockRenderer<State>
 		matrixStack.pushPose();
 		matrixStack.translate(xOffset, .375, 0);
 		matrixStack.mulPose(new Quaternionf().rotateZ(Mth.HALF_PI));
-		ClientUtils.mc().getItemRenderer().renderStatic(
+		ClientUtils.getItemRenderer().renderStatic(
 				stack, ItemDisplayContext.FIXED,
 				combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 				level, 0

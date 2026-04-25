@@ -57,7 +57,6 @@ public record GetterAndSetter<T>(Supplier<T> getter, Consumer<T> setter) impleme
 		return getter.get();
 	}
 
-	@Override
 	public void accept(T t)
 	{
 		set(t);

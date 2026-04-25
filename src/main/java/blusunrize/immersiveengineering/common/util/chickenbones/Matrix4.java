@@ -368,7 +368,6 @@ public class Matrix4
 		return new Transformation(toMatrix4f());
 	}
 
-	@Override
 	public String toString()
 	{
 		MathContext cont = new MathContext(4, RoundingMode.HALF_UP);
@@ -378,7 +377,6 @@ public class Matrix4
 				"["+new BigDecimal(m30, cont)+","+new BigDecimal(m31, cont)+","+new BigDecimal(m32, cont)+","+new BigDecimal(m33, cont)+"]";
 	}
 
-	@Override
 	public boolean equals(Object o)
 	{
 		if(this==o) return true;
@@ -405,7 +403,6 @@ public class Matrix4
 
 	}
 
-	@Override
 	public int hashCode()
 	{
 		int result;

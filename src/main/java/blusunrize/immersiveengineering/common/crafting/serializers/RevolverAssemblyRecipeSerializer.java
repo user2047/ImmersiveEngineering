@@ -17,28 +17,32 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import java.util.List;
 
-public class RevolverAssemblyRecipeSerializer implements RecipeSerializer<RevolverAssemblyRecipe>
+public class RevolverAssemblyRecipeSerializer
 {
 	public static final DualMapCodec<RegistryFriendlyByteBuf, RevolverAssemblyRecipe> CODECS = DualCompositeMapCodecs.composite(
 			new DualMapCodec<>(
-					RecipeSerializer.SHAPED_RECIPE.codec(), RecipeSerializer.SHAPED_RECIPE.streamCodec()
+					ShapedRecipe.SERIALIZER.codec(), ShapedRecipe.SERIALIZER.streamCodec()
 			), RevolverAssemblyRecipe::toVanilla,
 			DualCodecs.INT.listOf().optionalFieldOf("copyNBT", List.of()), RevolverAssemblyRecipe::getCopyTargets,
 			RevolverAssemblyRecipe::new
 	);
 
-	@Override
 	public MapCodec<RevolverAssemblyRecipe> codec()
 	{
 		return CODECS.mapCodec();
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, RevolverAssemblyRecipe> streamCodec()
 	{
 		return CODECS.streamCodec();
+	}
+
+	public RecipeSerializer<RevolverAssemblyRecipe> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

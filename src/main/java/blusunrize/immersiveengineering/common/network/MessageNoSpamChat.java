@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.common.network;
 
 import blusunrize.immersiveengineering.common.util.ChatUtils;
 import blusunrize.immersiveengineering.mixin.accessors.client.ChatComponentAccess;
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -29,7 +29,6 @@ public record MessageNoSpamChat(Component message) implements IMessage
 	public static final StreamCodec<RegistryFriendlyByteBuf, MessageNoSpamChat> CODEC = ComponentSerialization.TRUSTED_STREAM_CODEC
 			.map(MessageNoSpamChat::new, MessageNoSpamChat::message);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -38,11 +37,10 @@ public record MessageNoSpamChat(Component message) implements IMessage
 			final List<GuiMessage> allMessages = chatAccess.getAllMessages();
 			allMessages.removeIf(guiMessage -> Objects.equals(guiMessage.signature(), ChatUtils.NO_SPAM_SIGNATURE));
 			chatAccess.invokeRefreshTrimmedMessages();
-			chat.addMessage(message, ChatUtils.NO_SPAM_SIGNATURE, null);
+			chat.addClientSystemMessage(message);
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

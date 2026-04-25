@@ -32,7 +32,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,11 +40,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.ComponentEnergyStorage;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -61,10 +60,9 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 
 	public RailgunItem()
 	{
-		super(new Properties().stacksTo(1).component(IEDataComponents.GENERIC_ENERGY, 0), TYPE, 2+1);
+		super(itemProperties().stacksTo(1).component(IEDataComponents.GENERIC_ENERGY, 0), TYPE, 2+1);
 	}
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{
@@ -73,20 +71,17 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		};
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public void recalculateUpgrades(ItemStack stack, Level w, Player player)
 	{
 		super.recalculateUpgrades(stack, w, player);
 		capStoredEnergyAtMaximum(stack);
 	}
 
-	@Override
 	public void clearUpgrades(ItemStack stack)
 	{
 		super.clearUpgrades(stack);
@@ -100,7 +95,6 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 			stack.set(IEDataComponents.GENERIC_ENERGY, getMaxEnergyStored(stack));
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		if(slotChanged||CapabilityShader.shouldReequipDueToShader(oldStack, newStack))
@@ -113,7 +107,7 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 	{
 		registerCapabilitiesISI(registrar);
 		registrar.register(
-				EnergyStorage.ITEM,
+				Energy.ITEM,
 				stack -> new ComponentEnergyStorage(stack, IEDataComponents.GENERIC_ENERGY.get(), getMaxEnergyStored(stack))
 		);
 		registrar.register(
@@ -122,35 +116,32 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
-		IEnergyStorage energy = Objects.requireNonNull(stack.getCapability(EnergyStorage.ITEM));
+		IEnergyStorage energy = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM));
 		String stored = energy.getEnergyStored()+"/"+getMaxEnergyStored(stack);
 		list.add(Component.translatable(Lib.DESC+"info.energyStored", stored).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Nonnull
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.NONE;
+		return ItemUseAnimation.NONE;
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
 		int consumption = IEServerConfig.TOOLS.railgun_consumption.get();
-		IEnergyStorage energy = Objects.requireNonNull(stack.getCapability(EnergyStorage.ITEM));
+		IEnergyStorage energy = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM));
 		if(energy.extractEnergy(consumption, true)==consumption&&!findAmmo(stack, player).isEmpty())
 		{
 			player.startUsingItem(hand);
 			playChargeSound(player, stack);
-			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+			return InteractionResult.SUCCESS;
 		}
-		return new InteractionResultHolder<>(InteractionResult.PASS, stack);
+		return InteractionResult.PASS;
 	}
 
 	public static void playChargeSound(LivingEntity living, ItemStack railgun)
@@ -163,7 +154,6 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 
 	}
 
-	@Override
 	public void onUseTick(Level level, LivingEntity user, ItemStack stack, int count)
 	{
 		int inUse = this.getUseDuration(stack, user)-count;
@@ -179,16 +169,15 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		}
 	}
 
-	@Override
-	public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int timeLeft)
+	public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int timeLeft)
 	{
 		if(!world.isClientSide()&&user instanceof Player player)
 		{
 			int inUse = this.getUseDuration(stack, user)-timeLeft;
 			if(inUse < getChargeTime(stack))
-				return;
+				return false;
 			int consumption = IEServerConfig.TOOLS.railgun_consumption.get();
-			IEnergyStorage energy = Objects.requireNonNull(stack.getCapability(EnergyStorage.ITEM));
+			IEnergyStorage energy = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM));
 			if(energy.extractEnergy(consumption, true)==consumption)
 			{
 				ItemStack ammo = findAmmo(stack, player);
@@ -200,6 +189,7 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 				}
 			}
 		}
+		return true;
 	}
 
 	public static Entity fireProjectile(ItemStack railgun, Level world, LivingEntity user, ItemStack ammo)
@@ -209,7 +199,7 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		Entity shot = new RailgunShotEntity(user.level(), user, speed, 0, ammo);
 		shot = projectileProperties.getProjectile(user instanceof Player player?player: null, ammo, shot);
 		user.level().playSound(null, user.getX(), user.getY(), user.getZ(), IESounds.railgunFire.value(), SoundSource.PLAYERS, 1, .5f+(.5f*user.getRandom().nextFloat()));
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 			user.level().addFreshEntity(shot);
 
 		ShaderAndCase shader = ShaderRegistry.getStoredShaderAndCase(railgun);
@@ -292,7 +282,6 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		return false;
 	}
 
-	@Override
 	public void onScrollwheel(ItemStack stack, Player player, boolean forward)
 	{
 		int slot = stack.getOrDefault(IEDataComponents.RAILGUN_AMMO_SLOT, 0);
@@ -316,16 +305,14 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 		return (int)(40/(1+getUpgradesStatic(railgun).get(UpgradeEffect.SPEED)));
 	}
 
-	@Override
 	public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_)
 	{
 		return 72000;
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null&&!inv.getStackInSlot(0).isEmpty()&&!inv.getStackInSlot(1).isEmpty())
 			Utils.unlockIEAdvancement(player, "tools/upgrade_railgun");
 	}
@@ -336,7 +323,6 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 	}
 
 
-	@Override
 	public boolean canZoom(ItemStack stack, Player player)
 	{
 		return this.getUpgrades(stack).has(UpgradeEffect.SCOPE);
@@ -344,7 +330,6 @@ public class RailgunItem extends UpgradeableToolItem implements IZoomTool, IScro
 
 	float[] zoomSteps = new float[]{.1f, .15625f, .2f, .25f, .3125f, .4f, .5f, .625f};
 
-	@Override
 	public float[] getZoomSteps(ItemStack stack, Player player)
 	{
 		return zoomSteps;

@@ -12,7 +12,6 @@ import blusunrize.immersiveengineering.common.register.IEMenuTypes;
 import blusunrize.immersiveengineering.common.register.IEMenuTypes.ItemContainerType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -24,21 +23,19 @@ public class MaintenanceKitItem extends IEBaseItem
 {
 	public MaintenanceKitItem()
 	{
-		super(new Properties().durability(50));
+		super(itemProperties().durability(50));
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 			openGui(player, hand);
 		ItemStack stack = player.getItemInHand(hand);
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Nullable
-	@Override
 	protected ItemContainerType<?> getContainerType()
 	{
 		return IEMenuTypes.MAINTENANCE_KIT;

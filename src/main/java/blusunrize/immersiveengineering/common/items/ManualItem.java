@@ -12,7 +12,6 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -26,20 +25,18 @@ public class ManualItem extends IEBaseItem
 {
 	public ManualItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
-		if(world.isClientSide)
+		if(world.isClientSide())
 			ImmersiveEngineering.proxy.openManual();
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, player.getItemInHand(hand));
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();

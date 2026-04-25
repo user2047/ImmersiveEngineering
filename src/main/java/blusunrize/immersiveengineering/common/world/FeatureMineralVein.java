@@ -34,7 +34,6 @@ public class FeatureMineralVein extends Feature<NoneFeatureConfiguration>
 		super(NoneFeatureConfiguration.CODEC);
 	}
 
-	@Override
 	public boolean place(@Nonnull FeaturePlaceContext<NoneFeatureConfiguration> ctx)
 	{
 		if(ExcavatorHandler.noiseGenerator==null)
@@ -46,7 +45,7 @@ public class FeatureMineralVein extends Feature<NoneFeatureConfiguration>
 
 		ServerLevel realLevel = ctx.level().getLevel();
 		ResourceKey<Level> dimension = realLevel.dimension();
-		ChunkPos chunkPos = new ChunkPos(ctx.origin());
+		ChunkPos chunkPos = ChunkPos.containing(ctx.origin());
 		if(!veinGeneratedChunks.containsEntry(dimension, chunkPos))
 		{
 			veinGeneratedChunks.put(dimension, chunkPos);

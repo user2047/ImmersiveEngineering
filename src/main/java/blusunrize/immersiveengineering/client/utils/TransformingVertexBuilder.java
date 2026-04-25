@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.utils.Color4;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.neoforge.client.model.pipeline.VertexConsumerWrapper;
 import org.joml.Vector3f;
@@ -52,7 +52,6 @@ public final class TransformingVertexBuilder extends VertexConsumerWrapper
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer addVertex(float x, float y, float z)
 	{
 		var pos = new Vector4f(x, y, z, 1);
@@ -72,7 +71,6 @@ public final class TransformingVertexBuilder extends VertexConsumerWrapper
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setNormal(float x, float y, float z)
 	{
 		var normal = new Vector3f(x, y, z);

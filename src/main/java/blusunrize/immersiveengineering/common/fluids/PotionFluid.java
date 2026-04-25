@@ -80,13 +80,11 @@ public class PotionFluid extends Fluid
 	}
 
 	@Nonnull
-	@Override
 	public Item getBucket()
 	{
 		return Misc.POTION_BUCKET.get();
 	}
 
-	@Override
 	protected boolean canBeReplacedWith(@Nonnull FluidState fluidState, @Nonnull BlockGetter blockReader,
 										@Nonnull BlockPos pos, @Nonnull Fluid fluid, @Nonnull Direction direction)
 	{
@@ -94,64 +92,54 @@ public class PotionFluid extends Fluid
 	}
 
 	@Nonnull
-	@Override
 	protected Vec3 getFlow(@Nonnull BlockGetter blockReader, @Nonnull BlockPos pos, @Nonnull FluidState fluidState)
 	{
 		return Vec3.ZERO;
 	}
 
-	@Override
 	public int getTickDelay(LevelReader p_205569_1_)
 	{
 		return 0;
 	}
 
-	@Override
 	protected float getExplosionResistance()
 	{
 		return 0;
 	}
 
-	@Override
 	public float getHeight(@Nonnull FluidState p_215662_1_, @Nonnull BlockGetter p_215662_2_, @Nonnull BlockPos p_215662_3_)
 	{
 		return 0;
 	}
 
-	@Override
 	public float getOwnHeight(@Nonnull FluidState p_223407_1_)
 	{
 		return 0;
 	}
 
 	@Nonnull
-	@Override
 	protected BlockState createLegacyBlock(@Nonnull FluidState state)
 	{
 		return Blocks.AIR.defaultBlockState();
 	}
 
-	@Override
 	public boolean isSource(@Nonnull FluidState state)
 	{
 		return true;
 	}
 
-	@Override
 	public int getAmount(@Nonnull FluidState state)
 	{
 		return 0;
 	}
 
 	@Nonnull
-	@Override
 	public VoxelShape getShape(@Nonnull FluidState p_215664_1_, @Nonnull BlockGetter p_215664_2_, @Nonnull BlockPos p_215664_3_)
 	{
 		return Shapes.empty();
 	}
 
 	@Nonnull
-	@Override
 	public FluidType getFluidType()
 	{
 		return IEFluids.POTION_TYPE.value();
@@ -163,7 +151,7 @@ public class PotionFluid extends Fluid
 		if(potionData==null)
 			return;
 		List<MobEffectInstance> effects = new ArrayList<>();
-		potionData.forEachEffect(effects::add);
+		potionData.forEachEffect(effects::add, 1);
 		if(effects.isEmpty())
 			tooltip.accept(Component.translatable("effect.none").withStyle(ChatFormatting.GRAY));
 		else
@@ -182,7 +170,7 @@ public class PotionFluid extends Fluid
 		}
 		if(potionData.potion().isPresent())
 		{
-			String modID = potionData.potion().get().unwrapKey().orElseThrow().location().getNamespace();
+			String modID = potionData.potion().get().unwrapKey().orElseThrow().identifier().getNamespace();
 			tooltip.accept(Component.translatable(Lib.DESC_INFO+"potionMod", Utils.getModName(modID)).withStyle(ChatFormatting.DARK_GRAY));
 		}
 	}
@@ -200,15 +188,13 @@ public class PotionFluid extends Fluid
 					.density(1300));
 		}
 
-		@Override
 		public Component getDescription(FluidStack stack)
 		{
 			var potionData = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 			PotionBottleType s = stack.getOrDefault(IEDataComponents.POTION_BOTTLE_TYPE, PotionBottleType.REGULAR);
-			return Component.translatable(Potion.getName(potionData.potion(), s.getBottleItem().getDescriptionId()+".effect."));
+			return potionData.getName(s.getBottleItem().getDescriptionId()+".effect.");
 		}
 
-		@Override
 		public ItemStack getBucket(FluidStack stack)
 		{
 			return PotionBucketItem.forPotion(getType(stack));
@@ -228,7 +214,6 @@ public class PotionFluid extends Fluid
 			this.bottleItem = bottleItem;
 		}
 
-		@Override
 		public @NotNull String getSerializedName()
 		{
 			return name().toLowerCase(Locale.ROOT);

@@ -60,7 +60,7 @@ public class IEApi
 		// TODO caching should not be global, tags can change!
 		return oreOutputPreference.computeIfAbsent(
 				tag, rl -> getPreferredElementbyMod(
-						TagUtils.elementStream(tags, rl), tags.registryOrThrow(Registries.ITEM)
+						TagUtils.elementStream(tags, rl), tags.lookupOrThrow(Registries.ITEM)
 				).orElse(Items.AIR).getDefaultInstance()
 		).copy();
 	}

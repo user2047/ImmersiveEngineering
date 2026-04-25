@@ -36,25 +36,21 @@ public class ShaderInventory implements Container
 	}
 
 
-	@Override
 	public int getContainerSize()
 	{
 		return 1;
 	}
 
-	@Override
 	public boolean isEmpty()
 	{
 		return this.shader.isEmpty();
 	}
 
-	@Override
 	public ItemStack getItem(int i)
 	{
 		return this.shader;
 	}
 
-	@Override
 	public ItemStack removeItemNoUpdate(int i)
 	{
 		if(!this.shader.isEmpty())
@@ -66,7 +62,6 @@ public class ShaderInventory implements Container
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public ItemStack removeItem(int i, int j)
 	{
 		if(!this.shader.isEmpty())
@@ -91,7 +86,6 @@ public class ShaderInventory implements Container
 	}
 
 
-	@Override
 	public void setItem(int i, ItemStack stack)
 	{
 		this.shader = stack;
@@ -100,13 +94,11 @@ public class ShaderInventory implements Container
 		this.container.slotsChanged(this);
 	}
 
-	@Override
 	public int getMaxStackSize()
 	{
 		return 64;
 	}
 
-	@Override
 	public void setChanged()
 	{
 		if(wrapper!=null)
@@ -116,29 +108,24 @@ public class ShaderInventory implements Container
 				wrapper.setShader(null);
 	}
 
-	@Override
 	public boolean stillValid(Player entityplayer)
 	{
 		return true;
 	}
 
-	@Override
 	public void startOpen(Player player)
 	{
 	}
 
-	@Override
 	public void stopOpen(Player player)
 	{
 	}
 
-	@Override
 	public boolean canPlaceItem(int i, ItemStack itemstack)
 	{
 		return true;
 	}
 
-	@Override
 	public void clearContent()
 	{
 	}

@@ -51,7 +51,7 @@ public class ExcavatorHandler
 	@Nullable
 	public static MineralVein getRandomMineral(Level world, BlockPos pos)
 	{
-		if(world.isClientSide)
+		if(world.isClientSide())
 			return null;
 		MineralWorldInfo info = getMineralWorldInfo(world, pos);
 		return info.getMineralVein(ApiUtils.RANDOM);
@@ -70,7 +70,7 @@ public class ExcavatorHandler
 
 	public static MineralWorldInfo getMineralWorldInfo(Level world, ColumnPos columnPos)
 	{
-		if(world.isClientSide)
+		if(world.isClientSide())
 			return null;
 		ResourceKey<Level> dimension = world.dimension();
 		Pair<ResourceKey<Level>, ColumnPos> cacheKey = Pair.of(dimension, columnPos);
@@ -114,7 +114,7 @@ public class ExcavatorHandler
 			Level world, BlockPos villagerPos, long radius, List<Long> excludedPositions
 	)
 	{
-		if(world.isClientSide)
+		if(world.isClientSide())
 			return Collections.emptyList();
 		long radiusSq = radius*radius;
 		ResourceKey<Level> dimension = world.dimension();
@@ -176,7 +176,7 @@ public class ExcavatorHandler
 					Set<Holder<Biome>> biomes = new HashSet<>();
 					BiomeManager biomeManager = worldGenLevel.getBiomeManager();
 					int surfaceHeight = worldGenLevel.getHeight(Types.WORLD_SURFACE_WG, finalPos.x(), finalPos.z());
-					for(int i = worldGenLevel.getMinBuildHeight(); i <= surfaceHeight; i++)
+					for(int i = worldGenLevel.getMinY(); i <= surfaceHeight; i++)
 						biomes.add(biomeManager.getNoiseBiomeAtPosition(pos.x(), i, pos.z()));
 					MineralSelection selection = new MineralSelection(world, biomes);
 					if(selection.getTotalWeight() > 0)
@@ -194,7 +194,7 @@ public class ExcavatorHandler
 					}
 					if(mineralMix!=null)
 					{
-						MineralVein vein = new MineralVein(pos, mineralMix.id(), radius);
+						MineralVein vein = new MineralVein(pos, mineralMix.id().identifier(), radius);
 						// generate initial depletion
 						if(initialVeinDepletion > 0)
 							vein.setDepletion((int)(mineralVeinYield*(rand.nextDouble()*initialVeinDepletion)));

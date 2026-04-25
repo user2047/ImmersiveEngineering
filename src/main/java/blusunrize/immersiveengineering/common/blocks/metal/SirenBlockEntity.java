@@ -42,7 +42,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -81,7 +81,6 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 		super(IEBlockEntities.SIREN.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(active)
@@ -96,7 +95,7 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 					// hear the bell
 					entity.getBrain().setMemory(MemoryModuleType.HEARD_BELL_TIME, getLevelNonnull().getGameTime());
 					// make raiders glow
-					if(entity.getType().is(EntityTypeTags.RAIDERS))
+					if(entity.getType().builtInRegistryHolder().is(EntityTypeTags.RAIDERS))
 						entity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 80));
 				});
 			}
@@ -106,10 +105,9 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 			activeTicks = 0;
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
-		if(!level.isClientSide&&SafeChunkUtils.isChunkSafe(level, worldPosition))
+		if(!level.isClientSide()&&SafeChunkUtils.isChunkSafe(level, worldPosition))
 		{
 			final boolean oldActive = this.active;
 			this.active = handler.getValue(this.redstoneChannel.getId()) > 0;
@@ -119,29 +117,25 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 	}
 
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_Siren, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("redstoneChannel"))
-			redstoneChannel = DyeColor.byId(message.getInt("redstoneChannel"));
+			redstoneChannel = DyeColor.byId(message.getIntOr("redstoneChannel", 0));
 		if(message.contains("sound"))
-			sound = SirenSound.BY_ORDINAL.apply(message.getInt("sound"));
+			sound = SirenSound.BY_ORDINAL.apply(message.getIntOr("sound", 0));
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -150,22 +144,19 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 		nbt.putBoolean("active", active);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		redstoneChannel = DyeColor.byId(nbt.getInt("redstoneChannel"));
-		sound = SirenSound.BY_ORDINAL.apply(nbt.getInt("sound"));
-		active = nbt.getBoolean("active");
+		redstoneChannel = DyeColor.byId(nbt.getIntOr("redstoneChannel", 0));
+		sound = SirenSound.BY_ORDINAL.apply(nbt.getIntOr("sound", 0));
+		active = nbt.getBooleanOr("active", false);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return WireType.REDSTONE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		return CONNECTION_OFFSET;
@@ -189,26 +180,22 @@ public class SirenBlockEntity extends ImmersiveConnectableBlockEntity
 		return list;
 	}, (direction, aabb) -> direction.getAxis()==Axis.Y?aabb: ShapeUtils.transformAABB(aabb, direction));
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		Direction f = getFacing();
 		return SHAPES.get(f, f);
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_LIKE_NO_DOWN;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(!Utils.isScrewdriver(player.getItemInHand(InteractionHand.MAIN_HAND)))

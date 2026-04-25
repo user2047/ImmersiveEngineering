@@ -17,10 +17,9 @@ public class ScrewdriverItem extends IEBaseItem
 {
 	public ScrewdriverItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public boolean doesSneakBypassUse(ItemStack stack, LevelReader world, BlockPos pos, Player player)
 	{
 		return true;

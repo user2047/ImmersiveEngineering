@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.Sheetmeta
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
@@ -23,7 +23,6 @@ import org.joml.Quaternionf;
 
 public class SheetmetalTankRenderer extends IEMultiblockRenderer<State>
 {
-	@Override
 	public void render(IMultiblockContext<State> context, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final State state = context.getState();
@@ -56,7 +55,7 @@ public class SheetmetalTankRenderer extends IEMultiblockRenderer<State>
 			{
 				float h = fs.getAmount()/(float)state.tank.getCapacity();
 				matrixStack.translate(0, 0, .004f);
-				GuiHelper.drawRepeatedFluidSprite(bufferIn.getBuffer(RenderType.solid()), matrixStack, fs,
+				GuiHelper.drawRepeatedFluidSprite(bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), matrixStack, fs,
 						0, 0+(1-h)*16, 16, h*16);
 			}
 			matrixStack.popPose();

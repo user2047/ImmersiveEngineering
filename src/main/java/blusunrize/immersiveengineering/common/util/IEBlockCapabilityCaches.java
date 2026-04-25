@@ -24,18 +24,20 @@ import java.util.function.Supplier;
 
 public class IEBlockCapabilityCaches
 {
-	public static <T, C> IEBlockCapabilityCache<T> create(
-			BlockCapability<T, C> capability,
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static IEBlockCapabilityCache create(
+			BlockCapability capability,
 			Supplier<BlockPos> getPosition,
-			Supplier<C> getContext,
+			Supplier getContext,
 			Supplier<@Nullable Level> getLevel
 	)
 	{
 		return new IEBlockCapCacheImpl<>(capability, getPosition, getContext, getLevel);
 	}
 
-	public static <T> IEBlockCapabilityCache<T> forNeighbor(
-			BlockCapability<T, Direction> capability, BlockEntity be, Supplier<Direction> neighborDirection
+	@SuppressWarnings("rawtypes")
+	public static IEBlockCapabilityCache forNeighbor(
+			BlockCapability capability, BlockEntity be, Supplier<Direction> neighborDirection
 	)
 	{
 		return create(
@@ -46,11 +48,12 @@ public class IEBlockCapabilityCaches
 		);
 	}
 
-	public static <T> Map<Direction, IEBlockCapabilityCache<T>> allNeighbors(
-			BlockCapability<T, Direction> capability, BlockEntity be
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static Map allNeighbors(
+			BlockCapability capability, BlockEntity be
 	)
 	{
-		Map<Direction, IEBlockCapabilityCache<T>> result = new EnumMap<>(Direction.class);
+		Map<Direction, IEBlockCapabilityCache> result = new EnumMap<>(Direction.class);
 		for(Direction offset : Direction.values())
 			result.put(offset, forNeighbor(capability, be, () -> offset));
 		return result;
@@ -83,7 +86,6 @@ public class IEBlockCapabilityCaches
 			this.getLevel = getLevel;
 		}
 
-		@Override
 		public T getCapability()
 		{
 			C currentCtx = getContext.get();
@@ -101,7 +103,7 @@ public class IEBlockCapabilityCaches
 			{
 				// Cap caching is not available on non-server levels
 				// TODO do we ever intentionally query on client levels? If yes, do we want:
-				// Preconditions.checkState(!level.isClientSide);
+				// Preconditions.checkState(!level.isClientSide());
 				this.cache = null;
 				return level.getCapability(this.capability, currentPos, currentCtx);
 			}

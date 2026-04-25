@@ -112,7 +112,7 @@ public abstract class TemplateMultiblock implements IMultiblock
 		else
 		{
 			//noinspection ConstantValue: We pass null during datagen, but should not do so anywhere else
-			if(!DatagenModLoader.isRunningDataGen()&&(level==null||!level.isClientSide))
+			if(!DatagenModLoader.isRunningDataGen()&&(level==null||!level.isClientSide()))
 				throw new RuntimeException("Unexpected level parameter: "+level);
 			newTemplate = SYNCED_CLIENT_TEMPLATES.get(loc);
 		}
@@ -183,7 +183,7 @@ public abstract class TemplateMultiblock implements IMultiblock
 				if(!BlockMatcher.matches(expected, inWorld, world, here, additionalPredicates).isAllow())
 					continue mirrorLoop;
 			}
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 				form(world, origin, rot, mirror, side);
 			return true;
 		}

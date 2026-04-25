@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.client.utils.RenderUtils;
 import blusunrize.immersiveengineering.common.blocks.metal.BlastFurnacePreheaterBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -23,7 +23,6 @@ public class BlastFurnacePreheaterRenderer extends IEBlockEntityRenderer<BlastFu
 	public static final String NAME = "blastfurnace_preheater_fan";
 	public static DynamicModel MODEL;
 
-	@Override
 	public void render(
 			@Nonnull BlastFurnacePreheaterBlockEntity bEntity,
 			float partial, @Nonnull PoseStack transform, @Nonnull MultiBufferSource buffers, int light, int overlay
@@ -37,7 +36,7 @@ public class BlastFurnacePreheaterRenderer extends IEBlockEntityRenderer<BlastFu
 		transform.mulPose(new Quaternionf().rotateAxis(angle, axis));
 		transform.translate(-0.5, -0.5, -0.5);
 		RenderUtils.renderModelTESRFast(
-				MODEL.getNullQuads(), buffers.getBuffer(RenderType.solid()), transform, light, overlay
+				MODEL.getNullQuads(), buffers.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), transform, light, overlay
 		);
 		transform.popPose();
 	}

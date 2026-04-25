@@ -24,13 +24,11 @@ public class ImprovedBlastfurnaceMultiblock extends StoneMultiblock
 				IEMultiblockLogic.ADV_BLAST_FURNACE);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 14;
 	}
 
-	@Override
 	protected void replaceStructureBlock(
 			StructureBlockInfo info, Level world, BlockPos actualPos,
 			boolean mirrored, Direction clickDirection, Vec3i offsetFromMaster

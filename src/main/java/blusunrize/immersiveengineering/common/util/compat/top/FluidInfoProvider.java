@@ -12,6 +12,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockB
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SheetmetalTankLogic;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,13 +23,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public class FluidInfoProvider implements IProbeInfoProvider
 {
 
-	@Override
-	public Identifier getID()
+	public ResourceLocation getID()
 	{
-		return ImmersiveEngineering.rl("fluid_info");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("fluid_info"));
 	}
 
-	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
 			BlockState blockState, IProbeHitData data)
 	{

@@ -31,7 +31,6 @@ public class SiloMultiblock extends IETemplateMultiblock
 		);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 10;

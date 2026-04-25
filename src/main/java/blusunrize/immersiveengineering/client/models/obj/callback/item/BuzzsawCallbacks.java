@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.items.BuzzsawItem;
 import blusunrize.immersiveengineering.common.items.SawbladeItem;
 import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +35,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 {
 	public static final BuzzsawCallbacks INSTANCE = new BuzzsawCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = BuzzsawItem.getUpgradesStatic(stack);
@@ -53,7 +52,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 		return new Key(bladeTextures, hasQuiver, upgrades.has(UpgradeEffect.OILED));
 	}
 
-	@Override
 	public TextureAtlasSprite getTextureReplacement(Key key, String group, String material)
 	{
 		if("blade".equals(material))
@@ -66,7 +64,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 		return null;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
 		if("body".equals(group))
@@ -90,7 +87,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 
 	private static final List<List<String>> GROUP_BLADE = List.of(List.of("blade"));
 
-	@Override
 	public List<List<String>> getSpecialGroups(ItemStack stack, ItemDisplayContext transform, LivingEntity entity)
 	{
 		return GROUP_BLADE;
@@ -99,7 +95,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 	private static final Transformation MAT_FIXED = new Transformation(new Vector3f(0.60945f, 0, 0), null, null, null);
 
 	@Nonnull
-	@Override
 	public Transformation getTransformForGroups(ItemStack stack, List<String> groups, ItemDisplayContext transform, LivingEntity entity, float partialTicks)
 	{
 		if(!DrillCallbacks.shouldRotate(Tools.BUZZSAW, entity, stack, transform))
@@ -112,7 +107,6 @@ public class BuzzsawCallbacks implements ItemCallback<Key>
 				null, null);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(Arrays.asList(null, null, null), false, false);

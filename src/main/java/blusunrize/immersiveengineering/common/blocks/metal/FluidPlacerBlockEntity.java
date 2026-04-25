@@ -26,7 +26,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -73,7 +73,6 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 		super(IEBlockEntities.FLUID_PLACER.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if((isRSPowered()^redstoneControlInverted))
@@ -199,19 +198,17 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 		return state.getFluidState().isSource();
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		CompoundTag sideConfigNBT = nbt.getCompound("sideConfig");
+		CompoundTag sideConfigNBT = nbt.getCompoundOrEmpty("sideConfig");
 		for(Direction d : DirectionUtils.VALUES)
-			sideConfig.put(d, IOSideConfig.VALUES[sideConfigNBT.getInt(d.getSerializedName())]);
-		tank.readFromNBT(provider, nbt.getCompound("tank"));
-		redstoneControlInverted = nbt.getBoolean("redstoneInverted");
+			sideConfig.put(d, IOSideConfig.VALUES[sideConfigNBT.getIntOr(d.getSerializedName(), 0)]);
+		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+		redstoneControlInverted = nbt.getBooleanOr("redstoneInverted", false);
 		if(descPacket)
 			this.markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		CompoundTag sideConfigNBT = new CompoundTag();
@@ -219,16 +216,14 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 			sideConfigNBT.putInt(d.getSerializedName(), sideConfig.get(d).ordinal());
 		nbt.put("sideConfig", sideConfigNBT);
 		nbt.putBoolean("redstoneInverted", redstoneControlInverted);
-		nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+		nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 	}
 
-	@Override
 	public IOSideConfig getSideConfig(Direction side)
 	{
 		return sideConfig.get(side);
 	}
 
-	@Override
 	public boolean toggleSide(Direction side, Player p)
 	{
 		sideConfig.computeIfPresent(side, (s, conf) -> IOSideConfig.next(conf));
@@ -239,20 +234,16 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 		return true;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			redstoneControlInverted = !redstoneControlInverted;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")),
-					true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
 			setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	private final IFluidHandler tankCap = makeFluidInput(tank);
@@ -260,12 +251,11 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 	public static void registerCapabilities(BECapabilityRegistrar<FluidPlacerBlockEntity> registrar)
 	{
 		registrar.register(
-				FluidHandler.BLOCK,
+				Capabilities.Fluid.BLOCK,
 				(be, facing) -> facing==null||be.sideConfig.get(facing)==IOSideConfig.INPUT?be.tankCap: null
 		);
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult rtr, boolean hammer)
 	{
 		if(hammer&&IEClientConfig.showTextOverlay.get()&&rtr instanceof BlockHitResult)
@@ -273,7 +263,7 @@ public class FluidPlacerBlockEntity extends IEBaseBlockEntity implements IEServe
 			BlockHitResult brtr = (BlockHitResult)rtr;
 			IOSideConfig here = sideConfig.get(brtr.getDirection());
 			IOSideConfig opposite = sideConfig.get(brtr.getDirection().getOpposite());
-			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectFluid.", here, opposite);
+			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectCapabilities.Fluid.", here, opposite);
 		}
 		return null;
 	}

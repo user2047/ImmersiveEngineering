@@ -17,6 +17,7 @@ import blusunrize.immersiveengineering.api.utils.SetRestrictedField;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -108,7 +109,10 @@ public class ShaderRegistry
 		return shaderRegistry.get(name)
 				.setCrateLoot(loot)
 				.setBagLoot(bags)
-				.setReplicationCost(() -> new IngredientWithSize(Ingredient.of(defaultReplicationCost), 10-rarityWeightMap.get(rarity)));
+				.setReplicationCost(() -> new IngredientWithSize(
+						Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(defaultReplicationCost)),
+						10-rarityWeightMap.get(rarity)
+				));
 	}
 
 	public static <T extends ShaderCase> T registerShaderCase(Identifier name, T shader, Rarity rarity)

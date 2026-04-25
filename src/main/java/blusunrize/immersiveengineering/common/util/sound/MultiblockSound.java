@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.common.util.sound;
 
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.mixin.accessors.client.GuiSubtitleOverlayAccess;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -63,13 +63,11 @@ public class MultiblockSound extends AbstractTickableSoundInstance
 		return () -> soundManager.isActive(instance);
 	}
 
-	@Override
 	public boolean canStartSilent()
 	{
 		return true;
 	}
 
-	@Override
 	public void tick()
 	{
 		if(!valid.getAsBoolean())

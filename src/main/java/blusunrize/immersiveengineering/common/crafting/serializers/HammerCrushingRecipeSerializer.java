@@ -19,6 +19,7 @@ import blusunrize.immersiveengineering.common.register.IEItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 
@@ -28,17 +29,15 @@ public class HammerCrushingRecipeSerializer extends IERecipeSerializer<LazyShape
 			TagOutput.CODECS.fieldOf("result"), LazyShapelessRecipe::getResult,
 			DualCodecs.INGREDIENT.fieldOf("input"), r -> r.getIngredients().get(0),
 			(result, input) -> new LazyShapelessRecipe(
-					"", result, NonNullList.of(Ingredient.EMPTY, input, Ingredient.of(IEItems.Tools.HAMMER)), this
+					"", result, NonNullList.of(Ingredient.of(Items.BARRIER), input, Ingredient.of(IEItems.Tools.HAMMER)), this
 			)
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, LazyShapelessRecipe> codecs()
 	{
 		return codecs;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(Blocks.CRAFTING_TABLE);

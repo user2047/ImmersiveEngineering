@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,19 +25,16 @@ public class BreakerSwitchCallbacks implements BlockCallback<Integer>
 {
 	public static final BreakerSwitchCallbacks INSTANCE = new BreakerSwitchCallbacks();
 
-	@Override
 	public Integer extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		return blockEntity instanceof BreakerSwitchBlockEntity breaker?breaker.rotation: getDefaultKey();
 	}
 
-	@Override
 	public Integer getDefaultKey()
 	{
 		return 0;
 	}
 
-	@Override
 	public Transformation applyTransformations(Integer rotation, String group, Transformation transform)
 	{
 		return transform.compose(new Transformation(

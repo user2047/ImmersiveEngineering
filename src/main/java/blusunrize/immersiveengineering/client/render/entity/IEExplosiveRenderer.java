@@ -9,6 +9,7 @@
 package blusunrize.immersiveengineering.client.render.entity;
 
 import blusunrize.immersiveengineering.common.entities.GunpowderBarrelEntity;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Quaternionf;
 import net.minecraft.client.Minecraft;
@@ -17,11 +18,11 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.inventory.InventoryMenu;
 
-public class IEExplosiveRenderer extends EntityRenderer<GunpowderBarrelEntity>
+public class IEExplosiveRenderer extends IEEntityRenderer<GunpowderBarrelEntity>
 {
 	public IEExplosiveRenderer(Context renderManager)
 	{
@@ -29,12 +30,11 @@ public class IEExplosiveRenderer extends EntityRenderer<GunpowderBarrelEntity>
 		this.shadowRadius = .5f;
 	}
 
-	@Override
 	public void render(GunpowderBarrelEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn)
 	{
 		if(entity.block==null)
 			return;
-		BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
+		BlockRenderDispatcher blockrendererdispatcher = ClientUtils.getBlockRenderer();
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 0.5F, 0);
 		if(entity.getFuse()-partialTicks+1 < 10)
@@ -61,9 +61,8 @@ public class IEExplosiveRenderer extends EntityRenderer<GunpowderBarrelEntity>
 		super.render(entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 
-	@Override
 	public Identifier getTextureLocation(GunpowderBarrelEntity entity)
 	{
-		return InventoryMenu.BLOCK_ATLAS;
+		return TextureAtlas.LOCATION_BLOCKS;
 	}
 }

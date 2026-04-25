@@ -29,31 +29,27 @@ public class FluorescentTubeCallbacks implements ItemCallback<Key>
 {
 	public static final FluorescentTubeCallbacks INSTANCE = new FluorescentTubeCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack object, LivingEntity owner)
 	{
 		boolean lit = isLit(object);
 		float min = .3F+(lit?object.get(IEDataComponents.FLUORESCENT_TUBE_LIT).strength()*.68F: 0);
-		float mult = min+(lit?ApiUtils.RANDOM.nextFloat()*Mth.clamp(1-min, 0, .1F): 0);
+		float mult = min+(lit?ApiUtils.getRandom().nextFloat()*Mth.clamp(1-min, 0, .1F): 0);
 		float[] colors = getRGBFloat(object, mult);
 		return new Key(new Color4(colors[0], colors[1], colors[2], colors[3]));
 	}
 
 	private static final List<List<String>> special = List.of(List.of("tube"));
 
-	@Override
 	public List<List<String>> getSpecialGroups(ItemStack stack, ItemDisplayContext transform, LivingEntity entity)
 	{
 		return special;
 	}
 
-	@Override
 	public boolean areGroupsFullbright(ItemStack stack, List<String> groups)
 	{
 		return groups.size()==1&&"tube".equals(groups.get(0))&&isLit(stack);
 	}
 
-	@Override
 	public Color4 getRenderColor(Key object, String group, String material, ShaderCase shaderCase, Color4 original)
 	{
 		if("tube".equals(group))
@@ -62,7 +58,6 @@ public class FluorescentTubeCallbacks implements ItemCallback<Key>
 			return new Color4(.067f, .067f, .067f, 1);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(new Color4(1, 1, 1, 1));

@@ -13,7 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
@@ -44,7 +44,7 @@ public interface IDrillHead
 	/**
 	 * @return The mining level of the drill
 	 */
-	Tier getMiningLevel(ItemStack head);
+	ToolMaterial getMiningLevel(ItemStack head);
 
 	/**
 	 * @return The speed of the drill

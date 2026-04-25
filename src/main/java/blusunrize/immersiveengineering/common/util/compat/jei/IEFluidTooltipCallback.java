@@ -25,7 +25,6 @@ import java.util.Optional;
  */
 public class IEFluidTooltipCallback implements IRecipeSlotRichTooltipCallback
 {
-	@Override
 	public void onRichTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip)
 	{
 		Optional<FluidStack> maybeFluid = recipeSlotView.getDisplayedIngredient(NeoForgeTypes.FLUID_STACK);

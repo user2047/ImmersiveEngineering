@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.client.models.mirror;
 
 import com.mojang.math.Transformation;
 import org.joml.Vector3f;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 
 import javax.annotation.Nonnull;
 
@@ -25,18 +25,18 @@ public class MirroredModelState implements ModelState
 	public MirroredModelState(ModelState inner)
 	{
 		this.inner = inner;
-		this.mirroredMainRotation = mirror(inner.getRotation());
+		this.mirroredMainRotation = mirror(inner.transformation());
 	}
 
 	@Nonnull
-	public Transformation getRotation()
+	public Transformation transformation()
 	{
 		return mirroredMainRotation;
 	}
 
 	public boolean isUvLocked()
 	{
-		return inner.isUvLocked();
+		return false;
 	}
 
 	private static Transformation mirror(Transformation in)

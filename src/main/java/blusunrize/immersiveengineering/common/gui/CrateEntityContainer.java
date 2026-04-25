@@ -34,7 +34,6 @@ public class CrateEntityContainer extends CrateMenu
 		this.wrappingEntity = null;
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player player)
 	{
 		if(wrappingEntity==null)

@@ -27,8 +27,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -52,7 +52,6 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 	);
 	private static final Map<Identifier, DynamicModel> MODELS_BY_BLOCK = new HashMap<>();
 
-	@Override
 	public void render(TurretBlockEntity<?> tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(!tile.getLevelNonnull().hasChunkAt(tile.getBlockPos()))
@@ -97,13 +96,13 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 	{
 		pos = pos.above();
 
-		VertexConsumer solidBuilder = buffer.getBuffer(RenderType.solid());
+		VertexConsumer solidBuilder = buffer.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid());
 		matrix.pushPose();
 		matrix.translate(-.5, 0, -.5);
 		List<BakedQuad> quads = model.getQuads(
 				state, null, ApiUtils.RANDOM_SOURCE,
 				ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts)),
-				RenderType.solid()
+				blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);
 		RenderUtils.renderModelTESRFancy(quads, solidBuilder, matrix, world, pos, !isFirst, -1, light);
 		matrix.popPose();
@@ -114,7 +113,6 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 		MODEL_NAME_BY_BLOCK.forEach((key, value) -> MODELS_BY_BLOCK.put(key.getId(), new DynamicModel(value)));
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(TurretBlockEntity<?> turret)
 	{
 		if(turret.renderBB==null)

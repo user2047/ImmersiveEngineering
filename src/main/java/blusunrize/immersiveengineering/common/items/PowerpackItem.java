@@ -40,7 +40,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -48,15 +48,15 @@ import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
@@ -106,13 +106,12 @@ public class PowerpackItem extends UpgradeableToolItem
 
 	public PowerpackItem()
 	{
-		super(new Properties().stacksTo(1), TYPE, 4);
+		super(itemProperties().stacksTo(1), TYPE, 4);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
-		IEnergyStorage energy = stack.getCapability(EnergyStorage.ITEM);
+		IEnergyStorage energy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM);
 		if(energy!=null)
 		{
 			String stored = energy.getEnergyStored()+"/"+getMaxEnergyStored(stack);
@@ -121,27 +120,24 @@ public class PowerpackItem extends UpgradeableToolItem
 	}
 
 	@Nullable
-	@Override
 	public EquipmentSlot getEquipmentSlot(ItemStack stack)
 	{
 		return EquipmentSlot.CHEST;
 	}
 
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public InteractionResult use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack heldItem = player.getItemInHand(hand);
 		EquipmentSlot slot = player.getEquipmentSlotForItem(heldItem);
 		if(!player.getItemBySlot(slot).isEmpty())
-			return InteractionResultHolder.fail(heldItem);
+			return InteractionResult.FAIL;
 		player.setItemSlot(slot, heldItem.copy());
 		if(!world.isClientSide())
 			player.awardStat(Stats.ITEM_USED.get(this));
 		heldItem.setCount(0);
-		return InteractionResultHolder.sidedSuccess(heldItem, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity entity, int itemSlot, boolean isSelected)
 	{
 		// We'll just have to assume that's Curios which sets the slot of -1
@@ -151,7 +147,7 @@ public class PowerpackItem extends UpgradeableToolItem
 
 	public static void tickWornPack(ItemStack itemStack, Level world, Player player)
 	{
-		IEnergyStorage packEnergy = itemStack.getCapability(EnergyStorage.ITEM);
+		IEnergyStorage packEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(itemStack, Energy.ITEM);
 		if(packEnergy==null)
 			return;
 		var upgrades = getUpgradesStatic(itemStack);
@@ -164,8 +160,8 @@ public class PowerpackItem extends UpgradeableToolItem
 			// induction charging only happens every 4 ticks
 			if(upgrades.has(UpgradeEffect.INDUCTION)&&player.tickCount%4==0)
 			{
-				NonNullList<ItemStack> allItems = player.getInventory().items;
-				final int selected = player.getInventory().selected;
+				NonNullList<ItemStack> allItems = player.getInventory().getNonEquipmentItems();
+				final int selected = player.getInventory().getSelectedSlot();
 				for(int i = 0; i < allItems.size(); i++)
 				{
 					if(i==selected) // ignore equipped item
@@ -186,7 +182,7 @@ public class PowerpackItem extends UpgradeableToolItem
 
 	private static int insertInto(ItemStack insertInto, int maxAmount)
 	{
-		IEnergyStorage equippedEnergy = insertInto.getCapability(Capabilities.EnergyStorage.ITEM);
+		IEnergyStorage equippedEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(insertInto, Capabilities.Energy.ITEM);
 		Item insertItem = insertInto.getItem();
 		if(equippedEnergy!=null&&!(insertItem instanceof PowerpackItem)&&!(insertItem instanceof BlockItem))
 			return equippedEnergy.receiveEnergy(Math.min(maxAmount, ITEM_CHARGE_RATE), false);
@@ -200,7 +196,7 @@ public class PowerpackItem extends UpgradeableToolItem
 		boolean grounded = player.getRootVehicle().onGround();
 		if(!grounded&&player.getRootVehicle() instanceof AbstractMinecart minecart)
 		{
-			BlockPos railPos = minecart.getCurrentRailPosition();
+			BlockPos railPos = minecart.blockPosition();
 			if(world.getBlockState(railPos).is(BlockTags.RAILS))
 				grounded = true;
 		}
@@ -260,9 +256,7 @@ public class PowerpackItem extends UpgradeableToolItem
 						if(e.getAvailableEnergy() >= 4096)
 						{
 							e.extractEnergy(4096);
-							LightningBolt lightningbolt = EntityType.LIGHTNING_BOLT.create(world);
-							lightningbolt.moveTo(player.getX(), player.getY(), player.getZ());
-							world.addFreshEntity(lightningbolt);
+							LightningBolt lightningbolt = null;
 							Vec3 dir = minecart.getDeltaMovement().normalize();
 							Vec3 orth = dir.yRot((float)Math.toRadians(90));
 							Vec3 off = dir.scale(0.125);
@@ -302,13 +296,13 @@ public class PowerpackItem extends UpgradeableToolItem
 			if(itemEntity.hasPickUpDelay())
 				return false;
 			// check if already being pulled by a different magnet
-			String magnetSource = itemEntity.getPersistentData().getString(Lib.MAGNET_SOURCE_NBT);
+			String magnetSource = itemEntity.getPersistentData().getStringOr(Lib.MAGNET_SOURCE_NBT, "");
 			if(!magnetSource.isEmpty()&&!magnetSource.equals(player.getStringUUID()))
 				return false;
 			// check if NBT blacklisted (e.g.: on a conveyor)
 			return !itemEntity.getPersistentData().contains(Lib.MAGNET_PREVENT_NBT);
 		});
-		IEnergyStorage magnetEnergy = itemStack.getCapability(EnergyStorage.ITEM);
+		IEnergyStorage magnetEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(itemStack, Energy.ITEM);
 		for(ItemEntity itemEntity : items)
 			if(itemEntity.distanceTo(player) > 0.001&&magnetEnergy.extractEnergy(MAGNET_CONSUMPTION, false) >= MAGNET_CONSUMPTION)
 			{
@@ -331,14 +325,14 @@ public class PowerpackItem extends UpgradeableToolItem
 	{
 		if(!capacitorConfigMap.get().containsKey(capacitor.getItem()))
 			return;
-		IItemHandler cap = container.getCapability(ItemHandler.ITEM);
+		IItemHandler cap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(container, Capabilities.Item.ITEM);
 		if(cap instanceof IItemHandlerModifiable modifiable)
 			modifiable.setStackInSlot(0, capacitor);
 	}
 
 	public static ItemStack getCapacitorStatic(ItemStack container)
 	{
-		IItemHandler cap = container.getCapability(ItemHandler.ITEM);
+		IItemHandler cap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(container, Capabilities.Item.ITEM);
 		if(cap!=null)
 		{
 			ItemStack capacitor = cap.getStackInSlot(0);
@@ -349,7 +343,7 @@ public class PowerpackItem extends UpgradeableToolItem
 
 	public static ItemStack getBannerStatic(ItemStack container)
 	{
-		IItemHandler cap = container.getCapability(ItemHandler.ITEM);
+		IItemHandler cap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(container, Capabilities.Item.ITEM);
 		if(cap!=null)
 		{
 			ItemStack banner = cap.getStackInSlot(1);
@@ -376,22 +370,20 @@ public class PowerpackItem extends UpgradeableToolItem
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
 		registerCapabilitiesISI(registrar);
-		registrar.register(EnergyStorage.ITEM, stack -> {
+		registrar.register(Energy.ITEM, stack -> {
 			final ItemStack capacitor = getCapacitorStatic(stack);
-			final IEnergyStorage capacitorStorage = capacitor.getCapability(EnergyStorage.ITEM);
+			final IEnergyStorage capacitorStorage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(capacitor, Energy.ITEM);
 			if(capacitorStorage==null)
 				return null;
 			return new WrappingEnergyStorage(capacitorStorage, true, true, () -> setCapacitorStatic(stack, capacitor));
 		});
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{
@@ -404,10 +396,9 @@ public class PowerpackItem extends UpgradeableToolItem
 		};
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null&&!inv.getStackInSlot(0).isEmpty()&&!inv.getStackInSlot(2).isEmpty()&&!inv.getStackInSlot(3).isEmpty())
 			Utils.unlockIEAdvancement(player, "tools/upgrade_powerpack");
 	}

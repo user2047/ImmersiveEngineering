@@ -44,13 +44,11 @@ public class CatwalkStairsBlock extends CatwalkBlock
 		super(blockProps, isDyeable);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		builder.add(DYE_PROPERTY, BlockStateProperties.WATERLOGGED, IEProperties.FACING_HORIZONTAL, RAILING_LEFT, RAILING_RIGHT);
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		BlockState ret = this.stateDefinition.any()
@@ -63,14 +61,12 @@ public class CatwalkStairsBlock extends CatwalkBlock
 		return ret;
 	}
 
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		return super.getStateForPlacement(context)
 				.setValue(IEProperties.FACING_HORIZONTAL, context.getHorizontalDirection());
 	}
 
-	@Override
 	public InteractionResult useHammer(BlockState state, Level world, BlockPos pos, @Nullable Player player, UseOnContext context)
 	{
 		Direction currentDirection = state.getValue(IEProperties.FACING_HORIZONTAL);
@@ -85,12 +81,11 @@ public class CatwalkStairsBlock extends CatwalkBlock
 				case EAST -> hitVec.z < 0?RAILING_LEFT: RAILING_RIGHT;
 			};
 			world.setBlock(pos, state.setValue(railing, !state.getValue(railing)), 3);
-			return InteractionResult.sidedSuccess(world.isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rotation)
 	{
 		Direction currentDirection = state.getValue(IEProperties.FACING_HORIZONTAL);
@@ -136,13 +131,11 @@ public class CatwalkStairsBlock extends CatwalkBlock
 		return list;
 	});
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(new RailingsKey(state, false));
 	}
 
-	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(new RailingsKey(state, true));

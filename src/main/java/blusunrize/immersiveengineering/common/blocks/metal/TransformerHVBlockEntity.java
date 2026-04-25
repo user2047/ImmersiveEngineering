@@ -24,19 +24,16 @@ public class TransformerHVBlockEntity extends TransformerBlockEntity
 		acceptableLowerWires = ImmutableSet.of(WireType.LV_CATEGORY, WireType.MV_CATEGORY);
 	}
 
-	@Override
 	protected float getLowerOffset()
 	{
 		return super.getHigherOffset();
 	}
 
-	@Override
 	protected float getHigherOffset()
 	{
 		return .75F;
 	}
 
-	@Override
 	public String getHigherWiretype()
 	{
 		return HV_CATEGORY;

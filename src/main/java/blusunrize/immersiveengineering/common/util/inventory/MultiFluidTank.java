@@ -37,13 +37,13 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 
 	public MultiFluidTank readFromNBT(CompoundTag nbt, Provider provider)
 	{
-		if(nbt.contains("fluids", Tag.TAG_LIST))
+		if(nbt.contains("fluids"))
 		{
 			fluids.clear();
-			ListTag tagList = nbt.getList("fluids", Tag.TAG_COMPOUND);
+			ListTag tagList = nbt.getListOrEmpty("fluids");
 			for(int i = 0; i < tagList.size(); i++)
 			{
-				FluidStack fs = FluidStack.parseOptional(provider, tagList.getCompound(i));
+				FluidStack fs = blusunrize.immersiveengineering.common.util.FluidStackCompat.parseOptional(provider, tagList.getCompoundOrEmpty(i));
 				if(!fs.isEmpty())
 					this.fluids.add(fs);
 			}
@@ -56,7 +56,7 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 		ListTag tagList = new ListTag();
 		for(FluidStack fs : this.fluids)
 			if(!fs.isEmpty())
-				tagList.add(fs.save(provider));
+				tagList.add(blusunrize.immersiveengineering.common.util.FluidStackCompat.save(fs, provider));
 		nbt.put("fluids", tagList);
 		return nbt;
 	}
@@ -67,14 +67,12 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 	}
 
 	@Nonnull
-	@Override
 	public FluidStack getFluid()
 	{
 		//grabbing the last fluid, for output reasons
 		return fluids.size() > 0?fluids.get(fluids.size()-1): FluidStack.EMPTY;
 	}
 
-	@Override
 	public int getFluidAmount()
 	{
 		int sum = 0;
@@ -83,26 +81,22 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 		return sum;
 	}
 
-	@Override
 	public int getCapacity()
 	{
 		return this.capacity;
 	}
 
-	@Override
 	public boolean isFluidValid(FluidStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getTanks()
 	{
 		return fluids.size()+1;
 	}
 
 	@Nonnull
-	@Override
 	public FluidStack getFluidInTank(int tank)
 	{
 		if(tank < fluids.size())
@@ -110,7 +104,6 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 		return FluidStack.EMPTY;
 	}
 
-	@Override
 	public int getTankCapacity(int tank)
 	{
 		if(tank < fluids.size())
@@ -118,13 +111,11 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 		return this.capacity-getFluidAmount();
 	}
 
-	@Override
 	public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int fill(FluidStack resource, FluidAction action)
 	{
 		int space = this.capacity-getFluidAmount();
@@ -159,7 +150,6 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 	}
 
 	@Nonnull
-	@Override
 	public FluidStack drain(FluidStack resource, FluidAction action)
 	{
 		if(this.fluids.isEmpty())
@@ -221,7 +211,6 @@ public class MultiFluidTank implements IFluidTank, IFluidHandler
 	}
 
 	@Nonnull
-	@Override
 	public FluidStack drain(int maxDrain, FluidAction doDrain)
 	{
 		if(this.fluids.isEmpty())

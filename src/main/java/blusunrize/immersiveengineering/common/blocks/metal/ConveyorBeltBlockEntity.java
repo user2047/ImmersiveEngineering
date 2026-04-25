@@ -30,7 +30,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -47,8 +47,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -58,7 +57,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = Lib.MODID)
 public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBlockEntity
 		implements IStateBasedDirectional, ICollisionBounds, ISelectionBounds, IHammerInteraction,
 		IPlayerInteraction, IConveyorBlockEntity<T>, IEServerTickableBE
@@ -73,81 +72,70 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 		conveyorBeltSubtype = ConveyorHandler.getConveyor(type, this);
 	}
 
-	@Override
 	@Nullable
 	public T getConveyorInstance()
 	{
 		return conveyorBeltSubtype;
 	}
 
-	@Override
 	public void onEntityCollision(Level world, Entity entity)
 	{
 		if(this.conveyorBeltSubtype!=null)
 			this.conveyorBeltSubtype.onEntityCollision(entity);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		if(nbt.contains("conveyorBeltSubtypeNBT", Tag.TAG_COMPOUND))
-			conveyorBeltSubtype.readConveyorNBT(nbt.getCompound("conveyorBeltSubtypeNBT"));
+		if(nbt.contains("conveyorBeltSubtypeNBT"))
+			conveyorBeltSubtype.readConveyorNBT(nbt.getCompoundOrEmpty("conveyorBeltSubtypeNBT"));
 
 		if(descPacket&&level!=null)
 			this.markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		if(conveyorBeltSubtype!=null)
 			nbt.put("conveyorBeltSubtypeNBT", conveyorBeltSubtype.writeConveyorNBT());
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return ConveyorBlock.FACING;
 	}
 
-	@Override
 	public Direction getFacing()
 	{
 		return IStateBasedDirectional.super.getFacing();
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_QUADRANT;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return !entity.isShiftKeyDown();
 	}
 
-	@Override
 	public void afterRotation(Direction oldDir, Direction newDir)
 	{
 		if(this.conveyorBeltSubtype!=null)
 			this.conveyorBeltSubtype.afterRotation(oldDir, newDir);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(this.conveyorBeltSubtype!=null)
 			this.conveyorBeltSubtype.tickServer();
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(player.isShiftKeyDown()&&conveyorBeltSubtype!=null&&conveyorBeltSubtype.changeConveyorDirection())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				this.setChanged();
 				this.markContainingBlockForUpdate(null);
@@ -158,8 +146,7 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 		return false;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(conveyorBeltSubtype!=null)
 		{
@@ -176,16 +163,15 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 				this.setChanged();
 				this.markContainingBlockForUpdate(null);
 				level.blockEvent(getBlockPos(), this.getBlockState().getBlock(), 0, 0);
-				return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+				return InteractionResult.SUCCESS;
 			}
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	private static final VoxelShape COLISIONBB =
 			Shapes.box(0, 0, 0, 1, .125F, 1);
 
-	@Override
 	public VoxelShape getCollisionShape(CollisionContext ctx)
 	{
 		if(conveyorBeltSubtype!=null)
@@ -193,7 +179,6 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 		return COLISIONBB;
 	}
 
-	@Override
 	public VoxelShape getSelectionShape(@Nullable CollisionContext ctx)
 	{
 		if(conveyorBeltSubtype!=null)
@@ -205,11 +190,10 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 
 	public static void registerCapabilities(BECapabilityRegistrar<ConveyorBeltBlockEntity<?>> registrar)
 	{
-		registrar.registerAllContexts(ItemHandler.BLOCK, be -> be.insertionCap);
+		registrar.registerAllContexts(Capabilities.Item.BLOCK, be -> be.insertionCap);
 	}
 
 	// Make public
-	@Override
 	public boolean isRSPowered()
 	{
 		return super.isRSPowered();
@@ -223,7 +207,7 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 			Supplier<BlockEntityType<?>> beType = IEBlockEntities.REGISTER.register(
 					type.getId().getPath(), () -> new BlockEntityType<>(
 							(pos, state) -> new ConveyorBeltBlockEntity<>(type, pos, state),
-							ImmutableSet.of(ConveyorHandler.getBlock(type)), null
+							ImmutableSet.of(ConveyorHandler.getBlock(type))
 					));
 			BE_TYPES.put(type, beType);
 		}
@@ -239,19 +223,16 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 			this.conveyor = conveyor;
 		}
 
-		@Override
 		public int getSlots()
 		{
 			return 1;
 		}
 
-		@Override
 		public ItemStack getStackInSlot(int slot)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 		{
 			if(conveyor.getConveyorInstance().isBlocked())
@@ -267,25 +248,21 @@ public class ConveyorBeltBlockEntity<T extends IConveyorBelt> extends IEBaseBloc
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public int getSlotLimit(int slot)
 		{
 			return 64;
 		}
 
-		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
 			return true;
 		}
 
-		@Override
 		public void setStackInSlot(int slot, ItemStack stack)
 		{
 		}

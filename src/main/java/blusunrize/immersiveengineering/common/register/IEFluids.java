@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -108,12 +108,6 @@ public class IEFluids
 
 	public static void registerBucketCapabilities(RegisterCapabilitiesEvent event)
 	{
-		for(FluidEntry entry : ALL_ENTRIES)
-			event.registerItem(
-					FluidHandler.ITEM,
-					(stack, $) -> new FluidBucketWrapper(stack),
-					entry.bucket.get()
-			);
 	}
 
 	public record FluidEntry(
@@ -189,7 +183,9 @@ public class IEFluids
 					() -> Properties.ofFullCopy(Blocks.WATER),
 					p -> new IEFluidBlock(thisMutable.getValue(), p)
 			);
-			DeferredHolder<Item, BucketItem> bucket = IEItems.REGISTER.register(name+"_bucket", () -> makeBucket(still, burnTime));
+			DeferredHolder<Item, BucketItem> bucket = IEItems.REGISTER.register(
+					name+"_bucket", id -> makeBucket(still, burnTime, id)
+			);
 			FluidEntry entry = new FluidEntry(flowing, flowingTex, still, stillTex, block, bucket, type, properties);
 			thisMutable.setValue(entry);
 			ALL_FLUID_BLOCKS.add(block);
@@ -217,14 +213,13 @@ public class IEFluids
 			return bucket.value();
 		}
 
-		private static BucketItem makeBucket(Supplier<IEFluid> still, int burnTime)
+		private static BucketItem makeBucket(Supplier<IEFluid> still, int burnTime, Identifier id)
 		{
 			return new BucketItem(
-					still.get(), new Item.Properties()
+					still.get(), IEItems.defaultProperties(id)
 					.stacksTo(1)
 					.craftRemainder(Items.BUCKET))
 			{
-				@Override
 				public int getBurnTime(ItemStack itemStack, RecipeType<?> type)
 				{
 					return burnTime;

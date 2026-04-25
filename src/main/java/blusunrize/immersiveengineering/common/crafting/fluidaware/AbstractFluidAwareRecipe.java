@@ -36,27 +36,29 @@ public abstract class AbstractFluidAwareRecipe<MatchLocation extends IMatchLocat
 	}
 
 	@Nonnull
-	@Override
 	public String getGroup()
 	{
 		return this.group;
 	}
 
 	@Nonnull
-	@Override
+	public String group()
+	{
+		return this.group;
+	}
+
+	@Nonnull
 	public ItemStack getResultItem(Provider access)
 	{
 		return this.recipeOutput;
 	}
 
 	@Nonnull
-	@Override
 	public NonNullList<Ingredient> getIngredients()
 	{
 		return this.recipeItems;
 	}
 
-	@Override
 	public CraftingBookCategory category()
 	{
 		return CraftingBookCategory.MISC;

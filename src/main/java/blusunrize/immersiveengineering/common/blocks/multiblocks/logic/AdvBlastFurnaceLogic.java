@@ -37,7 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +59,6 @@ public class AdvBlastFurnaceLogic
 	private static final CapabilityPosition SLAG_OUTPUT_CAP = CapabilityPosition.opposing(SLAG_OUTPUT_OFFSET);
 	private static final CapabilityPosition INPUT_CAP = new CapabilityPosition(1, 3, 1, RelativeBlockFace.UP);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -85,7 +84,6 @@ public class AdvBlastFurnaceLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -95,7 +93,7 @@ public class AdvBlastFurnaceLogic
 			level.getRawLevel().addAlwaysVisibleParticle(
 					ParticleTypes.CAMPFIRE_COSY_SMOKE,
 					particlePos.x, particlePos.y, particlePos.z,
-					ApiUtils.RANDOM.nextDouble(-0.00625, 0.00625), .05, ApiUtils.RANDOM.nextDouble(-0.00625, 0.00625)
+					ApiUtils.getRandom().nextDouble(-0.00625, 0.00625), .05, ApiUtils.getRandom().nextDouble(-0.00625, 0.00625)
 			);
 		}
 	}
@@ -106,16 +104,14 @@ public class AdvBlastFurnaceLogic
 				.getValue(NonMirrorableWithActiveBlock.ACTIVE);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(ItemHandler.BLOCK, (state, position) -> {
+		register.register(Capabilities.Item.BLOCK, (state, position) -> {
 			if(OUTPUT_CAP.equals(position))
 				return state.outputHandler;
 			else if(SLAG_OUTPUT_CAP.equals(position))
@@ -127,13 +123,11 @@ public class AdvBlastFurnaceLogic
 		});
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.getInventory(), drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return AdvBlastFurnaceShapes.SHAPE_GETTER;
@@ -151,8 +145,8 @@ public class AdvBlastFurnaceLogic
 		public State(IInitialMultiblockContext<State> ctx)
 		{
 			this.innerState = new BlastFurnaceLogic.State(ctx);
-			this.outputRef = ctx.getCapabilityAt(ItemHandler.BLOCK, OUTPUT_OFFSET);
-			this.slagRef = ctx.getCapabilityAt(ItemHandler.BLOCK, SLAG_OUTPUT_OFFSET);
+			this.outputRef = ctx.getCapabilityAt(Capabilities.Item.BLOCK, OUTPUT_OFFSET);
+			this.slagRef = ctx.getCapabilityAt(Capabilities.Item.BLOCK, SLAG_OUTPUT_OFFSET);
 			this.inputHandler = new WrappingItemHandler(
 					getInventory(), true, false, new IntRange(0, 2)
 			);
@@ -164,37 +158,31 @@ public class AdvBlastFurnaceLogic
 			);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			innerState.writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			innerState.readSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return innerState.getInventory();
 		}
 
-		@Override
 		public @Nullable BlastFurnaceRecipe getRecipeForInput()
 		{
 			return innerState.getRecipeForInput();
 		}
 
-		@Override
 		public int getBurnTimeOf(Level level, ItemStack fuel)
 		{
 			return innerState.getBurnTimeOf(level, fuel);
 		}
 
-		@Override
 		public int getProcessSpeed(IMultiblockLevel level)
 		{
 			int i = 1;
@@ -207,7 +195,6 @@ public class AdvBlastFurnaceLogic
 			return i;
 		}
 
-		@Override
 		public void turnOff(IMultiblockLevel level)
 		{
 			for(final BlockPos offset : HEATER_OFFSETS)

@@ -19,19 +19,16 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
  */
 public record DoubleIcon(IDrawable main, IDrawable secondary, float scale) implements IDrawable
 {
-	@Override
 	public int getWidth()
 	{
 		return 18;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return 18;
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics, int xOffset, int yOffset)
 	{
 		PoseStack matrixStack = graphics.pose();

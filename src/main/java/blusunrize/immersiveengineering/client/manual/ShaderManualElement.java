@@ -65,13 +65,11 @@ public class ShaderManualElement extends SpecialManualElements
 		this.shader = shader;
 	}
 
-	@Override
 	public int getPixelsTaken()
 	{
 		return 47;
 	}
 
-	@Override
 	public void onOpened(ManualScreen gui, int x, int y, List<Button> buttons)
 	{
 		Player player = mc().player;
@@ -87,7 +85,7 @@ public class ShaderManualElement extends SpecialManualElements
 			for(ItemStack is : ShaderRegistry.itemExamples)
 			{
 				ItemStack s = is.copy();
-				ShaderWrapper wrapper = s.getCapability(CapabilityShader.ITEM);
+				ShaderWrapper wrapper = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(s, CapabilityShader.ITEM);
 				if(wrapper!=null)
 				{
 					wrapper.setShader(shader.name);
@@ -166,10 +164,8 @@ public class ShaderManualElement extends SpecialManualElements
 		this.text = textAssembly;
 	}
 
-	@Override
 	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
-		Lighting.setupFor3DItems();
 		float scale = 2;
 		PoseStack transform = graphics.pose();
 		transform.pushPose();
@@ -185,7 +181,6 @@ public class ShaderManualElement extends SpecialManualElements
 		if(unlocked)
 			ManualUtils.renderItemStack(graphics, replicationCost.getRandomizedExampleStack(mc().player.tickCount), 102, 118, false);
 
-		Lighting.setupForFlatItems();
 
 		int w = manual.fontRenderer().width(this.name.getString());
 		drawWrappedWithTransform(graphics, this.name, 60-w/2, 24);
@@ -206,13 +201,11 @@ public class ShaderManualElement extends SpecialManualElements
 		}
 	}
 
-	@Override
 	public boolean listForSearch(String searchTag)
 	{
 		return false;
 	}
 
-	@Override
 	public void recalculateCraftingRecipes()
 	{
 	}

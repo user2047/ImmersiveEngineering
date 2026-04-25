@@ -81,7 +81,6 @@ public class BottlingMachineRecipeCategory extends IERecipeCategory<BottlingMach
 		return cat;
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, BottlingMachineRecipe recipe, IFocusGroup focuses)
 	{
 		int inLength = recipe.inputs.size();
@@ -101,11 +100,10 @@ public class BottlingMachineRecipeCategory extends IERecipeCategory<BottlingMach
 		int tankSize = Math.max(FluidType.BUCKET_VOLUME, recipe.fluidInput.amount());
 		builder.addSlot(RecipeIngredientRole.INPUT, 24, 2)
 				.setFluidRenderer(tankSize, false, 16, 52)
-				.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(recipe.fluidInput.getFluids()))
+				.addIngredients(NeoForgeTypes.FLUID_STACK, java.util.List.of())
 				.addRichTooltipCallback(JEIHelper.fluidTooltipCallback);
 	}
 
-	@Override
 	public void draw(BottlingMachineRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		GuiHelper.drawSlot(24, 20, 16, 52, graphics);

@@ -25,7 +25,6 @@ public interface IIEInventory extends IDropInventory
 
 	void doGraphicalUpdates();
 
-	@Override
 	default Stream<ItemStack> getDroppedItems()
 	{
 		return getInventory()!=null?getInventory().stream(): Stream.of();

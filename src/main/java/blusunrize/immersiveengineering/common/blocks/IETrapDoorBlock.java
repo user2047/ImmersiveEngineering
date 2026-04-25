@@ -12,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
@@ -41,7 +42,6 @@ public class IETrapDoorBlock extends TrapDoorBlock
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState state = super.getStateForPlacement(context);
@@ -53,19 +53,17 @@ public class IETrapDoorBlock extends TrapDoorBlock
 		return state;
 	}
 
-	@Override
-	public ItemInteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
+	public InteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
 	{
 		if(this.lockedByRedstone&&blockState.getValue(POWERED))
 		{
 			level.playSound(player, pos, SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, SoundSource.BLOCKS, 0.25F, level.getRandom().nextFloat()*0.1F+0.9F);
-			return ItemInteractionResult.CONSUME_PARTIAL;
+			return InteractionResult.CONSUME;
 		}
 		return super.useItemOn(stack, blockState, level, pos, player, hand, hitResult);
 	}
 
-	@Override
-	public void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
+	public void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, Orientation orientation, boolean isMoving)
 	{
 		if(this.lockedByRedstone)
 		{
@@ -74,6 +72,6 @@ public class IETrapDoorBlock extends TrapDoorBlock
 				level.setBlock(pos, blockState.setValue(POWERED, flag), 2);
 		}
 		else
-			super.neighborChanged(blockState, level, pos, block, fromPos, isMoving);
+			super.neighborChanged(blockState, level, pos, block, orientation, isMoving);
 	}
 }

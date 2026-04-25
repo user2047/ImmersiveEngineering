@@ -12,7 +12,6 @@ import blusunrize.immersiveengineering.api.multiblocks.TemplateMultiblock;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistration.Disassembler;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistration.ExtraComponent;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IMultiblockComponent;
-import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IMultiblockComponent.CapabilityGetter;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IMultiblockComponent.CapabilityRegistrar;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IMultiblockComponent.StateWrapper;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockBEHelper;
@@ -29,7 +28,9 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -85,6 +86,7 @@ public abstract class MultiblockRegistrationBuilder<
 	private Function<Level, List<StructureBlockInfo>> structure;
 
 	private MultiblockRegistration<State> result;
+	private static final ThreadLocal<ResourceKey<Item>> CURRENT_ITEM_ID = new ThreadLocal<>();
 
 	public MultiblockRegistrationBuilder(IMultiblockLogic<State> logic, Identifier name)
 	{
@@ -146,6 +148,7 @@ public abstract class MultiblockRegistrationBuilder<
 	)
 	{
 		return customBlock(register, blockItemRegister, reg -> {
+			properties.setId(ResourceKey.create(Registries.BLOCK, name));
 			if(reg.mirrorable())
 				return new MultiblockPartBlock.WithMirrorState<>(properties, reg);
 			else
@@ -172,8 +175,29 @@ public abstract class MultiblockRegistrationBuilder<
 	{
 		Preconditions.checkState(this.block==null);
 		this.block = register.register(name.getPath(), () -> make.apply(this.result));
-		this.item = blockItemRegister.register(name.getPath(), () -> makeItem.apply(this.result.block().get()));
+		this.item = blockItemRegister.register(name.getPath(), () -> makeItemWithId(name, () -> makeItem.apply(this.result.block().get())));
 		return self();
+	}
+
+	public static Item.Properties defaultItemProperties()
+	{
+		Item.Properties properties = new Item.Properties();
+		ResourceKey<Item> itemId = CURRENT_ITEM_ID.get();
+		if(itemId!=null)
+			properties.setId(itemId);
+		return properties;
+	}
+
+	private static <T extends Item> T makeItemWithId(Identifier id, Supplier<T> makeItem)
+	{
+		CURRENT_ITEM_ID.set(ResourceKey.create(Registries.ITEM, id));
+		try
+		{
+			return makeItem.get();
+		} finally
+		{
+			CURRENT_ITEM_ID.remove();
+		}
 	}
 
 	public Self structure(Supplier<TemplateMultiblock> structure)
@@ -253,10 +277,10 @@ public abstract class MultiblockRegistrationBuilder<
 		logic.registerCapabilities(new CapabilityRegistrar<>()
 		{
 			@Override
-			public <T>
-			void register(BlockCapability<T, @Nullable Direction> capability, CapabilityGetter<T, State> getter)
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			public void register(BlockCapability capability, IMultiblockComponent.CapabilityGetter<State> getter)
 			{
-				ICapabilityProvider<IMultiblockBE<State>, @Nullable Direction, T> provider = (be, side) -> {
+				ICapabilityProvider<IMultiblockBE<State>, Direction, Object> provider = (be, side) -> {
 					IMultiblockBEHelper<State> helper = be.getHelper();
 					State state = helper.getState();
 					if(state!=null)
@@ -278,8 +302,7 @@ public abstract class MultiblockRegistrationBuilder<
 		Mutable<BlockEntityType<? extends BE>> resultBox = new MutableObject<>();
 		resultBox.setValue(new BlockEntityType<>(
 				(pos, state) -> construct.make(resultBox.getValue(), pos, state, result),
-				Set.of(block.get()),
-				null
+				Set.of(block.get())
 		));
 		return resultBox.getValue();
 	}

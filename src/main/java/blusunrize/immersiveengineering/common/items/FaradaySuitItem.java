@@ -11,28 +11,27 @@ package blusunrize.immersiveengineering.common.items;
 import blusunrize.immersiveengineering.api.tool.IElectricEquipment;
 import blusunrize.immersiveengineering.common.register.IEArmorMaterials;
 import blusunrize.immersiveengineering.common.util.IEDamageSources.ElectricDamageSource;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial.Layer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.ArmorType;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public class FaradaySuitItem extends ArmorItem implements IElectricEquipment
+public class FaradaySuitItem extends IEBaseItem implements IElectricEquipment
 {
-	public FaradaySuitItem(Type type)
+	private final ArmorType type;
+
+	public FaradaySuitItem(ArmorType type)
 	{
-		super(IEArmorMaterials.FARADAY, type, IEArmorMaterials.getProperties(IEArmorMaterials.FARADAY, type));
+		super(IEArmorMaterials.getProperties(IEArmorMaterials.FARADAY, type));
+		this.type = type;
 	}
 
-	@Override
 	public void onStrike(ItemStack equipped, EquipmentSlot eqSlot, LivingEntity owner, Map<String, Object> cache,
 						 @Nullable DamageSource dSource, ElectricSource eSource)
 	{
@@ -56,18 +55,6 @@ public class FaradaySuitItem extends ArmorItem implements IElectricEquipment
 		}
 	}
 
-	@Override
-	@Nullable
-	public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, Layer layer, boolean innerModel)
-	{
-		// TODO remove
-		//if(slot==EquipmentSlot.LEGS)
-		//	return IEApi.ieLoc("textures/models/armor/faraday_layer_2.png");
-		//else
-			return null;
-	}
-
-	@Override
 	public boolean isBookEnchantable(ItemStack stack, ItemStack book)
 	{
 		return false;

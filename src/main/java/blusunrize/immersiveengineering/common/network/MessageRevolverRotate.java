@@ -24,7 +24,6 @@ public record MessageRevolverRotate(boolean forward) implements IMessage
 	public static final StreamCodec<ByteBuf, MessageRevolverRotate> CODEC = ByteBufCodecs.BOOL
 			.map(MessageRevolverRotate::new, MessageRevolverRotate::forward);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		Player player = context.player();
@@ -35,7 +34,6 @@ public record MessageRevolverRotate(boolean forward) implements IMessage
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

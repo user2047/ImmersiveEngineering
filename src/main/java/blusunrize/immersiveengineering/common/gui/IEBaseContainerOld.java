@@ -36,13 +36,11 @@ public class IEBaseContainerOld<T extends BlockEntity> extends IEContainerMenu
 			this.inv = new BlockEntityInventory(tile, this);
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player player)
 	{
 		return inv!=null&&inv.stillValid(player);//Override for TE's that don't implement IIEInventory
 	}
 
-	@Override
 	public void removed(@Nonnull Player playerIn)
 	{
 		super.removed(playerIn);

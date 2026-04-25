@@ -100,7 +100,6 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 		return 0xE0E0E0;
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();
@@ -119,7 +118,6 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 		}
 	}
 
-	@Override
 	public void gatherTooltip(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		this.tooltip.accept(tooltip, getState());

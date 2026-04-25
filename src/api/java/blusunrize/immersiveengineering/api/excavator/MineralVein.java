@@ -9,11 +9,14 @@
 
 package blusunrize.immersiveengineering.api.excavator;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ColumnPos;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
@@ -44,7 +47,7 @@ public class MineralVein
 	public RecipeHolder<MineralMix> getMineralHolder(Level level)
 	{
 		MineralMix mineral = getMineral(level);
-		return mineral!=null?new RecipeHolder<>(getMineralName(), mineral): null;
+		return mineral!=null?new RecipeHolder<>(recipeKey(getMineralName()), mineral): null;
 	}
 
 	@Nullable
@@ -109,13 +112,13 @@ public class MineralVein
 	{
 		try
 		{
-			ColumnPos pos = new ColumnPos(tag.getInt("x"), tag.getInt("z"));
-			Identifier id = Identifier.parse(tag.getString("mineral"));
-			int radius = tag.getInt("radius");
+			ColumnPos pos = new ColumnPos(tag.getIntOr("x", 0), tag.getIntOr("z", 0));
+			Identifier id = Identifier.parse(tag.getStringOr("mineral", ""));
+			int radius = tag.getIntOr("radius", 0);
 			MineralVein info = new MineralVein(pos, id, radius);
-			info.depletion = tag.getInt("depletion");
+			info.depletion = tag.getIntOr("depletion", 0);
 			return info;
-		} catch(ResourceLocationException ex)
+		} catch(IdentifierException ex)
 		{
 			return null;
 		}
@@ -124,5 +127,10 @@ public class MineralVein
 	public Identifier getMineralName()
 	{
 		return mineralName;
+	}
+
+	private static ResourceKey<Recipe<?>> recipeKey(Identifier id)
+	{
+		return ResourceKey.create(Registries.RECIPE, id);
 	}
 }

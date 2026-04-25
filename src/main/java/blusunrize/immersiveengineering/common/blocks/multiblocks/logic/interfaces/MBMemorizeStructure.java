@@ -30,29 +30,27 @@ public interface MBMemorizeStructure<State extends IMultiblockState> extends IMu
 
 	class StructureMemo extends HashMap<BlockPos, BlockState> implements IMultiblockState
 	{
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			ListTag list = new ListTag();
 			this.forEach((pos, state) -> {
 				CompoundTag compound = new CompoundTag();
-				compound.put("pos", NbtUtils.writeBlockPos(pos));
+				compound.putLong("pos", pos.asLong());
 				compound.put("state", NbtUtils.writeBlockState(state));
 				list.add(compound);
 			});
 			nbt.put("memorizedStates", list);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			HolderGetter<Block> lookup = provider.lookupOrThrow(Registries.BLOCK);
-			ListTag list = nbt.getList("memorizedStates", 10);
+			ListTag list = nbt.getListOrEmpty("memorizedStates");
 			list.forEach(tag -> {
 				if(tag instanceof CompoundTag compound)
 					this.put(
-							NbtUtils.readBlockPos(compound, "pos").orElseThrow(),
-							NbtUtils.readBlockState(lookup, compound.getCompound("state"))
+							BlockPos.of(compound.getLongOr("pos", BlockPos.ZERO.asLong())),
+							NbtUtils.readBlockState(lookup, compound.getCompoundOrEmpty("state"))
 					);
 			});
 		}

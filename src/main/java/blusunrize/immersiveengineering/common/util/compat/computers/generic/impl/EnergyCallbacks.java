@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.common.util.compat.computers.generic.Call
 import blusunrize.immersiveengineering.common.util.compat.computers.generic.CallbackEnvironment;
 import blusunrize.immersiveengineering.common.util.compat.computers.generic.ComputerCallable;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class EnergyCallbacks extends Callback<BlockEntity>
@@ -22,24 +22,12 @@ public class EnergyCallbacks extends Callback<BlockEntity>
 	@ComputerCallable
 	public int getMaxEnergyStored(CallbackEnvironment<BlockEntity> env)
 	{
-		IEnergyStorage storage = env.object().getLevel().getCapability(
-				EnergyStorage.BLOCK, env.object().getBlockPos(), null
-		);
-		if(storage!=null)
-			return storage.getMaxEnergyStored();
-		else
-			return 0;
+		return 0;
 	}
 
 	@ComputerCallable
 	public int getEnergyStored(CallbackEnvironment<BlockEntity> env)
 	{
-		IEnergyStorage storage = env.object().getLevel().getCapability(
-				EnergyStorage.BLOCK, env.object().getBlockPos(), null
-		);
-		if(storage!=null)
-			return storage.getEnergyStored();
-		else
-			return 0;
+		return 0;
 	}
 }

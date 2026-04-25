@@ -46,7 +46,6 @@ public record MessagePowerpackAntenna(UUID player, boolean remove, BlockPos from
 			);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -71,7 +70,6 @@ public record MessagePowerpackAntenna(UUID player, boolean remove, BlockPos from
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

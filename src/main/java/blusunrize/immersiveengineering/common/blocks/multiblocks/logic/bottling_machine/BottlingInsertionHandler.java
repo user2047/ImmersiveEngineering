@@ -37,21 +37,18 @@ public class BottlingInsertionHandler implements IItemHandler
 		this.state = state;
 	}
 
-	@Override
 	public int getSlots()
 	{
 		return 1;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
 		return ItemStack.EMPTY;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
 	{
 		stack = stack.copy();
@@ -76,19 +73,16 @@ public class BottlingInsertionHandler implements IItemHandler
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 	{
 		return true;//TODO

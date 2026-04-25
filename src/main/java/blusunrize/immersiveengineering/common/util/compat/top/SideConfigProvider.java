@@ -19,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -30,13 +31,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SideConfigProvider implements IProbeInfoProvider
 {
 
-	@Override
-	public Identifier getID()
+	public ResourceLocation getID()
 	{
-		return ImmersiveEngineering.rl("side_config_info");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("side_config_info"));
 	}
 
-	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
 		BlockState blockState, IProbeHitData data)
 	{

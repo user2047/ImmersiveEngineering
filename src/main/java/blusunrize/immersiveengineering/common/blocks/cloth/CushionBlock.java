@@ -32,7 +32,6 @@ public class CushionBlock extends IEBaseBlock
 		super(props);
 	}
 
-	@Override
 	public void fallOn(Level w, BlockState state, BlockPos pos, Entity entity, float fallStrength)
 	{
 		entity.fallDistance = 0;

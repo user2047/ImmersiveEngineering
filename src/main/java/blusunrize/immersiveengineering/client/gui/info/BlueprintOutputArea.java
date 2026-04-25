@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.common.gui.IESlot.BlueprintOutput;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -36,7 +36,6 @@ public class BlueprintOutputArea extends InfoArea
 		this.slot = slot;
 	}
 
-	@Override
 	protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		if(!slot.isOnPage())
@@ -71,7 +70,6 @@ public class BlueprintOutputArea extends InfoArea
 			));
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		if(!slot.isOnPage())
@@ -80,6 +78,6 @@ public class BlueprintOutputArea extends InfoArea
 		if(ghostStack.isEmpty()||slot.hasItem())
 			return;
 		graphics.renderItem(ghostStack, area.getX(), area.getY());
-		graphics.fill(RenderType.guiGhostRecipeOverlay(), area.getX(), area.getY(), area.getX()+area.getWidth(), area.getY()+area.getHeight(), 0xbb333333);
+		graphics.fill(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.guiGhostRecipeOverlay(), area.getX(), area.getY(), area.getX()+area.getWidth(), area.getY()+area.getHeight(), 0xbb333333);
 	}
 }

@@ -38,7 +38,6 @@ public class CrateMenu extends AbstractContainerMenu implements IScreenMessageRe
 		for(int i = 0; i < container.getContainerSize(); i++)
 			this.addSlot(new Slot(container, i, 8+(i%9)*18, 18+(i/9)*18)
 			{
-				@Override
 				public boolean mayPlace(ItemStack stack)
 				{
 					return IEApi.isAllowedInCrate(stack);
@@ -57,17 +56,15 @@ public class CrateMenu extends AbstractContainerMenu implements IScreenMessageRe
 		this(type, id, inventoryPlayer, new SimpleContainer(WoodenCrateBlockEntity.CONTAINER_SIZE));
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
 		if(container instanceof WoodenCrateBlockEntity crate)
 		{
-			crate.setCustomName(Component.literal(nbt.getString("name")));
+			crate.setCustomName(Component.literal(nbt.getStringOr("name", "")));
 			crate.doGraphicalUpdates();
 		}
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player pPlayer)
 	{
 		return container.stillValid(pPlayer);

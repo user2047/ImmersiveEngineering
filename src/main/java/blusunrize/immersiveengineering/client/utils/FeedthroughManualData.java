@@ -12,7 +12,7 @@ import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks.Multibl
 import blusunrize.immersiveengineering.common.blocks.multiblocks.FeedthroughMultiblock;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
@@ -31,19 +31,16 @@ public class FeedthroughManualData implements MultiblockManualData
 			Util.make(new ItemStack(Blocks.BOOKSHELF, 1), s -> s.set(DataComponents.CUSTOM_NAME, ARBITRARY_SOLID))
 	));
 
-	@Override
 	public NonNullList<ItemStack> getTotalMaterials()
 	{
 		return materials.get();
 	}
 
-	@Override
 	public boolean canRenderFormedStructure()
 	{
 		return false;
 	}
 
-	@Override
 	public void renderFormedStructure(PoseStack transform, MultiBufferSource buffer)
 	{
 	}

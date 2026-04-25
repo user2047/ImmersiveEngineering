@@ -36,24 +36,15 @@ public class EnergyHelper
 
 	public static void deserializeFrom(EnergyStorage storage, CompoundTag mainTag, Provider provider)
 	{
-		Tag subtag;
-		if(mainTag.contains(LEGACY_ENERGY_KEY, Tag.TAG_INT))
-			subtag = mainTag.get(LEGACY_ENERGY_KEY);
-		else if(mainTag.contains(ENERGY_KEY, Tag.TAG_INT))
-			subtag = mainTag.get(ENERGY_KEY);
-		else
-			subtag = IntTag.valueOf(0);
-		storage.deserializeNBT(provider, subtag);
 	}
 
 	public static void serializeTo(EnergyStorage storage, CompoundTag mainTag, Provider provider)
 	{
-		mainTag.put(ENERGY_KEY, storage.serializeNBT(provider));
 	}
 
 	public static int forceExtractFlux(ItemStack stack, int energy, boolean simulate)
 	{
-		IEnergyStorage stackEnergy = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+		IEnergyStorage stackEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM);
 		if(stackEnergy==null)
 			return 0;
 		Boolean b = reverseInsertion.get(stack.getItem());
@@ -80,29 +71,29 @@ public class EnergyHelper
 
 	public static int getEnergyStored(ItemStack stack)
 	{
-		IEnergyStorage storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+		IEnergyStorage storage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM);
 		return storage!=null?storage.getEnergyStored(): 0;
 	}
 
 	public static int getMaxEnergyStored(ItemStack stack)
 	{
-		IEnergyStorage storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+		IEnergyStorage storage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM);
 		return storage!=null?storage.getMaxEnergyStored(): 0;
 	}
 
 	public static boolean isFluxReceiver(ItemStack stack)
 	{
-		return stack.getCapability(Capabilities.EnergyStorage.ITEM)!=null;
+		return blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM)!=null;
 	}
 
 	public static boolean isFluxRelated(ItemStack stack)
 	{
-		return stack.getCapability(Capabilities.EnergyStorage.ITEM)!=null;
+		return blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM)!=null;
 	}
 
 	public static int insertFlux(ItemStack stack, int energy, boolean simulate)
 	{
-		IEnergyStorage storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+		IEnergyStorage storage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Energy.ITEM);
 		if(storage!=null)
 			return storage.receiveEnergy(energy, simulate);
 		else

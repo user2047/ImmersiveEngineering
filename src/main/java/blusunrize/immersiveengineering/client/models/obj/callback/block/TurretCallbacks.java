@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import com.mojang.datafixers.util.Unit;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -24,13 +24,11 @@ public class TurretCallbacks implements BlockCallback<Unit>
 {
 	public static final TurretCallbacks INSTANCE = new TurretCallbacks();
 
-	@Override
 	public Unit extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		return getDefaultKey();
 	}
 
-	@Override
 	public Unit getDefaultKey()
 	{
 		return Unit.INSTANCE;
@@ -38,7 +36,6 @@ public class TurretCallbacks implements BlockCallback<Unit>
 
 	private static final IEObjState STATE = new IEObjState(VisibilityList.show("base"));
 
-	@Override
 	public IEObjState getIEOBJState(Unit unit)
 	{
 		return STATE;

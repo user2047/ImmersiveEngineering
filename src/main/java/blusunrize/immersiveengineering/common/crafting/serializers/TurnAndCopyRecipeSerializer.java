@@ -23,7 +23,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import java.util.List;
 
-public class TurnAndCopyRecipeSerializer implements RecipeSerializer<TurnAndCopyRecipe>
+public class TurnAndCopyRecipeSerializer
 {
 	private record AdditionalData(List<Integer> copySlots, boolean quarter, boolean eights)
 	{
@@ -52,19 +52,22 @@ public class TurnAndCopyRecipeSerializer implements RecipeSerializer<TurnAndCopy
 
 	public static final DualMapCodec<RegistryFriendlyByteBuf, TurnAndCopyRecipe> CODECS = DualCompositeMapCodecs.composite(
 			AdditionalData.CODECS, AdditionalData::new,
-			new DualMapCodec<>(RecipeSerializer.SHAPED_RECIPE.codec(), RecipeSerializer.SHAPED_RECIPE.streamCodec()), AbstractShapedRecipe::toVanilla,
+			new DualMapCodec<>(ShapedRecipe.SERIALIZER.codec(), ShapedRecipe.SERIALIZER.streamCodec()), AbstractShapedRecipe::toVanilla,
 			AdditionalData::apply
 	);
 
-	@Override
 	public MapCodec<TurnAndCopyRecipe> codec()
 	{
 		return CODECS.mapCodec();
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, TurnAndCopyRecipe> streamCodec()
 	{
 		return CODECS.streamCodec();
+	}
+
+	public RecipeSerializer<TurnAndCopyRecipe> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

@@ -16,7 +16,6 @@ import java.util.function.Function;
 
 public record SiloTankShapes(int height, boolean offsetLegs) implements Function<BlockPos, VoxelShape>
 {
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		boolean isCenter = posInMultiblock.getX()==1&&posInMultiblock.getZ()==1;

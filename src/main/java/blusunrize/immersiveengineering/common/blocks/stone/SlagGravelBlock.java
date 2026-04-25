@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,19 +27,21 @@ public class SlagGravelBlock extends FallingBlock
 		super(properties);
 	}
 
-	@Override
 	protected MapCodec<? extends FallingBlock> codec()
 	{
 		return MapCodec.unit(this);
 	}
 
-	@Override
+	public int getDustColor(BlockState state, BlockGetter level, BlockPos pos)
+	{
+		return 0x6d6d6d;
+	}
+
 	public boolean isRandomlyTicking(BlockState state)
 	{
 		return true;
 	}
 
-	@Override
 	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand)
 	{
 		BlockPos posAbove = pos.above();

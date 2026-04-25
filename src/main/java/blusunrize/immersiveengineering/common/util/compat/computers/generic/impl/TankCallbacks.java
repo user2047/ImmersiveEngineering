@@ -27,7 +27,6 @@ public class TankCallbacks<T> extends Callback<T>
 		this.desc = desc;
 	}
 
-	@Override
 	public String renameMethod(String javaName)
 	{
 		return javaName.replace("Desc", capitalize(this.desc));

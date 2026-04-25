@@ -109,7 +109,6 @@ public class GuiReactiveList<E> extends Button
 		return this.maxOffset;
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
 		recalculateEntries();
@@ -181,7 +180,11 @@ public class GuiReactiveList<E> extends Button
 		}
 	}
 
-	@Override
+	protected void extractContents(GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
+	{
+		renderWidget(graphics, mx, my, partialTicks);
+	}
+
 	public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY)
 	{
 		if(deltaY!=0&&maxOffset > 0)
@@ -198,7 +201,6 @@ public class GuiReactiveList<E> extends Button
 
 	public int selectedOption = -1;
 
-	@Override
 	public boolean mouseClicked(double mx, double my, int key)
 	{
 		selectedOption = -1;
@@ -211,7 +213,6 @@ public class GuiReactiveList<E> extends Button
 					if(mmY >= i*fr.lineHeight&&mmY < (i+1)*fr.lineHeight)
 						selectedOption = offset+i;
 			}
-		super.mouseClicked(mx, my, key);
 		return selectedOption!=-1;
 	}
 }

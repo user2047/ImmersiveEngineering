@@ -42,8 +42,8 @@ public class ClocheRenderFunctions
 	public static void init()
 	{
 		// register farmland texture
-		ClocheRecipe.registerSoilTexture(Ingredient.of(new ItemStack(Items.DIRT), new ItemStack(Items.COARSE_DIRT),
-				new ItemStack(Items.GRASS_BLOCK), new ItemStack(Items.DIRT_PATH)), Identifier.withDefaultNamespace("block/farmland_moist"));
+		ClocheRecipe.registerSoilTexture(Ingredient.of(Items.DIRT, Items.COARSE_DIRT, Items.GRASS_BLOCK, Items.DIRT_PATH),
+				Identifier.withDefaultNamespace("block/farmland_moist"));
 
 		// register defaults
 		register("crop", RenderFunctionCrop.CODEC);
@@ -102,13 +102,11 @@ public class ClocheRenderFunctions
 			this.maxAge = cropAge.getSecond();
 		}
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.875f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			int age = Math.min(this.maxAge, Math.round(this.maxAge*growth));
@@ -120,7 +118,6 @@ public class ClocheRenderFunctions
 			return ImmutableList.of(Pair.of(state, new Transformation(null)));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -138,13 +135,11 @@ public class ClocheRenderFunctions
 			this.cropBlock = cropBlock;
 		}
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.6875f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			Transformation bottom = new Transformation(new Vector3f(0, growth-1, 0), null, null, null);
@@ -154,7 +149,6 @@ public class ClocheRenderFunctions
 					Pair.of(this.cropBlock.defaultBlockState(), top));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -172,13 +166,11 @@ public class ClocheRenderFunctions
 				RenderFunctionStem::new
 		);
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 1;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			PoseStack transform = new PoseStack();
@@ -206,7 +198,6 @@ public class ClocheRenderFunctions
 			}
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -224,13 +215,11 @@ public class ClocheRenderFunctions
 			this.cropBlock = cropBlock;
 		}
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.75f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			Vector3f transl = new Vector3f(0.5f-growth/2, 0, 0.5f-growth/2);
@@ -238,7 +227,6 @@ public class ClocheRenderFunctions
 			return ImmutableList.of(Pair.of(this.cropBlock.defaultBlockState(), new Transformation(transl, null, scale, null)));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -256,13 +244,11 @@ public class ClocheRenderFunctions
 			this.cropBlock = cropBlock;
 		}
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.75f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			Vector3f transl = new Vector3f(0.5f-growth/2, 0, 0.5f-growth/2);
@@ -273,7 +259,6 @@ public class ClocheRenderFunctions
 					Pair.of(this.cropBlock.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER), new Transformation(transl1, null, scale, null)));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -284,13 +269,11 @@ public class ClocheRenderFunctions
 	{
 		public static final DualMapCodec<? super RegistryFriendlyByteBuf, RenderFunctionChorus> CODEC = DualMapCodec.unit(new RenderFunctionChorus());
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.5f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			growth *= 2;
@@ -304,7 +287,6 @@ public class ClocheRenderFunctions
 					Pair.of(Blocks.CHORUS_FLOWER.defaultBlockState(), top));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;
@@ -333,13 +315,11 @@ public class ClocheRenderFunctions
 			this.doublingAge = doublingAge;
 		}
 
-		@Override
 		public float getScale(ItemStack seed, float growth)
 		{
 			return 0.6875f;
 		}
 
-		@Override
 		public Collection<Pair<BlockState, Transformation>> getBlocks(ItemStack stack, float growth)
 		{
 			int age = Math.min(this.maxAge, Math.round(this.maxAge*growth));
@@ -354,7 +334,6 @@ public class ClocheRenderFunctions
 			return ImmutableList.of(Pair.of(cropBlock.defaultBlockState().setValue(ageProperty, age), new Transformation(null)));
 		}
 
-		@Override
 		public DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction> codec()
 		{
 			return CODEC;

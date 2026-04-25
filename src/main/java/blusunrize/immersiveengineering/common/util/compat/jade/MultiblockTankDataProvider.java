@@ -18,6 +18,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.Sheetmeta
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.ProcessContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +31,6 @@ import java.util.List;
 
 public class MultiblockTankDataProvider<T extends IMultiblockState> implements IServerExtensionProvider<CompoundTag>, IClientExtensionProvider<CompoundTag, FluidView>
 {
-	@Override
 	public @Nullable List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor)
 	{
 		if(accessor.getTarget() instanceof IMultiblockBE<?> multiblockBE)
@@ -53,16 +53,14 @@ public class MultiblockTankDataProvider<T extends IMultiblockState> implements I
 	}
 
 
-	@Override
 	public List<ClientViewGroup<FluidView>> getClientGroups(Accessor<?> accessor, List<ViewGroup<CompoundTag>> list)
 	{
 		return ClientViewGroup.map(list, FluidView::readDefault, null);
 	}
 
-	@Override
-	public Identifier getUid()
+	public ResourceLocation getUid()
 	{
-		return ImmersiveEngineering.rl("multiblock_tank");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("multiblock_tank"));
 	}
 
 	private CompoundTag getTagFromTank(IFluidTank tank)

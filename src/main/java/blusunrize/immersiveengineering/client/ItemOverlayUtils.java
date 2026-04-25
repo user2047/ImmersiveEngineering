@@ -50,8 +50,7 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -67,7 +66,7 @@ import java.util.function.Predicate;
 import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 import static blusunrize.immersiveengineering.api.Lib.getRedstoneColorComponent;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class ItemOverlayUtils
 {
 	private static final List<SubtitleOffset> SUBTITLE_OFFSETS = List.of(
@@ -94,7 +93,7 @@ public class ItemOverlayUtils
 	public static void register(RegisterGuiLayersEvent ev)
 	{
 		ev.registerBelow(
-				VanillaGuiLayers.DEBUG_OVERLAY,
+				VanillaGuiLayers.CHAT,
 				GuiLayers.ITEMS,
 				ItemOverlayUtils::renderItemOverlays
 		);
@@ -230,7 +229,7 @@ public class ItemOverlayUtils
 		graphics.blitSprite(ieLoc("hud/gauge_full_empty"), -24, -68, 31, 62);
 
 		transform.translate(-23, -37, 0);
-		IFluidHandlerItem handler = equipped.getCapability(FluidHandler.ITEM);
+		IFluidHandlerItem handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(equipped, Capabilities.Fluid.ITEM);
 		if(handler!=null)
 		{
 			int capacity = -1;

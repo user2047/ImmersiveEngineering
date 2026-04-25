@@ -11,10 +11,13 @@ package blusunrize.lib.manual.utils;
 import blusunrize.lib.manual.ManualUtils;
 import blusunrize.lib.manual.PositionedItemStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -78,15 +81,30 @@ public class ManualRecipeRef
 	public <C extends RecipeInput, R extends Recipe<C>>
 	void forEachMatchingRecipe(RecipeType<R> type, Consumer<R> out)
 	{
-		RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
+		RecipeManager recipeManager = getRecipeManager();
+		if(recipeManager==null)
+			return;
 		if(isRecipeName())
-			recipeManager.byKey(getRecipeName())
+			recipeManager.byKey(ResourceKey.create(Registries.RECIPE, getRecipeName()))
 					.ifPresent(recipeHolder -> out.accept((R)recipeHolder.value()));
 		else
-			for(RecipeHolder<R> recipe : recipeManager.getAllRecipesFor(type))
+			for(RecipeHolder<?> recipe : recipeManager.getRecipes())
+			{
+				if(!recipe.value().getType().equals(type))
+					continue;
 				if(ManualUtils.stackMatchesObject(
-						recipe.value().getResultItem(Minecraft.getInstance().level.registryAccess()), getResult()
+						ManualUtils.getRecipeResult(recipe.value()), getResult()
 				))
-					out.accept(recipe.value());
+					out.accept((R)recipe.value());
+			}
+	}
+
+	@Nullable
+	private RecipeManager getRecipeManager()
+	{
+		Minecraft mc = Minecraft.getInstance();
+		if(mc.getSingleplayerServer()!=null)
+			return mc.getSingleplayerServer().getRecipeManager();
+		return null;
 	}
 }

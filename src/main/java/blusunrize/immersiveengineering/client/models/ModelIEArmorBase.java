@@ -11,41 +11,34 @@ package blusunrize.immersiveengineering.client.models;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Skeleton;
-import net.minecraft.world.entity.monster.Zombie;
 
 import java.util.function.Function;
 
-public abstract class ModelIEArmorBase extends HumanoidModel<LivingEntity>
+public abstract class ModelIEArmorBase extends HumanoidModel
 {
+	private float attackTime;
+
 	public ModelIEArmorBase(ModelPart p_170679_, Function<Identifier, RenderType> p_170680_)
 	{
 		super(p_170679_, p_170680_);
 	}
 
-	@Override
 	public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
 	{
 		attackTime = entity.getAttackAnim(ClientUtils.partialTicks());
 		if(entity instanceof ArmorStand)
 			setRotationAnglesStand(entity);
-		else if(entity instanceof Skeleton||entity instanceof Zombie)
-			setRotationAnglesZombie(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		else
-			super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-		young = entity.isBaby();
-		crouching = entity.isShiftKeyDown();
-		riding = entity.isPassenger()&&(entity.getVehicle()!=null&&entity.getVehicle().shouldRiderSit());
+			setRotationAnglesZombie(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 	}
 
 	public void setRotationAnglesZombie(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
 	{
-		super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		float f6 = Mth.sin(this.attackTime*3.141593F);
 		float f7 = Mth.sin((1.0F-(1.0F-this.attackTime)*(1.0F-this.attackTime))*3.141593F);
 		this.rightArm.zRot = 0.0F;
@@ -66,28 +59,28 @@ public abstract class ModelIEArmorBase extends HumanoidModel<LivingEntity>
 	{
 		if(entity instanceof ArmorStand entityarmorstand)
 		{
-			this.head.xRot = (0.01745329F*entityarmorstand.getHeadPose().getX());
-			this.head.yRot = (0.01745329F*entityarmorstand.getHeadPose().getY());
-			this.head.zRot = (0.01745329F*entityarmorstand.getHeadPose().getZ());
+			this.head.xRot = (0.01745329F*entityarmorstand.getHeadPose().x());
+			this.head.yRot = (0.01745329F*entityarmorstand.getHeadPose().y());
+			this.head.zRot = (0.01745329F*entityarmorstand.getHeadPose().z());
 			this.head.setPos(0.0F, 1.0F, 0.0F);
-			this.body.xRot = (0.01745329F*entityarmorstand.getBodyPose().getX());
-			this.body.yRot = (0.01745329F*entityarmorstand.getBodyPose().getY());
-			this.body.zRot = (0.01745329F*entityarmorstand.getBodyPose().getZ());
-			this.leftArm.xRot = (0.01745329F*entityarmorstand.getLeftArmPose().getX());
-			this.leftArm.yRot = (0.01745329F*entityarmorstand.getLeftArmPose().getY());
-			this.leftArm.zRot = (0.01745329F*entityarmorstand.getLeftArmPose().getZ());
-			this.rightArm.xRot = (0.01745329F*entityarmorstand.getRightArmPose().getX());
-			this.rightArm.yRot = (0.01745329F*entityarmorstand.getRightArmPose().getY());
-			this.rightArm.zRot = (0.01745329F*entityarmorstand.getRightArmPose().getZ());
-			this.leftLeg.xRot = (0.01745329F*entityarmorstand.getLeftLegPose().getX());
-			this.leftLeg.yRot = (0.01745329F*entityarmorstand.getLeftLegPose().getY());
-			this.leftLeg.zRot = (0.01745329F*entityarmorstand.getLeftLegPose().getZ());
+			this.body.xRot = (0.01745329F*entityarmorstand.getBodyPose().x());
+			this.body.yRot = (0.01745329F*entityarmorstand.getBodyPose().y());
+			this.body.zRot = (0.01745329F*entityarmorstand.getBodyPose().z());
+			this.leftArm.xRot = (0.01745329F*entityarmorstand.getLeftArmPose().x());
+			this.leftArm.yRot = (0.01745329F*entityarmorstand.getLeftArmPose().y());
+			this.leftArm.zRot = (0.01745329F*entityarmorstand.getLeftArmPose().z());
+			this.rightArm.xRot = (0.01745329F*entityarmorstand.getRightArmPose().x());
+			this.rightArm.yRot = (0.01745329F*entityarmorstand.getRightArmPose().y());
+			this.rightArm.zRot = (0.01745329F*entityarmorstand.getRightArmPose().z());
+			this.leftLeg.xRot = (0.01745329F*entityarmorstand.getLeftLegPose().x());
+			this.leftLeg.yRot = (0.01745329F*entityarmorstand.getLeftLegPose().y());
+			this.leftLeg.zRot = (0.01745329F*entityarmorstand.getLeftLegPose().z());
 			this.leftLeg.setPos(1.9F, 11.0F, 0.0F);
-			this.rightLeg.xRot = (0.01745329F*entityarmorstand.getRightLegPose().getX());
-			this.rightLeg.yRot = (0.01745329F*entityarmorstand.getRightLegPose().getY());
-			this.rightLeg.zRot = (0.01745329F*entityarmorstand.getRightLegPose().getZ());
+			this.rightLeg.xRot = (0.01745329F*entityarmorstand.getRightLegPose().x());
+			this.rightLeg.yRot = (0.01745329F*entityarmorstand.getRightLegPose().y());
+			this.rightLeg.zRot = (0.01745329F*entityarmorstand.getRightLegPose().z());
 			this.rightLeg.setPos(-1.9F, 11.0F, 0.0F);
-			this.hat.copyFrom(this.head);
+			this.hat.loadPose(this.head.storePose());
 		}
 	}
 }

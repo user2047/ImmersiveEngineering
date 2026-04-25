@@ -43,7 +43,6 @@ public class RailgunAttackGoal<T extends Fusilier> extends Goal
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
 	}
 
-	@Override
 	public boolean canUse()
 	{
 		return this.isValidTarget()&&this.isHoldingRailgun();
@@ -55,7 +54,6 @@ public class RailgunAttackGoal<T extends Fusilier> extends Goal
 	}
 
 
-	@Override
 	public boolean canContinueToUse()
 	{
 		return this.isValidTarget()&&(this.canUse()||!this.mob.getNavigation().isDone())&&this.isHoldingRailgun();
@@ -67,7 +65,6 @@ public class RailgunAttackGoal<T extends Fusilier> extends Goal
 	}
 
 
-	@Override
 	public void stop()
 	{
 		super.stop();

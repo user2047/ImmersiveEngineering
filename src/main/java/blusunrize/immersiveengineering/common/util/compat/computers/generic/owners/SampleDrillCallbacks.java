@@ -30,7 +30,6 @@ public class SampleDrillCallbacks extends CallbackOwner<SampleDrillBlockEntity>
 		addAdditional(EnergyCallbacks.INSTANCE);
 	}
 
-	@Override
 	public boolean canAttachTo(SampleDrillBlockEntity candidate)
 	{
 		return !candidate.isDummy();

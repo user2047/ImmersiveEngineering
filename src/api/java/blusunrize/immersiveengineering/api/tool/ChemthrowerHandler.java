@@ -119,12 +119,10 @@ public class ChemthrowerHandler
 		{
 			if(this.source!=null)
 			{
-				if(target.hurt(source, damage))
-				{
-					target.invulnerableTime = (int)(target.invulnerableTime*.75);
-					if(source.is(DamageTypeTags.IS_FIRE)&&!target.fireImmune())
-						target.igniteForSeconds(fluid.is(Tags.Fluids.GASEOUS)?2: 5);
-				}
+				target.hurt(source, damage);
+				target.invulnerableTime = (int)(target.invulnerableTime*.75);
+				if(source.is(DamageTypeTags.IS_FIRE)&&!target.fireImmune())
+					target.igniteForSeconds(fluid.is(Tags.Fluids.GASEOUS)?2: 5);
 			}
 		}
 
@@ -169,8 +167,8 @@ public class ChemthrowerHandler
 					{
 						MobEffectInstance e = this.potionEffects[iEffect];
 						MobEffect effect = e.getEffect().value();
-						if(effect.isInstantenous())
-							effect.applyInstantenousEffect(projectile, shooter, target, e.getAmplifier(), 1);
+						if(effect.isInstantenous()&&target.level() instanceof net.minecraft.server.level.ServerLevel serverLevel)
+							effect.applyInstantenousEffect(serverLevel, projectile, shooter, target, e.getAmplifier(), 1);
 						else
 						{
 							MobEffectInstance newEffect = new MobEffectInstance(e.getEffect(), e.getDuration(), e.getAmplifier());
@@ -197,8 +195,10 @@ public class ChemthrowerHandler
 				target.clearFire();
 
 			if(target instanceof Blaze||target instanceof EnderMan)
-				if(target.hurt(getPlayerDrownDamage(shooter, target.damageSources()), 3))
-					target.invulnerableTime = (int)(target.invulnerableTime*.75);
+			{
+				target.hurt(getPlayerDrownDamage(shooter, target.damageSources()), 3);
+				target.invulnerableTime = (int)(target.invulnerableTime*.75);
+			}
 		}
 
 		@Override

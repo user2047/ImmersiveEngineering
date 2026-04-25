@@ -21,7 +21,6 @@ public class AlloySmelterMultiblock extends StoneMultiblock
 				IEMultiblockLogic.ALLOY_SMELTER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 20;

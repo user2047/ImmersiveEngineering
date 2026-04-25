@@ -18,7 +18,6 @@ import blusunrize.immersiveengineering.common.entities.RevolvershotEntity;
 import blusunrize.immersiveengineering.common.entities.SawbladeEntity;
 import blusunrize.immersiveengineering.mixin.accessors.DamageSourcesAccess;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,7 +43,6 @@ public class IEDamageSources
 			dmg = amount;
 		}
 
-		@Override
 		public boolean apply(Entity e)
 		{
 			if(e instanceof LivingEntity living)
@@ -54,7 +52,6 @@ public class IEDamageSources
 			return dmg > 0;
 		}
 
-		@Override
 		public float getDamage()
 		{
 			return dmg;
@@ -179,7 +176,6 @@ public class IEDamageSources
 
 	private static Holder<DamageType> typeHolder(Level level, ResourceKey<DamageType> typeKey)
 	{
-		final Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-		return registry.getHolderOrThrow(typeKey);
+		return level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(typeKey);
 	}
 }

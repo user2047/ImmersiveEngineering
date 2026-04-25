@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -67,7 +67,6 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 			}));
 	}
 
-	@Override
 	public VoxelShape getShape(@Nullable CollisionContext ctx, ShapeType type)
 	{
 		final BlockPos posInMB = getPositionInMB();
@@ -82,32 +81,29 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 		return absoluteShape;
 	}
 
-	@Override
 	public CapabilityPosition getCapabilityPosition(@Nullable Direction side)
 	{
 		final RelativeBlockFace relativeSide = RelativeBlockFace.from(orientation, side);
 		return new CapabilityPosition(getPositionInMB(), relativeSide);
 	}
 
-	@Override
-	public ItemInteractionResult click(Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult click(Player player, InteractionHand hand, BlockHitResult hit)
 	{
 		final MultiblockBEHelperMaster<State> helper = getMasterHelper();
 		if(helper==null)
-			return ItemInteractionResult.FAIL;
+			return InteractionResult.FAIL;
 		final MultiblockContext<State> ctx = helper.getContext();
 		for(final ComponentInstance<?> component : helper.getComponentInstances())
 		{
-			final ItemInteractionResult componentResult = component.click(
-					getPositionInMB(), player, hand, hit, player.level().isClientSide
+			final InteractionResult componentResult = component.click(
+					getPositionInMB(), player, hand, hit, player.level().isClientSide()
 			);
-			if(componentResult!=ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION)
+			if(componentResult!=InteractionResult.PASS)
 				return componentResult;
 		}
-		return multiblock.logic().click(ctx, getPositionInMB(), player, hand, hit, player.level().isClientSide);
+		return multiblock.logic().click(ctx, getPositionInMB(), player, hand, hit, player.level().isClientSide());
 	}
 
-	@Override
 	public void disassemble()
 	{
 		if(beingDisassembled)
@@ -126,7 +122,6 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 		levelRaw.removeBlock(absolutePos, false);
 	}
 
-	@Override
 	public void onEntityCollided(Entity collided)
 	{
 		final MultiblockBEHelperMaster<State> helper = getMasterHelper();
@@ -143,13 +138,11 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 	@Nullable
 	protected abstract MultiblockBEHelperMaster<State> getMasterHelper();
 
-	@Override
 	public void markDisassembling()
 	{
 		beingDisassembled = true;
 	}
 
-	@Override
 	public int getComparatorValue()
 	{
 		if(!multiblock.hasComparatorOutput())
@@ -158,19 +151,17 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 		final MultiblockBEHelperMaster<State> masterHelper = getMasterHelper();
 		if(masterHelper==null)
 			return 0;
-		return masterHelper.getCurrentComparatorOutputs().getInt(getPositionInMB());
+		return masterHelper.getCurrentComparatorOutputs().getOrDefault(getPositionInMB(), 0);
 	}
 
-	@Override
 	public void onNeighborChanged(BlockPos fromPos)
 	{
 		BlockPos delta = fromPos.subtract(be.getBlockPos());
-		Direction sideAbsolute = Direction.getNearest(delta.getX(), delta.getY(), delta.getZ());
+		Direction sideAbsolute = Direction.getNearest(delta.getX(), delta.getY(), delta.getZ(), Direction.NORTH);
 		Preconditions.checkNotNull(sideAbsolute);
 		updateRedstoneValue(sideAbsolute, fromPos);
 	}
 
-	@Override
 	public int getRedstoneInput(RelativeBlockFace side)
 	{
 		if(cachedRedstoneValues.containsKey(side))
@@ -183,7 +174,6 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 		}
 	}
 
-	@Override
 	public BlockState getOriginalBlock(Level level)
 	{
 		IMultiblockLogic<State> logic = getMultiblock().logic();
@@ -202,7 +192,6 @@ public abstract class MultiblockBEHelperCommon<State extends IMultiblockState> i
 		return Blocks.AIR.defaultBlockState();
 	}
 
-	@Override
 	public ItemStack getPickBlock()
 	{
 		final Level level = be.getLevel();

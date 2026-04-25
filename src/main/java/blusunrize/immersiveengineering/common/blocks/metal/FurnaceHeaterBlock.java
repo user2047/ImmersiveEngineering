@@ -22,7 +22,6 @@ public class FurnaceHeaterBlock extends IEEntityBlock<FurnaceHeaterBlockEntity>
 		super(IEBlockEntities.FURNACE_HEATER, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

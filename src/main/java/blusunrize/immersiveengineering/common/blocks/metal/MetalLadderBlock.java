@@ -88,7 +88,6 @@ public class MetalLadderBlock extends LadderBlock implements IHammerBlockInterac
 		this.type = type;
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx)
 	{
 		VoxelShape base = super.getShape(state, world, pos, ctx);
@@ -102,7 +101,6 @@ public class MetalLadderBlock extends LadderBlock implements IHammerBlockInterac
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
 		BlockState baseState = super.getStateForPlacement(ctx);
@@ -114,7 +112,6 @@ public class MetalLadderBlock extends LadderBlock implements IHammerBlockInterac
 			return baseState.setValue(LadderBlock.FACING, Direction.fromYRot(ctx.getRotation()).getOpposite());
 	}
 
-	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
 		if(type==CoverType.NONE)
@@ -123,13 +120,11 @@ public class MetalLadderBlock extends LadderBlock implements IHammerBlockInterac
 			return true;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> state)
 	{
 		state.add(FACING, WATERLOGGED, OPEN);
 	}
 
-	@Override
 	public InteractionResult useHammer(BlockState state, Level world, BlockPos pos, Player player, UseOnContext context)
 	{
 		if(player==null)

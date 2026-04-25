@@ -12,6 +12,7 @@ import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.client.TextUtils;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
+import blusunrize.immersiveengineering.common.register.IEItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -25,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -35,6 +37,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class BlockItemIE extends BlockItem
 {
@@ -47,33 +50,26 @@ public class BlockItemIE extends BlockItem
 
 	public BlockItemIE(Block b)
 	{
-		this(b, new Item.Properties());
+		this(b, IEItems.defaultProperties());
 	}
 
-	@Override
-	public String getDescriptionId()
-	{
-		return getBlock().getDescriptionId();
-	}
-
-	@Override
-	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag advanced)
 	{
 		if(getBlock() instanceof IIEBlock ieBlock&&ieBlock.hasFlavour())
 		{
 			String flavourKey = Lib.DESC_FLAVOUR+ieBlock.getNameForFlavour();
-			tooltip.add(TextUtils.applyFormat(Component.translatable(flavourKey), ChatFormatting.GRAY));
+			tooltip.accept(TextUtils.applyFormat(Component.translatable(flavourKey), ChatFormatting.GRAY));
 		}
-		super.appendHoverText(stack, ctx, tooltip, advanced);
+		super.appendHoverText(stack, ctx, display, tooltip, advanced);
 		if(stack.has(IEDataComponents.GENERIC_ENERGY))
-			tooltip.add(TextUtils.applyFormat(
+			tooltip.accept(TextUtils.applyFormat(
 					Component.translatable(Lib.DESC_INFO+"energyStored", stack.get(IEDataComponents.GENERIC_ENERGY)),
 					ChatFormatting.GRAY
 			));
 		if(stack.has(IEDataComponents.GENERIC_FLUID))
 		{
 			var fs = stack.get(IEDataComponents.GENERIC_FLUID).copy();
-			tooltip.add(Component.translatable(
+			tooltip.accept(Component.translatable(
 					Lib.DESC_INFO+"fluidStored", fs.getHoverName(), fs.getAmount()
 			).withStyle(ChatFormatting.GRAY));
 		}
@@ -86,13 +82,11 @@ public class BlockItemIE extends BlockItem
 		return this;
 	}
 
-	@Override
 	public int getBurnTime(ItemStack itemStack, RecipeType<?> type)
 	{
 		return this.burnTime;
 	}
 
-	@Override
 	protected boolean placeBlock(BlockPlaceContext context, BlockState newState)
 	{
 		Block b = newState.getBlock();
@@ -109,7 +103,6 @@ public class BlockItemIE extends BlockItem
 			return super.placeBlock(context, newState);
 	}
 
-	@Override
 	protected boolean updateCustomBlockEntityTag(BlockPos pos, Level worldIn, @Nullable Player player, ItemStack stack, BlockState state)
 	{
 		// Skip reading the tile from NBT if the block is a (general) multiblock
@@ -120,16 +113,14 @@ public class BlockItemIE extends BlockItem
 	}
 
 	@Nonnull
-	@Override
 	public Optional<TooltipComponent> getTooltipImage(@Nonnull ItemStack stack)
 	{
 		final ItemContainerContents items = stack.get(DataComponents.CONTAINER);
 		if(items!=null)
-			return Optional.of(new BundleTooltip(new BundleContents(items.stream().toList())));
+			return super.getTooltipImage(stack);
 		return super.getTooltipImage(stack);
 	}
 
-	@Override
 	public boolean canFitInsideContainerItems()
 	{
 		return !(getBlock() instanceof IEBaseBlock ieBlock)||ieBlock.fitsIntoContainer();

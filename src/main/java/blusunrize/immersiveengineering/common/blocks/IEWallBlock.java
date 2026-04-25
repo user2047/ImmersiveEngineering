@@ -24,13 +24,11 @@ public class IEWallBlock extends WallBlock implements IIEBlock
 		this.base = base;
 	}
 
-	@Override
 	public boolean hasFlavour()
 	{
 		return base.get().hasFlavour();
 	}
 
-	@Override
 	public String getNameForFlavour()
 	{
 		return base.get().getNameForFlavour();

@@ -32,19 +32,16 @@ public record WrappingItemHandler(
 		this(wrapped, allowInsert, allowExtract, new IntRange(0, wrapped.getSlots()));
 	}
 
-	@Override
 	public int getSlots()
 	{
 		return wrapped.getSlots();
 	}
 
-	@Override
 	public @NotNull ItemStack getStackInSlot(int slot)
 	{
 		return wrapped.getStackInSlot(slot);
 	}
 
-	@Override
 	public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)
 	{
 		if(!allowInsert||!isAcessible(slot))
@@ -52,7 +49,6 @@ public record WrappingItemHandler(
 		return wrapped.insertItem(slot, stack, simulate);
 	}
 
-	@Override
 	public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		if(!allowExtract||!isAcessible(slot))
@@ -60,13 +56,11 @@ public record WrappingItemHandler(
 		return wrapped.extractItem(slot, amount, simulate);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return Math.min(64, wrapped.getSlotLimit(slot));
 	}
 
-	@Override
 	public boolean isItemValid(int slot, @NotNull ItemStack stack)
 	{
 		return isAcessible(slot)&&wrapped.isItemValid(slot, stack);

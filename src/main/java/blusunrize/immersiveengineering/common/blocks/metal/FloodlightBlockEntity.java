@@ -35,7 +35,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -81,7 +81,6 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		super(IEBlockEntities.FLOODLIGHT.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(turnCooldown > 0)
@@ -271,13 +270,11 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 	}
 
 
-	@Override
 	public double getInterdictionRangeSquared()
 	{
 		return getIsActive()?1024: 0;
 	}
 
-	@Override
 	public void setRemovedIE()
 	{
 		SpawnInterdictionHandler.removeFromInterdictionTiles(this);
@@ -287,41 +284,38 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		super.setRemovedIE();
 	}
 
-	@Override
 	public void onChunkUnloaded()
 	{
 		SpawnInterdictionHandler.removeFromInterdictionTiles(this);
 		super.onChunkUnloaded();
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
 		SpawnInterdictionHandler.addInterdictionTile(this);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		energyStorage = nbt.getInt("energy");
-		redstoneControlInverted = nbt.getBoolean("redstoneControlInverted");
-		facing = Direction.from3DDataValue(nbt.getInt("facing"));
-		rotY = nbt.getFloat("rotY");
-		rotX = nbt.getFloat("rotX");
-		int lightAmount = nbt.getInt("lightAmount");
+		energyStorage = nbt.getIntOr("energy", 0);
+		redstoneControlInverted = nbt.getBooleanOr("redstoneControlInverted", false);
+		facing = Direction.from3DDataValue(nbt.getIntOr("facing", 0));
+		rotY = nbt.getFloatOr("rotY", 0);
+		rotX = nbt.getFloatOr("rotX", 0);
+		int lightAmount = nbt.getIntOr("lightAmount", 0);
 		fakeLights.clear();
 		for(int i = 0; i < lightAmount; i++)
 		{
-			int[] icc = nbt.getIntArray("fakeLight_"+i);
+			int[] icc = nbt.getIntArray("fakeLight_"+i).orElse(new int[0]);
 			fakeLights.add(new BlockPos(icc[0], icc[1], icc[2]));
 		}
-		if(level!=null&&level.isClientSide)
+		if(level!=null&&level.isClientSide())
 			this.markContainingBlockForUpdate(null);
 		if(descPacket&&nbt.contains("computerOn"))
 		{
-			boolean computerOn = nbt.getBoolean("computerOn");
+			boolean computerOn = nbt.getBooleanOr("computerOn", false);
 			computerControl.setOneRef();
 			computerControl.setEnabled(computerOn);
 		}
@@ -331,7 +325,6 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 			checkLight();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -350,7 +343,6 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 			nbt.putBoolean("computerOn", computerControl.isEnabled());
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==1)
@@ -362,13 +354,11 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		return super.triggerEvent(id, arg);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return WireType.LV_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		BlockPos otherPos = other.position();
@@ -398,7 +388,6 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		return new Vec3(x, y, z);
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return Shapes.box(
@@ -411,10 +400,9 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		);
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			if(side.getAxis()==this.getFacing().getAxis())
 				turnY(player.isShiftKeyDown(), false);
@@ -424,41 +412,33 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		return true;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			redstoneControlInverted = !redstoneControlInverted;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")),
-					true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
 			setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public void onDirectionalPlacement(Direction side, float hitX, float hitY, float hitZ, LivingEntity placer)
 	{
 		Direction f = Direction.fromYRot(placer.getYRot());
@@ -509,19 +489,16 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		}
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return true;
 	}
 
-	@Override
 	public int getRequestedEnergy()
 	{
 		if(energyStorage < maximumStorage)
@@ -529,13 +506,11 @@ public class FloodlightBlockEntity extends ImmersiveConnectableBlockEntity imple
 		return 0;
 	}
 
-	@Override
 	public void insertEnergy(int amount)
 	{
 		energyStorage += amount;
 	}
 
-	@Override
 	public Stream<ComputerControlState> getAllComputerControlStates()
 	{
 		return Stream.of(computerControl);

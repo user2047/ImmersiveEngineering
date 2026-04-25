@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.common.util;
 import blusunrize.immersiveengineering.api.tool.ExternalHeaterHandler;
 import blusunrize.immersiveengineering.api.tool.ExternalHeaterHandler.IExternalHeatable;
 import blusunrize.immersiveengineering.mixin.accessors.FurnaceTEAccess;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -36,20 +37,21 @@ public class VanillaFurnaceHeater implements IExternalHeatable
 		ItemStack input = furnace.getItem(DATA_LIT_TIME);
 		if(input.isEmpty())
 			return false;
-		var output = ((FurnaceTEAccess)furnace).getQuickCheck().getRecipeFor(new SingleRecipeInput(furnace.getItem(0)), furnace.getLevel());
+		if(!(furnace.getLevel() instanceof ServerLevel serverLevel))
+			return false;
+		var output = ((FurnaceTEAccess)furnace).getQuickCheck().getRecipeFor(new SingleRecipeInput(furnace.getItem(0)), serverLevel);
 		if(output.isEmpty())
 			return false;
 		ItemStack existingOutput = furnace.getItem(2);
 		if(existingOutput.isEmpty())
 			return true;
-		ItemStack outStack = output.get().value().getResultItem(furnace.getLevel().registryAccess());
+		ItemStack outStack = output.get().value().assemble(new SingleRecipeInput(furnace.getItem(0)));
 		if(!ItemStack.isSameItem(existingOutput, outStack))
 			return false;
 		int stackSize = existingOutput.getCount()+outStack.getCount();
 		return stackSize <= furnace.getMaxStackSize()&&stackSize <= outStack.getMaxStackSize();
 	}
 
-	@Override
 	public int doHeatTick(int energyAvailable, boolean redstone)
 	{
 		long now = furnace.getLevel().getGameTime();

@@ -64,7 +64,6 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 		this.pickup = Pickup.DISALLOWED;
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -88,7 +87,6 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 		return fluid;
 	}
 
-	@Override
 	public double getDefaultGravity()
 	{
 		if(getFluid().isEmpty())
@@ -98,16 +96,14 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 		return (isGas?.025f: .05F)*(fluidStack.getFluid().getFluidType().getDensity(fluidStack) < 0?-1: 1);
 	}
 
-	@Override
 	public boolean canIgnite()
 	{
 		return ChemthrowerHandler.isFlammable(getFluid().getFluid());
 	}
 
-	@Override
 	public void baseTick()
 	{
-		if(this.level().isClientSide)
+		if(this.level().isClientSide())
 			this.fluid = getFluidSynced();
 		BlockState state = level().getBlockState(blockPosition());
 		// TODO this is a very rough port of the previous material-based check
@@ -116,7 +112,6 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 		super.baseTick();
 	}
 
-	@Override
 	public void igniteForTicks(int p_320711_)
 	{
 		if(!canIgnite())
@@ -124,10 +119,9 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 		super.igniteForTicks(p_320711_);
 	}
 
-	@Override
 	public void onHit(HitResult mop)
 	{
-		if(this.level().isClientSide||getFluid().isEmpty())
+		if(this.level().isClientSide()||getFluid().isEmpty())
 			return;
 		FluidStack fluidStack = getFluid();
 		Fluid fluid = fluidStack.getFluid();
@@ -150,8 +144,8 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 			int tempDiff = fluid.getFluidType().getTemperature(fluidStack)-300;
 			int damage = Math.abs(tempDiff)/500;
 			Entity hit = ((EntityHitResult)mop).getEntity();
-			if(hit.hurt(hit.damageSources().lava(), damage))
-				hit.invulnerableTime = (int)(hit.invulnerableTime*.75);
+			hit.hurt(hit.damageSources().lava(), damage);
+			hit.invulnerableTime = (int)(hit.invulnerableTime*.75);
 		}
 		if(mop.getType()==Type.ENTITY)
 		{
@@ -160,8 +154,8 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 			{
 				Entity hit = ((EntityHitResult)mop).getEntity();
 				hit.igniteForSeconds(f);
-				if(hit.hurt(hit.damageSources().inFire(), 2))
-					hit.invulnerableTime = (int)(hit.invulnerableTime*.75);
+				hit.hurt(hit.damageSources().inFire(), 2);
+				hit.invulnerableTime = (int)(hit.invulnerableTime*.75);
 			}
 		}
 	}
@@ -181,7 +175,6 @@ public class ChemthrowerShotEntity extends IEProjectileEntity
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getDefaultPickupItem()
 	{
 		return Items.WATER_BUCKET.getDefaultInstance();

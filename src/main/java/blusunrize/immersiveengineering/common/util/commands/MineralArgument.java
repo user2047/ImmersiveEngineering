@@ -36,7 +36,6 @@ public class MineralArgument implements ArgumentType<RecipeHolder<MineralMix>>
 	public static final DynamicCommandExceptionType invalidVein = new DynamicCommandExceptionType(
 			(input) -> Component.translatable(Lib.CHAT_COMMAND+"mineral.invalid", input));
 
-	@Override
 	public RecipeHolder<MineralMix> parse(StringReader reader) throws CommandSyntaxException
 	{
 		String name = reader.readQuotedString();//TODO does this work properly?
@@ -46,13 +45,11 @@ public class MineralArgument implements ArgumentType<RecipeHolder<MineralMix>>
 		throw invalidVein.create(name);
 	}
 
-	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 	{
 		return SharedSuggestionProvider.suggest(getStaticMinerals().stream().map(mix -> "\""+mix.id()+"\""), builder);
 	}
 
-	@Override
 	public Collection<String> getExamples()
 	{
 		List<String> ret = new ArrayList<>();

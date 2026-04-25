@@ -31,7 +31,6 @@ public class WindowBlock extends IEBaseBlock
 		super(blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -43,7 +42,6 @@ public class WindowBlock extends IEBaseBlock
 		return Direction.NORTH;
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		BlockState ret = super.getInitDefaultState();
@@ -55,7 +53,6 @@ public class WindowBlock extends IEBaseBlock
 		return this.defaultBlockState().setValue(IEProperties.FACING_ALL, pContext.getNearestLookingDirection());
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		Direction facing = state.getValue(IEProperties.FACING_ALL);

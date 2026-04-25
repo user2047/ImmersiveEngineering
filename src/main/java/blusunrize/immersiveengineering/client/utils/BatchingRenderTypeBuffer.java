@@ -12,7 +12,7 @@ package blusunrize.immersiveengineering.client.utils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -25,7 +25,6 @@ public class BatchingRenderTypeBuffer implements MultiBufferSource
 	private final Map<RenderType, CollectingVertexBuilder> builders = new HashMap<>();
 
 	@Nonnull
-	@Override
 	public VertexConsumer getBuffer(@Nonnull RenderType type)
 	{
 		return builders.computeIfAbsent(type, s -> new CollectingVertexBuilder());
@@ -34,7 +33,7 @@ public class BatchingRenderTypeBuffer implements MultiBufferSource
 	public void pipe(MultiBufferSource out)
 	{
 		// Glint uses GL_EQUAL for depth, so it needs to be drawn after everything else
-		Collection<RenderType> delay = ImmutableList.of(RenderType.glint(), RenderType.entityGlint());
+		Collection<RenderType> delay = ImmutableList.of(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.glint(), blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entityGlint());
 		for(Entry<RenderType, CollectingVertexBuilder> e : builders.entrySet())
 			if(!delay.contains(e.getKey()))
 				e.getValue().pipeAndClear(out.getBuffer(e.getKey()));

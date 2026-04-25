@@ -34,12 +34,11 @@ public class SplitModelLoader implements IGeometryLoader<UnbakedSplitModel>
 	public static final String DYNAMIC = "dynamic";
 
 	@Nonnull
-	@Override
 	public UnbakedSplitModel read(JsonObject modelContents, @Nonnull JsonDeserializationContext deserializationContext)
 	{
 		UnbakedModel baseModel;
 		JsonElement innerJson = modelContents.get(INNER_MODEL);
-		baseModel = ExtendedBlockModelDeserializer.INSTANCE.fromJson(innerJson, BlockModel.class);
+		baseModel = (UnbakedModel)(Object)ExtendedBlockModelDeserializer.INSTANCE.fromJson(innerJson, BlockModel.class);
 		JsonArray partsJson = modelContents.getAsJsonArray(PARTS);
 		List<Vec3i> parts = new ArrayList<>(partsJson.size());
 		for(JsonElement e : partsJson)

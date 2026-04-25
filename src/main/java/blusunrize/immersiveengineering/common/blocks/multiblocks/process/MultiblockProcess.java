@@ -42,7 +42,7 @@ public abstract class MultiblockProcess<R extends MultiblockRecipe, CTX extends 
 
 	public MultiblockProcess(RecipeHolder<R> recipe)
 	{
-		this.recipeId = recipe.id();
+		this.recipeId = recipe.id().identifier();
 		this.getRecipe = ($, $1) -> {
 			throw new RuntimeException("A process initialized with a recipe should never query recipes");
 		};
@@ -54,8 +54,8 @@ public abstract class MultiblockProcess<R extends MultiblockRecipe, CTX extends 
 			BiFunction<Level, Identifier, R> getRecipe, CompoundTag data
 	)
 	{
-		this(Identifier.parse(data.getString("recipe")), getRecipe);
-		this.processTick = data.getInt("process_processTick");
+		this(Identifier.parse(data.getStringOr("recipe", "")), getRecipe);
+		this.processTick = data.getIntOr("process_processTick", 0);
 	}
 
 	protected List<ItemStack> getRecipeItemOutputs(Level level, CTX context)

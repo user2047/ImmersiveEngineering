@@ -23,37 +23,31 @@ import java.util.function.Consumer;
 public class EmptyLevelEntityGetter<T extends EntityAccess> implements LevelEntityGetter<T>
 {
 	@Nullable
-	@Override
 	public T get(int p_156931_)
 	{
 		return null;
 	}
 
 	@Nullable
-	@Override
 	public T get(@Nonnull UUID p_156939_)
 	{
 		return null;
 	}
 
 	@Nonnull
-	@Override
 	public Iterable<T> getAll()
 	{
 		return ImmutableList.of();
 	}
 
-	@Override
 	public <U extends T> void get(EntityTypeTest<T, U> p_156935_, AbortableIterationConsumer<U> p_261602_)
 	{
 	}
 
-	@Override
 	public void get(@Nonnull AABB p_156937_, @Nonnull Consumer<T> p_156938_)
 	{
 	}
 
-	@Override
 	public <U extends T> void get(EntityTypeTest<T, U> p_156932_, AABB p_156933_, AbortableIterationConsumer<U> p_261542_)
 	{
 

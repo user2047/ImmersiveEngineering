@@ -40,13 +40,11 @@ public class TooltipArea extends InfoArea
 		this.tooltip = tooltip;
 	}
 
-	@Override
 	protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		this.tooltip.accept(tooltip);
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 	}

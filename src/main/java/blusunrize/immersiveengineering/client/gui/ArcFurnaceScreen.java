@@ -21,7 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -48,13 +48,11 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(new EnergyInfoArea(leftPos+157, topPos+22, menu.energy));
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
@@ -62,7 +60,6 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 			addLine.accept(Component.translatable(Lib.GUI_CONFIG+"arcfurnace.distribute"));
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(var process : menu.processes.get())
@@ -78,7 +75,6 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 
 	private static final DecimalFormat PROGRESS_PERCENTAGE = new DecimalFormat(" #00%");
 
-	@Override
 	protected List<Component> getTooltipFromContainerItem(ItemStack stack)
 	{
 		List<Component> ret = super.getTooltipFromContainerItem(stack);
@@ -96,7 +92,6 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 		return ret;
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -106,7 +101,6 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 						autoSplitStacks();
 				})
 		{
-			@Override
 			public boolean isHoveredOrFocused()
 			{
 				return super.isHoveredOrFocused()&&menu.getCarried().isEmpty();
@@ -139,8 +133,8 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 					emptySlot = i;
 			if(emptySlot >= 0&&largestSlot >= 0)
 			{
-				this.slotClicked(menu.getSlot(largestSlot), largestSlot, 1, ClickType.PICKUP);
-				this.slotClicked(menu.getSlot(emptySlot), emptySlot, 0, ClickType.PICKUP);
+				this.slotClicked(menu.getSlot(largestSlot), largestSlot, 1, ContainerInput.PICKUP);
+				this.slotClicked(menu.getSlot(emptySlot), emptySlot, 0, ContainerInput.PICKUP);
 			}
 			else
 				break;

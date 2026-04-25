@@ -40,7 +40,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -48,8 +48,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.IFluidTank;
@@ -97,7 +97,6 @@ public class RefineryLogic
 	}
 
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -111,7 +110,6 @@ public class RefineryLogic
 		);
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -146,17 +144,15 @@ public class RefineryLogic
 		state.processor.addProcessToQueue(process, level, false);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_POS, state -> state.energy);
-		register.register(FluidHandler.BLOCK, (state, position) -> {
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_POS, state -> state.energy);
+		register.register(Capabilities.Fluid.BLOCK, (state, position) -> {
 			if(FLUID_OUTPUT_CAP.equals(position))
 				return state.outputCap;
 			else if(FLUID_INPUT_CAPS.contains(position))
@@ -167,20 +163,18 @@ public class RefineryLogic
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
 			Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient
 	)
 	{
 		if(isClient)
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		final State state = ctx.getState();
 		IFluidHandler tank = null;
 		if(FLUID_INPUTS.contains(posInMultiblock))
@@ -194,10 +188,9 @@ public class RefineryLogic
 		}
 		else
 			player.openMenu(IEMenuTypes.REFINERY.provide(ctx, posInMultiblock));
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return RefineryShapes.SHAPE_GETTER;
@@ -229,7 +222,7 @@ public class RefineryLogic
 			this.inventory = SlotwiseItemHandler.makeWithGroups(
 					List.of(new IOConstraintGroup(IOConstraint.NO_CONSTRAINT, NUM_SLOTS)), ctx.getMarkDirtyRunnable()
 			);
-			this.fluidOutput = ctx.getCapabilityAt(FluidHandler.BLOCK, FLUID_OUTPUT);
+			this.fluidOutput = ctx.getCapabilityAt(Capabilities.Fluid.BLOCK, FLUID_OUTPUT);
 			this.inputCap = new ArrayFluidHandler(
 					false, true, markDirty, tanks.leftInput, tanks.rightInput
 			);
@@ -243,53 +236,46 @@ public class RefineryLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("energy", energy.serializeNBT(provider));
 			nbt.put("tanks", tanks.toNBT(provider));
 			nbt.put("processor", processor.toNBT(provider));
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
-			tanks.readNBT(provider, nbt.getCompound("tanks"));
+			tanks.readNBT(provider, nbt.getCompoundOrEmpty("tanks"));
 			processor.fromNBT(
 					nbt.get("processor"),
 					(getRecipe, data, p) -> new MultiblockProcessInMachine<>(getRecipe, data),
 					provider
 			);
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			active = nbt.getBoolean("active");
+			active = nbt.getBooleanOr("active", false);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public IFluidTank[] getInternalTanks()
 		{
 			return tankArray;
 		}
 
-		@Override
 		public int[] getOutputTanks()
 		{
 			return new int[]{2};
@@ -308,17 +294,17 @@ public class RefineryLogic
 		public Tag toNBT(Provider provider)
 		{
 			CompoundTag tag = new CompoundTag();
-			tag.put("leftIn", leftInput.writeToNBT(provider, new CompoundTag()));
-			tag.put("rightIn", rightInput.writeToNBT(provider, new CompoundTag()));
-			tag.put("out", output.writeToNBT(provider, new CompoundTag()));
+			tag.put("leftIn", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(leftInput, provider));
+			tag.put("rightIn", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(rightInput, provider));
+			tag.put("out", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(output, provider));
 			return tag;
 		}
 
 		public void readNBT(Provider provider, CompoundTag tag)
 		{
-			leftInput.readFromNBT(provider, tag.getCompound("leftIn"));
-			rightInput.readFromNBT(provider, tag.getCompound("rightIn"));
-			output.readFromNBT(provider, tag.getCompound("out"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(leftInput, provider, tag.getCompoundOrEmpty("leftIn"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(rightInput, provider, tag.getCompoundOrEmpty("rightIn"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(output, provider, tag.getCompoundOrEmpty("out"));
 		}
 	}
 }

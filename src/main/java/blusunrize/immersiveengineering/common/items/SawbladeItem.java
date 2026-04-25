@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 public class SawbladeItem extends IEBaseItem
 {
 	private static final Set<ItemAbility> TOOL_ACTIONS = ImmutableSet.of(
-			ItemAbilities.AXE_DIG, ItemAbilities.SWORD_DIG, ItemAbilities.SHEARS_CARVE
+			ItemAbilities.SHEARS_CARVE
 	);
 	private final float sawbladeSpeed;
 	private final float sawbladeDamage;
@@ -34,7 +34,7 @@ public class SawbladeItem extends IEBaseItem
 
 	public SawbladeItem(int maxDamage, float sawbladeSpeed, float sawbladeDamage, Identifier texture)
 	{
-		super(new Properties().durability(maxDamage).setNoRepair());
+		super(itemProperties().durability(maxDamage));
 		this.sawbladeSpeed = sawbladeSpeed;
 		this.sawbladeDamage = sawbladeDamage;
 		this.texture = texture;
@@ -46,13 +46,11 @@ public class SawbladeItem extends IEBaseItem
 		this(maxDamage, sawbladeSpeed, sawbladeDamage, ImmersiveEngineering.rl("item/sawblade_blade"));
 	}
 
-	@Override
 	public boolean isEnchantable(ItemStack stack)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isBookEnchantable(ItemStack stack, ItemStack book)
 	{
 		return false;

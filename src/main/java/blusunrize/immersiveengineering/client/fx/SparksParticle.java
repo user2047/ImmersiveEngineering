@@ -8,20 +8,20 @@
 
 package blusunrize.immersiveengineering.client.fx;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class SparksParticle extends TextureSheetParticle
+public class SparksParticle extends SingleQuadParticle
 {
-	public SparksParticle(ClientLevel world, double x, double y, double z, double mx, double my, double mz, SpriteSet sprite)
+	public SparksParticle(ClientLevel world, double x, double y, double z, double mx, double my, double mz, TextureAtlasSprite sprite)
 	{
-		super(world, x, y, z, mx, my, mz);
+		super(world, x, y, z, mx, my, mz, sprite);
 		this.setLifetime(16);
 		this.x = x;
 		this.y = y;
@@ -29,29 +29,24 @@ public class SparksParticle extends TextureSheetParticle
 		this.xd = mx;
 		this.yd = my;
 		this.zd = mz;
-		pickSprite(sprite);
-		//TODO this.setParticleTextureIndex(ApiUtils.RANDOM.nextInt(3));
 	}
 
-	@Override
-	public int getLightColor(float p_70070_1_)
+	protected int getLightCoords(float p_70070_1_)
 	{
 		return 240<<16|240;
 	}
 
-	@Override
-	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks)
+	public void tick()
 	{
+		super.tick();
 		int particleAge = age;
 		this.setColor(1, .2f+(16-particleAge)/16f, particleAge > 4?0: (4-particleAge)/4f);
-		super.render(buffer, renderInfo, partialTicks);
 	}
 
 	@Nonnull
-	@Override
-	public ParticleRenderType getRenderType()
+	protected Layer getLayer()
 	{
-		return ParticleRenderType.PARTICLE_SHEET_LIT;
+		return Layer.OPAQUE;
 	}
 
 	public static class Factory implements ParticleProvider<SimpleParticleType>
@@ -64,10 +59,9 @@ public class SparksParticle extends TextureSheetParticle
 		}
 
 		@Nullable
-		@Override
-		public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+		public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random)
 		{
-			return new SparksParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
+			return new SparksParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, sprite.get(random));
 		}
 	}
 }

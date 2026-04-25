@@ -34,7 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.OptionalDouble;
@@ -60,19 +60,16 @@ public class ExtractConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<ExtractConveyor> getType()
 	{
 		return TYPE;
 	}
 
-	@Override
 	public boolean changeConveyorDirection()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean setConveyorDirection(ConveyorDirection dir)
 	{
 		return false;
@@ -98,7 +95,7 @@ public class ExtractConveyor extends ConveyorBase
 
 		Level world = tile.getLevel();
 		BlockPos neighbour = tile.getBlockPos().relative(this.getExtractDirection());
-		if(!world.isEmptyBlock(neighbour)&&world.getCapability(ItemHandler.BLOCK, neighbour, this.getExtractDirection().getOpposite())!=null)
+		if(!world.isEmptyBlock(neighbour)&&world.getCapability(Capabilities.Item.BLOCK, neighbour, this.getExtractDirection().getOpposite())!=null)
 		{
 			BlockState connected = world.getBlockState(neighbour);
 			VoxelShape connectedShape = connected.getShape(world, neighbour);
@@ -125,13 +122,11 @@ public class ExtractConveyor extends ConveyorBase
 		return OptionalDouble.of(extend);
 	}
 
-	@Override
 	public boolean isActive()
 	{
 		return true;
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(this.transferCooldown > 0)
@@ -170,7 +165,6 @@ public class ExtractConveyor extends ConveyorBase
 		}
 	}
 
-	@Override
 	public boolean playerInteraction(Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ, Direction side)
 	{
 		if(super.playerInteraction(player, hand, heldItem, hitX, hitY, hitZ, side))
@@ -188,9 +182,8 @@ public class ExtractConveyor extends ConveyorBase
 			this.extractionSizeIndex++;
 			if(this.extractionSizeIndex >= EXTRACTION_SIZE.length)
 				this.extractionSizeIndex = 0;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"conveyor.stacksize", EXTRACTION_SIZE[this.extractionSizeIndex]),
-					true
+			player.sendSystemMessage(
+					Component.translatable(Lib.CHAT_INFO+"conveyor.stacksize", EXTRACTION_SIZE[this.extractionSizeIndex])
 			);
 			return true;
 		}
@@ -213,7 +206,6 @@ public class ExtractConveyor extends ConveyorBase
 		return extension;
 	}
 
-	@Override
 	public VoxelShape getSelectionShape()
 	{
 		VoxelShape ret = super.getSelectionShape();
@@ -231,7 +223,6 @@ public class ExtractConveyor extends ConveyorBase
 		return ret;
 	}
 
-	@Override
 	public CompoundTag writeConveyorNBT()
 	{
 		CompoundTag nbt = super.writeConveyorNBT();
@@ -241,16 +232,15 @@ public class ExtractConveyor extends ConveyorBase
 		return nbt;
 	}
 
-	@Override
 	public void readConveyorNBT(CompoundTag nbt)
 	{
 		super.readConveyorNBT(nbt);
-		transferCooldown = nbt.getInt("transferCooldown");
+		transferCooldown = nbt.getIntOr("transferCooldown", 0);
 		if(nbt.contains("transferTickrate"))
 			extractionSizeIndex = 0;
 		else
-			extractionSizeIndex = nbt.getInt("extractionSizeIndex");
-		relativeExtractDir = Rotation.values()[nbt.getInt("relativeExtractDir")];
+			extractionSizeIndex = nbt.getIntOr("extractionSizeIndex", 0);
+		relativeExtractDir = Rotation.values()[nbt.getIntOr("relativeExtractDir", 0)];
 		if(relativeExtractDir==Rotation.NONE)
 			relativeExtractDir = Rotation.CLOCKWISE_180;
 	}

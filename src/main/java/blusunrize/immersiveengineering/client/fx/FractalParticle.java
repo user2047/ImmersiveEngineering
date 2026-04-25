@@ -19,8 +19,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
@@ -74,7 +75,6 @@ public class FractalParticle extends Particle
 		}
 	}
 
-	@Override
 	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks)
 	{
 		// Use a custom render queue to allow the particles to use multiple render types (by default particles can only
@@ -82,10 +82,9 @@ public class FractalParticle extends Particle
 		PARTICLE_FRACTAL_DEQUE.add(this);
 	}
 
-	@Override
-	public ParticleRenderType getRenderType()
+	public ParticleRenderType getGroup()
 	{
-		return ParticleRenderType.CUSTOM;
+		return ParticleRenderType.NO_RENDER;
 	}
 
 	public List<Pair<RenderType, Consumer<VertexConsumer>>> render(float partialTicks, PoseStack matrixStack)
@@ -195,8 +194,7 @@ public class FractalParticle extends Particle
 	{
 
 		@Nullable
-		@Override
-		public Particle createParticle(FractalOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+		public Particle createParticle(FractalOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random)
 		{
 			return new FractalParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.direction(), typeIn.scale(),
 					typeIn.maxAge(), typeIn.points(), typeIn.colourOut(), typeIn.colourIn());

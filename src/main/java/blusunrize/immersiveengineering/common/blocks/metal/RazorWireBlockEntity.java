@@ -53,19 +53,16 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 		super(IEBlockEntities.RAZOR_WIRE.get(), pos, state);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public void onEntityCollision(Level world, Entity entity)
 	{
 		if(entity instanceof LivingEntity)
@@ -83,7 +80,6 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 		entity.hurt(IEDamageSources.razorWire(entity.level()), dmg);
 	}
 
-	@Override
 	public VoxelShape getSelectionShape(@Nullable CollisionContext ctx)
 	{
 		return Shapes.block();
@@ -91,7 +87,6 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 
 	private static final CachedVoxelShapes<BoundingBoxKey> SHAPES = new CachedVoxelShapes<>(RazorWireBlockEntity::getShape);
 
-	@Override
 	public VoxelShape getCollisionShape(CollisionContext ctx)
 	{
 		return SHAPES.get(new BoundingBoxKey(this));
@@ -142,7 +137,6 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 			this.stacked = te.isStacked();
 		}
 
-		@Override
 		public boolean equals(Object o)
 		{
 			if(this==o) return true;
@@ -155,7 +149,6 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 					facing==that.facing;
 		}
 
-		@Override
 		public int hashCode()
 		{
 			return Objects.hash(wallL, wallR, onGround, stacked, facing);
@@ -177,13 +170,11 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 		return false;
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return WireType.LV_CATEGORY.equals(cableType.getCategory());//TODO only allow one connection!
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		BlockPos otherPos = other.position();
@@ -211,25 +202,21 @@ public class RazorWireBlockEntity extends ImmersiveConnectableBlockEntity implem
 		}
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return true;
 	}
 
-	@Override
 	public int getRequestedEnergy()
 	{
 		return 64;
 	}
 
-	@Override
 	public void insertEnergy(int amount)
 	{
 		int maxReach = amount/8;

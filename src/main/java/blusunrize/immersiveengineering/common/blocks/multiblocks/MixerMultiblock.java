@@ -20,7 +20,6 @@ public class MixerMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.MIXER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

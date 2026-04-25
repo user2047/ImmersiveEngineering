@@ -48,10 +48,9 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 
 	public FluorescentTubeItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		Direction side = ctx.getClickedFace();
@@ -59,7 +58,7 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		Player player = ctx.getPlayer();
 		if(side==Direction.UP&&player!=null)
 		{
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
 				ItemStack stack = ctx.getItemInHand();
 				Vec3 look = player.getLookAngle();
@@ -85,19 +84,16 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		s.set(IEDataComponents.COLOR, color);
 	}
 
-	@Override
 	public boolean canConfigure(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public ToolConfigBoolean[] getBooleanOptions(ItemStack stack)
 	{
 		return new ToolConfigBoolean[0];
 	}
 
-	@Override
 	public ToolConfigFloat[] getFloatOptions(ItemStack stack)
 	{
 		ToolConfigFloat[] ret = new ToolConfigFloat[3];
@@ -108,7 +104,6 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		return ret;
 	}
 
-	@Override
 	public void applyConfigOption(ItemStack stack, String key, Object value)
 	{
 		var rgb = getRGB(stack);
@@ -121,19 +116,16 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		setRGB(stack, rgb);
 	}
 
-	@Override
 	public String fomatConfigName(ItemStack stack, ToolConfig config)
 	{
 		return config.name;
 	}
 
-	@Override
 	public String fomatConfigDescription(ItemStack stack, ToolConfig config)
 	{
 		return config.name;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		int color = getRGBInt(stack, 1);
@@ -143,7 +135,6 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		));
 	}
 
-	@Override
 	public int getColourForIEItem(ItemStack stack, int pass)
 	{
 		if(pass==0)
@@ -174,19 +165,17 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		stack.set(IEDataComponents.FLUORESCENT_TUBE_LIT, new LitState(Mth.clamp(strength, 0, 1F), 35));
 	}
 
-	@Override
 	public void onStrike(ItemStack equipped, EquipmentSlot eqSlot, LivingEntity owner, Map<String, Object> cache, DamageSource dmg,
 						 ElectricSource eSource)
 	{
 		setLit(equipped, eSource.level);
 	}
 
-	@Override
 	public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected)
 	{
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 		var state = stack.get(IEDataComponents.FLUORESCENT_TUBE_LIT);
-		if(!worldIn.isClientSide&&state!=null)
+		if(!worldIn.isClientSide()&&state!=null)
 		{
 			if(state.time > 1)
 				stack.set(IEDataComponents.FLUORESCENT_TUBE_LIT, new LitState(state.strength, state.time-1));
@@ -195,7 +184,6 @@ public class FluorescentTubeItem extends IEBaseItem implements IConfigurableTool
 		}
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, @Nonnull ItemStack newStack, boolean slotChanged)
 	{
 		return !ItemStack.isSameItem(oldStack, newStack)||!Objects.equals(getRGB(oldStack), getRGB(newStack));

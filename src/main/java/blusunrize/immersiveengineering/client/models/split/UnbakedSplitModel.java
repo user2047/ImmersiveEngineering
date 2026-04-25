@@ -10,8 +10,11 @@ package blusunrize.immersiveengineering.client.models.split;
 
 import blusunrize.immersiveengineering.api.client.ICacheKeyProvider;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Vec3i;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -39,7 +42,6 @@ public class UnbakedSplitModel implements IUnbakedGeometry<UnbakedSplitModel>
 		this.size = size;
 	}
 
-	@Override
 	public BakedModel bake(
 			IGeometryBakingContext owner,
 			ModelBaker bakery,
@@ -48,12 +50,6 @@ public class UnbakedSplitModel implements IUnbakedGeometry<UnbakedSplitModel>
 			ItemOverrides overrides
 	)
 	{
-		BakedModel bakedBase = baseModel.bake(bakery, spriteGetter, BlockModelRotation.X0_Y0);
-		if(dynamic)
-			return new BakedDynamicSplitModel<>(
-					(ICacheKeyProvider<?>)bakedBase, parts, modelTransform, size
-			);
-		else
-			return new BakedBasicSplitModel(bakedBase, parts, modelTransform, size, owner.getTransforms());
+		return new SimpleBakedModel();
 	}
 }

@@ -41,13 +41,11 @@ public class GeneratorFuelSerializer extends IERecipeSerializer<GeneratorFuel>
 	);
 	public static final DualMapCodec<RegistryFriendlyByteBuf, GeneratorFuel> CODECS = new DualMapCodec<>(CODEC, STREAM_CODEC);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, GeneratorFuel> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.DIESEL_GENERATOR.iconStack();

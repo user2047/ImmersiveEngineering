@@ -45,19 +45,16 @@ public class FakeLightBlock extends IEEntityBlock<FakeLightBlockEntity>
 		super(IEBlockEntities.FAKE_LIGHT, props);
 	}
 
-	@Override
 	public boolean isAir(BlockState state)
 	{
 		return true;
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return Shapes.empty();
 	}
 
-	@Override
 	public boolean isPathfindable(BlockState state, PathComputationType type)
 	{
 		return true;
@@ -73,27 +70,23 @@ public class FakeLightBlock extends IEEntityBlock<FakeLightBlockEntity>
 			super(IEBlockEntities.FAKE_LIGHT.get(), pos, state);
 		}
 
-		@Override
 		public double getInterdictionRangeSquared()
 		{
 			return 1024;
 		}
 
-		@Override
 		public void setRemovedIE()
 		{
 			SpawnInterdictionHandler.removeFromInterdictionTiles(this);
 			super.setRemovedIE();
 		}
 
-		@Override
 		public void onChunkUnloaded()
 		{
 			SpawnInterdictionHandler.removeFromInterdictionTiles(this);
 			super.onChunkUnloaded();
 		}
 
-		@Override
 		public void onLoad()
 		{
 			super.onLoad();
@@ -103,20 +96,18 @@ public class FakeLightBlock extends IEEntityBlock<FakeLightBlockEntity>
 				SpawnInterdictionHandler.addInterdictionTile(this);
 		}
 
-		@Override
 		public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 		{
-			if(nbt.contains("floodlightCoords", Tag.TAG_COMPOUND))
-				floodlightCoords = NbtUtils.readBlockPos(nbt, "floodlightCoords").orElseThrow();
+			if(nbt.contains("floodlightCoords"))
+				floodlightCoords = BlockPos.of(nbt.getLongOr("floodlightCoords", BlockPos.ZERO.asLong()));
 			else
 				floodlightCoords = null;
 		}
 
-		@Override
 		public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 		{
 			if(floodlightCoords!=null)
-				nbt.put("floodlightCoords", NbtUtils.writeBlockPos(floodlightCoords));
+				nbt.putLong("floodlightCoords", floodlightCoords.asLong());
 		}
 
 		public void setFloodlightCoords(BlockPos pos)

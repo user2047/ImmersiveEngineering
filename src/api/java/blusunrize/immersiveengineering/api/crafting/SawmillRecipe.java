@@ -23,7 +23,7 @@ import java.util.List;
 
 public class SawmillRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<SawmillRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SawmillRecipe>> SERIALIZER;
 	public static final CachedRecipeList<SawmillRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.SAWMILL);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -50,7 +50,7 @@ public class SawmillRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<SawmillRecipe> getIESerializer()
+	protected RecipeSerializer<SawmillRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

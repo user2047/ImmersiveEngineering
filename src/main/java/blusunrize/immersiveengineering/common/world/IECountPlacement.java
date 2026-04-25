@@ -28,13 +28,11 @@ public class IECountPlacement extends RepeatingPlacement
 	}
 
 	//TODO why is this constant? Was it constant before or did I mess up the port?
-	@Override
 	protected int count(RandomSource p_191913_, BlockPos p_191914_)
 	{
 		return IEServerConfig.ORES.ores.get(type).veinsPerChunk.get();
 	}
 
-	@Override
 	public PlacementModifierType<?> type()
 	{
 		return IEWorldGen.IE_COUNT_PLACEMENT.value();

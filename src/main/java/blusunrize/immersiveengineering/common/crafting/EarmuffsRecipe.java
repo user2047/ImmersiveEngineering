@@ -15,26 +15,23 @@ import blusunrize.immersiveengineering.common.util.RecipeSerializers;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public class EarmuffsRecipe implements CraftingRecipe
+public class EarmuffsRecipe implements IECraftingRecipe
 {
 	public EarmuffsRecipe()
 	{
 	}
 
-	@Override
 	public boolean isSpecial()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level worldIn)
 	{
 		ItemStack earmuffs = ItemStack.EMPTY;
@@ -47,8 +44,8 @@ public class EarmuffsRecipe implements CraftingRecipe
 				final boolean isEarmuffs = stackInSlot.is(Misc.EARMUFFS.asItem());
 				if(earmuffs.isEmpty()&&isEarmuffs)
 					earmuffs = stackInSlot;
-				else if(armor.isEmpty()&&stackInSlot.getItem() instanceof ArmorItem armorItem&&
-						armorItem.getEquipmentSlot()==EquipmentSlot.HEAD&&
+				else if(armor.isEmpty()&&
+						stackInSlot.getItem().getEquipmentSlot(stackInSlot)==EquipmentSlot.HEAD&&
 						!isEarmuffs)
 					armor = stackInSlot;
 				else
@@ -63,8 +60,7 @@ public class EarmuffsRecipe implements CraftingRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		ItemStack earmuffs = ItemStack.EMPTY;
 		ItemStack armor = ItemStack.EMPTY;
@@ -76,8 +72,8 @@ public class EarmuffsRecipe implements CraftingRecipe
 				final boolean isEarmuffs = stackInSlot.is(Misc.EARMUFFS.asItem());
 				if(earmuffs.isEmpty()&&isEarmuffs)
 					earmuffs = stackInSlot;
-				else if(armor.isEmpty()&&stackInSlot.getItem() instanceof ArmorItem&&
-						((ArmorItem)stackInSlot.getItem()).getEquipmentSlot()==EquipmentSlot.HEAD&&
+				else if(armor.isEmpty()&&
+						stackInSlot.getItem().getEquipmentSlot(stackInSlot)==EquipmentSlot.HEAD&&
 						!isEarmuffs)
 					armor = stackInSlot;
 				// TODO else fail?
@@ -105,24 +101,21 @@ public class EarmuffsRecipe implements CraftingRecipe
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width >= 2&&height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return new ItemStack(Misc.EARMUFFS, 1);
 	}
 
 	@Nonnull
-	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
-		NonNullList<ItemStack> remaining = CraftingRecipe.super.getRemainingItems(inv);
+		NonNullList<ItemStack> remaining = IECraftingRecipe.super.getRemainingItems(inv);
 		for(int i = 0; i < remaining.size(); i++)
 		{
 			ItemStack stackInSlot = inv.getItem(i);
@@ -134,19 +127,16 @@ public class EarmuffsRecipe implements CraftingRecipe
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.EARMUFF_SERIALIZER.get();
 	}
 
-	@Override
 	public NonNullList<Ingredient> getIngredients()
 	{
 		return NonNullList.withSize(1, Ingredient.of(Misc.EARMUFFS));
 	}
 
-	@Override
 	public CraftingBookCategory category()
 	{
 		return CraftingBookCategory.MISC;

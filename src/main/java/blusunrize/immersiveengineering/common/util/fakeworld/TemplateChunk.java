@@ -10,7 +10,6 @@ package blusunrize.immersiveengineering.common.util.fakeworld;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.world.level.ChunkPos;
@@ -35,9 +34,9 @@ public class TemplateChunk extends LevelChunk
 	public TemplateChunk(Level worldIn, ChunkPos chunkPos, List<StructureBlockInfo> blocksInChunk, Predicate<BlockPos> shouldShow)
 	{
 		super(worldIn, chunkPos);
-		Registry<Biome> biomeRegistry = worldIn.registryAccess().registryOrThrow(Registries.BIOME);
+		worldIn.registryAccess().lookupOrThrow(Registries.BIOME);
 		for(int i = 0; i < getSections().length; ++i)
-			getSections()[i] = new TemplateChunkSection(i, biomeRegistry, shouldShow, chunkPos);
+			getSections()[i] = new TemplateChunkSection(i, worldIn.registryAccess(), shouldShow, chunkPos);
 		this.shouldShow = shouldShow;
 		this.biome = worldIn.getUncachedNoiseBiome(0, 0, 0);
 		for(StructureBlockInfo info : blocksInChunk)
@@ -58,7 +57,6 @@ public class TemplateChunk extends LevelChunk
 	}
 
 	@Nonnull
-	@Override
 	public FluidState getFluidState(@Nonnull BlockPos pos)
 	{
 		return getBlockState(pos).getFluidState();
@@ -66,7 +64,6 @@ public class TemplateChunk extends LevelChunk
 
 
 	@Nullable
-	@Override
 	public BlockEntity getBlockEntity(@Nonnull BlockPos pos, @Nonnull EntityCreationType creationMode)
 	{
 		if(!shouldShow.test(pos))
@@ -75,7 +72,6 @@ public class TemplateChunk extends LevelChunk
 	}
 
 	@Nullable
-	@Override
 	public BlockState setBlockState(@Nonnull BlockPos pos, @Nonnull BlockState state, boolean isMoving)
 	{
 		return null;
@@ -91,49 +87,41 @@ public class TemplateChunk extends LevelChunk
 		section.actuallySetBlockState(sectionX, sectionY, sectionZ, state);
 	}
 
-	@Override
 	public int getLightEmission(@Nonnull BlockPos pos)
 	{
 		return 0;
 	}
 
-	@Override
 	public void addAndRegisterBlockEntity(@Nonnull BlockEntity blockEntity)
 	{
 	}
 
-	@Override
 	public void setBlockEntity(@Nonnull BlockEntity blockEntity)
 	{
 	}
 
-	@Override
 	public void removeBlockEntity(@Nonnull BlockPos pos)
 	{
 	}
 
 	// Not always correct, but hopefully "good enough"
-	@Override
 	public boolean isEmpty()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isYSpaceEmpty(int startY, int endY)
 	{
 		return false;
 	}
 
 	@Nonnull
-	@Override
 	public FullChunkStatus getFullStatus()
 	{
 		return FullChunkStatus.INACCESSIBLE;
 	}
 
 	@Nonnull
-	@Override
 	public Holder<Biome> getNoiseBiome(int p_204426_, int p_204427_, int p_204428_)
 	{
 		return this.biome;

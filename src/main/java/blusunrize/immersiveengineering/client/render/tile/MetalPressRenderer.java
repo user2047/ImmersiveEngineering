@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Multibl
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -25,7 +25,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Quaternionf;
 
 import java.util.List;
@@ -37,7 +37,6 @@ public class MetalPressRenderer extends IEMultiblockRenderer<State>
 	public static final String NAME = "metal_press_piston";
 	public static DynamicModel PISTON;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final State state = ctx.getState();
@@ -81,12 +80,12 @@ public class MetalPressRenderer extends IEMultiblockRenderer<State>
 		matrixStack.translate(0, -piston*.6875f, 0);
 		matrixStack.pushPose();
 		matrixStack.translate(-0.5, -0.5, -0.5);
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 		BakedModel pistonModel = PISTON.get();
 		blockRenderer.getModelRenderer().renderModel(
-				matrixStack.last(), bufferIn.getBuffer(RenderType.solid()), null, pistonModel,
+				matrixStack.last(), bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, pistonModel,
 				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, RenderType.solid()
+				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);
 		matrixStack.popPose();
 
@@ -96,7 +95,7 @@ public class MetalPressRenderer extends IEMultiblockRenderer<State>
 			matrixStack.mulPose(new Quaternionf().rotateX(-Mth.HALF_PI));
 			float scale = .75f;
 			matrixStack.scale(scale, scale, 1);
-			ClientUtils.mc().getItemRenderer().renderStatic(
+			ClientUtils.getItemRenderer().renderStatic(
 					state.mold, ItemDisplayContext.FIXED,
 					combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 					level, 0
@@ -120,7 +119,7 @@ public class MetalPressRenderer extends IEMultiblockRenderer<State>
 			matrixStack.mulPose(new Quaternionf().rotateX(-Mth.HALF_PI));
 			float scale = .625f;
 			matrixStack.scale(scale, scale, 1);
-			ClientUtils.mc().getItemRenderer().renderStatic(
+			ClientUtils.getItemRenderer().renderStatic(
 					displays.get(0), ItemDisplayContext.FIXED,
 					combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 					level, 0);

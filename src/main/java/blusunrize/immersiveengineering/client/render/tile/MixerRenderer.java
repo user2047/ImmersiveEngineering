@@ -10,16 +10,17 @@ package blusunrize.immersiveengineering.client.render.tile;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.mixer.MixerLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Quaternionf;
 
@@ -28,12 +29,11 @@ public class MixerRenderer extends IEMultiblockRenderer<State>
 	public static final String NAME = "mixer_agitator";
 	public static DynamicModel AGITATOR;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final State state = ctx.getState();
 		final MultiblockOrientation orientation = ctx.getLevel().getOrientation();
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 
 		matrixStack.pushPose();
 		matrixStack.translate(.5, .5, .5);
@@ -47,9 +47,9 @@ public class MixerRenderer extends IEMultiblockRenderer<State>
 
 		matrixStack.translate(-0.5, -0.5, -0.5);
 		blockRenderer.getModelRenderer().renderModel(
-				matrixStack.last(), bufferIn.getBuffer(RenderType.solid()), null, AGITATOR.get(),
+				matrixStack.last(), bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, AGITATOR.get(),
 				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, RenderType.solid()
+				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);
 
 		matrixStack.popPose();
@@ -66,7 +66,7 @@ public class MixerRenderer extends IEMultiblockRenderer<State>
 				float yy = fs.getAmount()/(float)state.tank.getCapacity()*1.0625f;
 				matrixStack.translate(0, 0, -yy);
 				float w = (i < state.tank.getFluidTypes()-1||yy >= .125)?26: 16+yy/.0125f;
-				GuiHelper.drawRepeatedFluidSprite(bufferIn.getBuffer(RenderType.translucent()), matrixStack, fs,
+				GuiHelper.drawRepeatedFluidSprite(bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent()), matrixStack, fs,
 						-w/2, -w/2, w, w);
 			}
 		}

@@ -32,7 +32,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -65,7 +65,6 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 		super(IEBlockEntities.WINDMILL.get(), pos, state);
 	}
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
@@ -78,7 +77,6 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 		}
 	}
 
-	@Override
 	public void tickClient()
 	{
 		rotation += getActualTurnSpeed();
@@ -106,7 +104,6 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 		return mod*turnSpeed;
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(level.getGameTime()%128==((getBlockPos().getX()^getBlockPos().getZ())&127))
@@ -176,15 +173,13 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 		return turnSpeed;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		sails = nbt.getInt("sails");
-		rotation = nbt.getFloat("rotation");
-		turnSpeed = nbt.getFloat("turnSpeed");
+		sails = nbt.getIntOr("sails", 0);
+		rotation = nbt.getFloatOr("rotation", 0);
+		turnSpeed = nbt.getFloatOr("turnSpeed", 0);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putInt("sails", sails);
@@ -194,32 +189,27 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 
 	public AABB renderAABB;
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_PREFER_SIDE;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(sails < 8&&heldItem.getItem()==Ingredients.WINDMILL_SAIL.asItem())
 		{
@@ -227,12 +217,11 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 			if(!player.getAbilities().instabuild)
 				heldItem.shrink(1);
 			this.setChanged();
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
@@ -252,13 +241,11 @@ public class WindmillBlockEntity extends IEBaseBlockEntity implements IEServerTi
 	}
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(this.getFacing());
 	}
 
-	@Override
 	public boolean shouldPlaySound(String sound)
 	{
 		return turnSpeed > 0;

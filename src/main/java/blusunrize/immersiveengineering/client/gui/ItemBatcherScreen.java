@@ -42,7 +42,6 @@ public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 		this.imageHeight = 199;
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -83,7 +82,6 @@ public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 		}
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(this.font, I18n.get("block.immersiveengineering.item_batcher"), 8, 6,  Lib.COLOUR_I_ImmersiveOrange, true);

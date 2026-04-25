@@ -173,10 +173,10 @@ public class IEManual
 				MineralMix.RECIPES.getRecipes(Minecraft.getInstance().level)
 		);
 		Function<RecipeHolder<MineralMix>, String> toName = mineral -> {
-			String translationKey = MineralMix.getTranslationKey(mineral.id());
+			String translationKey = MineralMix.getTranslationKey(mineral.id().identifier());
 			String localizedName = I18n.get(translationKey);
 			if(localizedName.equals(translationKey))
-				localizedName = MineralMix.getPlainName(mineral.id());
+				localizedName = MineralMix.getPlainName(mineral.id().identifier());
 			return localizedName;
 		};
 		mineralsToAdd.sort((i1, i2) -> toName.apply(i1).compareToIgnoreCase(toName.apply(i2)));
@@ -355,7 +355,7 @@ public class IEManual
 			for(int i = 0; i < stacks.length; ++i)
 				stacks[i] = BuiltInRegistries.FLUID.get(
 						Identifier.parse(GsonHelper.getAsString(arr.get(i).getAsJsonObject(), "fluid"))
-				);
+				).map(h -> h.value()).orElse(net.minecraft.world.level.material.Fluids.EMPTY);
 		}
 		else
 		{
@@ -363,7 +363,7 @@ public class IEManual
 			Preconditions.checkArgument(recipe.isJsonObject());
 			stacks = new Fluid[]{BuiltInRegistries.FLUID.get(
 					Identifier.parse(GsonHelper.getAsString(recipe.getAsJsonObject(), "fluid"))
-			)};
+			).map(h -> h.value()).orElse(net.minecraft.world.level.material.Fluids.EMPTY)};
 		}
 		return stacks;
 	}

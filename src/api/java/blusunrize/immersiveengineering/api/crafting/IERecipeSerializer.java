@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public abstract class IERecipeSerializer<R extends Recipe<?>> implements RecipeSerializer<R>
+public abstract class IERecipeSerializer<R extends Recipe<?>>
 {
 	public static final Codec<List<StackWithChance>> CHANCE_LIST_CODEC = makeChanceOutputCodec();
 	public static final DualCodec<RegistryFriendlyByteBuf, List<StackWithChance>> CHANCE_LIST_CODECS = new DualCodec<>(
@@ -52,16 +52,19 @@ public abstract class IERecipeSerializer<R extends Recipe<?>> implements RecipeS
 
 	protected abstract DualMapCodec<RegistryFriendlyByteBuf, R> codecs();
 
-	@Override
 	public final MapCodec<R> codec()
 	{
 		return codecs().mapCodec();
 	}
 
-	@Override
 	public final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec()
 	{
 		return codecs().streamCodec();
+	}
+
+	public final RecipeSerializer<R> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 
 	protected static <S extends ByteBuf, T> DualMapCodec<S, Optional<List<T>>> maybeListOrSingle(DualCodec<S, T> singleCodec, String key)

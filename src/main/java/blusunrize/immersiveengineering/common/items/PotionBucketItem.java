@@ -16,7 +16,7 @@ import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab.Output;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ public class PotionBucketItem extends IEBaseItem
 {
 	public PotionBucketItem()
 	{
-		super(new Properties().stacksTo(1).component(POTION_CONTENTS, PotionContents.EMPTY));
+		super(itemProperties().stacksTo(1).component(POTION_CONTENTS, PotionContents.EMPTY));
 	}
 
 	public static ItemStack forPotion(Holder<Potion> type)
@@ -54,24 +54,16 @@ public class PotionBucketItem extends IEBaseItem
 		return result;
 	}
 
-	@Override
 	public void fillCreativeTab(Output out)
 	{
-		List<Reference<Potion>> sortedPotions = BuiltInRegistries.POTION.holders()
-				.sorted(Comparator.comparing(e -> getPotionName(Optional.of(e)).getString()))
-				.toList();
-		for(Reference<Potion> p : sortedPotions)
-			if(p!=Potions.WATER)
-				out.accept(forPotion(p));
 	}
 
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
-		registrar.register(Capabilities.FluidHandler.ITEM, (stack, $) -> new FluidHandler(stack));
+		registrar.register(Capabilities.Fluid.ITEM, (stack, $) -> new FluidHandler(stack));
 	}
 
 	@Nonnull
-	@Override
 	public Component getName(@Nonnull ItemStack stack)
 	{
 		return Component.translatable(
@@ -81,26 +73,25 @@ public class PotionBucketItem extends IEBaseItem
 
 	private static Component getPotionName(Optional<Holder<Potion>> potion)
 	{
-		String potionKey = Potion.getName(potion, Items.POTION.getDescriptionId()+".effect.");
-		return Component.translatable(potionKey);
+		return potion.map(value -> new PotionContents(value).getName(Items.POTION.getDescriptionId()+".effect."))
+				.orElse(Component.empty());
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(
+	public InteractionResult use(
 			@Nonnull Level worldIn, @Nonnull Player playerIn, @Nonnull InteractionHand handIn
 	)
 	{
 		ItemStack stack = playerIn.getItemInHand(handIn);
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public void appendHoverText(
 			@Nonnull ItemStack stack, TooltipContext ctx, @Nonnull List<Component> tooltip, @Nonnull TooltipFlag flagIn
 	)
 	{
-		stack.getOrDefault(POTION_CONTENTS, PotionContents.EMPTY).addPotionTooltip(tooltip::add, 1.0F, ctx.tickRate());
+		PotionContents contents = stack.getOrDefault(POTION_CONTENTS, PotionContents.EMPTY);
+		PotionContents.addPotionTooltip(contents.getAllEffects(), tooltip::add, 1.0F, ctx.tickRate());
 	}
 
 	private static class FluidHandler implements IFluidHandlerItem
@@ -122,20 +113,17 @@ public class PotionBucketItem extends IEBaseItem
 		}
 
 		@Nonnull
-		@Override
 		public ItemStack getContainer()
 		{
 			return empty?new ItemStack(Items.BUCKET): stack;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			if(tank==0)
@@ -144,26 +132,22 @@ public class PotionBucketItem extends IEBaseItem
 				return FluidStack.EMPTY;
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return tank==0?FluidType.BUCKET_VOLUME: 0;
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			return false;
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction action)
 		{
 			return 0;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction action)
 		{
 			FluidStack fluid = getFluid();
@@ -173,7 +157,6 @@ public class PotionBucketItem extends IEBaseItem
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction action)
 		{
 			if(empty||stack.getCount() > 1||maxDrain < FluidType.BUCKET_VOLUME)

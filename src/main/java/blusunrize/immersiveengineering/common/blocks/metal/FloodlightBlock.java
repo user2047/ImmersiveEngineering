@@ -28,7 +28,6 @@ public class FloodlightBlock extends ConnectorBlock<FloodlightBlockEntity>
 		super(props, IEBlockEntities.FLOODLIGHT);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

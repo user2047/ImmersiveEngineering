@@ -27,6 +27,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.ChunkLoaderMult
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.ChunkLoaderLogic.State;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.shapes.ChunkLoaderShapes;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
+import blusunrize.immersiveengineering.common.util.NBTCompat;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler.IOConstraint;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler.IOConstraintGroup;
@@ -42,8 +43,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
 import net.neoforged.neoforge.common.world.chunk.TicketSet;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -79,7 +80,6 @@ public class ChunkLoaderLogic
 	public static final BlockPos REDSTONE_POS = new BlockPos(0, 1, 2);
 	private static final CapabilityPosition INPUT_POS = new CapabilityPosition(0, 1, 1, RelativeBlockFace.RIGHT);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		if(!(context.getLevel().getRawLevel() instanceof ServerLevel))
@@ -125,7 +125,7 @@ public class ChunkLoaderLogic
 	{
 		BlockPos masterPos = ctx.getLevel().toAbsolute(ChunkLoaderMultiblock.MASTER_OFFSET);
 		if((ctx.getLevel().getRawLevel() instanceof ServerLevel serverLevel))
-			getChunks(masterPos).forEach(chunk -> TICKET_CONTROLLER.forceChunk(serverLevel, masterPos, chunk.x, chunk.z, add, true));
+			getChunks(masterPos).forEach(chunk -> TICKET_CONTROLLER.forceChunk(serverLevel, masterPos, chunk.x(), chunk.z(), add, true));
 	}
 
 	private static Stream<ChunkPos> getChunks(BlockPos masterPos)
@@ -138,37 +138,31 @@ public class ChunkLoaderLogic
 		return IntStream.range(minX, maxX).boxed().flatMap(x -> IntStream.range(minZ, maxZ).mapToObj(z -> new ChunkPos(x, z)));
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 	}
 
-	@Override
 	public void onRemoved(IMultiblockContext<State> context)
 	{
 		forceChunks(context, false);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAt(ItemHandler.BLOCK, INPUT_POS, state -> state.input);
-		register.registerAt(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.registerAt(Capabilities.Item.BLOCK, INPUT_POS, state -> state.input);
+		register.registerAt(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return ChunkLoaderShapes.SHAPE_GETTER;
@@ -193,32 +187,30 @@ public class ChunkLoaderLogic
 			this.input = new WrappingItemHandler(inventory, true, false);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("inventory", inventory.serializeNBT(provider));
-			nbt.put("energy", energy.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
+			var energyOutput = NBTCompat.createOutput(provider);
+			energy.serialize(energyOutput);
+			nbt.put("energy", energyOutput.buildResult());
 			nbt.putInt("refreshTimer", refreshTimer);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
-			energy.deserializeNBT(provider, nbt.getCompound("energy"));
-			refreshTimer = nbt.getInt("refreshTimer");
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
+			energy.deserialize(NBTCompat.createInput(provider, nbt.getCompoundOrEmpty("energy")));
+			refreshTimer = nbt.getIntOr("refreshTimer", 0);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("renderAsActive", renderAsActive);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			renderAsActive = nbt.getBoolean("renderAsActive");
+			renderAsActive = nbt.getBooleanOr("renderAsActive", false);
 		}
 
 		public Stream<BlockEntity> getNearbyBlockEntities(IMultiblockContext<State> ctx)
@@ -228,7 +220,7 @@ public class ChunkLoaderLogic
 			Stream<ChunkPos> chunks = ChunkLoaderLogic.getChunks(masterPos);
 			return chunks
 					// find all block entities in the area
-					.flatMap(pos -> level.getChunk(pos.x, pos.z).getBlockEntities().values().stream())
+					.flatMap(pos -> level.getChunk(pos.x(), pos.z()).getBlockEntities().values().stream())
 					// filter to ticking ones
 					.filter(blockEntity -> !masterPos.equals(blockEntity.getBlockPos())&&blockEntity.getBlockState().getTicker(level, blockEntity.getType())!=null);
 		}

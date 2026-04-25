@@ -114,14 +114,12 @@ public class GenericDataSerializers
 	{
 		public static final StreamCodec<RegistryFriendlyByteBuf, DataPair<?>> CODEC = new StreamCodec<>()
 		{
-			@Override
 			public DataPair<?> decode(RegistryFriendlyByteBuf buffer)
 			{
 				DataSerializer<?> serializer = SERIALIZERS.get(buffer.readVarInt());
 				return serializer.read(buffer);
 			}
 
-			@Override
 			public void encode(RegistryFriendlyByteBuf buffer, DataPair<?> data)
 			{
 				data.write(buffer);

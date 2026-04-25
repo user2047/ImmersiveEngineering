@@ -45,10 +45,9 @@ public class WolfpackShotEntity extends RevolvershotHomingEntity
 		redirectionSpeed = .1875;
 	}
 
-	@Override
 	public void onHit(HitResult mop)
 	{
-		if(!this.level().isClientSide&&mop instanceof EntityHitResult)
+		if(!this.level().isClientSide()&&mop instanceof EntityHitResult)
 		{
 			Entity hit = ((EntityHitResult)mop).getEntity();
 			if(hit.invulnerableTime > 0)

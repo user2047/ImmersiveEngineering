@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.api.utils.codec;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -25,12 +24,9 @@ import java.util.stream.Collectors;
 
 public class IECodecs
 {
-	public static final Codec<ItemStack> ITEM_STACK_COUNT_OPTIONAL = Codec.either(ItemStack.CODEC, ItemStack.SINGLE_ITEM_CODEC).xmap(
-			either -> either.map(Function.identity(), Function.identity()),
-			stack -> stack.getCount()==1?Either.right(stack):Either.left(stack)
-	);
+	public static final Codec<ItemStack> ITEM_STACK_COUNT_OPTIONAL = ItemStack.OPTIONAL_CODEC;
 
-	public static final Codec<NonNullList<Ingredient>> NONNULL_INGREDIENTS = Ingredient.LIST_CODEC.xmap(
+	public static final Codec<NonNullList<Ingredient>> NONNULL_INGREDIENTS = Ingredient.CODEC.listOf().xmap(
 			l -> {
 				NonNullList<Ingredient> result = NonNullList.create();
 				result.addAll(l);

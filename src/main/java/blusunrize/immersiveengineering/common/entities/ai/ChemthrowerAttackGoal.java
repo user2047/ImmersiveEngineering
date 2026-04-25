@@ -29,13 +29,11 @@ public class ChemthrowerAttackGoal<T extends Bulwark> extends ShieldCombatGoal<T
 		super(mob, attackRadius, new IntRange(120, 180), new IntRange(0, 1));
 	}
 
-	@Override
 	protected boolean isHoldingWeapon()
 	{
 		return this.mob.isHolding(is -> is.getItem() instanceof ChemthrowerItem);
 	}
 
-	@Override
 	public void tick()
 	{
 		super.tick();
@@ -45,7 +43,6 @@ public class ChemthrowerAttackGoal<T extends Bulwark> extends ShieldCombatGoal<T
 			this.mob.setAiming(false);
 	}
 
-	@Override
 	boolean performAttack()
 	{
 		counter++;
@@ -65,7 +62,7 @@ public class ChemthrowerAttackGoal<T extends Bulwark> extends ShieldCombatGoal<T
 			// Apply momentum from the player.
 			chem.setDeltaMovement(this.mob.getDeltaMovement().add(vecDir.scale(range)));
 			chem.igniteForSeconds(10);
-			if(!this.mob.level().isClientSide)
+			if(!this.mob.level().isClientSide())
 				this.mob.level().addFreshEntity(chem);
 		}
 		if(counter%4==0)

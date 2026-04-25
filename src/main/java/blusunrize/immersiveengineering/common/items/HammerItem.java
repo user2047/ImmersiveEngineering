@@ -64,16 +64,14 @@ public class HammerItem extends IEBaseItem
 {
 	public HammerItem()
 	{
-		super(new Properties().durability(100));// Value is overridden in getMaxDamage
+		super(itemProperties().durability(100));// Value is overridden in getMaxDamage
 	}
 
-	@Override
 	public int getMaxDamage(ItemStack stack)
 	{
 		return IEServerConfig.getOrDefault(IEServerConfig.TOOLS.hammerDurabiliy);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		super.appendHoverText(stack, ctx, tooltip, flagIn);
@@ -87,7 +85,7 @@ public class HammerItem extends IEBaseItem
 		if(list.isEmpty())
 			return;
 		MutableComponent title = Component.translatable(titleKey);
-		if(!Screen.hasShiftDown())
+		if(!net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown())
 			tooltip.add(title.append(" ").append(Component.translatable(Lib.DESC_INFO+"holdShift")));
 		else
 		{
@@ -101,7 +99,6 @@ public class HammerItem extends IEBaseItem
 		}
 	}
 
-	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
 		Level world = context.getLevel();
@@ -179,12 +176,12 @@ public class HammerItem extends IEBaseItem
 		List<Identifier> result = new ArrayList<>();
 		for(int i = 0; i < data.size(); ++i)
 		{
-			String listEntry = data.getString(i);
+			String listEntry = data.getStringOr(i, "");
 			Identifier asRL = Identifier.tryParse(listEntry);
 			if(asRL==null||MultiblockHandler.getByUniqueName(asRL)==null)
 			{
-				if(player!=null&&!player.getCommandSenderWorld().isClientSide)
-					player.displayClientMessage(Component.literal("Invalid "+prefix+" entry: "+listEntry), false);
+				if(player!=null&&!player.level().isClientSide())
+					player.sendSystemMessage(Component.literal("Invalid "+prefix+" entry: "+listEntry));
 				return null;
 			}
 			result.add(asRL);
@@ -192,38 +189,32 @@ public class HammerItem extends IEBaseItem
 		return result;
 	}
 
-	@Override
 	public boolean doesSneakBypassUse(ItemStack stack, LevelReader world, BlockPos pos, Player player)
 	{
 		return true;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getCraftingRemainingItem(@Nonnull ItemStack stack)
 	{
 		return ItemUtils.damageCopy(stack, 1);
 	}
 
-	@Override
 	public boolean hasCraftingRemainingItem(@Nonnull ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isEnchantable(@Nonnull ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getEnchantmentValue()
 	{
 		return 14;
 	}
 
-	@Override
 	public boolean isBookEnchantable(ItemStack stack, ItemStack book)
 	{
 		var enchantments = book.get(DataComponents.ENCHANTMENTS);
@@ -236,22 +227,19 @@ public class HammerItem extends IEBaseItem
 		return enchantment.is(Enchantments.EFFICIENCY)||enchantment.is(Enchantments.UNBREAKING)||enchantment.is(Enchantments.MENDING);
 	}
 
-	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate)
 	{
 		return repairCandidate.is(Tags.Items.INGOTS_IRON);
 	}
 
-	@Override
 	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand)
 	{
-		if(!player.level().isClientSide&&RotationUtil.rotateEntity(entity, player))
+		if(!player.level().isClientSide()&&RotationUtil.rotateEntity(entity, player))
 			return InteractionResult.SUCCESS;
 		else
 			return InteractionResult.PASS;
 	}
 
-	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
 		if(isCorrectToolForDrops(stack, state))
@@ -259,7 +247,6 @@ public class HammerItem extends IEBaseItem
 		return super.getDestroySpeed(stack, state);
 	}
 
-	@Override
 	public boolean isCorrectToolForDrops(ItemStack stack, BlockState state)
 	{
 		return state.is(IETags.hammerHarvestable);
@@ -271,8 +258,8 @@ public class HammerItem extends IEBaseItem
 	)
 	{
 		public static final DualCodec<ByteBuf, MultiblockRestriction> CODECS = DualCompositeCodecs.composite(
-				DualCodecs.RESOURCE_LOCATION.listOf().optionalFieldOf("allowed"), MultiblockRestriction::allowed,
-				DualCodecs.RESOURCE_LOCATION.listOf().optionalFieldOf("forbidden"), MultiblockRestriction::forbidden,
+				blusunrize.immersiveengineering.api.utils.codec.IEDualCodecs.IDENTIFIER.listOf().optionalFieldOf("allowed"), MultiblockRestriction::allowed,
+				blusunrize.immersiveengineering.api.utils.codec.IEDualCodecs.IDENTIFIER.listOf().optionalFieldOf("forbidden"), MultiblockRestriction::forbidden,
 				MultiblockRestriction::new
 		);
 		public static final MultiblockRestriction DEFAULT = new MultiblockRestriction(

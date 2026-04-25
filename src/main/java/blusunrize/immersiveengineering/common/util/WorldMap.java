@@ -23,7 +23,7 @@ public class WorldMap<Key, Value>
 	@Nullable
 	public Value get(Level world, Key key)
 	{
-		Preconditions.checkArgument(!world.isClientSide);
+		Preconditions.checkArgument(!world.isClientSide());
 		final Map<Key, Value> worldMap = map.get(world.dimension());
 		if(worldMap==null)
 			return null;
@@ -32,14 +32,14 @@ public class WorldMap<Key, Value>
 
 	public void put(Level world, Key key, Value value)
 	{
-		Preconditions.checkArgument(!world.isClientSide);
+		Preconditions.checkArgument(!world.isClientSide());
 		final Map<Key, Value> worldMap = map.computeIfAbsent(world.dimension(), $ -> new HashMap<>());
 		worldMap.put(key, value);
 	}
 
 	public void clearDimension(Level world)
 	{
-		Preconditions.checkArgument(!world.isClientSide);
+		Preconditions.checkArgument(!world.isClientSide());
 		map.remove(world.dimension());
 	}
 

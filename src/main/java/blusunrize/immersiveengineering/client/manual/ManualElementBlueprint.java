@@ -23,7 +23,6 @@ public class ManualElementBlueprint extends ManualElementIECrafting
 		recalculateCraftingRecipes();
 	}
 
-	@Override
 	public void recalculateCraftingRecipes()
 	{
 		this.recipes.clear();

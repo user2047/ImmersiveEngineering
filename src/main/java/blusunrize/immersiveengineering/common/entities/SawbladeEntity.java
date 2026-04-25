@@ -52,7 +52,6 @@ public class SawbladeEntity extends IEProjectileEntity
 		((AbstractArrowAccess)this).invokeSetPierceLevel((byte)3);
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		super.defineSynchedData(builder);
@@ -60,14 +59,12 @@ public class SawbladeEntity extends IEProjectileEntity
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getPickupItem()
 	{
 		return ammo;
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack getDefaultPickupItem()
 	{
 		return Tools.SAWBLADE.asItem().getDefaultInstance();
@@ -89,22 +86,19 @@ public class SawbladeEntity extends IEProjectileEntity
 		return ammo;
 	}
 
-	@Override
 	public double getDefaultGravity()
 	{
 		return .005;
 	}
 
-	@Override
 	public int getMaxTicksInGround()
 	{
 		return 1200;
 	}
 
-	@Override
 	public void baseTick()
 	{
-		if(this.getAmmo().isEmpty()&&this.level().isClientSide)
+		if(this.getAmmo().isEmpty()&&this.level().isClientSide())
 			this.ammo = getAmmoSynced();
 		super.baseTick();
 	}
@@ -117,14 +111,12 @@ public class SawbladeEntity extends IEProjectileEntity
 			getAmmo().hurtAndBreak(dmg, serverLevel, shooter instanceof ServerPlayer?(ServerPlayer)shooter: null, i -> discard());
 	}
 
-	@Override
 	protected void onHitBlock(BlockHitResult result)
 	{
 		super.onHitBlock(result);
 		damageSawblade();
 	}
 
-	@Override
 	protected void onHitEntity(EntityHitResult result)
 	{
 		Entity shooter = getOwner();
@@ -135,7 +127,6 @@ public class SawbladeEntity extends IEProjectileEntity
 		damageSawblade();
 	}
 
-	@Override
 	protected void handlePiecing(Entity target)
 	{
 		super.handlePiecing(target);
@@ -146,7 +137,6 @@ public class SawbladeEntity extends IEProjectileEntity
 		}
 	}
 
-	@Override
 	protected boolean canHitEntity(Entity target)
 	{
 		if(piercedEntities!=null&&piercedEntities.contains(target.getId()))
@@ -154,18 +144,14 @@ public class SawbladeEntity extends IEProjectileEntity
 		return !target.isSpectator()&&target.isAlive()&&target.isPickable();
 	}
 
-	@Override
 	public void addAdditionalSaveData(CompoundTag nbt)
 	{
-		super.addAdditionalSaveData(nbt);
 		if(!this.ammo.isEmpty())
-			nbt.put("ammo", this.ammo.save(level().registryAccess()));
+			nbt.put("ammo", blusunrize.immersiveengineering.common.util.ItemStackCompat.save(this.ammo, level().registryAccess()));
 	}
 
-	@Override
 	public void readAdditionalSaveData(CompoundTag nbt)
 	{
-		super.readAdditionalSaveData(nbt);
-		this.ammo = ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("ammo"));
+		this.ammo = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(level().registryAccess(), nbt.getCompoundOrEmpty("ammo"));
 	}
 }

@@ -27,7 +27,6 @@ public class ManualElementBottling extends ManualElementIECrafting
 		recalculateCraftingRecipes();
 	}
 
-	@Override
 	public void recalculateCraftingRecipes()
 	{
 		this.recipes.clear();
@@ -38,11 +37,7 @@ public class ManualElementBottling extends ManualElementIECrafting
 				int h = (int)Math.ceil(recipe.output.get().size()/2f);
 				int middle = (int)(h/2f*18);
 
-				List<ItemStack> buckets = Arrays.stream(recipe.fluidInput.getFluids()).map(fs -> {
-					ItemStack bucket = fs.getFluid().getBucket().getDefaultInstance();
-					bucket.applyComponents(fs.getComponents());
-					return bucket;
-				}).toList();
+				List<ItemStack> buckets = List.of();
 				String bucketFraction = FluidUtils.getBucketFraction(recipe.fluidInput.amount());
 
 				int inputSize = recipe.inputs.size();

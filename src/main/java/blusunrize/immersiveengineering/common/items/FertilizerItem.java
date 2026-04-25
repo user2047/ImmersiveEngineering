@@ -19,10 +19,9 @@ public class FertilizerItem extends IEBaseItem
 {
 	public FertilizerItem()
 	{
-		super(new Properties());
+		super(itemProperties());
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext pContext)
 	{
 		Level level = pContext.getLevel();
@@ -30,9 +29,9 @@ public class FertilizerItem extends IEBaseItem
 		BlockPos offsetPos = clickedPos.relative(pContext.getClickedFace());
 		if(BoneMealItem.applyBonemeal(pContext.getItemInHand(), level, clickedPos, pContext.getPlayer()))
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 				level.levelEvent(1505, clickedPos, 0);
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else
 		{
@@ -40,9 +39,9 @@ public class FertilizerItem extends IEBaseItem
 			boolean isSturdy = blockstate.isFaceSturdy(level, clickedPos, pContext.getClickedFace());
 			if(isSturdy&&BoneMealItem.growWaterPlant(pContext.getItemInHand(), level, offsetPos, pContext.getClickedFace()))
 			{
-				if(!level.isClientSide)
+				if(!level.isClientSide())
 					level.levelEvent(1505, offsetPos, 0);
-				return InteractionResult.sidedSuccess(level.isClientSide);
+				return InteractionResult.SUCCESS;
 			}
 			else
 				return InteractionResult.PASS;

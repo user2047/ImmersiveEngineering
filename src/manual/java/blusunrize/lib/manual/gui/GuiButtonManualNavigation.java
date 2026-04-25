@@ -9,16 +9,10 @@
 package blusunrize.lib.manual.gui;
 
 import blusunrize.lib.manual.ManualUtils;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class GuiButtonManualNavigation extends Button
 {
@@ -37,15 +31,13 @@ public class GuiButtonManualNavigation extends Button
 	}
 
 	@Override
-	public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partial)
+	protected void extractContents(GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		isHovered = mx >= this.getX()&&mx < (this.getX()+this.width)&&my >= this.getY()&&my < (this.getY()+this.height);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, ONE, ZERO);
 		int u = type==5?46: type==4||type==6?36: (type < 2?0: type < 3?16: 26)+(type > 1?(10-width): type==1?(16-width): 0);
 		int v = 216+(type==0?0: type==1?10: type==2?(16-height): type==3?0: type==4||type==5?10: 0);
 		if(isHovered)
 			v += 20;
-		graphics.blit(gui.texture, this.getX(), this.getY(), u, v, width, height);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, gui.texture, this.getX(), this.getY(), u, v, width, height, 256, 256);
 	}
 }

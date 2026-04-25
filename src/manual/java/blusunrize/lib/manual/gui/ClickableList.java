@@ -12,25 +12,21 @@ import blusunrize.lib.manual.ManualEntry;
 import blusunrize.lib.manual.ManualUtils;
 import blusunrize.lib.manual.Tree;
 import blusunrize.lib.manual.Tree.AbstractNode;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3x2fStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.opengl.GlStateManager.DestFactor.ZERO;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.ONE;
-import static com.mojang.blaze3d.opengl.GlStateManager.SourceFactor.SRC_ALPHA;
 
 public class ClickableList extends Button
 {
@@ -64,17 +60,17 @@ public class ClickableList extends Button
 	}
 
 	@Override
-	public void renderWidget(@NotNull GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
+	protected void extractContents(@NotNull GuiGraphicsExtractor graphics, int mx, int my, float partialTicks)
 	{
-		PoseStack transform = graphics.pose();
+		Matrix3x2fStack transform = graphics.pose();
 		if(!visible)
 			return;
 		Font fr = gui.manual.fontRenderer();
 
 		int mmY = my-this.getY();
-		transform.pushPose();
-		transform.scale(textScale, textScale, textScale);
-		transform.translate(getX()/textScale, getY()/textScale, 0);
+		transform.pushMatrix();
+		transform.scale(textScale, textScale);
+		transform.translate(getX()/textScale, getY()/textScale);
 		isHovered = mx >= getX()&&mx < getX()+width&&my >= getY()&&my < getY()+height;
 		for(int i = 0; i < Math.min(perPage, headers.length); i++)
 		{
@@ -83,21 +79,16 @@ public class ClickableList extends Button
 			if(currEntryHovered)
 				col = gui.manual.getHighlightColour();
 			if(i!=0)
-				transform.translate(0, getFontHeight(), 0);
+				transform.translate(0, getFontHeight());
 			int j = offset+i;
 			if(j > headers.length-1)
 				j = headers.length-1;
 			String s = headers[j];
 			if(isCategory[j])
-			{
-				RenderSystem.enableBlend();
-				RenderSystem.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, ONE, ZERO);
-				graphics.blit(gui.texture, 0, 0, 11, 226+(currEntryHovered?20: 0), 5, 10);
-			}
-			graphics.drawString(fr, s, isCategory[j]?7: 0, 0, col, false);
+				graphics.blit(RenderPipelines.GUI_TEXTURED, gui.texture, 0, 0, 11, 226+(currEntryHovered?20: 0), 5, 10, 256, 256);
+			graphics.text(fr, s, isCategory[j]?7: 0, 0, col, false);
 		}
-		transform.scale(1/textScale, 1/textScale, 1/textScale);
-		transform.popPose();
+		transform.popMatrix();
 		if(maxOffset > 0)
 		{
 			final int minVisibleBlack = 0x1B<<24;
@@ -132,7 +123,7 @@ public class ClickableList extends Button
 	@Nullable
 	public AbstractNode<Identifier, ManualEntry> getSelected(double mx, double my)
 	{
-		if(!super.clicked(mx, my))
+		if(!isMouseOver(mx, my))
 			return null;
 		double mmY = my-this.getY();
 		for(int i = 0; i < Math.min(perPage, headers.length); i++)
@@ -142,15 +133,13 @@ public class ClickableList extends Button
 	}
 
 	@Override
-	public void onClick(double mx, double my)
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
 	{
-		handler.accept(getSelected(mx, my));
-	}
-
-	@Override
-	protected boolean clicked(double mx, double my)
-	{
-		return getSelected(mx, my)!=null;
+		AbstractNode<Identifier, ManualEntry> selected = getSelected(event.x(), event.y());
+		if(selected==null)
+			return false;
+		handler.accept(selected);
+		return true;
 	}
 
 	public void setEntries(List<AbstractNode<Identifier, ManualEntry>> nodes)

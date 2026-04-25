@@ -31,7 +31,6 @@ public class DieselGeneratorShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(new BlockPos(1, 1, 4).equals(posInMultiblock))

@@ -37,13 +37,11 @@ public class FlareBullet implements BulletHandler.IBullet<Color4>
 	{
 	}
 
-	@Override
 	public CodecsAndDefault<Color4> getCodec()
 	{
 		return CODEC;
 	}
 
-	@Override
 	public Entity getProjectile(Player shooter, Color4 color, Entity projectile, boolean electro)
 	{
 		RevolvershotFlareEntity flare = shooter!=null?new RevolvershotFlareEntity(projectile.level(), shooter,
@@ -56,30 +54,25 @@ public class FlareBullet implements BulletHandler.IBullet<Color4>
 		return flare;
 	}
 
-	@Override
 	public void onHitTarget(Level world, HitResult target, UUID shooter, Entity projectile, boolean headshot, Color4 bulletData)
 	{
 	}
 
-	@Override
 	public ItemStack getCasing(ItemStack stack)
 	{
 		return BulletHandler.emptyShell.asItem().getDefaultInstance();
 	}
 
-	@Override
 	public Identifier[] getTextures()
 	{
 		return textures;
 	}
 
-	@Override
 	public void addTooltip(Color4 color, TooltipContext world, List<Component> list, TooltipFlag flag)
 	{
 		list.add(FontUtils.withAppendColoredColour(Component.translatable(Lib.DESC_INFO+"bullet.flareColour"), color.toInt()));
 	}
 
-	@Override
 	public Color4 getColour(Color4 color, int layer)
 	{
 		if(layer!=1)
@@ -87,7 +80,6 @@ public class FlareBullet implements BulletHandler.IBullet<Color4>
 		return color;
 	}
 
-	@Override
 	public boolean isValidForTurret()
 	{
 		return true;

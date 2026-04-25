@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  */
 public class CokeOvenRecipe extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<CokeOvenRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CokeOvenRecipe>> SERIALIZER;
 	public static final CachedRecipeList<CokeOvenRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.COKE_OVEN);
 
 	public final IngredientWithSize input;
@@ -47,12 +47,10 @@ public class CokeOvenRecipe extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer getIESerializer()
+	protected RecipeSerializer<?> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return this.output.get();

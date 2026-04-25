@@ -30,13 +30,11 @@ public class BlockEntityInventory implements Container
 		this.eventHandler = eventHandler;
 	}
 
-	@Override
 	public int getContainerSize()
 	{
 		return inv.getInventory().size();
 	}
 
-	@Override
 	public boolean isEmpty()
 	{
 		for(ItemStack stack : inv.getInventory())
@@ -49,13 +47,11 @@ public class BlockEntityInventory implements Container
 		return true;
 	}
 
-	@Override
 	public ItemStack getItem(int index)
 	{
 		return inv.getInventory().get(index);
 	}
 
-	@Override
 	public ItemStack removeItem(int index, int count)
 	{
 		ItemStack stack = inv.getInventory().get(index);
@@ -74,7 +70,6 @@ public class BlockEntityInventory implements Container
 		return stack;
 	}
 
-	@Override
 	public ItemStack removeItemNoUpdate(int index)
 	{
 		ItemStack ret = inv.getInventory().get(index).copy();
@@ -82,26 +77,22 @@ public class BlockEntityInventory implements Container
 		return ret;
 	}
 
-	@Override
 	public void setItem(int index, ItemStack stack)
 	{
 		inv.getInventory().set(index, stack);
 		eventHandler.slotsChanged(this);
 	}
 
-	@Override
 	public int getMaxStackSize()
 	{
 		return 64;
 	}
 
-	@Override
 	public void setChanged()
 	{
 		tile.setChanged();
 	}
 
-	@Override
 	public boolean stillValid(Player player)
 	{
 		return isValidForPlayer(tile, player);
@@ -114,24 +105,20 @@ public class BlockEntityInventory implements Container
 		return !bEntity.isRemoved()&&Vec3.atCenterOf(bEntity.getBlockPos()).distanceToSqr(player.position()) < 64;
 	}
 
-	@Override
 	public void startOpen(Player player)
 	{
 	}
 
-	@Override
 	public void stopOpen(Player player)
 	{
 		inv.doGraphicalUpdates();
 	}
 
-	@Override
 	public boolean canPlaceItem(int index, ItemStack stack)
 	{
 		return inv.isStackValid(index, stack);
 	}
 
-	@Override
 	public void clearContent()
 	{
 		for(int i = 0; i < inv.getInventory().size(); i++)

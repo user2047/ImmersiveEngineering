@@ -21,13 +21,11 @@ public record MessageStoredEnergy(VoltmeterItem.RemoteEnergyData data) implement
 	public static final StreamCodec<ByteBuf, MessageStoredEnergy> CODEC = RemoteEnergyData.CODEC
 			.map(MessageStoredEnergy::new, MessageStoredEnergy::data);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> VoltmeterItem.lastEnergyUpdate = data);
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

@@ -22,7 +22,6 @@ public class ExcavatorShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getX()==2&&posInMultiblock.getZ()==4)

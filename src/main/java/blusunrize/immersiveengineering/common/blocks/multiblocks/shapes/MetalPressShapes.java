@@ -22,7 +22,6 @@ public class MetalPressShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getY()==1&&posInMultiblock.getX()%2==0)

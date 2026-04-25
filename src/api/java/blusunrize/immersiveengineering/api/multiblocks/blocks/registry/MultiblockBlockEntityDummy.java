@@ -22,12 +22,17 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.stream.Stream;
 
 public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 		extends BlockEntity
@@ -47,17 +52,19 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag tag, Provider provider)
+	protected void loadAdditional(ValueInput input)
 	{
-		super.loadAdditional(tag, provider);
-		helper.load(tag, provider);
+		super.loadAdditional(input);
+		helper.load(input.read("ieData", CompoundTag.CODEC).orElseGet(CompoundTag::new), input.lookup());
 	}
 
 	@Override
-	protected void saveAdditional(@Nonnull CompoundTag tag, Provider provider)
+	protected void saveAdditional(ValueOutput output)
 	{
-		super.saveAdditional(tag, provider);
-		helper.saveAdditional(tag, provider);
+		super.saveAdditional(output);
+		CompoundTag tag = new CompoundTag();
+		helper.saveAdditional(tag, Provider.create(Stream.empty()));
+		output.store("ieData", CompoundTag.CODEC, tag);
 	}
 
 	@Nonnull
@@ -67,13 +74,11 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 		return helper.getUpdateTag(provider);
 	}
 
-	@Override
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		helper.handleUpdateTag(tag, provider);
 	}
 
-	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		helper.onDataPacket(pkt.getTag(), provider);
@@ -84,6 +89,13 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	public Packet<ClientGamePacketListener> getUpdatePacket()
 	{
 		return helper.getUpdatePacket();
+	}
+
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state)
+	{
+		super.preRemoveSideEffects(pos, state);
+		helper.disassemble();
 	}
 
 	@Override

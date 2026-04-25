@@ -14,10 +14,9 @@ public class FakeIconItem extends IEBaseItem
 {
 	public FakeIconItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public void fillCreativeTab(Output out)
 	{
 	}

@@ -26,6 +26,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
@@ -38,6 +39,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -107,7 +110,7 @@ public class SkylineHookEntity extends Entity
 		this.connection = c;
 		this.start = start;
 		Vec3 pos = connection.getPoint(this.linePos, start).add(Vec3.atLowerCornerOf(start.position()));
-		this.moveTo(pos.x, pos.y, pos.z, this.getYRot(), this.getXRot());
+		this.setPos(pos.x, pos.y, pos.z);
 		if(!connection.getCatenaryData().isVertical())
 			this.angle = Math.atan2(connection.getCatenaryData().getDeltaZ(), connection.getCatenaryData().getDeltaX());
 		ignoreCollisions.clear();
@@ -131,14 +134,18 @@ public class SkylineHookEntity extends Entity
 		this.entityData.set(SLOPE_MODIFIER, slopeModifier);
 	}
 
-	@Override
 	protected void defineSynchedData(Builder builder)
 	{
 		builder.define(SLOPE_MODIFIER, 1f);
 	}
 
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount)
+	{
+		discard();
+		return true;
+	}
 
-	@Override
+
 	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		double d1 = this.getBoundingBox().getSize()*4.0D;
@@ -146,10 +153,9 @@ public class SkylineHookEntity extends Entity
 		return distance < d1*d1;
 	}
 
-	@Override
 	public void tick()
 	{
-		if(tickCount==1&&level().isClientSide)
+		if(tickCount==1&&level().isClientSide())
 			ImmersiveEngineering.proxy.startSkyhookSound(this);
 		Player player = null;
 		List<Entity> list = this.getPassengers();
@@ -157,12 +163,12 @@ public class SkylineHookEntity extends Entity
 			player = (Player)list.get(0);
 		if(connection==null||player==null||(hand!=null&&player.getItemInHand(hand).getItem()!=Misc.SKYHOOK.asItem()))
 		{
-			if(!level().isClientSide)
+			if(!level().isClientSide())
 				discard();
 			return;
 		}
 		//TODO figure out how to get the speed keeping on dismount working with less sync packets
-		if(this.tickCount%5==0&&!level().isClientSide)
+		if(this.tickCount%5==0&&!level().isClientSide())
 			sendUpdatePacketTo(player);
 		PlayerUtils.resetFloatingState(player);
 		boolean moved = false;
@@ -399,7 +405,6 @@ public class SkylineHookEntity extends Entity
 				.sum();
 	}
 
-	@Override
 	@Nullable
 	public LivingEntity getControllingPassenger()
 	{
@@ -407,69 +412,58 @@ public class SkylineHookEntity extends Entity
 		return list.isEmpty()?null: (LivingEntity)list.get(0);
 	}
 
-	@Override
 	public boolean shouldRiderSit()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isInvisible()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean displayFireAnimation()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isPushedByFluid()
 	{
 		return false;
 	}
 
-	@Override
 	public Vec3 getPassengerAttachmentPoint(Entity rider, EntityDimensions size, float p_296362_)
 	{
 		return new Vec3(0.0F, size.height()-2, 0.0F);
 	}
 
-	@Override
-	protected void addAdditionalSaveData(CompoundTag nbt)
+	protected void addAdditionalSaveData(ValueOutput nbt)
 	{
 		nbt.putFloat("slopeModifier", this.slopeModifier);
 	}
 
-	@Override
-	protected void readAdditionalSaveData(CompoundTag nbt)
+	protected void readAdditionalSaveData(ValueInput nbt)
 	{
-		this.slopeModifier = nbt.getFloat("slopeModifier");
+		this.slopeModifier = nbt.getFloatOr("slopeModifier", 0);
 		this.setSlopeModifier(this.slopeModifier);
 	}
 
-	@Override
 	public float getPickRadius()
 	{
 		return 0.0F;
 	}
 
-	@Override
 	public boolean isPickable()
 	{
 		return false;
 	}
 
-	@Override
-	public boolean hurt(DamageSource source, float amount)
+	public boolean hurtOld(DamageSource source, float amount)
 	{
 		this.discard();
 		return true;
 	}
 
-	@Override
 	public boolean isControlledByLocalInstance()
 	{
 		return false;
@@ -490,22 +484,20 @@ public class SkylineHookEntity extends Entity
 		{
 			ItemStack held = ((Player)passenger).getItemInHand(hand);
 			if(held.getItem()==Misc.SKYHOOK.asItem())
-				((Player)passenger).getCooldowns().addCooldown(Misc.SKYHOOK.asItem(), 10);
+				((Player)passenger).getCooldowns().addCooldown(held, 10);
 		}
 	}
 
-	@Override
 	protected void removePassenger(Entity passenger)
 	{
 		super.removePassenger(passenger);
-		if(!level().isClientSide)
+		if(!level().isClientSide())
 			ApiUtils.addFutureServerTask(level(), () -> handleDismount(passenger));
 		else
 			//TODO is this still needed?
 			ApiUtils.addFutureServerTask(level(), () -> handleDismount(passenger), true);
 	}
 
-	@Override
 	public void absMoveTo(double x, double y, double z, float yaw, float pitch)
 	{
 		//NOP

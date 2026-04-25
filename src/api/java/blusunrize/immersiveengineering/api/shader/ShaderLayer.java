@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.api.shader;
 
 import blusunrize.immersiveengineering.api.utils.Color4;
 import com.google.common.base.Preconditions;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 
 public class ShaderLayer

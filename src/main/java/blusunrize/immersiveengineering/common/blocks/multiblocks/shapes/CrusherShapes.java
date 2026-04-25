@@ -44,7 +44,6 @@ public class CrusherShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getZ()==1&&posInMultiblock.getX()==2)

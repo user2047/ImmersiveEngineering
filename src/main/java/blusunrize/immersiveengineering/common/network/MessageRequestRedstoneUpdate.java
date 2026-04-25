@@ -30,7 +30,6 @@ public record MessageRequestRedstoneUpdate(BlockPos pos) implements IMessage
 	public static final StreamCodec<ByteBuf, MessageRequestRedstoneUpdate> CODEC = BlockPos.STREAM_CODEC
 			.map(MessageRequestRedstoneUpdate::new, MessageRequestRedstoneUpdate::pos);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -71,7 +70,6 @@ public record MessageRequestRedstoneUpdate(BlockPos pos) implements IMessage
 		return redstoneLevel;
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

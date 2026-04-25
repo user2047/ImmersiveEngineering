@@ -38,7 +38,6 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 	private GuiButtonBoolean[] colorButtonsOutput;
 	private GuiButtonBoolean[] colorButtonsControl;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -91,7 +90,6 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
@@ -118,7 +116,6 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 			super(x, y, width, Component.empty(), min, max, value, handler);
 		}
 
-		@Override
 		protected void updateMessage()
 		{
 			this.setMessage(RedstoneTimerBlockEntity.getTimeFormatted(this.getValueInt()));

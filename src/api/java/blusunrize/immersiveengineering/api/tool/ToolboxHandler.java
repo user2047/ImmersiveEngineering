@@ -57,7 +57,6 @@ public class ToolboxHandler
 	static
 	{
 		Set<ItemAbility> toolActions = Sets.newHashSet();
-		toolActions.addAll(ItemAbilities.DEFAULT_PICKAXE_ACTIONS);
 		toolActions.addAll(ItemAbilities.DEFAULT_AXE_ACTIONS);
 		toolActions.addAll(ItemAbilities.DEFAULT_SHOVEL_ACTIONS);
 		toolActions.addAll(ItemAbilities.DEFAULT_HOE_ACTIONS);

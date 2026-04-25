@@ -50,25 +50,21 @@ public class UnionMultiblock implements IMultiblock
 				.orElse(Component.empty().copy());
 	}
 
-	@Override
 	public Identifier getUniqueName()
 	{
 		return name;
 	}
 
-	@Override
 	public boolean isBlockTrigger(BlockState state, Direction side, @Nullable Level world)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean createStructure(Level world, BlockPos pos, Direction side, Player player)
 	{
 		return false;
 	}
 
-	@Override
 	public List<StructureBlockInfo> getStructure(@Nullable Level world)
 	{
 		Vec3i min = getMin(world);
@@ -79,13 +75,11 @@ public class UnionMultiblock implements IMultiblock
 		return ret;
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;
 	}
 
-	@Override
 	public Vec3i getSize(@Nullable Level world)
 	{
 		Vec3i max = Vec3i.ZERO;
@@ -128,25 +122,21 @@ public class UnionMultiblock implements IMultiblock
 		return new Vec3i(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
 	}
 
-	@Override
 	public void disassemble(Level world, BlockPos startPos, boolean mirrored, Direction clickDirectionAtCreation)
 	{
 
 	}
 
-	@Override
 	public BlockPos getTriggerOffset()
 	{
 		return BlockPos.ZERO;
 	}
 
-	@Override
 	public void initializeClient(Consumer<MultiblockManualData> consumer)
 	{
 		consumer.accept(new UnionMBManualData(parts, getMin(ImmersiveEngineering.proxy.getClientWorld())));
 	}
 
-	@Override
 	public Component getDisplayName()
 	{
 		return displayName.get();

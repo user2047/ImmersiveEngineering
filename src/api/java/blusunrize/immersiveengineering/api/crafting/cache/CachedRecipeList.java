@@ -11,7 +11,9 @@ package blusunrize.immersiveengineering.api.crafting.cache;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.crafting.IERecipeTypes;
 import com.google.common.collect.Streams;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -20,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 
 import javax.annotation.Nonnull;
@@ -28,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,12 +61,6 @@ public class CachedRecipeList<R extends Recipe<?>>
 		++reloadCount;
 	}
 
-	@SubscribeEvent(priority = EventPriority.HIGH)
-	public static void onRecipeUpdatedClient(RecipesUpdatedEvent ev)
-	{
-		++reloadCount;
-	}
-
 	public static int getReloadCount()
 	{
 		return reloadCount;
@@ -74,13 +68,13 @@ public class CachedRecipeList<R extends Recipe<?>>
 
 	public List<RecipeHolder<R>> getRecipes(@Nonnull Level level)
 	{
-		updateCache(level.getRecipeManager(), level.isClientSide());
+		updateCache(level.getServer()!=null?level.getServer().getRecipeManager(): null, level.isClientSide());
 		return Objects.requireNonNull(recipeHolders);
 	}
 
 	public Collection<Identifier> getRecipeNames(@Nonnull Level level)
 	{
-		updateCache(level.getRecipeManager(), level.isClientSide());
+		updateCache(level.getServer()!=null?level.getServer().getRecipeManager(): null, level.isClientSide());
 		return Objects.requireNonNull(recipes).keySet();
 	}
 
@@ -92,7 +86,7 @@ public class CachedRecipeList<R extends Recipe<?>>
 
 	public RecipeHolder<R> holderById(@Nonnull Level level, Identifier name)
 	{
-		updateCache(level.getRecipeManager(), level.isClientSide());
+		updateCache(level.getServer()!=null?level.getServer().getRecipeManager(): null, level.isClientSide());
 		return recipes.get(name);
 	}
 
@@ -100,6 +94,14 @@ public class CachedRecipeList<R extends Recipe<?>>
 	{
 		if(recipes!=null&&cachedAtReloadCount==reloadCount&&(!cachedDataIsClient||isClient))
 			return;
+		if(manager==null)
+		{
+			this.recipes = Map.of();
+			this.recipeHolders = List.of();
+			this.cachedDataIsClient = isClient;
+			this.cachedAtReloadCount = reloadCount;
+			return;
+		}
 		this.recipes = manager.getRecipes().stream()
 				.filter(iRecipe -> iRecipe.value().getType()==type.get())
 				.flatMap(r -> {
@@ -109,13 +111,16 @@ public class CachedRecipeList<R extends Recipe<?>>
 						String fmt = total >= 10000?"%05d": total >= 1000?"%04d": total >= 100?"%03d": total >= 10?"%02d": "%01d";
 						return Streams.mapWithIndex(
 								listRecipe.getSubRecipes().stream(),
-								(subRecipe, i) -> new RecipeHolder<>(r.id().withSuffix(String.format(fmt, i)), subRecipe)
+								(subRecipe, i) -> new RecipeHolder<>(
+										ResourceKey.create(Registries.RECIPE, r.id().identifier().withSuffix(String.format(fmt, i))),
+										subRecipe
+								)
 						);
 					}
 					else
 						return Stream.of(r);
 				})
-				.collect(Collectors.toMap(RecipeHolder::id, rh -> (RecipeHolder<R>)rh));
+				.collect(Collectors.toMap(rh -> rh.id().identifier(), rh -> (RecipeHolder<R>)rh));
 		this.recipeHolders = List.copyOf(this.recipes.values());
 		this.cachedDataIsClient = isClient;
 		this.cachedAtReloadCount = reloadCount;

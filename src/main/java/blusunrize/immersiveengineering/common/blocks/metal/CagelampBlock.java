@@ -21,7 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -56,14 +56,12 @@ public class CagelampBlock extends IEBaseBlock implements IBlockOverlayText
 		super(props);
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		return super.getInitDefaultState().setValue(IEProperties.INT_16, 14);
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState state = super.getStateForPlacement(context);
@@ -75,22 +73,19 @@ public class CagelampBlock extends IEBaseBlock implements IBlockOverlayText
 		return state;
 	}
 
-	@Override
 	public void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
 	{
 		if(level instanceof ServerLevel serverlevel)
 			this.updateActiveState(blockState, serverlevel, pos);
 	}
 
-	@Override
 	public void onIEBlockPlacedBy(BlockPlaceContext context, BlockState state)
 	{
 		if(context.getLevel() instanceof ServerLevel serverlevel)
 			this.updateActiveState(state, serverlevel, context.getClickedPos());
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level level, BlockPos pos, BlockHitResult hit)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level level, BlockPos pos, BlockHitResult hit)
 	{
 		if(level instanceof ServerLevel serverlevel)
 		{
@@ -100,10 +95,9 @@ public class CagelampBlock extends IEBaseBlock implements IBlockOverlayText
 			else
 				level.setBlock(pos, state.cycle(IEProperties.INT_16), 3);
 		}
-		return ItemInteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(blockState!=null&&Utils.isScrewdriver(player.getMainHandItem()))
@@ -126,7 +120,6 @@ public class CagelampBlock extends IEBaseBlock implements IBlockOverlayText
 		}
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -142,7 +135,6 @@ public class CagelampBlock extends IEBaseBlock implements IBlockOverlayText
 			.put(Direction.EAST, Shapes.box(0, .1875, .1875, .6875, .8125, .8125))
 			.build();
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(IEProperties.FACING_ALL));

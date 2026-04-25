@@ -24,10 +24,9 @@ public class RevolverCycleRecipe extends CustomRecipe
 {
 	public RevolverCycleRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		ItemStack revolver = ItemStack.EMPTY;
@@ -46,8 +45,7 @@ public class RevolverCycleRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		ItemStack revolver = ItemStack.EMPTY;
 		for(int i = 0; i < inv.size(); i++)
@@ -64,21 +62,18 @@ public class RevolverCycleRecipe extends CustomRecipe
 		return revolver;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width >= 2&&height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.REVOLVER_CYCLE_SERIALIZER.get();
 	}

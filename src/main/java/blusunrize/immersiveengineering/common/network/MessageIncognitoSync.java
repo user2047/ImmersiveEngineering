@@ -27,7 +27,6 @@ public record MessageIncognitoSync(int entityID, boolean isIncognito) implements
 			MessageIncognitoSync::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		if(context.flow().getReceptionSide()==LogicalSide.CLIENT)
@@ -43,7 +42,6 @@ public record MessageIncognitoSync(int entityID, boolean isIncognito) implements
 			});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

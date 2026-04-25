@@ -100,7 +100,6 @@ public class ItemBatcherMenu extends IEContainerMenu
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
@@ -128,16 +127,15 @@ public class ItemBatcherMenu extends IEContainerMenu
 		return itemstack;
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
 		super.receiveMessageFromScreen(nbt);
-		if(nbt.contains("batchMode", Tag.TAG_BYTE))
-			batchMode.set((int)nbt.getByte("batchMode"));
-		if(nbt.contains("redstoneColor_slot", Tag.TAG_INT))
+		if(nbt.contains("batchMode"))
+			batchMode.set((int)nbt.getByteOr("batchMode", (byte)0));
+		if(nbt.contains("redstoneColor_slot"))
 		{
-			final int slot = nbt.getInt("redstoneColor_slot");
-			final int newValue = nbt.getInt("redstoneColor_val");
+			final int slot = nbt.getIntOr("redstoneColor_slot", 0);
+			final int newValue = nbt.getIntOr("redstoneColor_val", 0);
 			colors.get(slot).set(newValue);
 		}
 	}

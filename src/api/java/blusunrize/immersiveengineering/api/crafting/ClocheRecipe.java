@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 public class ClocheRecipe extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<ClocheRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ClocheRecipe>> SERIALIZER;
 
 	public final List<StackWithChance> outputs;
 	public final Ingredient seed;
@@ -87,12 +87,10 @@ public class ClocheRecipe extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<ClocheRecipe> getIESerializer()
+	protected RecipeSerializer<ClocheRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return this.outputs.get(0).stack().get();

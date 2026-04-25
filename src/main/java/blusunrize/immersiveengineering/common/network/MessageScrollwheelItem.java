@@ -24,7 +24,6 @@ public record MessageScrollwheelItem(boolean forward) implements IMessage
 	public static final StreamCodec<ByteBuf, MessageScrollwheelItem> CODEC = ByteBufCodecs.BOOL
 			.map(MessageScrollwheelItem::new, MessageScrollwheelItem::forward);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		Player player = context.player();
@@ -35,7 +34,6 @@ public record MessageScrollwheelItem(boolean forward) implements IMessage
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

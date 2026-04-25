@@ -20,7 +20,6 @@ public class DieselGeneratorMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.DIESEL_GENERATOR);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

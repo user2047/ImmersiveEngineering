@@ -29,7 +29,6 @@ public class TransformerBlockItem extends BlockItemIE
 	}
 
 	@Nullable
-	@Override
 	protected BlockState getPlacementState(BlockPlaceContext context)
 	{
 		Level w = context.getLevel();

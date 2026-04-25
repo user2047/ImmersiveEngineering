@@ -31,10 +31,9 @@ public class JerrycanRefillRecipe extends CustomRecipe
 
 	public JerrycanRefillRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(@Nonnull CraftingInput inv, Level world)
 	{
 		ItemStack[] components = getComponents(inv);
@@ -51,8 +50,7 @@ public class JerrycanRefillRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(@Nonnull CraftingInput inv, Provider access)
+	public ItemStack assemble(@Nonnull CraftingInput inv)
 	{
 		ItemStack[] components = getComponents(inv);
 		ItemStack newContainer = components[containerIndex].copyWithCount(1);
@@ -93,14 +91,12 @@ public class JerrycanRefillRecipe extends CustomRecipe
 		return c;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
 		NonNullList<ItemStack> remaining = super.getRemainingItems(inv);
@@ -120,8 +116,7 @@ public class JerrycanRefillRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.JERRYCAN_REFILL.get();
 	}

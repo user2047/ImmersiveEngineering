@@ -46,11 +46,10 @@ public class SawmillRecipeCategory extends IERecipeCategory<SawmillRecipe>
 		this.arrowNormal = helper.createAnimatedDrawable(arrowStatic, 80, IDrawableAnimated.StartDirection.LEFT, false);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, SawmillRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 3, 7)
-				.addItemStacks(Arrays.asList(recipe.input.getItems()));
+				.addItemStacks(java.util.List.of());
 
 		if(!recipe.stripped.get().isEmpty())
 			builder.addSlot(RecipeIngredientRole.OUTPUT, 47, 7)
@@ -78,7 +77,6 @@ public class SawmillRecipeCategory extends IERecipeCategory<SawmillRecipe>
 	}
 
 
-	@Override
 	public void draw(SawmillRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		if(recipe.stripped.get().isEmpty())

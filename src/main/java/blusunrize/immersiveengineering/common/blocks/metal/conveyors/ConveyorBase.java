@@ -23,13 +23,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -65,40 +66,34 @@ public abstract class ConveyorBase implements IConveyorBelt
 		this.tile = tile;
 	}
 
-	@Override
 	public BlockEntity getBlockEntity()
 	{
 		return tile;
 	}
 
-	@Override
 	public ConveyorDirection getConveyorDirection()
 	{
 		return direction;
 	}
 
-	@Override
 	public boolean changeConveyorDirection()
 	{
-		if(!tile.getLevel().isClientSide)
+		if(!tile.getLevel().isClientSide())
 			direction = direction==ConveyorDirection.HORIZONTAL?ConveyorDirection.UP: direction==ConveyorDirection.UP?ConveyorDirection.DOWN: ConveyorDirection.HORIZONTAL;
 		return true;
 	}
 
-	@Override
 	public boolean setConveyorDirection(ConveyorDirection dir)
 	{
 		direction = dir;
 		return true;
 	}
 
-	@Override
 	public boolean isActive()
 	{
 		return true;
 	}
 
-	@Override
 	public void onEntityCollision(@Nonnull Entity entity)
 	{
 		collisionTracker.onEntityCollided(entity);
@@ -107,13 +102,11 @@ public abstract class ConveyorBase implements IConveyorBelt
 			((ItemEntity)entity).setPickUpDelay(10);
 	}
 
-	@Override
 	public boolean isBlocked()
 	{
 		return collisionTracker.getCollidedInRange(getBlockEntity().getLevel().getGameTime()) > 2;
 	}
 
-	@Override
 	public void onItemDeployed(ItemEntity entity)
 	{
 		IConveyorBelt.super.onItemDeployed(entity);
@@ -121,7 +114,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 			entity.setPickUpDelay(10);
 	}
 
-	@Override
 	public boolean playerInteraction(Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ, Direction side)
 	{
 		return handleCoverInteraction(player, hand, heldItem);
@@ -129,7 +121,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 
 	/* ============ NBT ============ */
 
-	@Override
 	public CompoundTag writeConveyorNBT()
 	{
 		CompoundTag nbt = new CompoundTag();
@@ -141,21 +132,20 @@ public abstract class ConveyorBase implements IConveyorBelt
 		return nbt;
 	}
 
-	@Override
 	public void readConveyorNBT(CompoundTag nbt)
 	{
-		direction = ConveyorDirection.values()[nbt.getInt("direction")];
-		if(nbt.contains("dyeColour", Tag.TAG_INT))
-			dyeColour = DyeColor.byId(nbt.getInt("dyeColour"));
+		direction = ConveyorDirection.values()[nbt.getIntOr("direction", 0)];
+		if(nbt.contains("dyeColour"))
+			dyeColour = DyeColor.byId(nbt.getIntOr("dyeColour", 0));
 		else
 			dyeColour = null;
-		if(nbt.contains("cover", Tag.TAG_STRING))
-			cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getString("cover")));
+		if(nbt.contains("cover"))
+			cover = BuiltInRegistries.BLOCK.get(Identifier.parse(nbt.getStringOr("cover", "")))
+					.map(holder -> holder.value()).orElse(Blocks.AIR);
 	}
 
 	/* ============ RENDERING ============ */
 
-	@Override
 	public boolean setDyeColour(DyeColor colour)
 	{
 		if(colour==this.dyeColour)
@@ -164,7 +154,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 		return true;
 	}
 
-	@Override
 	public DyeColor getDyeColour()
 	{
 		return this.dyeColour;
@@ -176,7 +165,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 
 	private static final CachedVoxelShapes<ShapeKey> SHAPES = new CachedVoxelShapes<>(ConveyorBase::getBoxes);
 
-	@Override
 	public VoxelShape getCollisionShape()
 	{
 		VoxelShape baseShape = IConveyorBelt.super.getCollisionShape();
@@ -185,7 +173,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 		return baseShape;
 	}
 
-	@Override
 	public VoxelShape getSelectionShape()
 	{
 		if(isCovered())
@@ -250,7 +237,7 @@ public abstract class ConveyorBase implements IConveyorBelt
 
 	public void dropCover(Player player)
 	{
-		if(tile!=null&&!tile.getLevel().isClientSide&&cover!=Blocks.AIR&&tile.getLevel().getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+		if(tile!=null&&tile.getLevel() instanceof ServerLevel serverLevel&&cover!=Blocks.AIR&&serverLevel.getGameRules().get(GameRules.BLOCK_DROPS))
 		{
 			ItemEntity entityitem = player.drop(new ItemStack(cover), false);
 			if(entityitem!=null)
@@ -297,7 +284,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 			return te.getLevel().getBestNeighborSignal(te.getBlockPos()) > 0;
 	}
 
-	@Override
 	public Direction getFacing()
 	{
 		BlockEntity te = getBlockEntity();
@@ -306,13 +292,11 @@ public abstract class ConveyorBase implements IConveyorBelt
 		return Direction.NORTH;
 	}
 
-	@Override
 	public Block getCover()
 	{
 		return cover;
 	}
 
-	@Override
 	public void setCover(Block cover)
 	{
 		this.cover = cover;
@@ -334,7 +318,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 			this.superShape = superShape;
 		}
 
-		@Override
 		public boolean equals(Object o)
 		{
 			if(this==o) return true;
@@ -346,7 +329,6 @@ public abstract class ConveyorBase implements IConveyorBelt
 					Objects.equals(superShape, shapeKey.superShape);
 		}
 
-		@Override
 		public int hashCode()
 		{
 			return Objects.hash(direction, collision, facing, superShape);

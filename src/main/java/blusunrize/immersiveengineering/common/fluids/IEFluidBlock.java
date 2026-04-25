@@ -10,12 +10,13 @@ package blusunrize.immersiveengineering.common.fluids;
 
 import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.common.register.IEFluids.FluidEntry;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -45,7 +46,6 @@ public class IEFluidBlock extends LiquidBlock
 		entryStatic = null;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(@Nonnull Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -54,7 +54,6 @@ public class IEFluidBlock extends LiquidBlock
 	}
 
 	@Nonnull
-	@Override
 	public FluidState getFluidState(@Nonnull BlockState state)
 	{
 		FluidState baseState = super.getFluidState(state);
@@ -77,10 +76,16 @@ public class IEFluidBlock extends LiquidBlock
 		this.level = level;
 	}
 
-	@Override
-	public void entityInside(@Nonnull BlockState state, @Nonnull Level worldIn, @Nonnull BlockPos pos, @Nonnull Entity entityIn)
+	public void entityInside(
+			@Nonnull BlockState state,
+			@Nonnull Level worldIn,
+			@Nonnull BlockPos pos,
+			@Nonnull Entity entityIn,
+			@Nonnull InsideBlockEffectApplier effectApplier,
+			boolean wasInside
+	)
 	{
-		super.entityInside(state, worldIn, pos, entityIn);
+		super.entityInside(state, worldIn, pos, entityIn, effectApplier, wasInside);
 		if(effect!=null&&entityIn instanceof LivingEntity)
 			((LivingEntity)entityIn).addEffect(new MobEffectInstance(effect, duration, level));
 	}

@@ -13,19 +13,20 @@ import blusunrize.immersiveengineering.client.models.CompositeBakedModel;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class CachedMirroredModel<K, T extends ICacheKeyProvider<K>> extends CompositeBakedModel<T> implements ICacheKeyProvider<K>
+public class CachedMirroredModel<K, T extends BakedModel & ICacheKeyProvider<K>> extends CompositeBakedModel<T> implements ICacheKeyProvider<K>
 {
 	private final LoadingCache<K, List<BakedQuad>> cache;
 
@@ -37,7 +38,6 @@ public class CachedMirroredModel<K, T extends ICacheKeyProvider<K>> extends Comp
 				.build(CacheLoader.from(k -> MirroredModelLoader.reversedQuads(base.getQuads(k))));
 	}
 
-	@Override
 	public List<BakedQuad> getQuads(K key)
 	{
 		if(key!=null)
@@ -47,7 +47,6 @@ public class CachedMirroredModel<K, T extends ICacheKeyProvider<K>> extends Comp
 	}
 
 	@Nullable
-	@Override
 	public K getKey(
 			@Nullable BlockState state,
 			@Nullable Direction side,
@@ -60,7 +59,6 @@ public class CachedMirroredModel<K, T extends ICacheKeyProvider<K>> extends Comp
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(
 			@Nullable BlockState pState,
 			@Nullable Direction pSide,
@@ -69,6 +67,6 @@ public class CachedMirroredModel<K, T extends ICacheKeyProvider<K>> extends Comp
 			@Nullable RenderType layer
 	)
 	{
-		return ICacheKeyProvider.super.getQuads(pState, pSide, pRand, extraData, layer);
+		return getQuads(getKey(pState, pSide, pRand, extraData, layer));
 	}
 }

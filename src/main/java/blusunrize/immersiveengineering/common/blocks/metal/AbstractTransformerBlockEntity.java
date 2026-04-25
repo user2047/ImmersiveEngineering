@@ -78,44 +78,37 @@ public abstract class AbstractTransformerBlockEntity extends ImmersiveConnectabl
 		return MV_CATEGORY;
 	}
 
-	@Override
 	public double getPowerLimit()
 	{
 		if(leftType==null||rightType==null) return 0;
 		return Math.min(((IEnergyWire)leftType).getTransferRate(), ((IEnergyWire)rightType).getTransferRate());
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(new ConnectionPoint(worldPosition, RIGHT_INDEX), new ConnectionPoint(worldPosition, LEFT_INDEX));
 	}
 
-	@Override
 	public Iterable<? extends Connection> getInternalConnections()
 	{
 		return ImmutableList.of(new Connection(worldPosition, LEFT_INDEX, RIGHT_INDEX));
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		return getConnectionOffset(type, here.index()==RIGHT_INDEX);
 	}
 
-	@Override
 	public void removeCable(Connection connection, ConnectionPoint attachedPoint)
 	{
 		WireType type = connection!=null?connection.type: null;
@@ -162,7 +155,6 @@ public abstract class AbstractTransformerBlockEntity extends ImmersiveConnectabl
 			nbt.putString("rightType", rightType.getUniqueName());
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
@@ -176,7 +168,6 @@ public abstract class AbstractTransformerBlockEntity extends ImmersiveConnectabl
 			rightType = null;
 	}
 
-	@Override
 	public boolean canConnect()
 	{
 		return true;
@@ -188,13 +179,11 @@ public abstract class AbstractTransformerBlockEntity extends ImmersiveConnectabl
 	{
 	}
 
-	@Override
 	public boolean isSource(ConnectionPoint cp)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isSink(ConnectionPoint cp)
 	{
 		return false;

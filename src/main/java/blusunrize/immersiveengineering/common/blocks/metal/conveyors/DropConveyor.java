@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 /**
  * @author BluSunrize - 20.08.2016
@@ -51,13 +51,11 @@ public class DropConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<DropConveyor> getType()
 	{
 		return TYPE;
 	}
 
-	@Override
 	public void handleInsertion(ItemEntity entity, ConveyorDirection conDir, double distX, double distZ)
 	{
 		if(!isPowered())
@@ -89,7 +87,7 @@ public class DropConveyor extends ConveyorBase
 		if(tile instanceof IConveyorBlockEntity)
 			return true;
 		// Inventories should only be targeted by insertion, not dropping
-		if(world.getCapability(ItemHandler.BLOCK, pos, Direction.UP)!=null)
+		if(world.getCapability(Capabilities.Item.BLOCK, pos, Direction.UP)!=null)
 			return false;
 		BlockState state = world.getBlockState(pos);
 		VoxelShape shape = state.getCollisionShape(world, pos);

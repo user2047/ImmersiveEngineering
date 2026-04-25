@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.client.manual;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks.MultiblockManualData;
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler.IMultiblock;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.utils.IERenderTypes;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.util.fakeworld.TemplateWorld;
@@ -35,11 +36,12 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -97,7 +99,6 @@ public class ManualElementMultiblock extends SpecialManualElements
 			Component.literal("\u2713"), ChatFormatting.GREEN, ChatFormatting.BOLD
 	).append(" ");
 
-	@Override
 	public void onOpened(ManualScreen gui, int x, int y, List<Button> pageButtons)
 	{
 		int yOff = 0;
@@ -182,7 +183,6 @@ public class ManualElementMultiblock extends SpecialManualElements
 		}
 	}
 
-	@Override
 	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		if(multiblock.getStructure(level)!=null)
@@ -206,11 +206,10 @@ public class ManualElementMultiblock extends SpecialManualElements
 
 				transform.pushPose();
 
-				final BlockRenderDispatcher blockRender = Minecraft.getInstance().getBlockRenderer();
+				final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
 
 				transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
 				transform.scale(scale, -scale, 1);
-				transform.pushTransformation(additionalTransform);
 				transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
 
 				transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
@@ -247,10 +246,9 @@ public class ManualElementMultiblock extends SpecialManualElements
 									if(te!=null)
 										modelData = te.getModelData();
 									final BakedModel model = blockRender.getBlockModel(state);
-									modelData = model.getModelData(structureWorld, pos, state, modelData);
 									blockRender.getModelRenderer().tesselateBlock(
 											structureWorld, model, state, pos, transform,
-											translucentFullbright, false, structureWorld.random, state.getSeed(pos),
+											translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
 											overlay, modelData, null
 									);
 									transform.popPose();
@@ -282,7 +280,6 @@ public class ManualElementMultiblock extends SpecialManualElements
 		}
 	}
 
-	@Override
 	public void mouseDragged(int x, int y, double clickX, double clickY, double mouseX, double mouseY, double lastX, double lastY, int mouseButton)
 	{
 		if((clickX >= 40&&clickX < 144&&mouseX >= 20&&mouseX < 164)&&(clickY >= 30&&clickY < 130&&mouseY >= 30&&mouseY < 180))
@@ -297,19 +294,17 @@ public class ManualElementMultiblock extends SpecialManualElements
 	{
 		Vector3f axis = new Vector3f((float)rY, (float)rX, 0);
 		if(axis.lengthSquared() < 1e-3)
-			return Transformation.identity();
+			return Transformation.IDENTITY;
 		float angle = (float)Math.sqrt(axis.dot(axis));
 		axis.normalize();
 		return new Transformation(null, new Quaternionf().rotateAxis((float)Math.toRadians(angle), axis), null, null);
 	}
 
-	@Override
 	public boolean listForSearch(String searchTag)
 	{
 		return false;
 	}
 
-	@Override
 	public int getPixelsTaken()
 	{
 		return yOffTotal;
@@ -390,7 +385,6 @@ public class ManualElementMultiblock extends SpecialManualElements
 			return blockIndex;
 		}
 
-		@Override
 		public boolean test(BlockPos blockPos)
 		{
 			int index = blockPos.getZ()+structureWidth*(blockPos.getX()+structureLength*blockPos.getY());

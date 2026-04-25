@@ -36,7 +36,7 @@ public abstract class TemplateMixin implements IConnectionTemplate
 
 	@Inject(method = "fillFromWorld", at = @At("HEAD"))
 	public void takeConnectionsFromWorld(
-			Level worldIn, BlockPos startPos, Vec3i size, boolean p_163806_, Block p_163807_, CallbackInfo ci
+			Level worldIn, BlockPos startPos, Vec3i size, boolean p_163806_, List<Block> p_163807_, CallbackInfo ci
 	)
 	{
 		WireTemplateHelper.fillConnectionsInArea(worldIn, startPos, size, this);
@@ -65,7 +65,6 @@ public abstract class TemplateMixin implements IConnectionTemplate
 		WireTemplateHelper.readConnectionsFromNBT(compound, this);
 	}
 
-	@Override
 	public List<TemplateConnection> getStoredConnections()
 	{
 		return connections;

@@ -11,6 +11,7 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.common.blocks.IEBaseBlockEntity;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -21,25 +22,21 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class EnergyInfoProvider implements IProbeInfoProvider, IProbeConfigProvider
 {
-	@Override
-	public Identifier getID()
+	public ResourceLocation getID()
 	{
-		return ImmersiveEngineering.rl("energy_info");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("energy_info"));
 	}
 
-	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
 		BlockState blockState, IProbeHitData data)
 	{
 	}
 
-	@Override
 	public void getProbeConfig(IProbeConfig config, Player player, Level world, Entity entity,
 		IProbeHitEntityData data)
 	{
 	}
 
-	@Override
 	public void getProbeConfig(IProbeConfig config, Player player, Level world,
 		BlockState blockState, IProbeHitData data)
 	{

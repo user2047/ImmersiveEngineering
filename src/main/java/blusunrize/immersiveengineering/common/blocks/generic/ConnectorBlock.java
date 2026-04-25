@@ -58,7 +58,6 @@ public abstract class ConnectorBlock<T extends BlockEntity & IImmersiveConnectab
 		lightOpacity = 0;
 	}
 
-	@Override
 	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
 	{
 		super.neighborChanged(state, world, pos, block, fromPos, isMoving);
@@ -74,7 +73,6 @@ public abstract class ConnectorBlock<T extends BlockEntity & IImmersiveConnectab
 		}
 	}
 
-	@Override
 	public ItemStack getCloneItemStack(BlockState state, HitResult targetIn, LevelReader world, BlockPos pos, Player player)
 	{
 		//Select the wire if the player is sneaking

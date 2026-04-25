@@ -40,7 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
@@ -64,20 +64,18 @@ public class CircuitTableBlockEntity extends IEBaseBlockEntity implements IIEInv
 		super(IEBlockEntities.CIRCUIT_TABLE.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 		if(!descPacket)
-			ContainerHelper.loadAllItems(nbt, inventory, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
 		if(!descPacket)
-			ContainerHelper.saveAllItems(nbt, inventory, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 	}
 
 	public static int getEditSlot()
@@ -99,68 +97,57 @@ public class CircuitTableBlockEntity extends IEBaseBlockEntity implements IIEInv
 		};
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public CircuitTableBlockEntity getGuiMaster()
 	{
 		return master();
 	}
 
-	@Override
 	public ArgContainer<CircuitTableBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.CIRCUIT_TABLE;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public EnumProperty<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
 	@Nullable
-	@Override
 	public CircuitTableBlockEntity master()
 	{
 		if(!isDummy())
@@ -174,13 +161,11 @@ public class CircuitTableBlockEntity extends IEBaseBlockEntity implements IIEInv
 		return (te instanceof CircuitTableBlockEntity)?(CircuitTableBlockEntity)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		DeskBlock.placeDummies(getBlockState(), level, worldPosition, ctx);
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		tempMasterBE = master();
@@ -188,7 +173,6 @@ public class CircuitTableBlockEntity extends IEBaseBlockEntity implements IIEInv
 		level.removeBlock(pos.relative(dummyDir), false);
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		if(isDummy())
@@ -203,7 +187,7 @@ public class CircuitTableBlockEntity extends IEBaseBlockEntity implements IIEInv
 
 	public static void registerCapabilities(BECapabilityRegistrar<CircuitTableBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> {
+		registrar.register(Energy.BLOCK, (be, side) -> {
 			if(side==null||side==be.getFacing()&&be.isDummy())
 				return be.energyCap.get();
 			else

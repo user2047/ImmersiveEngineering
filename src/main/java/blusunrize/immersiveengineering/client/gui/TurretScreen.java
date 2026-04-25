@@ -46,13 +46,11 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(new EnergyInfoArea(leftPos+158, topPos+16, menu.data.energy()));
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -125,14 +123,11 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 		}
 	}
 
-	@Override
 	public void render(@Nonnull GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		super.render(graphics, mx, my, partial);
-		this.nameField.render(graphics, mx, my, partial);
 	}
 
-	@Override
 	public boolean keyPressed(int key, int scancode, int p_keyPressed_3_)
 	{
 		if(this.nameField.isFocused())
@@ -142,13 +137,6 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 				addName();
 				return true;
 			}
-			else if(this.nameField.keyPressed(key, scancode, p_keyPressed_3_))
-				return true;
-			InputConstants.Key keyData = InputConstants.getKey(key, scancode);
-			// Hack: Stop AbstractContainerScreen.keyPressed from closing the screen when the inventory key ('E') is
-			// pressed. The name field handles its input in the (later) charTyped.
-			if(minecraft!=null&&minecraft.options.keyInventory.isActiveAndMatches(keyData))
-				return true;
 		}
 
 		return super.keyPressed(key, scancode, p_keyPressed_3_);
@@ -168,20 +156,13 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 		handleButtonClick(tag, listOffset);
 	}
 
-	@Override
 	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_)
 	{
-		return this.nameField.charTyped(p_charTyped_1_, p_charTyped_2_);
+		return false;
 	}
 
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
-		boolean ret = super.mouseClicked(mouseX, mouseY, mouseButton);
-		if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {
-			this.nameField.setFocused(true);
-			ret = true;
-		}
-		return ret;
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 }

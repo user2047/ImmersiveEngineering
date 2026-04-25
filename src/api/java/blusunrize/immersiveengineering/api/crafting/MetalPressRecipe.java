@@ -12,7 +12,9 @@ import blusunrize.immersiveengineering.api.crafting.cache.CachedRecipeList;
 import blusunrize.immersiveengineering.api.utils.SetRestrictedField;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -32,7 +34,7 @@ import java.util.function.BiConsumer;
  */
 public class MetalPressRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<MetalPressRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<MetalPressRecipe>> SERIALIZER;
 	public static final CachedRecipeList<MetalPressRecipe> STANDARD_RECIPES = new CachedRecipeList<>(IERecipeTypes.METAL_PRESS);
 	private static final Map<Identifier, MetalPressRecipe> SPECIAL_RECIPES = new HashMap<>();
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
@@ -58,7 +60,7 @@ public class MetalPressRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<MetalPressRecipe> getIESerializer()
+	protected RecipeSerializer<MetalPressRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
@@ -75,7 +77,7 @@ public class MetalPressRecipe extends MultiblockRecipe
 	}
 
 	public RecipeHolder<MetalPressRecipe> getActualRecipe(
-			Identifier ownId, ItemStack mold, ItemStack input, Level world
+			ResourceKey<net.minecraft.world.item.crafting.Recipe<?>> ownId, ItemStack mold, ItemStack input, Level world
 	)
 	{
 		return new RecipeHolder<>(ownId, this);
@@ -107,12 +109,17 @@ public class MetalPressRecipe extends MultiblockRecipe
 		if(reloadCountForByMold!=CachedRecipeList.getReloadCount())
 		{
 			recipesByMold = ArrayListMultimap.create();
-			BiConsumer<Identifier, MetalPressRecipe> addToMap = (id, recipe) -> recipesByMold.put(recipe.mold, new RecipeHolder<>(id, recipe));
-			STANDARD_RECIPES.getRecipes(level).forEach(r -> addToMap.accept(r.id(), r.value()));
+			BiConsumer<Identifier, MetalPressRecipe> addToMap = (id, recipe) -> recipesByMold.put(recipe.mold, new RecipeHolder<>(recipeKey(id), recipe));
+			STANDARD_RECIPES.getRecipes(level).forEach(r -> recipesByMold.put(r.value().mold, r));
 			SPECIAL_RECIPES.forEach(addToMap);
 			reloadCountForByMold = CachedRecipeList.getReloadCount();
 		}
 		return recipesByMold;
+	}
+
+	private static ResourceKey<net.minecraft.world.item.crafting.Recipe<?>> recipeKey(Identifier id)
+	{
+		return ResourceKey.create(Registries.RECIPE, id);
 	}
 
 	@Override

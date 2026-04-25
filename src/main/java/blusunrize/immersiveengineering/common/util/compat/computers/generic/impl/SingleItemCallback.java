@@ -39,7 +39,6 @@ public class SingleItemCallback<T> extends Callback<T>
 		this(getStack.andThen(l -> l.get(index)), desc);
 	}
 
-	@Override
 	public String renameMethod(String javaName)
 	{
 		return javaName.replace("Desc", capitalize(desc));

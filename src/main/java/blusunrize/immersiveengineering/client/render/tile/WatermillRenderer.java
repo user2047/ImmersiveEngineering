@@ -16,14 +16,14 @@ import blusunrize.immersiveengineering.common.blocks.wooden.WatermillBlockEntity
 import blusunrize.immersiveengineering.common.register.IEBlocks.WoodenDevices;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Quaternionf;
 
 public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntity>
@@ -36,7 +36,6 @@ public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntit
 		return MODEL.get().getQuads(state, null, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, null);
 	});
 
-	@Override
 	public void render(WatermillBlockEntity tile, float partialTicks, PoseStack transform, MultiBufferSource bufferIn,
 					   int combinedLightIn, int combinedOverlayIn)
 	{
@@ -49,7 +48,7 @@ public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntit
 		float wheelRotation = (float)(Mth.TWO_PI*(tile.getRotation()+partialTicks*tile.getSpeed()));
 		transform.mulPose(new Quaternionf().rotateZ(wheelRotation));
 		transform.translate(-.5, -.5, -.5);
-		MODEL_BUFFER.render(RenderType.cutoutMipped(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
+		MODEL_BUFFER.render(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutoutMipped(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
 		transform.popPose();
 	}
 
@@ -58,7 +57,6 @@ public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntit
 		MODEL_BUFFER.reset();
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(WatermillBlockEntity watermill)
 	{
 		if(watermill.renderAABB==null)

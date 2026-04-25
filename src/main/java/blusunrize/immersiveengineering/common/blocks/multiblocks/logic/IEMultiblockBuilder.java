@@ -66,7 +66,6 @@ public class IEMultiblockBuilder<S extends IMultiblockState>
 		return super.build(LAZY_MOD_BUS_REGISTRATION::add);
 	}
 
-	@Override
 	public <CS, C extends IMultiblockComponent<CS> & StateWrapper<S, CS>>
 	IEMultiblockBuilder<S> selfWrappingComponent(C extraComponent)
 	{
@@ -74,7 +73,6 @@ public class IEMultiblockBuilder<S extends IMultiblockState>
 		return super.selfWrappingComponent(extraComponent);
 	}
 
-	@Override
 	protected IEMultiblockBuilder<S> self()
 	{
 		return this;

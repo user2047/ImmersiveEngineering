@@ -28,7 +28,6 @@ public class OreRetrogenFeature extends OreFeature
 		super(OreConfiguration.CODEC);
 	}
 
-	@Override
 	public boolean place(@Nonnull FeaturePlaceContext<OreConfiguration> ctx)
 	{
 		float angle = ctx.random().nextFloat()*(float)Math.PI;

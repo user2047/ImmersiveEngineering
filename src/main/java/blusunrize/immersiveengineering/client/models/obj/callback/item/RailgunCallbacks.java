@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.client.models.obj.callback.item.RailgunCa
 import blusunrize.immersiveengineering.common.entities.illager.Fusilier;
 import blusunrize.immersiveengineering.common.items.RailgunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -26,14 +26,12 @@ public class RailgunCallbacks implements ItemCallback<Key>
 {
 	public static RailgunCallbacks INSTANCE = new RailgunCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = RailgunItem.getUpgradesStatic(stack);
 		return new Key(upgrades.has(UpgradeEffect.SCOPE), upgrades.get(UpgradeEffect.SPEED) > 0);
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key stack, String group, RenderType layer)
 	{
 		if(group.equals("upgrade_scope"))
@@ -45,7 +43,6 @@ public class RailgunCallbacks implements ItemCallback<Key>
 		return true;
 	}
 
-	@Override
 	public void handlePerspective(Key key, LivingEntity holder, ItemDisplayContext cameraTransformType, PoseStack mat)
 	{
 		if(ZoomHandler.isZooming && (cameraTransformType==ItemDisplayContext.FIRST_PERSON_LEFT_HAND||cameraTransformType==ItemDisplayContext.FIRST_PERSON_RIGHT_HAND))
@@ -80,7 +77,6 @@ public class RailgunCallbacks implements ItemCallback<Key>
 		}
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(false, false);

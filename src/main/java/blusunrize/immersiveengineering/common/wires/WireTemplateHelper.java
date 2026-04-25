@@ -95,10 +95,10 @@ public class WireTemplateHelper
 
 	public static void readConnectionsFromNBT(CompoundTag compound, IConnectionTemplate template)
 	{
-		ListTag connectionsNBT = compound.getList(CONNECTIONS_KEY, Tag.TAG_COMPOUND);
+		ListTag connectionsNBT = compound.getListOrEmpty(CONNECTIONS_KEY);
 		template.getStoredConnections().clear();
 		for(int i = 0; i < connectionsNBT.size(); i++)
-			template.getStoredConnections().add(new TemplateConnection(connectionsNBT.getCompound(i)));
+			template.getStoredConnections().add(new TemplateConnection(connectionsNBT.getCompoundOrEmpty(i)));
 	}
 
 	@Nullable

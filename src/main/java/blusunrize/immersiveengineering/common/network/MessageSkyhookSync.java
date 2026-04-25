@@ -48,7 +48,6 @@ public record MessageSkyhookSync(
 		);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -62,7 +61,6 @@ public record MessageSkyhookSync(
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

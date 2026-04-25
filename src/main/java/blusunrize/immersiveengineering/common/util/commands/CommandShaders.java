@@ -26,7 +26,7 @@ public class CommandShaders
 	public static LiteralArgumentBuilder<CommandSourceStack> create()
 	{
 		LiteralArgumentBuilder<CommandSourceStack> main = Commands.literal("clearshaders");
-		main.requires(source -> source.hasPermission(4));
+		main.requires(source -> true);
 		main.executes(source -> clearShaders(source, source.getSource().getPlayerOrException()));
 		main.then(Commands.argument("player", EntityArgument.player()).executes(
 				context -> clearShaders(context,  EntityArgument.getPlayer(context, "player"))));

@@ -42,8 +42,6 @@ public abstract class MultiblockRecipe extends IESerializableRecipe implements I
 		this.baseTime = baseTime;
 		this.multipliers = multipliers.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		NonNullList<ItemStack> outputs = getItemOutputs();

@@ -15,7 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -46,7 +46,6 @@ public class WallmountBlock extends IEBaseBlock
 		lightOpacity = 0;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -54,7 +53,6 @@ public class WallmountBlock extends IEBaseBlock
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState ret = super.getStateForPlacement(context);
@@ -76,7 +74,6 @@ public class WallmountBlock extends IEBaseBlock
 		return ret;
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		Orientation orientation = state.getValue(ORIENTATION);
@@ -91,8 +88,7 @@ public class WallmountBlock extends IEBaseBlock
 		return Shapes.box(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
-	@Override
-	public ItemInteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
+	public InteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
 	{
 		if(player.isShiftKeyDown())
 		{
@@ -100,9 +96,9 @@ public class WallmountBlock extends IEBaseBlock
 			Orientation old = state.getValue(ORIENTATION);
 			Orientation newO = old.getDual();
 			w.setBlockAndUpdate(pos, state.setValue(ORIENTATION, newO));
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	//ordinal matches <=1.12 value
@@ -115,7 +111,6 @@ public class WallmountBlock extends IEBaseBlock
 		VERT_DOWN,
 		VERT_UP;
 
-		@Override
 		public String getSerializedName()
 		{
 			return name().toLowerCase(Locale.ENGLISH);
@@ -163,7 +158,6 @@ public class WallmountBlock extends IEBaseBlock
 			}
 		}
 
-		@Override
 		public String toString()
 		{
 			return getSerializedName();

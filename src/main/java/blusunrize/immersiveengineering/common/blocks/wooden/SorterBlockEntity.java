@@ -30,7 +30,7 @@ import it.unimi.dsi.fastutil.ints.IntIterators;
 import malte0811.dualcodecs.DualCodec;
 import malte0811.dualcodecs.DualCodecs;
 import malte0811.dualcodecs.DualCompositeCodecs;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
@@ -39,17 +39,19 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
@@ -85,8 +87,9 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 	 */
 	private static Set<BlockPos> routed = null;
 
-	private final Map<Direction, IEBlockCapabilityCache<IItemHandler>> neighborCaps = IEBlockCapabilityCaches.allNeighbors(
-			ItemHandler.BLOCK, this
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private final Map<Direction, IEBlockCapabilityCache<IItemHandler>> neighborCaps = (Map)IEBlockCapabilityCaches.allNeighbors(
+			Capabilities.Item.BLOCK, this
 	);
 
 	public SorterBlockEntity(BlockPos pos, BlockState state)
@@ -97,7 +100,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 
 	public ItemStack routeItem(Direction inputSide, ItemStack stack, boolean simulate)
 	{
-		if(!level.isClientSide&&canRoute())
+		if(!level.isClientSide()&&canRoute())
 		{
 			boolean first = startRouting();
 			TransferPaths paths = getValidOutputs(inputSide, stack);
@@ -131,7 +134,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		int lengthFiltered = sides.length;
 		while(lengthFiltered > 0&&!stack.isEmpty())
 		{
-			int rand = ApiUtils.RANDOM.nextInt(lengthFiltered);
+			int rand = ApiUtils.getRandom().nextInt(lengthFiltered);
 			stack = this.outputItemToInv(stack, sides[rand], simulate);
 			sides[rand] = sides[lengthFiltered-1];
 			lengthFiltered--;
@@ -139,19 +142,16 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		return stack;
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public SorterBlockEntity getGuiMaster()
 	{
 		return this;
 	}
 
-	@Override
 	public ArgContainer<SorterBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.SORTER;
@@ -177,7 +177,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 
 	public ItemStack pullItem(Direction outputSide, int amount, boolean simulate)
 	{
-		if(!level.isClientSide&&canRoute())
+		if(!level.isClientSide()&&canRoute())
 		{
 			boolean first = startRouting();
 			for(Direction side : Direction.values())
@@ -293,19 +293,17 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		return Utils.insertStackIntoInventory(neighborCaps.get(side), stack, simulate);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		sideFilter = FILTER_CODEC.fromNBT(nbt.get("sideFilter"));
 		if(!descPacket)
 		{
-			ListTag filterList = nbt.getList("filter", 10);
+			ListTag filterList = nbt.getListOrEmpty("filter");
 			filter = new SorterInventory();
 			filter.readFromNBT(provider, filterList);
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.put("sideFilter", FILTER_CODEC.toNBT(sideFilter));
@@ -317,22 +315,20 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		}
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		CompoundTag data = new CompoundTag();
 		writeCustomNBT(data, false, context.getLevel().registryAccess());
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
-		BlockItem.setBlockEntityData(stack, this.getType(), data);
+		stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(this.getType(), data));
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final var data = ctx.getItemInHand().get(DataComponents.BLOCK_ENTITY_DATA);
 		if(data!=null)
-			readCustomNBT(data.copyTag(), false, ctx.getLevel().registryAccess());
+			readCustomNBT(data.copyTagWithoutId(), false, ctx.getLevel().registryAccess());
 	}
 
 	private final EnumMap<Direction, IItemHandler> insertionHandlers = new EnumMap<>(Direction.class);
@@ -344,10 +340,9 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 
 	public static void registerCapabilities(BECapabilityRegistrar<SorterBlockEntity> registrar)
 	{
-		registrar.register(ItemHandler.BLOCK, (be, facing) -> facing!=null?be.insertionHandlers.get(facing): null);
+		registrar.register(Capabilities.Item.BLOCK, (be, facing) -> facing!=null?be.insertionHandlers.get(facing): null);
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		return id==0;
@@ -364,43 +359,36 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 			this.side = side;
 		}
 
-		@Override
 		public int getSlots()
 		{
 			return 1;
 		}
 
-		@Override
 		public ItemStack getStackInSlot(int slot)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 		{
 			return sorter.routeItem(this.side, stack, simulate);
 		}
 
-		@Override
 		public ItemStack extractItem(int slot, int amount, boolean simulate)
 		{
 			return sorter.pullItem(this.side, amount, simulate);
 		}
 
-		@Override
 		public int getSlotLimit(int slot)
 		{
 			return 64;
 		}
 
-		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
 			return true;
 		}
 
-		@Override
 		public void setStackInSlot(int slot, ItemStack stack)
 		{
 		}
@@ -425,7 +413,6 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 			return side.ordinal()*FILTER_SLOTS_PER_SIDE+slotOnSide;
 		}
 
-		@Override
 		public int getSlotLimit(int slot)
 		{
 			return 1;
@@ -441,7 +428,6 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 			);
 		}
 
-		@Override
 		public void setStackInSlot(int slot, ItemStack stack)
 		{
 			ItemStack prev = getStackInSlot(slot);
@@ -473,7 +459,10 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 					slotTag.putByte("Slot", (byte)i);
 					if(this.selectedTags[i]!=null)
 						this.selectedTags[i].writeToNbt(slotTag);
-					list.add(stackInSlot.save(provider, slotTag));
+					ItemStack.OPTIONAL_CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), stackInSlot)
+							.result()
+							.flatMap(Tag::asCompound)
+							.ifPresent(stackTag -> list.add(stackTag.merge(slotTag)));
 				}
 			}
 		}
@@ -482,11 +471,12 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		{
 			for(int i = 0; i < list.size(); i++)
 			{
-				CompoundTag slotTag = list.getCompound(i);
-				int slot = slotTag.getByte("Slot")&255;
+				CompoundTag slotTag = list.getCompound(i).orElseGet(CompoundTag::new);
+				int slot = slotTag.getByteOr("Slot", (byte)0)&255;
 				if(slot < getSlots())
 				{
-					ItemStack stack = ItemStack.parseOptional(provider, slotTag);
+					ItemStack stack = ItemStack.OPTIONAL_CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), slotTag)
+							.result().orElse(ItemStack.EMPTY);
 					setStackInSlot(slot, stack);
 					this.selectedTags[slot] = FilterTag.readFromNbt(slotTag, stack);
 				}
@@ -570,7 +560,6 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 			this(Either.left(tag));
 		}
 
-		@Override
 		public boolean test(ItemStack stack)
 		{
 			return inner().map(stack::is, modId -> modId.equals(Utils.getModIdForItemStack(stack)));
@@ -598,7 +587,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 				return null;
 			if(location.getNamespace().equals("modid"))
 				return new FilterTag(Either.right(location.getPath()));
-			return stack.getTags().filter(t -> t.location().equals(location))
+			return stack.typeHolder().tags().filter(t -> t.location().equals(location))
 					.findFirst().map(FilterTag::new).orElse(null);
 		}
 
@@ -607,11 +596,11 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 		public static FilterTag readFromNbt(CompoundTag slotTag, ItemStack stack)
 		{
 			if(slotTag.contains("selectedMod"))
-				return new FilterTag(Either.right(slotTag.getString("selectedMod")));
+				return new FilterTag(Either.right(slotTag.getStringOr("selectedMod", "")));
 			if(slotTag.contains("selectedTag"))
 			{
-				Identifier rl = Identifier.parse(slotTag.getString("selectedTag"));
-				return stack.getTags()
+				Identifier rl = Identifier.parse(slotTag.getStringOr("selectedTag", ""));
+				return stack.typeHolder().tags()
 						.filter(t -> t.location().equals(rl))
 						.findFirst()
 						.map(itemTagKey -> new FilterTag(Either.left(itemTagKey)))
@@ -628,7 +617,7 @@ public class SorterBlockEntity extends IEBaseBlockEntity implements IInteraction
 
 		public static List<Identifier> getAvailableForItem(ItemStack stack)
 		{
-			List<Identifier> list = new ArrayList<>(stack.getTags().sorted(TAG_SORTER).map(TagKey::location).toList());
+			List<Identifier> list = new ArrayList<>(stack.typeHolder().tags().sorted(TAG_SORTER).map(TagKey::location).toList());
 			list.add(Identifier.fromNamespaceAndPath("modid", Utils.getModIdForItemStack(stack)));
 			return list;
 		}

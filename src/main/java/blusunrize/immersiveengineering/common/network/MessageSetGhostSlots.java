@@ -33,7 +33,6 @@ public record MessageSetGhostSlots(Map<Integer, ItemStack> stacksToSet) implemen
 	public static final StreamCodec<RegistryFriendlyByteBuf, MessageSetGhostSlots> CODEC = MAP_CODEC
 			.map(MessageSetGhostSlots::new, MessageSetGhostSlots::stacksToSet);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		Player player = context.player();
@@ -57,7 +56,6 @@ public record MessageSetGhostSlots(Map<Integer, ItemStack> stacksToSet) implemen
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

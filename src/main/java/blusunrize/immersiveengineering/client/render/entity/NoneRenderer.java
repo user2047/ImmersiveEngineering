@@ -18,19 +18,17 @@ import net.minecraft.world.entity.Entity;
 import javax.annotation.Nonnull;
 
 //Used for the skyline hook
-public class NoneRenderer<T extends Entity> extends EntityRenderer<T>
+public class NoneRenderer<T extends Entity> extends IEEntityRenderer<T>
 {
 	public NoneRenderer(Context renderManager)
 	{
 		super(renderManager);
 	}
 
-	@Override
 	public void render(T entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn)
 	{
 	}
 
-	@Override
 	public Identifier getTextureLocation(@Nonnull T entity)
 	{
 		return null;

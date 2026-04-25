@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
@@ -119,8 +120,9 @@ public class FurnaceHandler<R extends IESerializableRecipe>
 			{
 				lastBurnTime = addedBurntime;
 				burnTime += lastBurnTime;
-				if(fuel.hasCraftingRemainingItem()&&fuel.getCount()==1)
-					inv.setStackInSlot(fuelSlot, fuel.getCraftingRemainingItem());
+				ItemStackTemplate remainder = fuel.getItem().getCraftingRemainder();
+				if(remainder!=null&&fuel.getCount()==1)
+					inv.setStackInSlot(fuelSlot, remainder.create());
 				else
 					fuel.shrink(1);
 				setChanged.run();
@@ -146,10 +148,10 @@ public class FurnaceHandler<R extends IESerializableRecipe>
 	{
 		if(!(nbt instanceof CompoundTag compound))
 			return;
-		process = compound.getInt("process");
-		processMax = compound.getInt("processMax");
-		burnTime = compound.getInt("burnTime");
-		lastBurnTime = compound.getInt("lastBurnTime");
+		process = compound.getIntOr("process", 0);
+		processMax = compound.getIntOr("processMax", 0);
+		burnTime = compound.getIntOr("burnTime", 0);
+		lastBurnTime = compound.getIntOr("lastBurnTime", 0);
 	}
 
 	private boolean isAnyInputEmpty(IItemHandler inv)
@@ -262,7 +264,6 @@ public class FurnaceHandler<R extends IESerializableRecipe>
 			return data.get(CURRENT_PROCESS);
 		}
 
-		@Override
 		public int get(int index)
 		{
 			switch(index)
@@ -280,7 +281,6 @@ public class FurnaceHandler<R extends IESerializableRecipe>
 			}
 		}
 
-		@Override
 		public void set(int index, int value)
 		{
 			switch(index)
@@ -302,7 +302,6 @@ public class FurnaceHandler<R extends IESerializableRecipe>
 			}
 		}
 
-		@Override
 		public int getCount()
 		{
 			return NUM_SLOTS;

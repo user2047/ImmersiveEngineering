@@ -26,7 +26,6 @@ public record MessageContainerUpdate(int windowId, CompoundTag nbt) implements I
 			MessageContainerUpdate::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		ServerPlayer player = IMessage.serverPlayer(context);
@@ -37,7 +36,6 @@ public record MessageContainerUpdate(int windowId, CompoundTag nbt) implements I
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

@@ -74,7 +74,6 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		return new DirectionalBlockPos(worldPosition.relative(getFacing()), getFacing().getOpposite());
 	}
 
-	@Override
 	public void tickServer()
 	{
 		RedstoneBundleConnection connection = attached.getCapability();
@@ -97,10 +96,9 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		);
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			RedstoneBundleConnection connection = attached.getCapability();
 			if(connection!=null)
@@ -111,7 +109,6 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		}
 	}
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		RedstoneBundleConnection connection = attached.getCapability();
@@ -129,49 +126,41 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		}
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return REDSTONE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return ConnectorBlock.DEFAULT_FACING_PROP;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -179,19 +168,16 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		return new Vec3(.5-conRadius*side.getStepX(), .5-conRadius*side.getStepY(), .5-conRadius*side.getStepZ());
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return EnergyConnectorBlockEntity.getConnectorBounds(getFacing(), .625f);
 	}
 
-	@Override
 	public Collection<Identifier> getRequestedHandlers()
 	{
 		return ImmutableList.of(RedstoneNetworkHandler.ID);
 	}
 
-	@Override
 	protected void onNeighborBlockChange(BlockPos otherPos)
 	{
 		super.onNeighborBlockChange(otherPos);
@@ -216,7 +202,6 @@ public class ConnectorBundledBlockEntity extends ImmersiveConnectableBlockEntity
 		}
 	}
 
-	@Override
 	public void setRemovedIE()
 	{
 		super.setRemovedIE();

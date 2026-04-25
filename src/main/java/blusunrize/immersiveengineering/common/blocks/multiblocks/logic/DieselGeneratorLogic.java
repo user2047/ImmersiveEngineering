@@ -40,8 +40,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
@@ -68,7 +67,6 @@ public class DieselGeneratorLogic
 	private static final CapabilityPosition FLUID_INPUT_A = new CapabilityPosition(0, 0, 4, RelativeBlockFace.RIGHT);
 	private static final CapabilityPosition FLUID_INPUT_B = new CapabilityPosition(2, 0, 4, RelativeBlockFace.LEFT);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -117,7 +115,6 @@ public class DieselGeneratorLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -159,25 +156,23 @@ public class DieselGeneratorLogic
 
 	private double particleXZSpeed()
 	{
-		return ApiUtils.RANDOM.nextDouble(-0.015625, 0.015625);
+		return ApiUtils.getRandom().nextDouble(-0.015625, 0.015625);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(FluidHandler.BLOCK, (state, position) -> {
+		register.register(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, (state, position) -> {
 			if(FLUID_INPUT_A.equalsOrNullFace(position)||FLUID_INPUT_B.equalsOrNullFace(position))
 				return state.tank;
 			else
 				return null;
 		});
-		register.register(EnergyStorage.BLOCK, (state, position) -> {
+		register.register(Energy.BLOCK, (state, position) -> {
 			if(position.side()==null||(
 					position.side()==RelativeBlockFace.UP&&ENERGY_OUTPUTS.contains(position.posInMultiblock())
 			))
@@ -188,7 +183,6 @@ public class DieselGeneratorLogic
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		if(forType==ShapeType.BLOCK_SUPPORT)
@@ -221,7 +215,7 @@ public class DieselGeneratorLogic
 		{
 			ImmutableList.Builder<Supplier<@Nullable IEnergyStorage>> outputs = ImmutableList.builder();
 			for(BlockPos pos : ENERGY_OUTPUTS)
-				outputs.add(ctx.getCapabilityAt(EnergyStorage.BLOCK, pos, RelativeBlockFace.DOWN));
+				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos, RelativeBlockFace.DOWN));
 			this.energyOutputs = outputs.build();
 			this.mifHandler = () -> new MachineCheckImplementation[]{
 					new MachineCheckImplementation<>((BooleanSupplier)() -> this.active, MachineInterfaceHandler.BASIC_ACTIVE),
@@ -229,33 +223,29 @@ public class DieselGeneratorLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("tank0", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank0", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			nbt.putBoolean("active", active);
 			nbt.putInt("consumeTick", consumeTick);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			tank.readFromNBT(provider, nbt.getCompound("tank0"));
-			active = nbt.getBoolean("active");
-			consumeTick = nbt.getInt("consumeTick");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank0"));
+			active = nbt.getBooleanOr("active", false);
+			consumeTick = nbt.getIntOr("consumeTick", 0);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			final boolean oldActive = active;
-			active = nbt.getBoolean("active");
+			active = nbt.getBooleanOr("active", false);
 			if(active&&!oldActive)
 				animation_fanFadeIn = 80;
 			else if(!active&&oldActive)

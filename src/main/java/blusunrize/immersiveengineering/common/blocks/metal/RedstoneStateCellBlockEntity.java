@@ -17,7 +17,7 @@ import blusunrize.immersiveengineering.api.wires.redstone.RedstoneNetworkHandler
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.util.Utils;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
@@ -26,7 +26,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,7 +54,6 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 		super(IEBlockEntities.REDSTONE_STATE_CELL.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		super.tickServer();
@@ -64,35 +63,31 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 			Direction dir = getFacing();
 			Vec3 particlePos = Vec3.atCenterOf(getPosition()).add(dir.getStepX()*.25, dir.getStepY()*.25, dir.getStepZ()*.25);
 			serverLevel.sendParticles(
-					new DustParticleOptions(new Vector3f(1, 0, 0), .5f),
+					new DustParticleOptions(0xff0000, .5f),
 					particlePos.x, particlePos.y, particlePos.z, 4,
 					0.05, 0.05, 0.05, 0
 			);
 		}
 	}
 
-	@Override
 	public boolean isRSInput()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean isRSOutput()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return false;
 	}
 
-	@Override
 	public void onChange(ConnectionPoint cp, RedstoneNetworkHandler handler)
 	{
-		if(!level.isClientSide&&SafeChunkUtils.isChunkSafe(level, worldPosition))
+		if(!level.isClientSide()&&SafeChunkUtils.isChunkSafe(level, worldPosition))
 		{
 			int setVal = handler.getValue(redstoneChannelSet.getId());
 			int resetVal = handler.getValue(redstoneChannelReset.getId());
@@ -119,34 +114,30 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 	}
 
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		signals[redstoneChannel.ordinal()] = (byte)this.output;
 		rsDirty = false;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_RedstoneStateCell, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("redstoneChannelSet"))
-			redstoneChannelSet = DyeColor.byId(message.getInt("redstoneChannelSet"));
+			redstoneChannelSet = DyeColor.byId(message.getIntOr("redstoneChannelSet", 0));
 		if(message.contains("redstoneChannelReset"))
-			redstoneChannelReset = DyeColor.byId(message.getInt("redstoneChannelReset"));
+			redstoneChannelReset = DyeColor.byId(message.getIntOr("redstoneChannelReset", 0));
 		if(message.contains("redstoneChannel"))
-			redstoneChannel = DyeColor.byId(message.getInt("redstoneChannel"));
+			redstoneChannel = DyeColor.byId(message.getIntOr("redstoneChannel", 0));
 		updateAfterConfigure();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -155,16 +146,14 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 		nbt.putBoolean("wasToggled", wasToggled);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		redstoneChannelSet = DyeColor.byId(nbt.getInt("redstoneChannelSet"));
-		redstoneChannelReset = DyeColor.byId(nbt.getInt("redstoneChannelReset"));
-		wasToggled = nbt.getBoolean("wasToggled");
+		redstoneChannelSet = DyeColor.byId(nbt.getIntOr("redstoneChannelSet", 0));
+		redstoneChannelReset = DyeColor.byId(nbt.getIntOr("redstoneChannelReset", 0));
+		wasToggled = nbt.getBooleanOr("wasToggled", false);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -185,13 +174,11 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 			}
 	);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(getFacing());
 	}
 
-	@Override
 	public Pair<DyeColor, Byte>[] overrideVoltmeterRead()
 	{
 		return new Pair[]{
@@ -200,7 +187,6 @@ public class RedstoneStateCellBlockEntity extends ConnectorRedstoneBlockEntity
 	}
 
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(Utils.isScrewdriver(player.getMainHandItem()))

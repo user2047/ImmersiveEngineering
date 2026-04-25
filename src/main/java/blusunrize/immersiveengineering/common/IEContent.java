@@ -79,7 +79,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.event.lifecycle.ParallelDispatchEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -96,13 +96,15 @@ import static blusunrize.immersiveengineering.ImmersiveEngineering.MODID;
 import static blusunrize.immersiveengineering.api.tool.assembler.AssemblerHandler.defaultAdapter;
 import static blusunrize.immersiveengineering.common.fluids.IEFluid.BUCKET_DISPENSE_BEHAVIOR;
 
-@EventBusSubscriber(modid = MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = MODID)
 public class IEContent
 {
 	private static CompletableFuture<?> lastOnThreadFuture;
 
 	public static void modConstruction(IEventBus modBus)
 	{
+		modBus.addListener(IEContent::loadComplete);
+
 		/*BULLETS*/
 		IEBullets.initBullets();
 		/*WIRES*/
@@ -110,7 +112,7 @@ public class IEContent
 		/*CONVEYORS*/
 		ConveyorHandler.registerMagnetSuppression((entity, iConveyorTile) -> {
 			CompoundTag data = entity.getPersistentData();
-			if(!data.getBoolean(Lib.MAGNET_PREVENT_NBT))
+			if(!data.getBooleanOr(Lib.MAGNET_PREVENT_NBT, false))
 				data.putBoolean(Lib.MAGNET_PREVENT_NBT, true);
 		}, (entity, iConveyorTile) -> {
 			entity.getPersistentData().remove(Lib.MAGNET_PREVENT_NBT);
@@ -184,68 +186,31 @@ public class IEContent
 		IEStats.setup();
 
 		ShaderRegistry.itemShaderBag = IEItems.Misc.SHADER_BAG;
-		ShaderRegistry.itemExamples.add(new ItemStack(Weapons.REVOLVER));
-		ShaderRegistry.itemExamples.add(new ItemStack(Tools.DRILL));
-		ShaderRegistry.itemExamples.add(new ItemStack(Weapons.CHEMTHROWER));
-		ShaderRegistry.itemExamples.add(new ItemStack(Weapons.RAILGUN));
-		ShaderRegistry.itemExamples.add(new ItemStack(IEItems.Misc.SHIELD));
 
 		/*ASSEMBLER RECIPE ADAPTERS*/
 		//Fluid Ingredients
 		AssemblerHandler.registerSpecialIngredientConverter((o, remain) -> {
-			if(o.getCustomIngredient() instanceof IngredientFluidStack fluidIngred)
-				return new FluidTagRecipeQuery(fluidIngred.fluidIngredient());
-			else
-				return null;
+			return null;
 		});
 		// Buckets
 		// TODO add "duplicates" of the fluid-aware recipes that only use buckets, so that other mods using similar
 		//  code don't need explicit compat?
 		AssemblerHandler.registerSpecialIngredientConverter((o, remain) -> {
-			// Must be a vanilla ingredient, which returns an empty bucket
-			// TODO
-			if(/*!o.isVanilla()||*/remain.getItem()!=Items.BUCKET)
-				return null;
-			// Find bucket out of available items
-			Optional<ItemStack> potentialBucket = Arrays.stream(o.getItems())
-					.filter(stack -> stack.getItem() instanceof BucketItem)
-					.findFirst();
-			if(potentialBucket.isEmpty())
-				return null;
-			final Item bucketItem = potentialBucket.get().getItem();
-			//Explicitly check for vanilla-style non-dynamic container items
-			//noinspection deprecation
-			if(!bucketItem.hasCraftingRemainingItem()||bucketItem.getCraftingRemainingItem()!=Items.BUCKET)
-				return null;
-			final Fluid contained = ((BucketItem)bucketItem).content;
-			return new FluidStackRecipeQuery(new FluidStack(contained, FluidType.BUCKET_VOLUME));
+			return null;
 		});
 		// Milk is a weird special case
 		AssemblerHandler.registerSpecialIngredientConverter((o, remain) -> {
-			// Only works when the milk fluid is enabled
-			if(!NeoForgeMod.MILK.isBound())
-				return null;
-			// Must be a vanilla ingredient, which returns an empty bucket
-			// TODO
-			if(/*!o.isVanilla()||*/remain.getItem()!=Items.BUCKET)
-				return null;
-			// Find milk bucket out of available items
-			Optional<ItemStack> potentialBucket = Arrays.stream(o.getItems())
-					.filter(stack -> stack.getItem()==Items.MILK_BUCKET)
-					.findFirst();
-			if(potentialBucket.isEmpty())
-				return null;
-			return new FluidStackRecipeQuery(new FluidStack(NeoForgeMod.MILK.get(), FluidType.BUCKET_VOLUME));
+			return null;
 		});
 
 		// TODO move to IEFluids/constructors?
 		IEFluids.CREOSOTE.getBlock().setEffect(IEPotions.FLAMMABLE, 100, 0);
-		IEFluids.ETHANOL.getBlock().setEffect(MobEffects.CONFUSION, 70, 0);
+		IEFluids.ETHANOL.getBlock().setEffect(MobEffects.NAUSEA, 70, 0);
 		IEFluids.BIODIESEL.getBlock().setEffect(IEPotions.FLAMMABLE, 100, 1);
 		IEFluids.HIGH_POWER_BIODIESEL.getBlock().setEffect(IEPotions.FLAMMABLE, 100, 2);
-		IEFluids.CONCRETE.getBlock().setEffect(MobEffects.MOVEMENT_SLOWDOWN, 20, 3);
+		IEFluids.CONCRETE.getBlock().setEffect(MobEffects.SLOWNESS, 20, 3);
 		IEFluids.REDSTONE_ACID.getBlock().setEffect(IEPotions.CONDUCTIVE, 100, 1);
-		IEFluids.ACETALDEHYDE.getBlock().setEffect(MobEffects.CONFUSION, 70, 0);
+		IEFluids.ACETALDEHYDE.getBlock().setEffect(MobEffects.NAUSEA, 70, 0);
 		IEFluids.PHENOLIC_RESIN.getBlock().setEffect(IEPotions.STICKY, 40, 1);
 
 		ChemthrowerEffects.register();
@@ -264,7 +229,6 @@ public class IEContent
 	{
 		((FlowerPotBlock)Blocks.FLOWER_POT).addPlant(Misc.HEMP_PLANT.getId(), Misc.POTTED_HEMP);
 
-		DispenserBlock.registerBehavior(IEItems.Misc.SHIELD, ArmorItem.DISPENSE_ITEM_BEHAVIOR);
 		DispenserBlock.registerBehavior(Minecarts.CART_METAL_BARREL, IEMinecartItem.MINECART_DISPENSER_BEHAVIOR);
 		DispenserBlock.registerBehavior(Minecarts.CART_WOODEN_BARREL, IEMinecartItem.MINECART_DISPENSER_BEHAVIOR);
 		DispenserBlock.registerBehavior(Minecarts.CART_REINFORCED_CRATE, IEMinecartItem.MINECART_DISPENSER_BEHAVIOR);
@@ -274,6 +238,16 @@ public class IEContent
 		ComposterBlock.COMPOSTABLES.putIfAbsent(IEItems.Misc.HEMP_SEEDS.asItem(), 0.3f);
 		ComposterBlock.COMPOSTABLES.putIfAbsent(IEItems.Ingredients.HEMP_FIBER.asItem(), 0.15f);
 		Villages.init();
+	}
+
+	public static void loadComplete(FMLLoadCompleteEvent ev)
+	{
+		setFuture(ev.enqueueWork(IEContent::onThreadLoadComplete));
+	}
+
+	private static void onThreadLoadComplete()
+	{
+		ShaderRegistry.itemExamples.clear();
 		ShaderRegistry.compileWeight();
 	}
 
@@ -320,8 +294,6 @@ public class IEContent
 		IEServerConfig.MACHINES.populateAPI();
 		SetRestrictedField.lock(false);
 
-		ShieldDisablingHandler.registerDisablingFunction(Player.class, Player::disableShield);
-		ShieldDisablingHandler.registerDisablingFunction(EngineerIllager.class, EngineerIllager::disableShield);
 	}
 
 	public static void clearLastFuture()

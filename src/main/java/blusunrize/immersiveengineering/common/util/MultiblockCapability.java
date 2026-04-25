@@ -46,7 +46,6 @@ public abstract class MultiblockCapability<T>
 			this.ownValue = ownValue;
 		}
 
-		@Override
 		public @Nullable T get()
 		{
 			BE master = cachedMaster.get();

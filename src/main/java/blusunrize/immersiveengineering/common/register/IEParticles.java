@@ -17,7 +17,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -41,13 +40,13 @@ public class IEParticles
 			"sparks", () -> new SimpleParticleType(false)
 	);
 
-	@EventBusSubscriber(modid = ImmersiveEngineering.MODID, bus = Bus.MOD, value = Dist.CLIENT)
+	@EventBusSubscriber(modid = ImmersiveEngineering.MODID, value = Dist.CLIENT)
 	private static class Client
 	{
 		@SubscribeEvent
 		public static void registerParticleFactories(RegisterParticleProvidersEvent event)
 		{
-			event.registerSprite(IEParticles.FLUID_SPLASH.get(), new FluidSplashParticle.Factory());
+			event.registerSpecial(IEParticles.FLUID_SPLASH.get(), new FluidSplashParticle.Factory());
 			event.registerSpecial(IEParticles.FRACTAL.get(), new FractalParticle.Factory());
 			event.registerSpriteSet(IEParticles.SPARKS.get(), SparksParticle.Factory::new);
 			event.registerSpriteSet(IEParticles.IE_BUBBLE.get(), IEBubbleParticle.Factory::new);

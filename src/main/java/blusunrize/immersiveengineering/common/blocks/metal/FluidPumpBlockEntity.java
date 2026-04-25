@@ -39,7 +39,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Blocks;
@@ -55,8 +55,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -103,10 +103,9 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	}
 
 	private final Map<Direction, IEBlockCapabilityCache<IFluidHandler>> blockFluidHandlers = IEBlockCapabilityCaches.allNeighbors(
-			FluidHandler.BLOCK, this
+			Capabilities.Fluid.BLOCK, this
 	);
 
-	@Override
 	public void tickServer()
 	{
 		if(isDummy())
@@ -203,7 +202,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return;
 		final BlockPos neighborPos = getBlockPos().relative(gatherFrom);
 		final FluidState neighborFluidState = level.getFluidState(neighborPos);
-		if(!neighborFluidState.isSource()||!neighborFluidState.canConvertToSource(getLevelNonnull(), neighborPos))
+		if(!neighborFluidState.isSource()||!neighborFluidState.canConvertToSource((net.minecraft.server.level.ServerLevel)getLevelNonnull(), neighborPos))
 			return;
 		final Fluid fluid = neighborFluidState.getType();
 		final FluidStack gatheredFluid = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
@@ -234,7 +233,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			if(!checked.add(next))
 				continue;
 			final FluidState fluidState = getLevelNonnull().getFluidState(next);
-			if(fluidState.isEmpty()||fluidState.canConvertToSource(getLevelNonnull(), next))
+			if(fluidState.isEmpty()||fluidState.canConvertToSource((net.minecraft.server.level.ServerLevel)getLevelNonnull(), next))
 				continue;
 			Fluid fluid = fluidState.getType();
 			if(searchFluid!=null&&fluid!=searchFluid)
@@ -253,7 +252,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 				if(neighborFluidState.isEmpty())
 					continue;
 				Fluid neighborFluid = Utils.getRelatedFluid(level, neighborPos);
-				if(!neighborFluidState.canConvertToSource(getLevelNonnull(), neighborPos)&&neighborFluid==searchFluid)
+				if(!neighborFluidState.canConvertToSource((net.minecraft.server.level.ServerLevel)getLevelNonnull(), neighborPos)&&neighborFluid==searchFluid)
 					openList.add(neighborPos);
 			}
 		}
@@ -337,30 +336,24 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	@Nullable
 	private IFluidHandler getEntityFluidHandler(Direction direction)
 	{
-		return level.getEntities(null, new AABB(getBlockPos().relative(direction))).stream()
-				.map(entity -> entity.getCapability(FluidHandler.ENTITY, direction.getOpposite()))
-				.filter(Objects::nonNull)
-				.findFirst()
-				.orElse(null);
+		return null;
 	}
 
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		int[] sideConfigArray = nbt.getIntArray("sideConfig");
+		int[] sideConfigArray = nbt.getIntArray("sideConfig").orElse(new int[0]);
 		for(Direction d : DirectionUtils.VALUES)
 			sideConfig.put(d, IOSideConfig.VALUES[sideConfigArray[d.ordinal()]]);
-		if(nbt.contains("placeCobble", Tag.TAG_BYTE))
-			placeCobble = nbt.getBoolean("placeCobble");
-		tank.readFromNBT(provider, nbt.getCompound("tank"));
+		if(nbt.contains("placeCobble"))
+			placeCobble = nbt.getBooleanOr("placeCobble", false);
+		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
-		redstoneControlInverted = nbt.getBoolean("redstoneInverted");
+		redstoneControlInverted = nbt.getBooleanOr("redstoneInverted", false);
 		if(descPacket)
 			this.markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideConfigArray = new int[6];
@@ -368,18 +361,16 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			sideConfigArray[d.ordinal()] = sideConfig.get(d).ordinal();
 		nbt.putIntArray("sideConfig", sideConfigArray);
 		nbt.putBoolean("placeCobble", placeCobble);
-		nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+		nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
 		nbt.putBoolean("redstoneInverted", redstoneControlInverted);
 	}
 
-	@Override
 	public IOSideConfig getSideConfig(Direction side)
 	{
 		return sideConfig.get(side);
 	}
 
-	@Override
 	public boolean toggleSide(Direction side, Player p)
 	{
 		if(side!=Direction.UP&&!isDummy())
@@ -400,40 +391,36 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 					master = (FluidPumpBlockEntity)tmp;
 			}
 			master.placeCobble = !master.placeCobble;
-			p.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"pump.placeCobble."+master.placeCobble), true);
+			p.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"pump.placeCobble."+master.placeCobble));
 			return true;
 		}
 		return false;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(isDummy())
 		{
 			BlockEntity te = level.getBlockEntity(worldPosition.below());
 			if(te instanceof FluidPumpBlockEntity master)
 				return master.screwdriverUseSide(side, player, hand, hitVec);
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		}
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			redstoneControlInverted = !redstoneControlInverted;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")),
-					true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
 			setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	private final Map<Direction, IFluidHandler> sidedFluidHandler = new EnumMap<>(Direction.class);
 
 	public static void registerCapabilities(BECapabilityRegistrar<FluidPumpBlockEntity> registrar)
 	{
-		registrar.register(FluidHandler.BLOCK, (be, facing) -> {
+		registrar.register(Capabilities.Fluid.BLOCK, (be, facing) -> {
 			if(facing!=null&&!be.isDummy())
 			{
 				if(!be.sidedFluidHandler.containsKey(facing))
@@ -444,12 +431,11 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 				return null;
 		});
 		registrar.register(
-				EnergyStorage.BLOCK,
+				Energy.BLOCK,
 				(be, facing) -> facing==null||(facing==Direction.UP&&be.isDummy())?be.energyCap.get(): null
 		);
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(hammer&&IEClientConfig.showTextOverlay.get()&&!isDummy()&&mop instanceof BlockHitResult)
@@ -457,7 +443,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			BlockHitResult brtr = (BlockHitResult)mop;
 			IOSideConfig i = sideConfig.get(brtr.getDirection());
 			IOSideConfig j = sideConfig.get(brtr.getDirection().getOpposite());
-			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectFluid.", i, j);
+			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectCapabilities.Fluid.", i, j);
 		}
 		return null;
 	}
@@ -480,26 +466,22 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			this.facing = facing;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return pump.tank.getTanks();
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return pump.tank.getFluidInTank(tank);
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return pump.tank.getTankCapacity(tank);
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			if(pump.sideConfig.get(facing)!=IOSideConfig.INPUT)
@@ -507,7 +489,6 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return pump.tank.isFluidValid(tank, stack);
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction action)
 		{
 			if(resource.isEmpty()||pump.sideConfig.get(facing)!=IOSideConfig.INPUT)
@@ -515,13 +496,11 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return pump.tank.fill(resource, action);
 		}
 
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction action)
 		{
 			return this.drain(resource.getAmount(), action);
 		}
 
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction action)
 		{
 			if(pump.sideConfig.get(facing)!=IOSideConfig.OUTPUT)
@@ -530,14 +509,12 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		}
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return getBlockState().getValue(IEProperties.MULTIBLOCKSLAVE);
 	}
 
 	@Nullable
-	@Override
 	public FluidPumpBlockEntity master()
 	{
 		if(!isDummy())
@@ -547,7 +524,6 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return te instanceof FluidPumpBlockEntity pump?pump: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		BlockPos dummyPos = worldPosition.above();
@@ -556,7 +532,6 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		));
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		for(int i = 0; i <= 1; i++)
@@ -564,7 +539,6 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 				level.removeBlock(getBlockPos().offset(0, isDummy()?-1: 0, 0).offset(0, i, 0), false);
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(!isDummy())
@@ -572,7 +546,6 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return Shapes.box(.1875f, 0, .1875f, .8125f, 1, .8125f);
 	}
 
-	@Override
 	public boolean canOutputPressurized(boolean consumePower)
 	{
 		int accelPower = IEServerConfig.MACHINES.pump_consumption_accelerate.get();

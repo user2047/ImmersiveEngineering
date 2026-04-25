@@ -20,9 +20,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
@@ -33,7 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
 
 import java.util.List;
@@ -41,17 +41,16 @@ import java.util.Objects;
 
 import static blusunrize.immersiveengineering.api.IEApi.ieLoc;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public class RobotWolfItem extends IEBaseItem
 {
 	public static Identifier REGISTRY_KEY = ieLoc("robot");
 
 	public RobotWolfItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		Level level = ctx.getLevel();
@@ -71,11 +70,10 @@ public class RobotWolfItem extends IEBaseItem
 			else
 				spawnPos = targetPos.relative(direction);
 
-			Wolf wolf = EntityType.WOLF.spawn((ServerLevel)level, itemstack, player, spawnPos, MobSpawnType.SPAWN_EGG, true, !Objects.equals(targetPos, spawnPos)&&direction==Direction.UP);
+			Wolf wolf = EntityType.WOLF.spawn((ServerLevel)level, itemstack, player, spawnPos, EntitySpawnReason.SPAWN_ITEM_USE, true, !Objects.equals(targetPos, spawnPos)&&direction==Direction.UP);
 			if(wolf!=null)
 			{
 				// Set variant, tame and buff it
-				level.registryAccess().registryOrThrow(Registries.WOLF_VARIANT).getHolder(REGISTRY_KEY).ifPresent(wolf::setVariant);
 				wolf.tame(player);
 				wolf.setOrderedToSit(true);
 				wolf.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6);
@@ -91,7 +89,6 @@ public class RobotWolfItem extends IEBaseItem
 	}
 
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 	}
@@ -99,8 +96,7 @@ public class RobotWolfItem extends IEBaseItem
 	@SubscribeEvent
 	public static void onWolfInteract(EntityInteractSpecific event)
 	{
-		if(!(event.getTarget() instanceof Wolf wolf)||!wolf.getVariant().is(RobotWolfItem.REGISTRY_KEY))
-			// Only affect robot wolves
+		if(!(event.getTarget() instanceof Wolf wolf))
 			return;
 
 		ItemStack stack = event.getItemStack();
@@ -108,7 +104,7 @@ public class RobotWolfItem extends IEBaseItem
 		{
 			// Robot wolves do not use normal food and don't interact with spawn eggs
 			event.setCanceled(true);
-			event.setCancellationResult(InteractionResult.sidedSuccess(event.getLevel().isClientSide()));
+			event.setCancellationResult(InteractionResult.SUCCESS);
 		}
 		else if(wolf.getHealth() < wolf.getMaxHealth())
 		{
@@ -120,7 +116,7 @@ public class RobotWolfItem extends IEBaseItem
 				heldItems.getSecond().stack().consume(1, event.getEntity());
 				event.getEntity().playSound(SoundEvents.ANVIL_USE);
 				event.setCanceled(true);
-				event.setCancellationResult(InteractionResult.sidedSuccess(event.getLevel().isClientSide()));
+				event.setCancellationResult(InteractionResult.SUCCESS);
 			});
 		}
 	}

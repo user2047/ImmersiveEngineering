@@ -16,7 +16,7 @@ import blusunrize.immersiveengineering.client.models.obj.callback.block.TimerCal
 import blusunrize.immersiveengineering.common.blocks.metal.RedstoneTimerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -27,7 +27,6 @@ public class TimerCallbacks implements BlockCallback<Key>
 	public static final TimerCallbacks INSTANCE = new TimerCallbacks();
 	private static final Key INVALID = new Key(DyeColor.WHITE);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof RedstoneTimerBlockEntity timer))
@@ -35,13 +34,11 @@ public class TimerCallbacks implements BlockCallback<Key>
 		return new Key(timer.redstoneChannel);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public Color4 getRenderColor(Key key, String group, String material, ShaderCase shader, Color4 original)
 	{
 		if("coloured".equals(group))

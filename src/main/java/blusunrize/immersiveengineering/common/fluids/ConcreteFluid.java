@@ -18,6 +18,7 @@ import blusunrize.immersiveengineering.common.register.IEPotions;
 import blusunrize.immersiveengineering.mixin.accessors.FlowingFluidAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -42,13 +43,11 @@ public class ConcreteFluid extends IEFluid
 		super(entry);
 	}
 
-	@Override
 	protected boolean isRandomlyTicking()
 	{
 		return true;
 	}
 
-	@Override
 	public int getTickDelay(LevelReader p_205569_1_)
 	{
 		return 20;
@@ -56,11 +55,10 @@ public class ConcreteFluid extends IEFluid
 
 	boolean hasFlownInTick = false;
 
-	@Override
-	public void tick(Level world, BlockPos pos, FluidState state)
+	public void tick(ServerLevel world, BlockPos pos, BlockState blockState, FluidState state)
 	{
 		hasFlownInTick = false;
-		super.tick(world, pos, state);
+		super.tick(world, pos, blockState, state);
 		int timer = state.getValue(IEProperties.INT_32);
 		int level = getLegacyLevel(state);
 		int quantaRemaining = 16-level;
@@ -98,7 +96,6 @@ public class ConcreteFluid extends IEFluid
 			registerDefaultState(getStateDefinition().any().setValue(LEVEL, 7));
 		}
 
-		@Override
 		protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder)
 		{
 			super.createFluidStateDefinition(builder);
@@ -107,7 +104,6 @@ public class ConcreteFluid extends IEFluid
 	}
 
 	@Nonnull
-	@Override
 	protected FluidState getNewLiquid(Level worldIn, BlockPos pos, @Nonnull BlockState blockStateIn)
 	{
 		//Based on super version, respects timer/decay

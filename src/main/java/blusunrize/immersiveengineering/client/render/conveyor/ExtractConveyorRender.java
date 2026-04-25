@@ -19,8 +19,8 @@ import blusunrize.immersiveengineering.common.blocks.metal.conveyors.ExtractConv
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -38,10 +38,9 @@ public class ExtractConveyorRender extends BasicConveyorRender<ExtractConveyor>
 		super(active, inactive);
 	}
 
-	@Override
 	public List<BakedQuad> modifyQuads(List<BakedQuad> baseModel, RenderContext<ExtractConveyor> context, @Nullable RenderType renderType)
 	{
-		if(renderType!=null&&renderType!=RenderType.cutout())
+		if(renderType!=null&&renderType!=blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout())
 			return super.modifyQuads(baseModel, context, renderType);
 
 		final TextureAtlasSprite texture_steel = ClientUtils.getSprite(IEApi.ieLoc("block/metal/storage_steel"));
@@ -108,7 +107,6 @@ public class ExtractConveyorRender extends BasicConveyorRender<ExtractConveyor>
 		return super.modifyQuads(baseModel, context, renderType);
 	}
 
-	@Override
 	public Object getModelCacheKey(RenderContext<ExtractConveyor> context)
 	{
 		BasicConveyorCacheData basic = IConveyorModelRender.getDefaultData(this, context);
@@ -121,7 +119,6 @@ public class ExtractConveyorRender extends BasicConveyorRender<ExtractConveyor>
 		return new Key(basic, instance.getExtractDirection(), instance.getCurrentExtension());
 	}
 
-	@Override
 	public boolean shouldRenderWall(Direction facing, ConveyorWall wall, RenderContext<ExtractConveyor> context)
 	{
 		ExtractConveyor instance = context.instance();

@@ -35,7 +35,6 @@ public record MessageMultiblockSync(List<SyncedTemplate> templates) implements I
 			.apply(ByteBufCodecs.list())
 			.map(MessageMultiblockSync::new, MessageMultiblockSync::templates);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -76,7 +75,6 @@ public record MessageMultiblockSync(List<SyncedTemplate> templates) implements I
 		}
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

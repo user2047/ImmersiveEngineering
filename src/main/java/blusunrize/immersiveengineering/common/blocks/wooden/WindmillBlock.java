@@ -22,7 +22,6 @@ public class WindmillBlock extends IEEntityBlock<WindmillBlockEntity>
 		super(IEBlockEntities.WINDMILL, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

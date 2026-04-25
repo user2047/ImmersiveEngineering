@@ -31,18 +31,16 @@ public class BulletItem<T> extends IEBaseItem implements IColouredItem
 
 	public BulletItem(IBullet<T> type)
 	{
-		super(new Properties().component(IEDataComponents.getBulletData(type), type.getCodec().defaultValue()));
+		super(itemProperties().component(IEDataComponents.getBulletData(type), type.getCodec().defaultValue()));
 		this.type = type;
 		this.component = IEDataComponents.getBulletData(type);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		type.addTooltip(stack.get(component), ctx, list, flag);
 	}
 
-	@Override
 	public int getColourForIEItem(ItemStack stack, int pass)
 	{
 		return type.getColour(stack.get(component), pass).toInt();

@@ -33,7 +33,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -200,14 +200,14 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 		double dx = dropAt.getX()+.5;
 		double dy = dropAt.getY()+.5;
 		double dz = dropAt.getZ()+.5;
-		if(world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+		if(world instanceof ServerLevel serverLevel&&serverLevel.getGameRules().get(GameRules.BLOCK_DROPS))
 			world.addFreshEntity(new ItemEntity(world, dx, dy, dz, c.type.getWireCoil(c)));
 	}
 
 	public void removeInsertAndDropConnection(Connection c, Player player, Level world)
 	{
 		removeConnection(c);
-		if (world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+		if (world instanceof ServerLevel serverLevel&&serverLevel.getGameRules().get(GameRules.BLOCK_DROPS))
 			world.addFreshEntity(new ItemEntity(world, player.getX(), player.getY(), player.getZ(), c.type.getWireCoil(c), 0, 0, 0));
 	}
 
@@ -224,7 +224,7 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 		localNetSet.forEach(LocalWireNetwork::setInvalid);
 		localNetSet.clear();
 		localNetsByPos.clear();
-		ListTag locals = nbt.getList("locals", Tag.TAG_COMPOUND);
+		ListTag locals = nbt.getListOrEmpty("locals");
 		for(Tag b : locals)
 		{
 			CompoundTag subnet = (CompoundTag)b;
@@ -236,7 +236,6 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 		queuedLoads.clear();
 	}
 
-	@Override
 	public CompoundTag save(CompoundTag savedNBT, Provider provider)
 	{
 		ListTag locals = new ListTag();
@@ -364,10 +363,10 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 				WireLogger.logger.info("Loading connector {} at {}", iic, iic.getPosition());
 				if(validating)
 					WireLogger.logger.error("Adding a connector during validation!");
-				onConnectorLoad(iic, level.isClientSide);
+				onConnectorLoad(iic, level.isClientSide());
 				ApiUtils.addFutureServerTask(level, () -> initializeConnectionsOn(iic, level), true);
 				validateNextTick = true;
-				if(level.isClientSide)
+				if(level.isClientSide())
 					updateModelData(iic, level);
 			}
 			else
@@ -462,7 +461,7 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 
 	private void validate(Level world)
 	{
-		if(world.isClientSide||!VALIDATE_CONNECTIONS.get().getAsBoolean())
+		if(world.isClientSide()||!VALIDATE_CONNECTIONS.get().getAsBoolean())
 			return;
 		else
 			WireLogger.logger.info("Validating wire network...");
@@ -545,7 +544,7 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 		//TODO better way of finding all connectors in a chunk
 		Collection<ConnectionPoint> ret = new ArrayList<>();
 		for(ConnectionPoint cp : localNetsByPos.keySet())
-			if(pos.equals(new ChunkPos(cp.position())))
+			if(pos.equals(new ChunkPos(cp.position().getX()>>4, cp.position().getZ()>>4)))
 				ret.add(cp);
 		return ret;
 	}

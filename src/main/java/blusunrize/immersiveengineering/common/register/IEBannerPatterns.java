@@ -10,10 +10,11 @@ package blusunrize.immersiveengineering.common.register;
 
 import blusunrize.immersiveengineering.common.blocks.metal.WarningSignBlock.WarningSignIcon;
 import blusunrize.immersiveengineering.common.register.IEItems.ItemRegObject;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.BannerPatternItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.entity.BannerPattern;
 
@@ -44,9 +45,12 @@ public class IEBannerPatterns
 	private static BannerEntry addBanner(String name, String hashName, String... subdesigns)
 	{
 		ResourceKey<BannerPattern> pattern = ResourceKey.create(Registries.BANNER_PATTERN, ieLoc(name));
-		TagKey<BannerPattern> tag = TagKey.create(Registries.BANNER_PATTERN, pattern.location());
-		ItemRegObject<BannerPatternItem> item = IEItems.register("bannerpattern_"+name, () -> new BannerPatternItem(
-				tag, new Properties()
+		TagKey<BannerPattern> tag = TagKey.create(Registries.BANNER_PATTERN, pattern.identifier());
+		ItemRegObject<Item> item = IEItems.register("bannerpattern_"+name, () -> new Item(
+				IEItems.defaultProperties().stacksTo(1).delayedComponent(
+						DataComponents.PROVIDES_BANNER_PATTERNS,
+						lookup -> lookup.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(tag)
+				)
 		));
 		BannerEntry result = new BannerEntry(name, pattern, tag, item, hashName);
 		for(String design : subdesigns)
@@ -65,7 +69,7 @@ public class IEBannerPatterns
 			String name,
 			List<ResourceKey<BannerPattern>> patterns,
 			TagKey<BannerPattern> tag,
-			IEItems.ItemRegObject<BannerPatternItem> item,
+			IEItems.ItemRegObject<Item> item,
 			String hashName
 	)
 	{
@@ -73,7 +77,7 @@ public class IEBannerPatterns
 				String name,
 				ResourceKey<BannerPattern> pattern,
 				TagKey<BannerPattern> tag,
-				ItemRegObject<BannerPatternItem> item,
+				ItemRegObject<Item> item,
 				String hashName
 		)
 		{

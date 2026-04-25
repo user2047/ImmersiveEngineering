@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public class BlueprintCraftingRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<BlueprintCraftingRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BlueprintCraftingRecipe>> SERIALIZER;
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
 	public static final CachedRecipeList<BlueprintCraftingRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.BLUEPRINT);
@@ -57,7 +57,7 @@ public class BlueprintCraftingRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<BlueprintCraftingRecipe> getIESerializer()
+	protected RecipeSerializer<BlueprintCraftingRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
@@ -137,8 +137,9 @@ public class BlueprintCraftingRecipe extends MultiblockRecipe
 				{
 					int taken = Math.min(queryStack.getCount(), inputSize);
 					consumed.add(queryStack.copyWithCount(taken));
-					if(taken >= queryStack.getCount()&&queryStack.getItem().hasCraftingRemainingItem(queryStack))
-						query.set(i, queryStack.getItem().getCraftingRemainingItem(queryStack));
+					ItemStack craftingRemainder = queryStack.getItem().getCraftingRemainder().create();
+					if(taken >= queryStack.getCount()&&!craftingRemainder.isEmpty())
+						query.set(i, craftingRemainder);
 					else
 						queryStack.shrink(taken);
 					inputSize -= taken;

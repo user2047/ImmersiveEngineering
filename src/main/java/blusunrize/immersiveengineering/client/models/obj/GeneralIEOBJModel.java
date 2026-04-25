@@ -30,24 +30,24 @@ import malte0811.modelsplitter.model.MaterialLibrary.OBJMaterial;
 import malte0811.modelsplitter.model.OBJModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
+public class GeneralIEOBJModel<T> implements BakedModel, ICacheKeyProvider<ModelKey<T>>
 {
 	private final Cache<GroupKey<T>, List<ShadedQuads>> groupCache = CacheBuilder.newBuilder()
 			.maximumSize(100)
@@ -105,18 +105,16 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 		else
 			this.overrides = new ItemOverrides()
 			{
-				@Override
 				public BakedModel resolve(
 						@Nonnull BakedModel p_173465_, @Nonnull ItemStack p_173466_, @Nullable ClientLevel p_173467_, @Nullable LivingEntity p_173468_, int p_173469_
 				)
 				{
-					return Minecraft.getInstance().getModelManager().getMissingModel();
+			return null;
 				}
 			};
 		this.keyProperty = IEOBJCallbacks.getModelProperty(callback);
 	}
 
-	@Override
 	public List<BakedQuad> getQuads(ModelKey<T> key)
 	{
 		if(key==null)
@@ -126,8 +124,19 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 		);
 	}
 
+	@Nonnull
+	public List<BakedQuad> getQuads(
+			@Nullable BlockState state,
+			@Nullable Direction side,
+			@Nonnull RandomSource rand,
+			@Nonnull ModelData extraData,
+			@Nullable RenderType layer
+	)
+	{
+		return getQuads(getKey(state, side, rand, extraData, layer));
+	}
+
 	@Nullable
-	@Override
 	public ModelKey<T> getKey(
 			@Nullable BlockState state,
 			@Nullable Direction side,
@@ -149,7 +158,6 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 	}
 
 	@Nonnull
-	@Override
 	public ModelData getModelData(
 			@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData
 	)
@@ -171,7 +179,6 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 	}
 
 	@Nonnull
-	@Override
 	public ChunkRenderTypeSet getRenderTypes(
 			@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data
 	)
@@ -180,52 +187,44 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 	}
 
 	@Nonnull
-	@Override
 	public List<RenderType> getRenderTypes(@Nonnull ItemStack itemStack, boolean fabulous)
 	{
 		return fabulous?fabulousItemTypes: itemTypes;
 	}
 
-	@Override
 	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean usesBlockLight()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isCustomRenderer()
 	{
 		return isDynamic;
 	}
 
 	@Nonnull
-	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
 		return getParticleIcon(ModelData.EMPTY);
 	}
 
 	@Nonnull
-	@Override
 	public TextureAtlasSprite getParticleIcon(@Nonnull ModelData data)
 	{
 		return particles;
 	}
 
 	@Nonnull
-	@Override
 	public ItemOverrides getOverrides()
 	{
 		return overrides;
@@ -276,14 +275,13 @@ public class GeneralIEOBJModel<T> implements ICacheKeyProvider<ModelKey<T>>
 		}
 
 		@Nullable
-		@Override
 		public BakedModel resolve(
 				@Nonnull BakedModel baseModel, @Nonnull ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity holder, int p_173469_
 		)
 		{
 			GlobalTempData.setActiveHolder(holder);
 			T key = callback.extractKey(stack, holder);
-			ShaderWrapper wrapper = stack.getCapability(CapabilityShader.ITEM);
+			ShaderWrapper wrapper = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, CapabilityShader.ITEM);
 			ShaderCase shader = wrapper==null?null: wrapper.getCase();
 			return modelCache.getUnchecked(new ModelKey<>(key, shader, null));
 		}

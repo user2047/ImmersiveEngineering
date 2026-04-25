@@ -48,7 +48,6 @@ public class GuiSliderIE extends ExtendedSlider
 		this.handler = handler;
 	}
 
-	@Override
 	public void renderWidget(@Nonnull GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick)
 	{
 		Font fontrenderer = Minecraft.getInstance().font;
@@ -68,7 +67,6 @@ public class GuiSliderIE extends ExtendedSlider
 		graphics.drawCenteredString(fontrenderer, getMessage(), getX()+width/2, getY()-10+height/2-3, color);
 	}
 
-	@Override
 	protected void applyValue()
 	{
 		super.applyValue();

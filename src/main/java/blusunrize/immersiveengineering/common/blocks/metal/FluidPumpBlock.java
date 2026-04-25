@@ -26,14 +26,12 @@ public class FluidPumpBlock extends IEEntityBlock<FluidPumpBlockEntity>
 		super(IEBlockEntities.FLUID_PUMP, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, IEProperties.MULTIBLOCKSLAVE, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos start = context.getClickedPos();

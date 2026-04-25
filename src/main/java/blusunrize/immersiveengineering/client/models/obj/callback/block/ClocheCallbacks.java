@@ -19,13 +19,13 @@ import blusunrize.immersiveengineering.client.models.obj.callback.block.ClocheCa
 import blusunrize.immersiveengineering.client.utils.ModelUtils;
 import blusunrize.immersiveengineering.common.blocks.metal.ClocheBlockEntity;
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -41,7 +41,6 @@ public class ClocheCallbacks implements BlockCallback<Key>
 	public static final ClocheCallbacks INSTANCE = new ClocheCallbacks();
 	private static final Key INVALID = new Key(new ComparableItemStack(ItemStack.EMPTY));
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof ClocheBlockEntity clocheHere))
@@ -53,19 +52,16 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		return new Key(new ComparableItemStack(soil, true));
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public boolean dependsOnLayer()
 	{
 		return true;
 	}
 
-	@Override
 	@Nullable
 	public TextureAtlasSprite getTextureReplacement(Key key, String group, String material)
 	{
@@ -79,10 +75,9 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		return null;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key object, String group, RenderType layer)
 	{
-		return "glass".equals(group)==(layer==RenderType.translucent());
+		return "glass".equals(group)==(layer==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent());
 	}
 
 	@Nullable
@@ -108,7 +103,6 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		return rl;
 	}
 
-	@Override
 	public Color4 getRenderColor(Key key, String group, String material, ShaderCase shaderCase, Color4 original)
 	{
 		ItemStack soil = key.soil().stack;

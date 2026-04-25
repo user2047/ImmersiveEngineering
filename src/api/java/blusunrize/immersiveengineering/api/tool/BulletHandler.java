@@ -92,6 +92,11 @@ public class BulletHandler
 		return REGISTRY.keySet();
 	}
 
+	public static Collection<Identifier> keySet()
+	{
+		return getAllKeys();
+	}
+
 	public interface IBullet<StackData>
 	{
 		CodecsAndDefault<StackData> getCodec();
@@ -222,20 +227,18 @@ public class BulletHandler
 				return;
 			EntityHitResult target = (EntityHitResult)rtr;
 			Entity hitEntity = target.getEntity();
-			if(!world.isClientSide&&hitEntity!=null&&damageSourceGetter!=null)
+			if(!world.isClientSide()&&hitEntity!=null&&damageSourceGetter!=null)
 			{
 				Entity shooter = null;
 				if(shooterUUID!=null&&world instanceof ServerLevel serverLevel)
 					shooter = serverLevel.getEntity(shooterUUID);
 				if(shooter == null && projectile instanceof Projectile p)
 					shooter = p.getOwner();
-				if(hitEntity.hurt(damageSourceGetter.getSource(projectile, shooter, hitEntity), getDamage(hitEntity, headshot)))
-				{
-					if(resetHurt)
-						hitEntity.invulnerableTime = 0;
-					if(setFire)
-						hitEntity.igniteForSeconds(3);
-				}
+				hitEntity.hurt(damageSourceGetter.getSource(projectile, shooter, hitEntity), getDamage(hitEntity, headshot));
+				if(resetHurt)
+					hitEntity.invulnerableTime = 0;
+				if(setFire)
+					hitEntity.igniteForSeconds(3);
 			}
 		}
 

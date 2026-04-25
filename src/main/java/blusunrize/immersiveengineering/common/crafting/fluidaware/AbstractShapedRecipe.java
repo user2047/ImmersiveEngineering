@@ -13,25 +13,31 @@ import blusunrize.immersiveengineering.common.crafting.fluidaware.AbstractFluidA
 import blusunrize.immersiveengineering.common.util.RecipeSerializers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
+import net.minecraft.world.item.Items;
 
-// TODO to follow Neo convention this needs to have ShapedRecipe as the superclass instead AFAR
 public abstract class AbstractShapedRecipe<MatchLocation extends IMatchLocation>
-		extends ShapedRecipe implements IFluidAwareRecipe<MatchLocation>
+		extends AbstractFluidAwareRecipe<MatchLocation>
 {
+	private static final Ingredient EMPTY_PLACEHOLDER = Ingredient.of(Items.BARRIER);
 	private final int recipeWidth;
 	private final int recipeHeight;
-	private final CraftingBookCategory category;
 
 	public AbstractShapedRecipe(ShapedRecipe vanilla)
 	{
 		this(
-				vanilla.getGroup(),
+				vanilla.group(),
 				vanilla.getWidth(), vanilla.getHeight(),
-				vanilla.getResultItem(null), vanilla.category(),
-				vanilla.pattern
+				vanilla.assemble(null), vanilla.category(),
+				null
 		);
 	}
 
@@ -40,10 +46,28 @@ public abstract class AbstractShapedRecipe<MatchLocation extends IMatchLocation>
 			CraftingBookCategory category, ShapedRecipePattern pattern
 	)
 	{
-		super(groupIn, category, pattern, recipeOutput);
+		super(groupIn, ingredientsFromPattern(recipeWidth, recipeHeight, pattern), recipeOutput);
 		this.recipeWidth = recipeWidth;
 		this.recipeHeight = recipeHeight;
-		this.category = category;
+	}
+
+	private static NonNullList<Ingredient> ingredientsFromPattern(int width, int height, ShapedRecipePattern pattern)
+	{
+		NonNullList<Ingredient> result = NonNullList.withSize(width*height, emptyIngredient());
+		if(pattern!=null)
+			for(int i = 0; i < Math.min(result.size(), pattern.ingredients().size()); ++i)
+				result.set(i, pattern.ingredients().get(i).orElse(emptyIngredient()));
+		return result;
+	}
+
+	protected static Ingredient emptyIngredient()
+	{
+		return EMPTY_PLACEHOLDER;
+	}
+
+	protected static boolean isEmptyIngredient(Ingredient ingredient)
+	{
+		return ingredient==EMPTY_PLACEHOLDER;
 	}
 
 	public int getWidth()
@@ -56,40 +80,30 @@ public abstract class AbstractShapedRecipe<MatchLocation extends IMatchLocation>
 		return this.recipeHeight;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width >= this.recipeWidth&&height >= this.recipeHeight;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.IE_SHAPED_SERIALIZER.get();
 	}
 
 	public ShapedRecipe toVanilla()
 	{
-		return new ShapedRecipe(getGroup(), category, pattern, getResultItem(null));
+		return null;
 	}
 
-	@Override
-	public CraftingBookCategory category()
-	{
-		return category;
-	}
-
-	@Override
 	public boolean isIncomplete()
 	{
-		// Copied from Forge patch to ShapedRecipe
 		NonNullList<Ingredient> nonnulllist = getIngredients();
 		if(nonnulllist.isEmpty())
 			return true;
 		else
 			return nonnulllist.stream()
-					.filter(ingredient -> !ingredient.isEmpty())
-					.anyMatch(Ingredient::hasNoItems);
+					.filter(ingredient -> !isEmptyIngredient(ingredient)&&!ingredient.isEmpty())
+					.anyMatch(ingredient -> !ingredient.items().findAny().isPresent());
 	}
 }

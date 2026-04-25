@@ -78,13 +78,11 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 		return selectedState!=-1?selectedState: this.getStateAsInt();
 	}
 
-	@Override
 	public Component getMessage()
 	{
 		return this.messageGetter.apply(this.getState());
 	}
 
-	@Override
 	protected int getTextColor(boolean highlighted)
 	{
 		if(highlighted)
@@ -92,7 +90,6 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 		return 0x555555;
 	}
 
-	@Override
 	public void onClick(double mouseX, double mouseY)
 	{
 		if(!opened)
@@ -122,7 +119,6 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 	}
 
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();

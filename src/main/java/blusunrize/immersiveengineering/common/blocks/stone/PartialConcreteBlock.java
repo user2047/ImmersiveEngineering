@@ -39,7 +39,6 @@ public class PartialConcreteBlock extends IEBaseBlock
 				.noOcclusion();
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return shape;

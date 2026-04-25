@@ -63,7 +63,7 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 	private final IEnergyStorage energyStorage;
 	protected final Map<Direction, IEnergyStorage> energyCaps = new EnumMap<>(Direction.class);
 	private final Map<Direction, IEBlockCapabilityCache<IEnergyStorage>> connectedCaps = IEBlockCapabilityCaches.allNeighbors(
-			Capabilities.EnergyStorage.BLOCK, this
+			Capabilities.Energy.BLOCK, this
 	);
 	protected final IEnergyStorage nullEnergyCap;
 
@@ -88,7 +88,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		nullEnergyCap = new WrappingEnergyStorage(energyStorage, false, false);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		for(Direction f : DirectionUtils.VALUES)
@@ -123,13 +122,11 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		}
 	}
 
-	@Override
 	public IOSideConfig getSideConfig(Direction side)
 	{
 		return this.sideConfig.get(side);
 	}
 
-	@Override
 	public boolean toggleSide(Direction side, Player player)
 	{
 		sideConfig.put(side, IOSideConfig.next(sideConfig.get(side)));
@@ -139,7 +136,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return true;
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -165,7 +161,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return configValues.output.getAsInt();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		for(Direction f : DirectionUtils.VALUES)
@@ -174,11 +169,10 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 			EnergyHelper.serializeTo(forgeStorage, nbt, provider);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		for(Direction f : DirectionUtils.VALUES)
-			sideConfig.put(f, IOSideConfig.values()[nbt.getInt("sideConfig_"+f.ordinal())]);
+			sideConfig.put(f, IOSideConfig.values()[nbt.getIntOr("sideConfig_"+f.ordinal(), 0)]);
 		if(energyStorage instanceof EnergyStorage forgeStorage)
 			EnergyHelper.deserializeFrom(forgeStorage, nbt, provider);
 	}
@@ -186,12 +180,11 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 	public static void registerCapabilities(BECapabilityRegistrar<? extends CapacitorBlockEntity> registrar)
 	{
 		registrar.register(
-				Capabilities.EnergyStorage.BLOCK,
+				Capabilities.Energy.BLOCK,
 				(be, side) -> side==null?be.nullEnergyCap: be.energyCaps.get(side)
 		);
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(hammer&&IEClientConfig.showTextOverlay.get()&&mop instanceof BlockHitResult bmop)
@@ -203,13 +196,11 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return null;
 	}
 
-	@Override
 	public int getComparatorInputOverride()
 	{
 		return this.comparatorOutput;
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -218,7 +209,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
@@ -240,7 +230,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 	) implements IEnergyStorage
 	{
 
-		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate)
 		{
 			if(canReceive())
@@ -248,7 +237,6 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return 0;
 		}
 
-		@Override
 		public int extractEnergy(int maxExtract, boolean simulate)
 		{
 			if(canExtract())
@@ -256,25 +244,21 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return 0;
 		}
 
-		@Override
 		public int getEnergyStored()
 		{
 			return base.getEnergyStored();
 		}
 
-		@Override
 		public int getMaxEnergyStored()
 		{
 			return base.getMaxEnergyStored();
 		}
 
-		@Override
 		public boolean canExtract()
 		{
 			return sideConfig.apply(side)==IOSideConfig.OUTPUT;
 		}
 
-		@Override
 		public boolean canReceive()
 		{
 			return sideConfig.apply(side)==IOSideConfig.INPUT;

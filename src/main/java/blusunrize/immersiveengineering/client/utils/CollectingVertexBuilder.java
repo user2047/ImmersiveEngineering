@@ -23,7 +23,6 @@ public class CollectingVertexBuilder implements VertexConsumer
 	private Vertex currentVertex = null;
 
 	@Nonnull
-	@Override
 	public VertexConsumer addVertex(float x, float y, float z)
 	{
 		if(currentVertex!=null)
@@ -37,7 +36,6 @@ public class CollectingVertexBuilder implements VertexConsumer
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setColor(int red, int green, int blue, int alpha)
 	{
 		currentVertex.order.add(Element.COLOR);
@@ -49,7 +47,6 @@ public class CollectingVertexBuilder implements VertexConsumer
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setUv(float u, float v)
 	{
 		currentVertex.order.add(Element.UV);
@@ -59,7 +56,6 @@ public class CollectingVertexBuilder implements VertexConsumer
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setUv1(int u, int v)
 	{
 		currentVertex.order.add(Element.OVERLAY);
@@ -69,7 +65,6 @@ public class CollectingVertexBuilder implements VertexConsumer
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setUv2(int u, int v)
 	{
 		currentVertex.order.add(Element.UV2);
@@ -79,13 +74,24 @@ public class CollectingVertexBuilder implements VertexConsumer
 	}
 
 	@Nonnull
-	@Override
 	public VertexConsumer setNormal(float x, float y, float z)
 	{
 		currentVertex.order.add(Element.NORMAL);
 		currentVertex.normal[0] = x;
 		currentVertex.normal[1] = y;
 		currentVertex.normal[2] = z;
+		return this;
+	}
+
+	@Nonnull
+	public VertexConsumer setColor(int color)
+	{
+		return setColor(color>>16&255, color>>8&255, color&255, color>>24&255);
+	}
+
+	@Nonnull
+	public VertexConsumer setLineWidth(float width)
+	{
 		return this;
 	}
 

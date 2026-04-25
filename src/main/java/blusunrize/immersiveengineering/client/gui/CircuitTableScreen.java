@@ -35,7 +35,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -85,7 +85,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -99,20 +98,19 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		);
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
 
 		this.operatorList = (GuiSelectingList)this.addRenderableWidget(new GuiSelectingList(leftPos+58, topPos+16, 36, 56, btn -> {
-			this.minecraft.tell(this::updateButtons);
-			this.minecraft.tell(this::updateInstruction);
+			this.updateButtons();
+			this.updateInstruction();
 		}, Arrays.stream(LogicCircuitOperator.values()).map(Enum::name).toArray(String[]::new)).setPadding(1, 1, 2, 0));
 
 		this.outputButton = this.addRenderableWidget(GuiButtonLogicCircuitRegister.create(
 				leftPos+121, topPos+56,
 				Component.translatable(Lib.DESC_INFO+"circuit_table.btn.output"),
-				btn -> this.minecraft.tell(this::updateInstruction))
+				btn -> this.updateInstruction())
 		);
 
 		this.name = new EditBox(this.font, leftPos+172, topPos+10, 54, 12, Component.translatable(Lib.DESC_INFO+"circuit_table.field.name"));
@@ -158,12 +156,11 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 				});
 	}
 
-	@Override
-	protected void slotClicked(Slot pSlot, int pSlotId, int pMouseButton, ClickType pType)
+	protected void slotClicked(Slot pSlot, int pSlotId, int pMouseButton, ContainerInput pType)
 	{
 		// withdrawing from edit slot, or quick-moving a circuit into it
 		boolean editCircuit = pSlotId==CircuitTableBlockEntity.getEditSlot()||(
-				pType==ClickType.QUICK_MOVE&&pSlotId >= this.menu.ownSlotCount
+				pType==ContainerInput.QUICK_MOVE&&pSlotId >= this.menu.ownSlotCount
 						&&pSlot!=null&&pSlot.getItem().is(IEItems.Misc.LOGIC_CIRCUIT_BOARD.get())
 		);
 
@@ -175,8 +172,8 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		ItemStack circuitStack = this.menu.slots.get(CircuitTableBlockEntity.getEditSlot()).getItem();
 		if(!circuitStack.isEmpty())
 		{
-			this.minecraft.tell(this::updateButtons);
-			this.minecraft.tell(this::updateInstruction);
+			this.updateButtons();
+			this.updateInstruction();
 			if(pSlot.getItem().has(DataComponents.CUSTOM_NAME))
 				this.name.setValue(pSlot.getItem().get(DataComponents.CUSTOM_NAME).getString());
 		}
@@ -195,7 +192,7 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 				this.inputButtons.add(this.addRenderableWidget(GuiButtonLogicCircuitRegister.create(
 						leftPos+inputStart+20*i, topPos+18,
 						Component.translatable(Lib.DESC_INFO+"circuit_table.btn.input_num", (i+1)),
-						btn -> this.minecraft.tell(this::updateInstruction))
+						btn -> this.updateInstruction())
 				));
 		}
 		LogicCircuitInstruction editInstr = getEditInstruction();
@@ -211,7 +208,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 			this.operatorList.active = true;
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
@@ -227,7 +223,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		}
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.operator"), 76, 4, DyeColor.LIGHT_GRAY.getTextColor());
@@ -250,7 +245,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		}
 	}
 
-	@Override
 	public boolean keyPressed(int key, int scancode, int modifiers)
 	{
 		if(this.name.isFocused()&&key!=GLFW.GLFW_KEY_ESCAPE)
@@ -259,7 +253,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		return super.keyPressed(key, scancode, modifiers);
 	}
 
-	@Override
 	public boolean charTyped(char codePoint, int modifiers)
 	{
 		for(GuiButtonState<?> input : this.inputButtons)
@@ -270,7 +263,6 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 		return super.charTyped(codePoint, modifiers);
 	}
 
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
 		if(isMouseIn((int)mouseX, (int)mouseY, 52, 7, 100, 70)&&this.menu.getCarried().getItem() instanceof LogicCircuitBoardItem)

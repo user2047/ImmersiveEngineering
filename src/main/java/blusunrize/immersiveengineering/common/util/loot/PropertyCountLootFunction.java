@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -43,10 +42,9 @@ public class PropertyCountLootFunction extends LootItemConditionalFunction
 	}
 
 	@Nonnull
-	@Override
 	protected ItemStack run(@Nonnull ItemStack stack, @Nonnull LootContext context)
 	{
-		BlockState blockstate = context.getParamOrNull(LootContextParams.BLOCK_STATE);
+		BlockState blockstate = context.getOptionalParameter(LootContextParams.BLOCK_STATE);
 		if(blockstate!=null)
 			stack.setCount(getPropertyValue(blockstate));
 		return stack;
@@ -60,10 +58,9 @@ public class PropertyCountLootFunction extends LootItemConditionalFunction
 		return 1;
 	}
 
-	@Override
-	public LootItemFunctionType getType()
+	public MapCodec<? extends LootItemConditionalFunction> codec()
 	{
-		return IELootFunctions.PROPERTY_COUNT.value();
+		return CODEC;
 	}
 
 	public static class Builder extends LootItemConditionalFunction.Builder<PropertyCountLootFunction.Builder>
@@ -76,14 +73,12 @@ public class PropertyCountLootFunction extends LootItemConditionalFunction
 		}
 
 		@Nonnull
-		@Override
 		protected PropertyCountLootFunction.Builder getThis()
 		{
 			return this;
 		}
 
 		@Nonnull
-		@Override
 		public LootItemFunction build()
 		{
 			return new PropertyCountLootFunction(getConditions(), propertyName);

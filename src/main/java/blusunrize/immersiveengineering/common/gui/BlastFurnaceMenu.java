@@ -81,7 +81,6 @@ public class BlastFurnaceMenu extends IEContainerMenu
 		Level level = inventoryPlayer.player.level();
 		this.addSlot(new SlotItemHandler(inv, 0, 52, 17)
 		{
-			@Override
 			public boolean mayPlace(ItemStack itemStack)
 			{
 				return BlastFurnaceRecipe.findRecipe(level, itemStack, null)!=null;

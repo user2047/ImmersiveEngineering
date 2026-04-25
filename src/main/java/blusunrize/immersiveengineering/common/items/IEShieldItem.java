@@ -24,7 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -35,10 +35,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.energy.ComponentEnergyStorage;
@@ -56,14 +56,14 @@ public class IEShieldItem extends UpgradeableToolItem
 
 	public IEShieldItem()
 	{
-		super(new Properties().durability(1024), TYPE, 2);
+		super(itemProperties().durability(1024), TYPE, 2);
 	}
 
 	public static void registerCapabilities(ItemCapabilityRegistration.ItemCapabilityRegistrar registrar)
 	{
 		registerCapabilitiesISI(registrar);
 		registrar.register(
-				EnergyStorage.ITEM,
+				Energy.ITEM,
 				stack -> new ComponentEnergyStorage(stack, IEDataComponents.GENERIC_ENERGY.get(), getMaxEnergyStored(stack))
 		);
 		registrar.register(
@@ -72,7 +72,6 @@ public class IEShieldItem extends UpgradeableToolItem
 		);
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		if(slotChanged||CapabilityShader.shouldReequipDueToShader(oldStack, newStack))
@@ -81,36 +80,34 @@ public class IEShieldItem extends UpgradeableToolItem
 			return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		if(getMaxEnergyStored(stack) > 0)
 		{
-			IEnergyStorage energyStorage = stack.getCapability(EnergyStorage.ITEM);
+			IEnergyStorage energyStorage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM);
 			String stored = energyStorage.getEnergyStored()+"/"+getMaxEnergyStored(stack);
 			list.add(Component.translatable(Lib.DESC+"info.energyStored", stored));
 		}
 	}
 
-	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity ent, int slot, boolean inHand)
 	{
 		super.inventoryTick(stack, world, ent, slot, inHand);
-		if(world.isClientSide)
+		if(world.isClientSide())
 			return;
 
 		if(ent instanceof LivingEntity)
 			inHand |= ((LivingEntity)ent).getItemInHand(InteractionHand.OFF_HAND)==stack;
 
 		boolean blocking = ent instanceof LivingEntity&&((LivingEntity)ent).isBlocking();
-		IEnergyStorage energy = stack.getCapability(EnergyStorage.ITEM);
+		IEnergyStorage energy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Energy.ITEM);
 		if(!inHand||!blocking)//Don't recharge if in use, to avoid flickering
 		{
 			for(var cooldownKey : List.of(UpgradeEffect.FLASH, UpgradeEffect.SHOCK))
 			{
 				var upgrades = getUpgrades(stack);
 				var cooldown = upgrades.get(cooldownKey);
-				if(cooldown.isOnCooldown()&&energy.extractEnergy(10, true)==10)
+				if(energy!=null&&cooldown.isOnCooldown()&&energy.extractEnergy(10, true)==10)
 				{
 					energy.extractEnergy(10, false);
 					if(cooldown.isOnCooldown())
@@ -120,10 +117,9 @@ public class IEShieldItem extends UpgradeableToolItem
 		}
 	}
 
-	@Override
 	public boolean canPerformAction(ItemStack stack, ItemAbility toolAction)
 	{
-		return ItemAbilities.DEFAULT_SHIELD_ACTIONS.contains(toolAction);
+		return false;
 	}
 
 	public void hitShield(ItemStack stack, Player player, DamageSource source, float amount, LivingDamageEvent.Pre event)
@@ -133,7 +129,7 @@ public class IEShieldItem extends UpgradeableToolItem
 		{
 			Vec3 look = player.getLookAngle();
 			//Offsets Player position by look backwards, then truncates cone at 1
-			List<LivingEntity> targets = Utils.getTargetsInCone(player.getCommandSenderWorld(), player.position().subtract(look), player.getLookAngle().scale(9), 1.57079f, .5f);
+			List<LivingEntity> targets = Utils.getTargetsInCone(player.level(), player.position().subtract(look), player.getLookAngle().scale(9), 1.57079f, .5f);
 			for(LivingEntity t : targets)
 				if(!player.equals(t))
 				{
@@ -163,13 +159,12 @@ public class IEShieldItem extends UpgradeableToolItem
 			{
 				upgrades = upgrades.with(UpgradeEffect.SHOCK, new Cooldown(40));
 				player.level().playSound(null, player.getX(), player.getY(), player.getZ(), IESounds.spark.value(),
-						SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.RANDOM.nextFloat());
+						SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.getRandom().nextFloat());
 			}
 		}
 		stack.set(IEDataComponents.UPGRADE_DATA, upgrades);
 	}
 
-	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack material)
 	{
 		return material.is(IETags.getTagsFor(EnumMetals.STEEL).ingot);
@@ -181,35 +176,30 @@ public class IEShieldItem extends UpgradeableToolItem
 		return (upgrades.has(UpgradeEffect.FLASH)||upgrades.has(UpgradeEffect.SHOCK))?3200: 0;
 	}
 
-	@Override
 	public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_)
 	{
 		return 72000;
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, @Nonnull InteractionHand handIn)
+	public InteractionResult use(Level worldIn, Player playerIn, @Nonnull InteractionHand handIn)
 	{
 		ItemStack itemstack = playerIn.getItemInHand(handIn);
 		playerIn.startUsingItem(handIn);
-		return InteractionResultHolder.consume(itemstack);
+		return InteractionResult.CONSUME;
 	}
 
 	@Nonnull
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BLOCK;
+		return ItemUseAnimation.BLOCK;
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{
@@ -218,7 +208,6 @@ public class IEShieldItem extends UpgradeableToolItem
 		};
 	}
 
-	@Override
 	public boolean isFoil(ItemStack stack)
 	{
 		return false;//Remove glint effect since it doesn't work that well with models, see #2944

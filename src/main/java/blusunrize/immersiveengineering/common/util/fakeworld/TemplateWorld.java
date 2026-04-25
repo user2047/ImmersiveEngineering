@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -21,19 +22,27 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.profiling.InactiveProfiler;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.world.attribute.EnvironmentAttributeMap;
+import net.minecraft.world.attribute.EnvironmentAttributeSystem;
 import net.minecraft.world.TickRateManager;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.CardinalLighting;
+import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -42,11 +51,17 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.core.particles.ExplosionParticleInfo;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.clock.ClockManager;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.LevelTickAccess;
+import net.neoforged.neoforge.entity.PartEntity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,11 +71,16 @@ import java.util.function.Predicate;
 public class TemplateWorld extends Level
 {
 	private static final DimensionType DIMENSION_TYPE = new DimensionType(
-			OptionalLong.empty(), false, false, false, false, 1, false, false, 0, 256, 256,
-			BlockTags.INFINIBURN_OVERWORLD, Identifier.withDefaultNamespace("missingno"), 0,
-			new DimensionType.MonsterSettings(true, false, ConstantInt.ZERO, 0)
+			false, true, false, false, 1, 0, 256, 256,
+			BlockTags.INFINIBURN_OVERWORLD, 0,
+			new DimensionType.MonsterSettings(ConstantInt.ZERO, 0),
+			DimensionType.Skybox.OVERWORLD, CardinalLighting.Type.DEFAULT,
+			EnvironmentAttributeMap.EMPTY, HolderSet.empty(), Optional.empty()
 	);
 	private static final Identifier DIMENSION_TYPE_ID = ImmersiveEngineering.rl("multiblock_preview");
+	private static final ClockManager CLOCK_MANAGER = clock -> 0;
+	private static final EnvironmentAttributeSystem ENVIRONMENT_ATTRIBUTES = EnvironmentAttributeSystem.builder().build();
+	private static final WorldBorder WORLD_BORDER = new WorldBorder();
 
 	private static final Holder<DimensionType> STRUCTURE_DIMENSION = new FakeRegisteredHolder<>(
 			DIMENSION_TYPE, ResourceKey.create(Registries.DIMENSION_TYPE, DIMENSION_TYPE_ID)
@@ -83,61 +103,74 @@ public class TemplateWorld extends Level
 	{
 		super(
 				new FakeSpawnInfo(), Level.OVERWORLD, regAccess, STRUCTURE_DIMENSION,
-				() -> InactiveProfiler.INSTANCE, true, false, 0, 0
+				true, false, 0, 0
 		);
 		this.chunkProvider = new TemplateChunkProvider(blocks, this, shouldShow);
 		this.recipeManager = new RecipeManager(regAccess);
 	}
 
-	@Override
 	public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags)
 	{
 	}
 
-	@Override
 	public void playSeededSound(@Nullable Player p_262953_, double p_263004_, double p_263398_, double p_263376_, Holder<SoundEvent> p_263359_, SoundSource p_263020_, float p_263055_, float p_262914_, long p_262991_)
 	{
 	}
 
-	@Override
+	public void playSeededSound(@Nullable Entity p_262953_, double p_263004_, double p_263398_, double p_263376_, Holder<SoundEvent> p_263359_, SoundSource p_263020_, float p_263055_, float p_262914_, long p_262991_)
+	{
+	}
+
 	public void playSeededSound(@Nullable Player p_220372_, Entity p_220373_, Holder<SoundEvent> p_263500_, SoundSource p_220375_, float p_220376_, float p_220377_, long p_220378_)
 	{
 	}
 
+	public void playSeededSound(@Nullable Entity p_220372_, Entity p_220373_, Holder<SoundEvent> p_263500_, SoundSource p_220375_, float p_220376_, float p_220377_, long p_220378_)
+	{
+	}
+
+	public void explode(
+			@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator explosionCalculator,
+			double x, double y, double z, float radius, boolean fire, ExplosionInteraction explosionInteraction,
+			ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles,
+			WeightedList<ExplosionParticleInfo> explosionParticles, Holder<SoundEvent> explosionSound
+	)
+	{
+	}
+
 	@Nonnull
-	@Override
 	public String gatherChunkSourceStats()
 	{
 		return "";
 	}
 
 	@Nullable
-	@Override
 	public Entity getEntity(int id)
 	{
 		return null;
 	}
 
-	@Override
+	public Collection<? extends PartEntity<?>> dragonParts()
+	{
+		return List.of();
+	}
+
 	public TickRateManager tickRateManager()
 	{
 		return tickRateManager;
 	}
 
 	@Nullable
-	@Override
 	public MapItemSavedData getMapData(MapId p_324234_)
 	{
 		return maps.get(p_324234_);
 	}
 
-	@Override
 	public void setMapData(MapId p_324009_, MapItemSavedData p_151534_)
 	{
 		maps.put(p_324009_, p_151534_);
 	}
 
-	@Override
 	public MapId getFreeMapId()
 	{
 		int i = 0;
@@ -146,129 +179,152 @@ public class TemplateWorld extends Level
 		return new MapId(i);
 	}
 
-	@Override
+	public void setRespawnData(LevelData.RespawnData respawnData)
+	{
+	}
+
+	public LevelData.RespawnData getRespawnData()
+	{
+		return LevelData.RespawnData.DEFAULT;
+	}
+
 	public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress)
 	{
 	}
 
 	@Nonnull
-	@Override
 	public Scoreboard getScoreboard()
 	{
 		return scoreboard;
 	}
 
 	@Nonnull
-	@Override
 	public RecipeManager getRecipeManager()
 	{
 		return recipeManager;
 	}
 
+	public RecipeAccess recipeAccess()
+	{
+		return recipeManager;
+	}
+
 	@Nonnull
-	@Override
 	protected LevelEntityGetter<Entity> getEntities()
 	{
 		return new EmptyLevelEntityGetter<>();
 	}
 
 	@Nonnull
-	@Override
 	public LevelTickAccess<Block> getBlockTicks()
 	{
 		return new EmptyTickAccess<>();
 	}
 
 	@Nonnull
-	@Override
 	public LevelTickAccess<Fluid> getFluidTicks()
 	{
 		return new EmptyTickAccess<>();
 	}
 
 	@Nonnull
-	@Override
 	public ChunkSource getChunkSource()
 	{
 		return chunkProvider;
 	}
 
-	@Override
 	public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data)
 	{
 	}
 
-	@Override
+	public void levelEvent(@Nullable Entity entity, int type, @Nonnull BlockPos pos, int data)
+	{
+	}
+
 	public void gameEvent(Holder<GameEvent> p_316267_, Vec3 p_220405_, Context p_220406_)
 	{
 
 	}
 
 	@Nonnull
-	@Override
 	public RegistryAccess registryAccess()
 	{
 		Level clientWorld = ImmersiveEngineering.proxy.getClientWorld();
 		return Objects.requireNonNull(clientWorld).registryAccess();
 	}
 
-	@Override
 	public PotionBrewing potionBrewing()
 	{
 		return null;
 	}
 
-	@Override
+	public FuelValues fuelValues()
+	{
+		return FuelValues.vanillaBurnTimes(registryAccess(), enabledFeatures());
+	}
+
+	public ClockManager clockManager()
+	{
+		return CLOCK_MANAGER;
+	}
+
+	public EnvironmentAttributeSystem environmentAttributes()
+	{
+		return ENVIRONMENT_ATTRIBUTES;
+	}
+
 	public void setDayTimeFraction(float dayTimeFraction)
 	{
 	}
 
-	@Override
 	public float getDayTimeFraction()
 	{
 		return 1;
 	}
 
-	@Override
 	public float getDayTimePerTick()
 	{
 		return 1;
 	}
 
-	@Override
 	public void setDayTimePerTick(float dayTimePerTick)
 	{
 	}
 
-	@Override
 	public FeatureFlagSet enabledFeatures()
 	{
 		return ImmersiveEngineering.proxy.getClientWorld().enabledFeatures();
 	}
 
-	@Override
 	public float getShade(@Nonnull Direction p_230487_1_, boolean p_230487_2_)
 	{
 		return 1;
 	}
 
 	@Nonnull
-	@Override
 	public List<? extends Player> players()
 	{
 		return ImmutableList.of();
 	}
 
 	@Nonnull
-	@Override
 	public Holder<Biome> getUncachedNoiseBiome(int x, int y, int z)
 	{
-		return Holder.direct(registryAccess().registryOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS));
+		return registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
 	}
 
-	@Override
 	public int getBrightness(@Nonnull LightLayer lightType, @Nonnull BlockPos pos)
 	{
 		return 15;
+	}
+
+	public int getSeaLevel()
+	{
+		return 63;
+	}
+
+	public WorldBorder getWorldBorder()
+	{
+		return WORLD_BORDER;
 	}
 }

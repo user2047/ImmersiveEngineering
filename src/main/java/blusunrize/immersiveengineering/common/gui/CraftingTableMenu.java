@@ -23,7 +23,7 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -51,7 +51,7 @@ public class CraftingTableMenu extends IEContainerMenu
 		return new CraftingTableMenu(
 				blockCtx(type, id, be), invPlayer,
 				be.getCraftingInventory(),
-				Objects.requireNonNull(be.getLevel().getCapability(ItemHandler.BLOCK, be.getBlockPos(), null)),
+				be.getInventoryCap(),
 				ContainerLevelAccess.create(be.getLevel(), be.getBlockPos())
 		);
 	}
@@ -84,7 +84,6 @@ public class CraftingTableMenu extends IEContainerMenu
 		for(int i = 0; i < 18; i++)
 			this.addSlot(new SlotItemHandler(storageInventory, iSlot++, 8+(i%9)*18, 79+(i/9)*18){
 				// we gotta override this for JEI!
-				@Override
 				public boolean allowModification(Player player)
 				{
 					return true;
@@ -101,7 +100,6 @@ public class CraftingTableMenu extends IEContainerMenu
 
 		addSlotListener(new ContainerListener()
 		{
-			@Override
 			public void slotChanged(@Nonnull AbstractContainerMenu menu, int index, @Nonnull ItemStack stack)
 			{
 				// Kind of a hack: If another player modifies the crafting grid contents, we do not get a slotsChanged
@@ -109,7 +107,6 @@ public class CraftingTableMenu extends IEContainerMenu
 				slotsChanged(null);
 			}
 
-			@Override
 			public void dataChanged(@Nonnull AbstractContainerMenu menu, int index, int value)
 			{
 				// NOP
@@ -117,7 +114,6 @@ public class CraftingTableMenu extends IEContainerMenu
 		});
 	}
 
-	@Override
 	public void slotsChanged(@Nullable Container inventoryIn)
 	{
 		access.execute((world, $) -> {
@@ -129,8 +125,8 @@ public class CraftingTableMenu extends IEContainerMenu
 			if(optional.isPresent())
 			{
 				RecipeHolder<CraftingRecipe> icraftingrecipe = optional.get();
-				if(craftResultInventory.setRecipeUsed(world, serverplayerentity, icraftingrecipe))
-					itemstack = icraftingrecipe.value().assemble(craftingInventory.asCraftInput(), world.registryAccess());
+				if(craftResultInventory.setRecipeUsed(serverplayerentity, icraftingrecipe))
+					itemstack = icraftingrecipe.value().assemble(craftingInventory.asCraftInput());
 			}
 
 			craftResultInventory.setItem(0, itemstack);
@@ -139,7 +135,6 @@ public class CraftingTableMenu extends IEContainerMenu
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player playerIn, int index)
 	{
 		if(index!=0)
@@ -151,7 +146,7 @@ public class CraftingTableMenu extends IEContainerMenu
 		{
 			ItemStack itemstack1 = slot.getItem();
 			itemstack = itemstack1.copy();
-			access.execute((world, $) -> itemstack1.getItem().onCraftedBy(itemstack1, world, playerIn));
+			access.execute((world, $) -> itemstack1.getItem().onCraftedBy(itemstack1, playerIn));
 			if(!this.moveItemStackTo(itemstack1, 10, 46, true))
 				return ItemStack.EMPTY;
 			slot.onQuickCraft(itemstack1, itemstack);
@@ -171,7 +166,6 @@ public class CraftingTableMenu extends IEContainerMenu
 		return itemstack;
 	}
 
-	@Override
 	public boolean canTakeItemForPickAll(@Nonnull ItemStack pStack, Slot pSlot)
 	{
 		return pSlot.container!=this.craftResultInventory&&super.canTakeItemForPickAll(pStack, pSlot);

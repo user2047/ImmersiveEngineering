@@ -21,7 +21,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
-public class NoContainerSerializer implements RecipeSerializer<INoContainersRecipe>
+public class NoContainerSerializer
 {
 	public static final String BASE_RECIPE = "baseRecipe";
 
@@ -32,15 +32,18 @@ public class NoContainerSerializer implements RecipeSerializer<INoContainersReci
 			return new NoContainersRecipe<>((CraftingRecipe)inner);
 	}, INoContainersRecipe::baseRecipe);
 
-	@Override
 	public MapCodec<INoContainersRecipe> codec()
 	{
 		return CODECS.mapCodec();
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, INoContainersRecipe> streamCodec()
 	{
 		return CODECS.streamCodec();
+	}
+
+	public RecipeSerializer<INoContainersRecipe> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

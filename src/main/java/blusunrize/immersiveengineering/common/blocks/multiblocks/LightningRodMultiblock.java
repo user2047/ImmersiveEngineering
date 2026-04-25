@@ -21,7 +21,6 @@ public class LightningRodMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.LIGHTNING_ROD);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

@@ -16,19 +16,16 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 
 public record RevolverClientTooltip(RevolverServerTooltip data) implements ClientTooltipComponent
 {
-	@Override
-	public int getHeight()
+	public int getHeight(Font font)
 	{
 		return 40;
 	}
 
-	@Override
 	public int getWidth(Font pFont)
 	{
 		return 40;
 	}
 
-	@Override
 	public void renderImage(Font font, int mouseX, int mouseY, GuiGraphicsExtractor graphics)
 	{
 		graphics.pose().pushPose();

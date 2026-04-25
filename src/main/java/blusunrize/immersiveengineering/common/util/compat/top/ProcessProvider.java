@@ -14,6 +14,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,13 +26,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ProcessProvider implements IProbeInfoProvider
 {
 
-	@Override
-	public Identifier getID()
+	public ResourceLocation getID()
 	{
-		return ImmersiveEngineering.rl("process_info");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("process_info"));
 	}
 
-	@Override
 	public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
 		BlockState blockState, IProbeHitData data)
 	{

@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.common.blocks.generic.PostBlock;
 import blusunrize.immersiveengineering.common.register.IEBlocks.WoodenDecoration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -34,7 +34,6 @@ public class PostCallbacks implements BlockCallback<Key>
 {
 	public static final PostCallbacks INSTANCE = new PostCallbacks();
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		final int height = state.getValue(POST_SLAVE);
@@ -57,7 +56,6 @@ public class PostCallbacks implements BlockCallback<Key>
 		return new Key(state, connections, downArms);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(
@@ -66,7 +64,6 @@ public class PostCallbacks implements BlockCallback<Key>
 		);
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Key key)
 	{
 		List<String> visible = new ArrayList<>();

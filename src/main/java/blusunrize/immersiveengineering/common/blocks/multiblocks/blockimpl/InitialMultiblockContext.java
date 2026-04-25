@@ -30,40 +30,35 @@ public record InitialMultiblockContext<State extends IMultiblockState>(
 		BlockPos masterOffset
 ) implements IInitialMultiblockContext<State>
 {
-	@Override
-	public <T, C>
-	Supplier<T> getCapabilityAt(BlockCapability<T, C> capability, BlockPos posRelativeToMB, C context)
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public Supplier getCapabilityAt(BlockCapability capability, BlockPos posRelativeToMB, Object context)
 	{
 		return getCapabilityAt(masterBE, orientation, masterOffset, capability, posRelativeToMB, context);
 	}
 
-	@Override
-	public <T> Supplier<T> getCapabilityAt(
-			BlockCapability<T, Direction> capability, BlockPos posRelativeToMB, RelativeBlockFace face
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public Supplier getCapabilityAt(
+			BlockCapability capability, BlockPos posRelativeToMB, RelativeBlockFace face
 	)
 	{
 		return getCapabilityAt(capability, posRelativeToMB, face.forFront(orientation));
 	}
 
-	@Override
 	public Supplier<@Nullable Level> levelSupplier()
 	{
 		return masterBE::getLevel;
 	}
 
-	@Override
 	public Runnable getMarkDirtyRunnable()
 	{
 		return masterBE::setChanged;
 	}
 
-	@Override
 	public Runnable getSyncRunnable()
 	{
 		return () -> MultiblockContext.requestBESync(masterBE);
 	}
 
-	@Override
 	public Runnable getBlockUpdateRunnable()
 	{
 		return () ->{
@@ -85,7 +80,6 @@ public record InitialMultiblockContext<State extends IMultiblockState>(
 		{
 			private BlockCapabilityCache<T, C> cache;
 
-			@Override
 			@Nullable
 			public T get()
 			{

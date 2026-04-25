@@ -30,7 +30,6 @@ public record MessageNoisyToolAttack(int noisyToolHolderID) implements IMessage
 		this(holder.getId());
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -44,7 +43,6 @@ public record MessageNoisyToolAttack(int noisyToolHolderID) implements IMessage
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

@@ -17,7 +17,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -99,21 +98,31 @@ public class IICProxy implements IImmersiveConnectable
 
 	public static IICProxy readFromNBT(Level world, CompoundTag nbt)
 	{
-		ListTag internalNBT = nbt.getList("internal", Tag.TAG_COMPOUND);
+		ListTag internalNBT = nbt.getListOrEmpty("internal");
 		List<Connection> internal = new ArrayList<>(internalNBT.size());
 		for(Tag c : internalNBT)
 			internal.add(new Connection((CompoundTag)c));
-		ListTag pointNBT = nbt.getList("points", Tag.TAG_COMPOUND);
+		ListTag pointNBT = nbt.getListOrEmpty("points");
 		List<ConnectionPoint> points = new ArrayList<>();
 		for(Tag c : pointNBT)
 			points.add(new ConnectionPoint((CompoundTag)c));
-		return new IICProxy(world, NbtUtils.readBlockPos(nbt, "pos").orElseThrow(), internal, points);
+		CompoundTag pos = nbt.getCompoundOrEmpty("pos");
+		return new IICProxy(
+				world,
+				new BlockPos(pos.getIntOr("x", 0), pos.getIntOr("y", 0), pos.getIntOr("z", 0)),
+				internal,
+				points
+		);
 	}
 
 	public CompoundTag writeToNBT()
 	{
 		CompoundTag ret = new CompoundTag();
-		ret.put("pos", NbtUtils.writeBlockPos(pos));
+		CompoundTag posTag = new CompoundTag();
+		posTag.putInt("x", pos.getX());
+		posTag.putInt("y", pos.getY());
+		posTag.putInt("z", pos.getZ());
+		ret.put("pos", posTag);
 		ListTag points = new ListTag();
 		for(ConnectionPoint cp : this.points)
 			points.add(cp.createTag());

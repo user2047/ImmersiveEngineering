@@ -11,14 +11,15 @@ package blusunrize.immersiveengineering.client.render.entity;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.utils.client.ModelDataUtils;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.render.tile.DynamicModel;
 import blusunrize.immersiveengineering.common.entities.SawbladeEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -34,7 +35,7 @@ import org.joml.Quaternionf;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class SawbladeRenderer extends EntityRenderer<SawbladeEntity>
+public class SawbladeRenderer extends IEEntityRenderer<SawbladeEntity>
 {
 	public static final String NAME = "sawblade_entity";
 	public static DynamicModel MODEL;
@@ -46,14 +47,13 @@ public class SawbladeRenderer extends EntityRenderer<SawbladeEntity>
 	public SawbladeRenderer(Context renderManager)
 	{
 		super(renderManager);
-		itemRenderer = renderManager.getItemRenderer();
+		itemRenderer = ClientUtils.getItemRenderer();
 	}
 
-	@Override
 	public void render(SawbladeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn)
 	{
 		BlockPos blockPos = entity.blockPosition();
-		BlockState state = entity.getCommandSenderWorld().getBlockState(blockPos);
+		BlockState state = entity.level().getBlockState(blockPos);
 		BakedModel model = MODEL.get();
 
 		matrixStackIn.pushPose();
@@ -80,7 +80,6 @@ public class SawbladeRenderer extends EntityRenderer<SawbladeEntity>
 		matrixStackIn.popPose();
 	}
 
-	@Override
 	public Identifier getTextureLocation(@Nonnull SawbladeEntity entity)
 	{
 		return SAWBLADE;

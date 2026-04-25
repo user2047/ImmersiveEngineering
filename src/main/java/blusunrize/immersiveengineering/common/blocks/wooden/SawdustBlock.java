@@ -49,26 +49,22 @@ public class SawdustBlock extends IEBaseBlock
 		super(props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(LAYERS);
 	}
 
-	@Override
 	public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face)
 	{
 		return 60;
 	}
 
-	@Override
 	public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face)
 	{
 		return 60;
 	}
 
-	@Override
 	public boolean isPathfindable(BlockState state, PathComputationType type)
 	{
 		if(type==PathComputationType.LAND)
@@ -76,25 +72,21 @@ public class SawdustBlock extends IEBaseBlock
 		return false;
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(LAYERS));
 	}
 
-	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(LAYERS)-1);
 	}
 
-	@Override
 	public boolean useShapeForLightOcclusion(BlockState state)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos)
 	{
 		BlockState blockstate = worldIn.getBlockState(pos.below());
@@ -103,13 +95,11 @@ public class SawdustBlock extends IEBaseBlock
 				||block==this&&blockstate.getValue(LAYERS)==MAX_LAYER;
 	}
 
-	@Override
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos)
 	{
 		return !stateIn.canSurvive(worldIn, currentPos)?Blocks.AIR.defaultBlockState(): super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 
-	@Override
 	public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext)
 	{
 		int i = state.getValue(LAYERS);
@@ -125,7 +115,6 @@ public class SawdustBlock extends IEBaseBlock
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context)
 	{
 		BlockState blockstate = context.getLevel().getBlockState(context.getClickedPos());

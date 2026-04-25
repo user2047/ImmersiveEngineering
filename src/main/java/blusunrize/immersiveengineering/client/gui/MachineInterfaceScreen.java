@@ -72,7 +72,6 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 
 	private int middleSegmentCount;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -228,7 +227,6 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
-	@Override
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		if(availableChecks==null)
@@ -243,7 +241,6 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 		}
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		if(availableChecks==null)
@@ -281,7 +278,6 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 			super(x, y, 16, 16, Component.empty(), DELETE, handler);
 		}
 
-		@Override
 		public void gatherTooltip(int mouseX, int mouseY, List<Component> tooltip)
 		{
 			tooltip.add(Component.translatable(Lib.GUI_CONFIG+"machine_interface.remove"));

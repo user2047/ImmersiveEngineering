@@ -55,19 +55,16 @@ public class IEInventoryHandler implements IItemHandlerModifiable
 		return this;
 	}
 
-	@Override
 	public int getSlots()
 	{
 		return slots;
 	}
 
-	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
 		return this.inv.getInventory().get(this.slotOffset+slot);
 	}
 
-	@Override
 	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
 	{
 		if(!canInsert[slot]||stack.isEmpty())
@@ -138,7 +135,6 @@ public class IEInventoryHandler implements IItemHandlerModifiable
 		}
 	}
 
-	@Override
 	public ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		if(!canExtract[slot]||amount==0)
@@ -166,19 +162,16 @@ public class IEInventoryHandler implements IItemHandlerModifiable
 		return copy;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 	{
 		return canInsert[slot]&&inv.isStackValid(slot, stack);
 	}
 
-	@Override
 	public void setStackInSlot(int slot, @Nonnull ItemStack stack)
 	{
 		inv.getInventory().set(this.slotOffset+slot, stack);

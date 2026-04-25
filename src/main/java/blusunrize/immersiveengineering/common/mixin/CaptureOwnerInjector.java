@@ -34,7 +34,6 @@ public class CaptureOwnerInjector extends InvokeInjector
 		super(info, "@CaptureOwner");
 	}
 
-	@Override
 	protected void sanityCheck(Target target, List<InjectionPoint> injectionPoints)
 	{
 		super.sanityCheck(target, injectionPoints);
@@ -56,7 +55,6 @@ public class CaptureOwnerInjector extends InvokeInjector
 		// know what you're doing!
 	}
 
-	@Override
 	protected void injectAtInvoke(Target target, InjectionNode node)
 	{
 		MethodInsnNode invokedNode = (MethodInsnNode)node.getCurrentTarget();

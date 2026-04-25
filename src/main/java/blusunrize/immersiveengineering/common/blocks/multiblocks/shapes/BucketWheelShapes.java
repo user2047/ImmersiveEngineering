@@ -23,7 +23,6 @@ public class BucketWheelShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(Set.of(

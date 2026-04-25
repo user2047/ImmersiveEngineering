@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 public class AlloyRecipe extends IESerializableRecipe
 {
 	// TODO SetRestrictedField?
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<AlloyRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AlloyRecipe>> SERIALIZER;
 	public static final CachedRecipeList<AlloyRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.ALLOY);
 
 	public final IngredientWithSize input0;
@@ -45,12 +45,10 @@ public class AlloyRecipe extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<AlloyRecipe> getIESerializer()
+	protected RecipeSerializer<AlloyRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return this.output.get();

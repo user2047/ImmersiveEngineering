@@ -56,7 +56,6 @@ public class PotionBullet extends DamagingBullet<Data>
 		);
 	}
 
-	@Override
 	public String getTranslationKey(Data potion, String baseName)
 	{
 		if(potion.contents.hasEffects())
@@ -69,7 +68,6 @@ public class PotionBullet extends DamagingBullet<Data>
 		return baseName;
 	}
 
-	@Override
 	public void onHitTarget(Level world, HitResult target, UUID shooterUUID, Entity projectile, boolean headshot, Data bulletData)
 	{
 		super.onHitTarget(world, target, shooterUUID, projectile, headshot, bulletData);
@@ -113,8 +111,8 @@ public class PotionBullet extends DamagingBullet<Data>
 								if(target instanceof EntityHitResult&&living==((EntityHitResult)target).getEntity())
 									dist2 = 1D;
 								for(MobEffectInstance p : effects)
-									if(p.getEffect().value().isInstantenous())
-										p.getEffect().value().applyInstantenousEffect(bullet, shooter, living, p.getAmplifier(), dist2);
+									if(p.getEffect().value().isInstantenous()&&world instanceof net.minecraft.server.level.ServerLevel serverLevel)
+										p.getEffect().value().applyInstantenousEffect(serverLevel, bullet, shooter, living, p.getAmplifier(), dist2);
 									else
 									{
 										int j = (int)(dist2*p.getDuration()+.5D);
@@ -137,14 +135,12 @@ public class PotionBullet extends DamagingBullet<Data>
 	}
 
 
-	@Override
 	public void addTooltip(Data data, TooltipContext world, List<Component> list, TooltipFlag flag)
 	{
 		if(data.contents.hasEffects())
-			data.contents.addPotionTooltip(list::add, 0.25F, world.tickRate());
+			PotionContents.addPotionTooltip(data.contents.getAllEffects(), list::add, 0.25F, world.tickRate());
 	}
 
-	@Override
 	public Color4 getColour(Data data, int layer)
 	{
 		if(layer==1)

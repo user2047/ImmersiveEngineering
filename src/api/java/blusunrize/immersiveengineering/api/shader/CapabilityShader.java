@@ -9,15 +9,15 @@
 package blusunrize.immersiveengineering.api.shader;
 
 import blusunrize.immersiveengineering.api.IEApi;
-import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ItemCapability;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelProperty;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -106,7 +106,7 @@ public class CapabilityShader
 
 	public static class ShaderWrapper_Direct implements ShaderWrapper
 	{
-		public static final IAttachmentSerializer<CompoundTag, ShaderWrapper_Direct> SERIALIZER = new WrapperSerializer();
+		public static final IAttachmentSerializer<ShaderWrapper_Direct> SERIALIZER = new WrapperSerializer();
 
 		@Nullable
 		private Identifier shader = null;
@@ -136,27 +136,26 @@ public class CapabilityShader
 		}
 	}
 
-	public static final class WrapperSerializer implements IAttachmentSerializer<CompoundTag, ShaderWrapper_Direct>
+	public static final class WrapperSerializer implements IAttachmentSerializer<ShaderWrapper_Direct>
 	{
 		@Override
-		public CompoundTag write(ShaderWrapper_Direct attachment, Provider provider)
+		public boolean write(ShaderWrapper_Direct attachment, ValueOutput output)
 		{
-			CompoundTag nbt = new CompoundTag();
 			var shader = attachment.getShader();
 			if(shader!=null)
-				nbt.putString("IE:Shader", shader.toString());
+				output.putString("IE:Shader", shader.toString());
 			else
-				nbt.putString("IE:NoShader", "");
-			nbt.putString("IE:ShaderType", attachment.getShaderType().toString());
-			return nbt;
+				output.putString("IE:NoShader", "");
+			output.putString("IE:ShaderType", attachment.getShaderType().toString());
+			return true;
 		}
 
 		@Override
-		public ShaderWrapper_Direct read(IAttachmentHolder holder, CompoundTag tag, Provider provider)
+		public ShaderWrapper_Direct read(IAttachmentHolder holder, ValueInput input)
 		{
-			ShaderWrapper_Direct wrapper = new ShaderWrapper_Direct(Identifier.parse(tag.getString("IE:ShaderType")));
-			if(!tag.contains("IE:NoShader"))
-				wrapper.setShader(Identifier.parse(tag.getString("IE:Shader")));
+			ShaderWrapper_Direct wrapper = new ShaderWrapper_Direct(Identifier.parse(input.getStringOr("IE:ShaderType", "")));
+			if(input.getStringOr("IE:NoShader", "").isEmpty())
+				wrapper.setShader(Identifier.parse(input.getStringOr("IE:Shader", "")));
 			return wrapper;
 		}
 	}

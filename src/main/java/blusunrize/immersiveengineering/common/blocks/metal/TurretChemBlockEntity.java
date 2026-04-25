@@ -25,7 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -46,37 +46,31 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 		super(type, pos, state);
 	}
 
-	@Override
 	protected double getRange()
 	{
 		return 8;
 	}
 
-	@Override
 	protected boolean canActivate()
 	{
 		return tank.getFluidAmount() > 0&&this.energyStorage.getEnergyStored() >= IEServerConfig.MACHINES.turret_chem_consumption.get();
 	}
 
-	@Override
 	protected int getChargeupTicks()
 	{
 		return 10;
 	}
 
-	@Override
 	protected int getActiveTicks()
 	{
 		return 1;
 	}
 
-	@Override
 	protected boolean loopActivation()
 	{
 		return true;
 	}
 
-	@Override
 	protected void activate()
 	{
 		FluidStack fs = this.tank.getFluid().copy();
@@ -95,7 +89,7 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 
 				float scatter = isGas?.15f: .05f;
 				float range = isGas?.5f: 1f;
-//				if(getUpgrades(stack).getBoolean("focus"))
+//				if(getUpgrades(stack).getBooleanOr("focus", false))
 //				{
 //					range += .25f;
 //					scatter -= .025f;
@@ -105,7 +99,7 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 				FakePlayer fakePlayer = FakePlayerUtil.getFakePlayer(level);
 				for(int i = 0; i < split; i++)
 				{
-					Vec3 vecDir = v.add(ApiUtils.RANDOM.nextGaussian()*scatter, ApiUtils.RANDOM.nextGaussian()*scatter, ApiUtils.RANDOM.nextGaussian()*scatter);
+					Vec3 vecDir = v.add(ApiUtils.getRandom().nextGaussian()*scatter, ApiUtils.getRandom().nextGaussian()*scatter, ApiUtils.getRandom().nextGaussian()*scatter);
 					Vec3 throwerPos = getGunPosition();
 					ChemthrowerShotEntity chem = new ChemthrowerShotEntity(level, throwerPos.x+v.x*0.875, throwerPos.y+v.y*0.875,
 							throwerPos.z+v.z*0.875, fs);
@@ -113,7 +107,7 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 					chem.setDeltaMovement(vecDir.scale(range));
 					if(ignite)
 						chem.igniteForSeconds(10);
-					if(!level.isClientSide)
+					if(!level.isClientSide())
 						level.addFreshEntity(chem);
 				}
 				if(tick%4==0)
@@ -127,24 +121,22 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 		}
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
 		if(!descPacket)
 		{
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			ignite = nbt.getBoolean("ignite");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			ignite = nbt.getBooleanOr("ignite", false);
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		if(!descPacket)
 		{
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			nbt.putBoolean("ignite", ignite);
 		}
 	}
@@ -154,7 +146,7 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 	public static void registerCapabilities(BECapabilityRegistrar<TurretChemBlockEntity> registrar)
 	{
 		TurretBlockEntity.registerCapabilitiesBase(registrar);
-		registrar.register(FluidHandler.BLOCK, (be, facing) -> {
+		registrar.register(Capabilities.Fluid.BLOCK, (be, facing) -> {
 			if(!be.isDummy()&&(facing==null||facing==Direction.DOWN||facing==be.getFacing().getOpposite()))
 				return be.tankCap;
 			else
@@ -162,7 +154,6 @@ public class TurretChemBlockEntity extends TurretBlockEntity<TurretChemBlockEnti
 		});
 	}
 
-	@Override
 	public ArgContainer<TurretChemBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.CHEM_TURRET;

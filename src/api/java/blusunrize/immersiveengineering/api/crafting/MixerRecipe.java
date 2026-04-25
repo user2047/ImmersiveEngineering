@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class MixerRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<MixerRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<MixerRecipe>> SERIALIZER;
 	public static final CachedRecipeList<MixerRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.MIXER);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -52,7 +52,7 @@ public class MixerRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<MixerRecipe> getIESerializer()
+	protected RecipeSerializer<MixerRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

@@ -23,6 +23,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -87,7 +88,6 @@ public class IEPotions
 			return k <= 0||duration%k==0;
 		}
 
-		@Override
 		public boolean shouldApplyEffectTickThisTick(int duration, int amplifier)
 		{
 			return this==IEPotions.SLIPPERY.value()
@@ -95,7 +95,6 @@ public class IEPotions
 					||this==IEPotions.INCOGNITO.value();
 		}
 
-		@Override
 		public boolean applyEffectTick(LivingEntity living, int amplifier)
 		{
 			if(this==IEPotions.SLIPPERY.value())
@@ -103,14 +102,14 @@ public class IEPotions
 				if(living.onGround())
 					living.moveRelative(0, new Vec3(0, 1, 0.005));
 				EquipmentSlot hand = living.getRandom().nextBoolean()?EquipmentSlot.MAINHAND: EquipmentSlot.OFFHAND;
-				if(!living.level().isClientSide&&living.getRandom().nextInt(300)==0&&!living.getItemBySlot(hand).isEmpty())
+				if(living.level() instanceof ServerLevel serverLevel&&living.getRandom().nextInt(300)==0&&!living.getItemBySlot(hand).isEmpty())
 				{
-					ItemEntity dropped = living.spawnAtLocation(living.getItemBySlot(hand).copy(), 1);
+					ItemEntity dropped = living.spawnAtLocation(serverLevel, living.getItemBySlot(hand).copy(), 1);
 					dropped.setPickUpDelay(20);
 					living.setItemSlot(hand, ItemStack.EMPTY);
 				}
 			}
-			else if(this==IEPotions.CONCRETE_FEET.value()&&!living.level().isClientSide)
+			else if(this==IEPotions.CONCRETE_FEET.value()&&!living.level().isClientSide())
 			{
 				BlockState state = living.level().getBlockState(living.blockPosition());
 				return state.is(IETags.concreteForFeet);

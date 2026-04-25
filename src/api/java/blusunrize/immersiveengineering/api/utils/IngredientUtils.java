@@ -12,7 +12,9 @@ import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
@@ -35,7 +37,11 @@ public class IngredientUtils
 
 	public static Ingredient createIngredientFromList(List<ItemStack> list)
 	{
-		return Ingredient.of(list.toArray(new ItemStack[0]));
+		Item[] items = list.stream()
+				.filter(stack -> !stack.isEmpty())
+				.map(ItemStack::getItem)
+				.toArray(Item[]::new);
+		return items.length > 0?Ingredient.of(items): Ingredient.of(Items.BARRIER);
 	}
 
 	private static <T> boolean stacksMatchList(List<T> list, NonNullList<ItemStack> stacks, Function<T, Integer> size,

@@ -34,7 +34,6 @@ public record MessageContainerData(List<Pair<Integer, DataPair<?>>> synced) impl
 			.apply(ByteBufCodecs.list())
 			.map(MessageContainerData::new, MessageContainerData::synced);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -44,7 +43,6 @@ public record MessageContainerData(List<Pair<Integer, DataPair<?>>> synced) impl
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

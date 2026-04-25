@@ -52,10 +52,9 @@ public class CoresampleItem extends IEBaseItem
 {
 	public CoresampleItem()
 	{
-		super(new Properties().component(IEDataComponents.CORESAMPLE, ItemData.EMPTY));
+		super(itemProperties().component(IEDataComponents.CORESAMPLE, ItemData.EMPTY));
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		ItemData data = stack.getOrDefault(IEDataComponents.CORESAMPLE, ItemData.EMPTY);
@@ -105,7 +104,7 @@ public class CoresampleItem extends IEBaseItem
 		ResourceKey<Level> dimension = data.position.dimension;
 		if(dimension!=null)
 		{
-			String s2 = dimension.location().getPath();
+			String s2 = dimension.identifier().getPath();
 			if(s2.toLowerCase(Locale.ENGLISH).startsWith("the_"))
 				s2 = s2.substring(4);
 			list.add(Component.literal(Utils.toCamelCase(s2)).withStyle(baseColor));
@@ -125,7 +124,6 @@ public class CoresampleItem extends IEBaseItem
 	}
 
 
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		Player player = ctx.getPlayer();
@@ -186,7 +184,7 @@ public class CoresampleItem extends IEBaseItem
 	)
 	{
 		public static final DualCodec<ByteBuf, VeinSample> CODECS = DualCompositeCodecs.composite(
-				DualCodecs.RESOURCE_LOCATION.fieldOf("mineral"), VeinSample::mineral,
+				IEDualCodecs.IDENTIFIER.fieldOf("mineral"), VeinSample::mineral,
 				DualCodecs.INT.fieldOf("depletion"), VeinSample::depletion,
 				DualCodecs.DOUBLE.fieldOf("saturation"), VeinSample::saturation,
 				DualCodecs.DOUBLE.fieldOf("percentage"), VeinSample::percentageInTotalSample,
@@ -214,7 +212,7 @@ public class CoresampleItem extends IEBaseItem
 
 	public record CoresampleMapData(Map<String, List<Identifier>> mapDataToMinerals)
 	{
-		public static final DualCodec<ByteBuf, CoresampleMapData> CODECS = IEDualCodecs.forMap(DualCodecs.STRING, DualCodecs.RESOURCE_LOCATION.listOf())
+		public static final DualCodec<ByteBuf, CoresampleMapData> CODECS = IEDualCodecs.forMap(DualCodecs.STRING, IEDualCodecs.IDENTIFIER.listOf())
 				.fieldOf("mapDataToMinerals")
 				.codec()
 				.map(CoresampleMapData::new, CoresampleMapData::mapDataToMinerals);

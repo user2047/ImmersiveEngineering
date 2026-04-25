@@ -20,23 +20,27 @@ import java.util.function.Supplier;
 @NonExtendable
 public interface ICommonMultiblockContext
 {
-	default <T> Supplier<T> getCapabilityAt(BlockCapability<T, Direction> capability, MultiblockFace face)
+	@SuppressWarnings("rawtypes")
+	default Supplier getCapabilityAt(BlockCapability capability, MultiblockFace face)
 	{
 		return getCapabilityAt(capability, face.posInMultiblock(), face.face());
 	}
 
-	<T> Supplier<T> getCapabilityAt(
-			BlockCapability<T, Direction> capability, BlockPos posRelativeToMB, RelativeBlockFace face
+	@SuppressWarnings("rawtypes")
+	Supplier getCapabilityAt(
+			BlockCapability capability, BlockPos posRelativeToMB, RelativeBlockFace face
 	);
 
-	default <T> Supplier<T> getVoidCapabilityAt(
-			BlockCapability<T, Void> capability, BlockPos posRelativeToMB
+	@SuppressWarnings("rawtypes")
+	default Supplier getVoidCapabilityAt(
+			BlockCapability capability, BlockPos posRelativeToMB
 	)
 	{
 		return getCapabilityAt(capability, posRelativeToMB, null);
 	}
 
-	<T, C> Supplier<T> getCapabilityAt(
-			BlockCapability<T, C> capability, BlockPos posRelativeToMB, C context
+	@SuppressWarnings("rawtypes")
+	Supplier getCapabilityAt(
+			BlockCapability capability, BlockPos posRelativeToMB, Object context
 	);
 }

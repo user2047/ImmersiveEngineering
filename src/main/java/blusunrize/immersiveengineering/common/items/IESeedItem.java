@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.common.items;
 
+import blusunrize.immersiveengineering.common.register.IEItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 
@@ -16,12 +17,7 @@ public class IESeedItem extends BlockItem
 {
 	public IESeedItem(Block cropBlock)
 	{
-		super(cropBlock, new Properties());
+		super(cropBlock, IEItems.defaultProperties());
 	}
 
-	@Override
-	public String getDescriptionId()
-	{
-		return this.getOrCreateDescriptionId();
-	}
 }

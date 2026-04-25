@@ -30,7 +30,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -58,43 +58,36 @@ public class BalloonBlockEntity extends ImmersiveConnectableBlockEntity implemen
 		super(IEBlockEntities.BALLOON.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
 		final int oldStyle = style;
 		final DyeColor oldC0 = colour0;
 		final DyeColor oldC1 = colour1;
-		style = nbt.getInt("style");
-		int tmpIdx = nbt.getInt("colour0");
+		style = nbt.getIntOr("style", 0);
+		int tmpIdx = nbt.getIntOr("colour0", 0);
 		colour0 = tmpIdx >= 0&&tmpIdx < DyeColor.values().length?DyeColor.byId(tmpIdx): null;
-		tmpIdx = nbt.getInt("colour1");
+		tmpIdx = nbt.getIntOr("colour1", 0);
 		colour1 = tmpIdx >= 0&&tmpIdx < DyeColor.values().length?DyeColor.byId(tmpIdx): null;
 		if(oldStyle!=style||oldC0!=colour0||oldC1!=colour1)
 			requestModelDataUpdate();
-		if(nbt.contains("shader", Tag.TAG_COMPOUND))
-			shader = ShaderWrapper_Direct.SERIALIZER.read(this, nbt.getCompound("shader"), provider);
 		markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public void writeCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		nbt.putInt("style", style);
 		nbt.putInt("colour0", colour0!=null?colour0.getId(): -1);
 		nbt.putInt("colour1", colour1!=null?colour1.getId(): -1);
-		nbt.put("shader", ShaderWrapper_Direct.SERIALIZER.write(shader, provider));
 	}
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return Shapes.box(.125, 0, .125, .875, .9375, .875);
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -110,13 +103,11 @@ public class BalloonBlockEntity extends ImmersiveConnectableBlockEntity implemen
 		registrar.registerAllContexts(CapabilityShader.BLOCK, be -> be.shader);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		return STRUCTURE_CATEGORY.equals(cableType.getCategory());
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		BlockPos end = other.position();
@@ -135,12 +126,11 @@ public class BalloonBlockEntity extends ImmersiveConnectableBlockEntity implemen
 			return new Vec3(xDif > 0?.78125: .21875, .09375, .5);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(player.isShiftKeyDown())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				ItemEntity entityitem = new ItemEntity(level, player.getX(), player.getY(), player.getZ(),
 						new ItemStack(level.getBlockState(getBlockPos()).getBlock()),
@@ -148,13 +138,13 @@ public class BalloonBlockEntity extends ImmersiveConnectableBlockEntity implemen
 				level.removeBlock(getBlockPos(), false);
 				level.addFreshEntity(entityitem);
 			}
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		else if(!heldItem.isEmpty()&&heldItem.getItem() instanceof IShaderItem shaderItem)
 		{
 			this.shader.setShader(shaderItem.getShaderName());
 			markContainingBlockForUpdate(null);
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		int target = 0;
 		if(side.getAxis()==Axis.Y&&style==0)
@@ -175,27 +165,26 @@ public class BalloonBlockEntity extends ImmersiveConnectableBlockEntity implemen
 		}
 		DyeColor heldDye = Utils.getDye(heldItem);
 		if(heldDye==null)
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		if(target==0)
 		{
 			if(colour0==heldDye)
-				return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+				return InteractionResult.PASS;
 			colour0 = heldDye;
 		}
 		else
 		{
 			if(colour1==heldDye)
-				return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+				return InteractionResult.PASS;
 			colour1 = heldDye;
 		}
 		markContainingBlockForUpdate(null);
-		return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			style = 1-style;
 			markContainingBlockForUpdate(null);

@@ -53,13 +53,11 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 		this.imageHeight = 168;
 	}
 
-	@Override
 	protected void sendMessage(CompoundTag data)
 	{
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(this.workbench.getBlockPos(), data));
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -88,7 +86,6 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		List<InfoArea> areas = new ArrayList<>();
@@ -101,7 +98,6 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 		return areas;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int i = 0; i < menu.ownSlotCount; i++)

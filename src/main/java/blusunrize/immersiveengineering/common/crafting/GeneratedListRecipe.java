@@ -34,7 +34,7 @@ import static blusunrize.immersiveengineering.ImmersiveEngineering.rl;
 public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableRecipe implements IListRecipe
 {
 	public static Map<Identifier, RecipeListGenerator<?, ?>> LIST_GENERATORS = new HashMap<>();
-	public static Supplier<IERecipeSerializer<GeneratedListRecipe<?, ?>>> SERIALIZER;
+	public static Supplier<RecipeSerializer<GeneratedListRecipe<?, ?>>> SERIALIZER;
 
 	static
 	{
@@ -93,20 +93,17 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 		this.earlyResult = this.generator.makeEarlyResult().get();
 	}
 
-	@Override
-	protected IERecipeSerializer<GeneratedListRecipe<?, ?>> getIESerializer()
+	protected RecipeSerializer<?> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean isSpecial()
 	{
 		return true;
@@ -138,7 +135,7 @@ public class GeneratedListRecipe<R extends Recipe<?>, E> extends IESerializableR
 				IERecipeTypes.TypeWithClass<T> recipeType
 		)
 		{
-			Identifier serializedKey = serialized.unwrapKey().orElseThrow().location();
+			Identifier serializedKey = serialized.unwrapKey().orElseThrow().identifier();
 			return new RecipeListGenerator<>(makeEarlyResult, generator, serializedKey, recipeType);
 		}
 

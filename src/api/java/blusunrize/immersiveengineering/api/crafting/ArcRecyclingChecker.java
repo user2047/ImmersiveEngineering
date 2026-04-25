@@ -87,9 +87,8 @@ public class ArcRecyclingChecker
 	public static void allowPrefixedTagForRecycling(String prefix)
 	{
 		allowEnumeratedItemsForRecycling(
-				tags -> tags.registryOrThrow(Registries.ITEM).getTags()
-						.filter(e -> e.getFirst().location().getPath().startsWith(prefix))
-						.map(Pair::getSecond)
+				tags -> tags.lookupOrThrow(Registries.ITEM).listTags()
+						.filter(e -> e.key().location().getPath().startsWith(prefix))
 						.flatMap(HolderSet::stream)
 						.map(Holder::value)
 		);
@@ -97,7 +96,7 @@ public class ArcRecyclingChecker
 
 	public static void allowItemTagForRecycling(TagKey<Item> tagKey)
 	{
-		allowEnumeratedItemsForRecycling(tags -> TagUtils.elementStream(tags.registryOrThrow(Registries.ITEM), tagKey));
+		allowEnumeratedItemsForRecycling(tags -> TagUtils.elementStream(tags.lookupOrThrow(Registries.ITEM), tagKey));
 	}
 
 	/**
@@ -154,7 +153,7 @@ public class ArcRecyclingChecker
 		return Pair.of(iRecipe -> {
 			if(!RECYCLING_RECIPE_TYPES.contains(iRecipe.getType()))
 				return false;
-			return checker.isAllowed(tags, iRecipe.getResultItem(tags));
+			return checker.isAllowed(tags, ItemStack.EMPTY);
 		}, checker);
 	}
 

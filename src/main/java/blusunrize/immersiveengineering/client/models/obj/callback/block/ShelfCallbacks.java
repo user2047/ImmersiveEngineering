@@ -14,12 +14,12 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockB
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.ShelfCallbacks.Key;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.ShelfLogic;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,6 @@ public class ShelfCallbacks implements BlockCallback<Key>
 {
 	public static final ShelfCallbacks INSTANCE = new ShelfCallbacks();
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState blockState, BlockEntity blockEntity)
 	{
 		if(blockEntity instanceof IMultiblockBE<?> multiblockBE&&
@@ -45,7 +44,7 @@ public class ShelfCallbacks implements BlockCallback<Key>
 
 	public Key extractKey(ShelfLogic.State state)
 	{
-		Function<Identifier, TextureAtlasSprite> atlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+		Function<Identifier, TextureAtlasSprite> atlas = ClientUtils::getSprite;
 		Map<String, TextureAtlasSprite> texMap = new HashMap<>();
 		for(int i = 0; i < state.renderCrates.length; i++)
 			if(state.renderCrates[i]!=null)
@@ -53,13 +52,11 @@ public class ShelfCallbacks implements BlockCallback<Key>
 		return new Key(texMap);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(Collections.emptyMap());
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
 		if(group.startsWith("crate_"))
@@ -67,7 +64,6 @@ public class ShelfCallbacks implements BlockCallback<Key>
 		return true;
 	}
 
-	@Override
 	public @Nullable TextureAtlasSprite getTextureReplacement(Key key, String group, String material)
 	{
 		return key.texMap().get(group);

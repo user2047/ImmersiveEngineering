@@ -51,19 +51,18 @@ public class RevolvershotFlareEntity extends RevolvershotEntity
 		return getBullet().getFor(IEBullets.FLARE_TYPE);
 	}
 
-	@Override
 	public void tick()
 	{
 		super.tick();
-		if(level().isClientSide)
+		if(level().isClientSide())
 		{
 			var color = getColour();
-			level().addParticle(new DustParticleOptions(color.toVector3f(), 1), getX(), getY(), getZ(), 0, 0, 0);
+			level().addParticle(new DustParticleOptions(color.toInt(), 1), getX(), getY(), getZ(), 0, 0, 0);
 			if(tickCount > 40)
 				for(int i = 0; i < 20; i++)
 				{
-					Vec3 v = new Vec3(ApiUtils.RANDOM.nextDouble()-.5, ApiUtils.RANDOM.nextDouble()-.5, ApiUtils.RANDOM.nextDouble()-.5);
-					level().addParticle(new DustParticleOptions(color.toVector3f(), 1), getX()+v.x, getY()+v.y, getZ()+v.z, v.x/10, v.y/10, v.z/10);
+					Vec3 v = new Vec3(ApiUtils.getRandom().nextDouble()-.5, ApiUtils.getRandom().nextDouble()-.5, ApiUtils.getRandom().nextDouble()-.5);
+					level().addParticle(new DustParticleOptions(color.toInt(), 1), getX()+v.x, getY()+v.y, getZ()+v.z, v.x/10, v.y/10, v.z/10);
 				}
 		}
 		if(tickCount==40)
@@ -82,12 +81,11 @@ public class RevolvershotFlareEntity extends RevolvershotEntity
 		}
 	}
 
-	@Override
 	public void onHit(HitResult mop)
 	{
 		if(tickCount <= 40)
 		{
-			if(!this.level().isClientSide)
+			if(!this.level().isClientSide())
 				if(mop instanceof EntityHitResult)
 				{
 					Entity hit = ((EntityHitResult)mop).getEntity();
@@ -110,8 +108,8 @@ public class RevolvershotFlareEntity extends RevolvershotEntity
 	{
 		for(int i = 0; i < 80; i++)
 		{
-			Vec3 v = new Vec3((ApiUtils.RANDOM.nextDouble()-.5)*i > 40?2: 1, (ApiUtils.RANDOM.nextDouble()-.5)*i > 40?2: 1, (ApiUtils.RANDOM.nextDouble()-.5)*i > 40?2: 1);
-			level().addParticle(new DustParticleOptions(getColour().toVector3f(), 1), getX()+v.x, getY()+v.y, getZ()+v.z, v.x/10, v.y/10, v.z/10);
+			Vec3 v = new Vec3((ApiUtils.getRandom().nextDouble()-.5)*i > 40?2: 1, (ApiUtils.getRandom().nextDouble()-.5)*i > 40?2: 1, (ApiUtils.getRandom().nextDouble()-.5)*i > 40?2: 1);
+			level().addParticle(new DustParticleOptions(getColour().toInt(), 1), getX()+v.x, getY()+v.y, getZ()+v.z, v.x/10, v.y/10, v.z/10);
 		}
 	}
 }

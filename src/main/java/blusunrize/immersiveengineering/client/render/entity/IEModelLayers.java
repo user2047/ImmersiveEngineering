@@ -13,15 +13,14 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.models.ModelEarmuffs;
 import blusunrize.immersiveengineering.client.models.ModelGlider;
 import blusunrize.immersiveengineering.common.register.IEEntityTypes;
-import net.minecraft.client.model.MinecartModel;
+import net.minecraft.client.model.object.cart.MinecartModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Lib.MODID, value = Dist.CLIENT)
 public class IEModelLayers
 {
 	public static final ModelLayerLocation BARREL_MINECART = new ModelLayerLocation(IEEntityTypes.BARREL_MINECART.getId(), "main");

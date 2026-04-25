@@ -20,7 +20,6 @@ import org.joml.Quaternionf;
 
 public class SiloRenderer extends IEMultiblockRenderer<State>
 {
-	@Override
 	public void render(IMultiblockContext<State> context, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final State state = context.getState();
@@ -50,7 +49,7 @@ public class SiloRenderer extends IEMultiblockRenderer<State>
 			matrixStack.last().pose().scale(itemScale/baseScale, itemScale/baseScale, flatScale)
 			;
 			matrixStack.translate(0, -0.75, 0);
-			ClientUtils.mc().getItemRenderer().renderStatic(
+			ClientUtils.getItemRenderer().renderStatic(
 					state.identStack, ItemDisplayContext.GUI,
 					combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 					context.getLevel().getRawLevel(), 0

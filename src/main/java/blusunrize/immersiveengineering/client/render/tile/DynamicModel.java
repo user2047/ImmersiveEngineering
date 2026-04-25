@@ -11,33 +11,25 @@ package blusunrize.immersiveengineering.client.render.tile;
 import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEApi;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.Identifier;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = ImmersiveEngineering.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class DynamicModel
 {
 	private static final List<ModelResourceLocation> MODELS = new ArrayList<>();
 
-	@SubscribeEvent
-	public static void registerModels(ModelEvent.RegisterAdditional ev)
+	public static void registerModels(ModelEvent.RegisterStandalone ev)
 	{
-		for(ModelResourceLocation model : MODELS)
-			// TODO check if this works
-			ev.register(model);
 	}
 
 	private final ModelResourceLocation name;
@@ -51,7 +43,7 @@ public class DynamicModel
 
 	public BakedModel get()
 	{
-		final BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 		return blockRenderer.getBlockModelShaper().getModelManager().getModel(name);
 	}
 

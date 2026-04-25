@@ -53,8 +53,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.List;
@@ -75,13 +75,11 @@ public class CrusherLogic implements
 			new Vec3(3, 2.125, 1.5),
 	};
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -101,7 +99,7 @@ public class CrusherLogic implements
 		if(!(particleProcess instanceof MultiblockProcessInWorld<?> inWorld)||inWorld.inputItems.isEmpty())
 			return;
 		final ItemStack particleStack = inWorld.inputItems.get(0);
-		final ItemParticleOption particleData = new ItemParticleOption(ParticleTypes.ITEM, particleStack);
+		final ItemParticleOption particleData = new ItemParticleOption(ParticleTypes.ITEM, particleStack.getItem());
 		for(final Vec3 relativeOffset : PARTICLE_POSITIONS)
 		{
 			final Vec3 absolutePos = level.toAbsolute(relativeOffset);
@@ -111,7 +109,6 @@ public class CrusherLogic implements
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -126,11 +123,10 @@ public class CrusherLogic implements
 		}
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
-		register.register(ItemHandler.BLOCK, (state, position) -> {
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.register(Capabilities.Item.BLOCK, (state, position) -> {
 			if(isInInput(position.posInMultiblock(), false))
 				return state.insertionHandler;
 			else
@@ -139,7 +135,6 @@ public class CrusherLogic implements
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		state.processor.getQueue().forEach(process -> {
@@ -148,7 +143,6 @@ public class CrusherLogic implements
 		});
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return CrusherShapes.SHAPE_GETTER;
@@ -161,10 +155,9 @@ public class CrusherLogic implements
 		return false;
 	}
 
-	@Override
 	public void onEntityCollision(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Entity collided)
 	{
-		if(collided.level().isClientSide||!isInInput(posInMultiblock, true))
+		if(collided.level().isClientSide()||!isInInput(posInMultiblock, true))
 			return;
 		final State state = ctx.getState();
 		if(!collided.isAlive()||!state.rsState.isEnabled(ctx))
@@ -233,39 +226,33 @@ public class CrusherLogic implements
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("energy", energy.serializeNBT(provider));
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
 			processor.fromNBT(nbt.get("processor"), MultiblockProcessInWorld::new, provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("renderActive", renderAsActive);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			renderAsActive = nbt.getBoolean("renderActive");
+			renderAsActive = nbt.getBooleanOr("renderActive", false);
 		}
 
-		@Override
 		public void doProcessOutput(ItemStack output, IMultiblockLevel level)
 		{
 			this.output.insertOrDrop(output, level);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;

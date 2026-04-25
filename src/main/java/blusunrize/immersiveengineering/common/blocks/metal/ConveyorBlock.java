@@ -62,7 +62,6 @@ public class ConveyorBlock extends IEEntityBlock<ConveyorBeltBlockEntity<?>> imp
 		lightOpacity = 0;
 	}
 
-	@Override
 	public void fillCreativeTab(Output out)
 	{
 		out.accept(this);
@@ -79,14 +78,12 @@ public class ConveyorBlock extends IEEntityBlock<ConveyorBeltBlockEntity<?>> imp
 		return covered;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(FACING, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> tooltip, TooltipFlag advanced)
 	{
 		String flavourKey = getDescriptionId()+".flavour";
@@ -94,7 +91,6 @@ public class ConveyorBlock extends IEEntityBlock<ConveyorBeltBlockEntity<?>> imp
 			tooltip.add(Component.translatable(flavourKey));
 	}
 
-	@Override
 	public void onIEBlockPlacedBy(BlockPlaceContext context, BlockState state)
 	{
 		super.onIEBlockPlacedBy(context, state);
@@ -122,14 +118,12 @@ public class ConveyorBlock extends IEEntityBlock<ConveyorBeltBlockEntity<?>> imp
 		return conveyor.getOrDefault(IEDataComponents.DEFAULT_COVER, Blocks.AIR);
 	}
 
-	@Override
 	public IConveyorType<?> getType()
 	{
 		return type;
 	}
 
 	@Nullable
-	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type)
 	{
 		if(this.type.isTicking())

@@ -26,7 +26,6 @@ public record MessageBirthdayParty(int entityID) implements IMessage
 	public static final StreamCodec<ByteBuf, MessageBirthdayParty> CODEC = ByteBufCodecs.INT
 			.map(MessageBirthdayParty::new, MessageBirthdayParty::entityID);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> {
@@ -43,7 +42,6 @@ public record MessageBirthdayParty(int entityID) implements IMessage
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

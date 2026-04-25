@@ -17,8 +17,8 @@ import blusunrize.immersiveengineering.common.blocks.metal.conveyors.SplitConvey
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -36,7 +36,6 @@ public class SplitConveyorRender extends BasicConveyorRender<SplitConveyor>
 		super(active, inactive);
 	}
 
-	@Override
 	public boolean shouldRenderWall(Direction facing, ConveyorWall wall, RenderContext<SplitConveyor> context)
 	{
 		return false;
@@ -44,10 +43,9 @@ public class SplitConveyorRender extends BasicConveyorRender<SplitConveyor>
 
 	public static Identifier texture_casing = IEApi.ieLoc("block/conveyor/split_wall");
 
-	@Override
 	public List<BakedQuad> modifyQuads(List<BakedQuad> baseModel, RenderContext<SplitConveyor> context, @Nullable RenderType renderType)
 	{
-		if(renderType!=null&&renderType!=RenderType.cutout())
+		if(renderType!=null&&renderType!=blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout())
 			return super.modifyQuads(baseModel, context, renderType);
 		TextureAtlasSprite tex_casing0 = ClientUtils.getSprite(texture_casing);
 		Direction facing = context!=null?context.getFacing(): Direction.NORTH;

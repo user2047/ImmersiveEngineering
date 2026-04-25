@@ -22,13 +22,16 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Multibl
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.ProcessContext.ProcessContextInWorld;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.Identifier;
-import net.minecraft.tags.FluidTags;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -44,10 +47,10 @@ import java.util.function.BooleanSupplier;
 public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRecipe>
 {
 	private static final RecipeHolder<BottlingMachineRecipe> DUMMY_RECIPE = new RecipeHolder<>(
-			IEApi.ieLoc("bottling_dummy"),
+			ResourceKey.create(Registries.RECIPE, IEApi.ieLoc("bottling_dummy")),
 			new BottlingMachineRecipe(
 					new TagOutputList(TagOutput.EMPTY), IngredientWithSize.of(ItemStack.EMPTY),
-					SizedFluidIngredient.of(FluidTags.WATER, 1)
+					SizedFluidIngredient.of(Fluids.WATER, 1)
 			)
 	);
 	private static final float TRANSFORMATION_POINT = 0.45f;
@@ -64,14 +67,14 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 			State state
 	)
 	{
-		super(nbt.getBoolean("isFilling")?($, $1) -> DUMMY_RECIPE.value(): getRecipe, nbt, provider);
+		super(nbt.getBooleanOr("isFilling", false)?($, $1) -> DUMMY_RECIPE.value(): getRecipe, nbt, provider);
 		this.tank = state.tank;
 		this.allowPartialFill = () -> state.allowPartialFill;
-		this.isFilling = nbt.getBoolean("isFilling");
-		final ListTag filledNBT = nbt.getList("filledContainer", CompoundTag.TAG_COMPOUND);
+		this.isFilling = nbt.getBooleanOr("isFilling", false);
+		final ListTag filledNBT = nbt.getListOrEmpty("filledContainer");
 		this.filledContainer = new ArrayList<>();
 		for(int i = 0; i < filledNBT.size(); i++)
-			this.filledContainer.add(ItemStack.parseOptional(provider, filledNBT.getCompound(i)));
+			this.filledContainer.add(blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, filledNBT.getCompoundOrEmpty(i)));
 	}
 
 	public BottlingProcess(RecipeHolder<BottlingMachineRecipe> recipe, NonNullList<ItemStack> inputItem, State state)
@@ -96,13 +99,12 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 	public static InWorldProcessLoader<BottlingMachineRecipe> loader(State state)
 	{
 		return (getRecipe, tag, provider) -> {
-			if(tag.getBoolean("isFilling"))
+			if(tag.getBooleanOr("isFilling", false))
 				return new BottlingProcess((level, Identifier) -> DUMMY_RECIPE.value(), provider, tag, state);
 			return new BottlingProcess(getRecipe, provider, tag, state);
 		};
 	}
 
-	@Override
 	public void doProcessTick(ProcessContextInWorld<BottlingMachineRecipe> context, IMultiblockLevel level)
 	{
 		super.doProcessTick(context, level);
@@ -131,7 +133,6 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 		}
 	}
 
-	@Override
 	public List<ItemStack> getDisplayItem(Level level)
 	{
 		if(isFilling)
@@ -139,7 +140,6 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 		return super.getDisplayItem(level);
 	}
 
-	@Override
 	protected List<ItemStack> getRecipeItemOutputs(Level level, ProcessContextInWorld<BottlingMachineRecipe> context)
 	{
 		if(isFilling)
@@ -147,14 +147,13 @@ public class BottlingProcess extends MultiblockProcessInWorld<BottlingMachineRec
 		return super.getRecipeItemOutputs(level, context);
 	}
 
-	@Override
 	public void writeExtraDataToNBT(CompoundTag nbt, Provider provider)
 	{
 		super.writeExtraDataToNBT(nbt, provider);
 		nbt.putBoolean("isFilling", isFilling);
 		final ListTag filledNBT = new ListTag();
 		for(ItemStack stack : this.filledContainer)
-			filledNBT.add(stack.saveOptional(provider));
+			filledNBT.add(blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(stack, provider));
 		nbt.put("filledContainer", filledNBT);
 	}
 }

@@ -30,10 +30,9 @@ public class FlareBulletColorRecipe extends CustomRecipe
 {
 	public FlareBulletColorRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		boolean hasBullet = false;
@@ -59,8 +58,7 @@ public class FlareBulletColorRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		int[] colourArray = new int[3];
 		int j = 0;
@@ -115,15 +113,13 @@ public class FlareBulletColorRecipe extends CustomRecipe
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= 2;
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.FLARE_BULLET_COLOR.get();
 	}

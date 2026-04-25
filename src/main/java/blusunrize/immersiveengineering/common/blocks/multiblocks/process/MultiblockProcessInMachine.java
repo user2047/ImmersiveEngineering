@@ -54,9 +54,9 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 	public MultiblockProcessInMachine(BiFunction<Level, Identifier, R> getRecipe, CompoundTag data)
 	{
 		super(getRecipe, data);
-		this.inputSlots = data.getIntArray("process_inputSlots");
-		setInputAmounts(data.getIntArray("process_inputAmounts"));
-		setInputTanks(data.getIntArray("process_inputTanks"));
+		this.inputSlots = data.getIntArray("process_inputSlots").orElse(new int[0]);
+		setInputAmounts(data.getIntArray("process_inputAmounts").orElse(new int[0]));
+		setInputTanks(data.getIntArray("process_inputTanks").orElse(new int[0]));
 	}
 
 	public MultiblockProcessInMachine<R> setInputTanks(int... inputTanks)
@@ -99,7 +99,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		return recipe==null?List.of(): recipe.getFluidInputs();
 	}
 
-	@Override
 	protected boolean canOutputItem(ProcessContextInMachine<R> context, ItemStack output)
 	{
 		int[] outputSlots = context.getOutputSlots();
@@ -116,7 +115,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		return false;
 	}
 
-	@Override
 	protected boolean canOutputFluid(ProcessContextInMachine<R> context, FluidStack output)
 	{
 		IFluidTank[] tanks = context.getInternalTanks();
@@ -127,7 +125,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		return false;
 	}
 
-	@Override
 	protected void outputFluid(ProcessContextInMachine<R> context, FluidStack output)
 	{
 		IFluidTank[] tanks = context.getInternalTanks();
@@ -140,7 +137,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 			}
 	}
 
-	@Override
 	protected void outputItem(ProcessContextInMachine<R> context, ItemStack output, IMultiblockLevel level)
 	{
 		int[] outputSlots = context.getOutputSlots();
@@ -161,7 +157,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		}
 	}
 
-	@Override
 	public void doProcessTick(ProcessContextInMachine<R> context, IMultiblockLevel level)
 	{
 		R recipe = getLevelData(level.getRawLevel()).recipe();
@@ -183,7 +178,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		super.doProcessTick(context, level);
 	}
 
-	@Override
 	protected void processFinish(ProcessContextInMachine<R> context, IMultiblockLevel level)
 	{
 		super.processFinish(context, level);
@@ -233,7 +227,6 @@ public class MultiblockProcessInMachine<R extends MultiblockRecipe>
 		}
 	}
 
-	@Override
 	public void writeExtraDataToNBT(CompoundTag nbt, Provider provider)
 	{
 		if(inputSlots!=null)

@@ -50,11 +50,11 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -99,7 +99,6 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 			MachineInterfaceHandler.copyOptions(tank_cond, MachineInterfaceHandler.BASIC_FLUID_IN);
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -111,7 +110,6 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 		}
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -169,7 +167,9 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 			RecipeInputSources sources = new RecipeInputSources(craftingInput);
 			this.consumeIngredients(state, queries, availableStacks, true, sources);
 
-			NonNullList<ItemStack> remainingItems = pattern.recipe.getRemainingItems(craftingInput);
+			NonNullList<ItemStack> remainingItems = pattern.recipe instanceof CraftingRecipe craftingRecipe
+					?craftingRecipe.getRemainingItems(craftingInput)
+					: NonNullList.withSize(craftingInput.size(), ItemStack.EMPTY);
 			for(int i = 0; i < remainingItems.size(); i++)
 			{
 				ItemStack rem = remainingItems.get(i);
@@ -315,29 +315,25 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 		return canInsertOnto(state, 18+iPattern, output);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAt(ItemHandler.BLOCK, ITEM_INPUT, state -> state.itemInput);
-		register.registerAt(FluidHandler.BLOCK, FLUID_INPUT, state -> state.fluidInput);
-		register.registerAt(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.registerAt(Capabilities.Item.BLOCK, ITEM_INPUT, state -> state.itemInput);
+		register.registerAt(Capabilities.Fluid.BLOCK, FLUID_INPUT, state -> state.fluidInput);
+		register.registerAt(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
 		for(BlockPos bp : REDSTONE_PORTS)
 			register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, bp, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return AssemblerShapes.SHAPE_GETTER;
@@ -372,7 +368,7 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 
 		public State(IInitialMultiblockContext<State> ctx)
 		{
-			output = ctx.getCapabilityAt(ItemHandler.BLOCK, new BlockPos(1, 1, -1), RelativeBlockFace.FRONT);
+			output = ctx.getCapabilityAt(Capabilities.Item.BLOCK, new BlockPos(1, 1, -1), RelativeBlockFace.FRONT);
 			inventory = SlotwiseItemHandler.makeWithGroups(
 					List.of(new IOConstraintGroup(IOConstraint.NO_CONSTRAINT, INVENTORY_SIZE)),
 					ctx.getMarkDirtyRunnable()
@@ -389,46 +385,42 @@ public class AssemblerLogic implements IMultiblockLogic<State>, IServerTickableC
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			ListTag tanks = new ListTag();
 			for(FluidTank tank : this.tanks)
-				tanks.add(tank.writeToNBT(provider, new CompoundTag()));
+				tanks.add(blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			ListTag patterns = new ListTag();
 			for(CrafterPatternInventory pattern : this.patterns)
 				patterns.add(pattern.writeToNBT(provider));
 			nbt.put("tanks", tanks);
 			nbt.put("patterns", patterns);
 			nbt.putBoolean("recursiveIngredients", recursiveIngredients);
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.put("energy", energy.serializeNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			ListTag tanks = nbt.getList("tanks", Tag.TAG_COMPOUND);
+			ListTag tanks = nbt.getListOrEmpty("tanks");
 			for(int i = 0; i < NUM_TANKS; ++i)
-				this.tanks[i].readFromNBT(provider, tanks.getCompound(i));
-			ListTag patterns = nbt.getList("patterns", Tag.TAG_LIST);
+				blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(this.tanks[i], provider, tanks.getCompoundOrEmpty(i));
+			ListTag patterns = nbt.getListOrEmpty("patterns");
 			for(int i = 0; i < NUM_PATTERNS; ++i)
-				this.patterns[i].readFromNBT(patterns.getList(i), provider);
-			recursiveIngredients = nbt.getBoolean("recursiveIngredients");
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+				this.patterns[i].readFromNBT(patterns.getListOrEmpty(i), provider);
+			recursiveIngredients = nbt.getBooleanOr("recursiveIngredients", false);
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 			energy.deserializeNBT(provider, nbt.get("energy"));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("shouldPlaySound", shouldPlaySound);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			shouldPlaySound = nbt.getBoolean("shouldPlaySound");
+			shouldPlaySound = nbt.getBooleanOr("shouldPlaySound", false);
 		}
 
 		public IItemHandler getInventory()

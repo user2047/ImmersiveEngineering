@@ -17,9 +17,9 @@ import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 import com.mojang.math.Transformation;
 import org.joml.Vector3f;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemTransform;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
@@ -31,7 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.RenderTypeGroup;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,16 +57,16 @@ public class ModelUtils
 
 	public static Transformation fromItemTransform(ItemTransform transform, boolean leftHand)
 	{
-		Vector3f translate = transform.translation;
+		Vector3f translate = new Vector3f(transform.translation());
 		if(leftHand)
 		{
 			translate = new Vector3f(translate);
 			translate.setComponent(0, -translate.x());
 		}
 
-		float leftRX = transform.rotation.x();
-		float leftRY = transform.rotation.y();
-		float leftRZ = transform.rotation.z();
+		float leftRX = transform.rotation().x();
+		float leftRY = transform.rotation().y();
+		float leftRZ = transform.rotation().z();
 		if(leftHand)
 		{
 			leftRY = -leftRY;
@@ -76,14 +76,14 @@ public class ModelUtils
 				Mth.DEG_TO_RAD * leftRX, Mth.DEG_TO_RAD * leftRY, Mth.DEG_TO_RAD * leftRZ
 		);
 
-		float rightRX = transform.rightRotation.x();
-		float rightRY = transform.rightRotation.y()*(leftHand?-1: 1);
-		float rightRZ = transform.rightRotation.z()*(leftHand?-1: 1);
+		float rightRX = transform.rightRotation().x();
+		float rightRY = transform.rightRotation().y()*(leftHand?-1: 1);
+		float rightRZ = transform.rightRotation().z()*(leftHand?-1: 1);
 		Quaternionf rightRotation = new Quaternionf().rotateXYZ(
 				Mth.DEG_TO_RAD * rightRX, Mth.DEG_TO_RAD * rightRY, Mth.DEG_TO_RAD * rightRZ
 		);
 
-		return new Transformation(translate, leftRotation, transform.scale, rightRotation);
+		return new Transformation(translate, leftRotation, new Vector3f(transform.scale()), rightRotation);
 	}
 
 	public static Set<BakedQuad> createBakedBox(Vec3 from, Vec3 to, Matrix4 matrix, Direction facing, Function<Direction, TextureAtlasSprite> textureGetter, float[] colour)
@@ -162,7 +162,7 @@ public class ModelUtils
 	public static BakedQuad createBakedQuad(Vec3[] vertices, Direction facing, TextureAtlasSprite sprite, double[] uvs, float[] colour, boolean invert)
 	{
 		BakedQuadBuilder builder = new BakedQuadBuilder();
-		Vec3i normalInt = facing.getNormal();
+		Vec3i normalInt = facing.getUnitVec3i();
 		Vec3 faceNormal = new Vec3(normalInt.getX(), normalInt.getY(), normalInt.getZ());
 		int vId = invert?3: 0;
 		int u = vId > 1?2: 0;
@@ -181,13 +181,13 @@ public class ModelUtils
 
 	public static Identifier getSideTexture(@Nonnull ItemStack stack, Direction side)
 	{
-		BakedModel model = mc().getItemRenderer().getModel(stack, null, null, 0);
+		BakedModel model = ClientUtils.getItemRenderer().getModel(stack, null, null, 0);
 		return getSideTexture(model, side, null);
 	}
 
 	public static Identifier getSideTexture(@Nonnull BlockState state, Direction side)
 	{
-		BakedModel model = mc().getBlockRenderer().getBlockModel(state);
+		BakedModel model = ClientUtils.getBlockRenderer().getBlockModel(state);
 		return getSideTexture(model, side, state);
 	}
 

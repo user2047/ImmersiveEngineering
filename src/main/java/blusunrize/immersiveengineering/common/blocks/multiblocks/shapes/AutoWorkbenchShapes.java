@@ -33,7 +33,6 @@ public class AutoWorkbenchShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getY()==0||HIGH_FULL_BLOCKS.contains(posInMultiblock))

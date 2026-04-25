@@ -83,7 +83,7 @@ public class ManualElementTable extends SpecialManualElements
 							Component lineText = line[j];
 							List<FormattedCharSequence> lines = manual.fontRenderer().split(lineText, w);
 							for(int i = 0; i < lines.size(); i++)
-								graphics.drawString(
+								graphics.text(
 										manual.fontRenderer(), lines.get(i), xx, y+yOff+i*lineHeight, manual.getTextColour(), false
 								);
 							if(lines.size() > height)
@@ -93,10 +93,10 @@ public class ManualElementTable extends SpecialManualElements
 					if(horizontalBars)
 					{
 						float scale = .5f;
-						graphics.pose().scale(1, scale, 1);
+						graphics.pose().scale(1, scale);
 						int barHeight = (int)((y+yOff+height*lineHeight)/scale);
 						graphics.fill(x, barHeight, x+120, barHeight+1, manual.getTextColour()|0xff000000);
-						graphics.pose().scale(1, 1/scale, 1);
+						graphics.pose().scale(1, 1/scale);
 					}
 
 					yOff += height*(lineHeight+1);

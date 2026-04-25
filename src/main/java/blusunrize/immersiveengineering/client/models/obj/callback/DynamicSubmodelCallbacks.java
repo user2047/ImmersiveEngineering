@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.IEProperties.IEObjState;
 import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallback;
 import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallbacks;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 public class DynamicSubmodelCallbacks implements IEOBJCallback<VisibilityList>
 {
@@ -24,13 +24,11 @@ public class DynamicSubmodelCallbacks implements IEOBJCallback<VisibilityList>
 		return IEOBJCallbacks.getModelProperty(INSTANCE);
 	}
 
-	@Override
 	public IEObjState getIEOBJState(VisibilityList list)
 	{
 		return new IEObjState(list);
 	}
 
-	@Override
 	public VisibilityList getDefaultKey()
 	{
 		return VisibilityList.showAll();

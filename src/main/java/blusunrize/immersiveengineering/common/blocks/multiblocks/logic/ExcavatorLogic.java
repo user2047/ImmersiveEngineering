@@ -36,7 +36,7 @@ import blusunrize.immersiveengineering.common.util.FakePlayerUtil;
 import blusunrize.immersiveengineering.common.util.IESounds;
 import blusunrize.immersiveengineering.common.util.sound.MultiblockSound;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -64,7 +64,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -111,7 +111,6 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 		);
 	});
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -124,7 +123,6 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 		}
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -233,7 +231,7 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 		double dirY = -0.5;
 		double dirZ = 0.375*outputDir.getStepZ();
 		rawLevel.sendParticles(
-				new ItemParticleOption(ParticleTypes.ITEM, stack),
+						new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()),
 				topCenterAbs.x+dirX,
 				topCenterAbs.y-1,
 				topCenterAbs.z+dirY,
@@ -280,7 +278,7 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 			if(!block.canHarvestBlock(blockstate, rawLevel, absolutePos, fakePlayer))
 				return ItemStack.EMPTY;
 			if(block.onDestroyedByPlayer(
-					blockstate, rawLevel, absolutePos, fakePlayer, true, blockstate.getFluidState()
+					blockstate, rawLevel, absolutePos, fakePlayer, ItemStack.EMPTY, true, blockstate.getFluidState()
 			))
 			{
 				block.destroy(rawLevel, absolutePos, blockstate);
@@ -288,9 +286,8 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 				ItemStack tool = new ItemStack(Items.IRON_PICKAXE);
 				tool.enchant(
 						serverLevel.registryAccess()
-								.registryOrThrow(Registries.ENCHANTMENT)
-								.getHolder(Enchantments.SILK_TOUCH)
-								.orElseThrow(),
+								.lookupOrThrow(Registries.ENCHANTMENT)
+								.getOrThrow(Enchantments.SILK_TOUCH),
 						1
 				);
 				LootParams.Builder dropContext = new LootParams.Builder(serverLevel)
@@ -330,7 +327,7 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 			return false;
 		// if random number of 0-1 is smaller than the fail chance of the specific mineral
 		// or if random number of 0-1 is smaller than the distance based fail chance of the vein
-		if(ApiUtils.RANDOM.nextFloat() < mineralMix.failChance||ApiUtils.RANDOM.nextFloat() < mineralVein.getFailChance(wheelPos))
+		if(ApiUtils.getRandom().nextFloat() < mineralMix.failChance||ApiUtils.getRandom().nextFloat() < mineralVein.getFailChance(wheelPos))
 			wheel.digStacks.set(targetDown, mineralMix.getRandomSpoil(ApiUtils.RANDOM));
 		else
 			wheel.digStacks.set(targetDown, ore);
@@ -343,10 +340,9 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 		return true;
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(EnergyStorage.BLOCK, (state, position) -> {
+		register.register(Energy.BLOCK, (state, position) -> {
 			if(position.side()==null||ENERGY_INPUTS.contains(position))
 				return state.energy;
 			else
@@ -376,13 +372,11 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 		return Mth.ceil(Math.max(remain, 0)*15);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return ExcavatorShapes.SHAPE_GETTER;
@@ -406,28 +400,24 @@ public class ExcavatorLogic implements IMultiblockLogic<State>, IServerTickableC
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("energy", energy.serializeNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			active = nbt.getBoolean("active");
+			active = nbt.getBooleanOr("active", false);
 		}
 
 		public IEnergyStorage getEnergy()

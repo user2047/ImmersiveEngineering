@@ -30,14 +30,12 @@ public class TransformerBlock extends ConnectorBlock<TransformerBlockEntity>
 		super(props, IEBlockEntities.TRANSFORMER);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, IEProperties.MULTIBLOCKSLAVE, IEProperties.MIRRORED, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		return areAllReplaceable(
@@ -48,7 +46,6 @@ public class TransformerBlock extends ConnectorBlock<TransformerBlockEntity>
 	}
 
 	@Nullable
-	@Override
 	public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state)
 	{
 		return new TransformerBlockEntity(pos, state);

@@ -9,12 +9,12 @@
 package blusunrize.immersiveengineering.common.util.fakeworld;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
@@ -25,16 +25,15 @@ public class TemplateChunkSection extends LevelChunkSection
 	private final Predicate<BlockPos> shouldShow;
 	private final ChunkPos chunkPos;
 
-	public TemplateChunkSection(int sectionY, Registry<Biome> biomeRegistry, Predicate<BlockPos> shouldShow, ChunkPos chunkPos)
+	public TemplateChunkSection(int sectionY, RegistryAccess registryAccess, Predicate<BlockPos> shouldShow, ChunkPos chunkPos)
 	{
-		super(biomeRegistry);
+		super(PalettedContainerFactory.create(registryAccess));
 		this.sectionY = sectionY;
 		this.shouldShow = shouldShow;
 		this.chunkPos = chunkPos;
 	}
 
 	@Nonnull
-	@Override
 	public BlockState setBlockState(int x, int y, int z, @Nonnull BlockState state, boolean lock)
 	{
 		return getBlockState(x, y, z);
@@ -46,7 +45,6 @@ public class TemplateChunkSection extends LevelChunkSection
 		return super.setBlockState(x, y, z, state, false);
 	}
 
-	@Override
 	public BlockState getBlockState(int x, int y, int z)
 	{
 		if(!shouldShow.test(new BlockPos(chunkPos.getMinBlockX()+x, 16*sectionY+y, chunkPos.getMinBlockZ()+z)))

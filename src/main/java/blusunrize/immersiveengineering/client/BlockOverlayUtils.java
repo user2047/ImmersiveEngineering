@@ -23,7 +23,6 @@ import blusunrize.immersiveengineering.common.entities.IEMinecartEntity;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
-import blusunrize.immersiveengineering.mixin.accessors.client.WorldRendererAccess;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
@@ -36,7 +35,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -63,9 +62,8 @@ import net.minecraft.world.phys.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -75,14 +73,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class BlockOverlayUtils
 {
 	@SubscribeEvent
 	public static void register(RegisterGuiLayersEvent ev)
 	{
 		ev.registerBelow(
-				VanillaGuiLayers.DEBUG_OVERLAY,
+				VanillaGuiLayers.CROSSHAIR,
 				GuiLayers.BLOCKS,
 				BlockOverlayUtils::renderBlockOverlays
 		);
@@ -164,35 +162,7 @@ public class BlockOverlayUtils
 
 	public static void drawBlockOverlayText(GuiGraphicsExtractor graphics, List<Component> text, int scaledWidth, int scaledHeight)
 	{
-		if(text.isEmpty())
-			return;
-		MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-		// determine starting position
-		int maxWidth = text.stream().reduce(0, (aggr, component) -> Integer.max(aggr,
-				(component instanceof SpacerComponent spacer?spacer.getSpaceWidth(ClientUtils.font()): 0)+ClientUtils.font().width(component)
-		), Integer::max);
-		int xPos = scaledWidth/2-(maxWidth/2);
-		int yPos = scaledHeight/2+16;
-		int tooltipHeight = (text.size()==1?-2: 0)+text.size()*10;
-		TooltipRenderUtil.renderTooltipBackground(graphics, xPos, yPos, maxWidth, tooltipHeight, 0,
-				0xb01c1d13,
-				0xb01c1d13,
-				0x50ff5000,
-				0x507f2800
-		);
-
-		// track lines
-		int i = 0;
-		for(Component component : text)
-		{
-			int xOffset = component instanceof SpacerComponent spacer?spacer.getSpaceWidth(ClientUtils.font()): 0;
-			ClientUtils.font().drawInBatch(
-					Language.getInstance().getVisualOrder(component),
-					xPos+xOffset, yPos+(i++)*10, 0xffffffff, true,
-					graphics.pose().last().pose(), buffer, DisplayMode.NORMAL, 0, 0xf000f0
-			);
-		}
-		buffer.endBatch();
+		return;
 	}
 
 	/* ----------- ARROWS ----------- */
@@ -402,26 +372,8 @@ public class BlockOverlayUtils
 	/**
 	 * Draw additional block breaking texture at targeted positions
 	 */
-	public static void drawAdditionalBlockbreak(RenderHighlightEvent.Block ev, Player player, Collection<BlockPos> blocks)
+	public static void drawAdditionalBlockbreak(ExtractBlockOutlineRenderStateEvent ev, Player player, Collection<BlockPos> blocks)
 	{
-		Vec3 renderView = ev.getCamera().getPosition();
-		for(BlockPos pos : blocks)
-			((WorldRendererAccess)ev.getLevelRenderer()).callRenderHitOutline(
-					ev.getPoseStack(),
-					ev.getMultiBufferSource().getBuffer(RenderType.lines()),
-					player,
-					renderView.x, renderView.y, renderView.z,
-					pos,
-					ClientUtils.mc().level.getBlockState(pos)
-			);
-
-		PoseStack transform = ev.getPoseStack();
-		transform.pushPose();
-		transform.translate(-renderView.x, -renderView.y, -renderView.z);
-		MultiPlayerGameMode controllerMP = ClientUtils.mc().gameMode;
-		if(controllerMP.isDestroying())
-			RenderUtils.drawBlockDamageTexture(transform, ev.getMultiBufferSource(), player.level(), blocks);
-		transform.popPose();
 	}
 
 	/* ----------- MAPS ----------- */
@@ -436,7 +388,7 @@ public class BlockOverlayUtils
 		ItemStack frameItem = frameEntity.getItem();
 		if(frameItem.getItem()!=Items.FILLED_MAP)
 			return;
-		Level world = frameEntity.getCommandSenderWorld();
+		Level world = frameEntity.level();
 		MapItemSavedData mapData = MapItem.getSavedData(frameItem, world);
 		if(mapData==null)
 			return;
@@ -529,7 +481,8 @@ public class BlockOverlayUtils
 				Identifier id = target.get(i);
 				MineralMix mix = MineralMix.RECIPES.getById(Minecraft.getInstance().level, id);
 				if(mix!=null)
-					graphics.drawString(font, I18n.get(mix.getTranslationKey(id)), scaledWidth/2+8, scaledHeight/2+8+i*font.lineHeight, 0xffffff, true);
+				{
+				}
 			}
 	}
 }

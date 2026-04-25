@@ -117,7 +117,7 @@ public class SawmillProcess
 	public CompoundTag writeToNBT(Provider provider)
 	{
 		CompoundTag nbt = new CompoundTag();
-		nbt.put("input", this.input.save(provider));
+		nbt.put("input", blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(this.input, provider));
 		nbt.putInt("processTick", this.processTick);
 		nbt.putBoolean("stripped", this.stripped);
 		nbt.putBoolean("sawed", this.sawed);
@@ -136,11 +136,11 @@ public class SawmillProcess
 
 	public static SawmillProcess readFromNBT(CompoundTag nbt, Provider provider)
 	{
-		ItemStack input = ItemStack.parseOptional(provider, nbt.getCompound("input"));
+		ItemStack input = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("input"));
 		SawmillProcess process = new SawmillProcess(input);
-		process.processTick = nbt.getInt("processTick");
-		process.stripped = nbt.getBoolean("stripped");
-		process.sawed = nbt.getBoolean("sawed");
+		process.processTick = nbt.getIntOr("processTick", 0);
+		process.stripped = nbt.getBooleanOr("stripped", false);
+		process.sawed = nbt.getBooleanOr("sawed", false);
 		return process;
 	}
 

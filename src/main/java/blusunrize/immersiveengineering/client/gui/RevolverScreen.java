@@ -51,7 +51,6 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 			this.offset = ((bullets[0] >= 18?150: bullets[0] > 8?136: 74)-176)/2;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float par1, int par2, int par3)
 	{
 		int off = (offset < 0?-offset: 0);
@@ -67,7 +66,6 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 		}
 	}
 
-	@Override
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(TEXTURE, leftPos+Math.max(offset, 0), topPos+77, 0, 125, 176, 89);

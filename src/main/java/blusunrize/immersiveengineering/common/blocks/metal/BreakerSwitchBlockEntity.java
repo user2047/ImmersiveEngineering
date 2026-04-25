@@ -35,7 +35,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -73,7 +73,6 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo info, Vec3i offset)
 	{
 		Matrix4 mat = new Matrix4()
@@ -86,7 +85,6 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		return new ConnectionPoint(worldPosition, transformedHit.x > 0.5?RIGHT_INDEX: LEFT_INDEX);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		if(HV_CATEGORY.equals(cableType.getCategory())&&!canTakeHV())
@@ -103,13 +101,11 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		return false;
 	}
 
-	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget)
 	{
 		wires++;
 	}
 
-	@Override
 	public void removeCable(Connection connection, ConnectionPoint attachedPoint)
 	{
 		WireType type = connection!=null?connection.type: null;
@@ -119,7 +115,6 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 			wires--;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -128,16 +123,14 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		nbt.putBoolean("inverted", inverted);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		rotation = nbt.getInt("rotation");
-		wires = nbt.getInt("wires");
-		inverted = nbt.getBoolean("inverted");
+		rotation = nbt.getIntOr("rotation", 0);
+		wires = nbt.getIntOr("wires", 0);
+		inverted = nbt.getBooleanOr("inverted", false);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Matrix4 mat = new Matrix4(getFacing());
@@ -146,7 +139,6 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		return mat.apply(new Vec3(isLeft?.25: .75, .5, .125));
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		rotation = (rotation+3)%4;
@@ -159,25 +151,21 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		return true;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		final boolean oldPassing = allowEnergyToPass();
 		inverted = !inverted;
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsSignal."+(inverted?"invertedOn": "invertedOff")), true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsSignal."+(inverted?"invertedOn": "invertedOff")));
 			notifyNeighbours();
 			if(oldPassing!=allowEnergyToPass())
 				updateConductivity();
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(!Utils.isHammer(heldItem))
 		{
@@ -187,10 +175,10 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 			level.blockEvent(getBlockPos(), getBlockState().getBlock(), active?1: 0, 0);
 			notifyNeighbours();
 			updateConductivity();
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 	}
 
 	protected void updateConductivity()
@@ -209,7 +197,6 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 			level.updateNeighborsAt(getBlockPos().relative(f), getBlockState().getBlock());
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(super.triggerEvent(id, arg))
@@ -219,25 +206,21 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 	}
 
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return ConnectorBlock.DEFAULT_FACING_PROP;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
@@ -253,31 +236,26 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		return ImmutableList.of(new AABB(start, end));
 	});
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(Pair.of(getFacing(), rotation));
 	}
 
-	@Override
 	public int getWeakRSOutput(@Nonnull Direction side)
 	{
 		return (getIsActive()^inverted)?15: 0;
 	}
 
-	@Override
 	public int getStrongRSOutput(@Nonnull Direction side)
 	{
 		return side.getOpposite()==getFacing()&&(getIsActive()^inverted)?15: 0;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return true;
 	}
 
-	@Override
 	public void onDirectionalPlacement(Direction side, float hitX, float hitY, float hitZ, LivingEntity placer)
 	{
 		Direction f = Direction.SOUTH;
@@ -301,13 +279,11 @@ public class BreakerSwitchBlockEntity extends ImmersiveConnectableBlockEntity im
 		rotation = (rotation+4)%4;
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(new ConnectionPoint(worldPosition, LEFT_INDEX), new ConnectionPoint(worldPosition, RIGHT_INDEX));
 	}
 
-	@Override
 	public Iterable<? extends Connection> getInternalConnections()
 	{
 		if(allowEnergyToPass())

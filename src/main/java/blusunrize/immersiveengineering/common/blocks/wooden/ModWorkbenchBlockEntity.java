@@ -55,56 +55,47 @@ public class ModWorkbenchBlockEntity extends IEBaseBlockEntity implements IIEInv
 		super(IEBlockEntities.MOD_WORKBENCH.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.loadAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		ContainerHelper.saveAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 	}
 
 	public AABB renderAABB;
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return this.inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return slot==0?1: 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		applyConfigTo(inventory.get(0), message);
@@ -114,24 +105,22 @@ public class ModWorkbenchBlockEntity extends IEBaseBlockEntity implements IIEInv
 	{
 		if(!(stack.getItem() instanceof IConfigurableTool))
 			return;
-		for(String key : message.getAllKeys())
+		for(String key : message.keySet())
 		{
 			Tag tag = message.get(key);
 			if(tag instanceof ByteTag)
-				((IConfigurableTool)stack.getItem()).applyConfigOption(stack, key, ((ByteTag)tag).getAsByte()!=0);
+				((IConfigurableTool)stack.getItem()).applyConfigOption(stack, key, ((ByteTag)tag).byteValue()!=0);
 			else if(tag instanceof FloatTag)
-				((IConfigurableTool)stack.getItem()).applyConfigOption(stack, key, ((FloatTag)tag).getAsFloat());
+				((IConfigurableTool)stack.getItem()).applyConfigOption(stack, key, ((FloatTag)tag).floatValue());
 		}
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return getState().getValue(IEProperties.MULTIBLOCKSLAVE);
 	}
 
 	@Nullable
-	@Override
 	public ModWorkbenchBlockEntity master()
 	{
 		if(!isDummy())
@@ -145,13 +134,11 @@ public class ModWorkbenchBlockEntity extends IEBaseBlockEntity implements IIEInv
 		return (te instanceof ModWorkbenchBlockEntity)?(ModWorkbenchBlockEntity)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		DeskBlock.placeDummies(getBlockState(), level, worldPosition, ctx);
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		tempMasterBE = master();
@@ -159,13 +146,11 @@ public class ModWorkbenchBlockEntity extends IEBaseBlockEntity implements IIEInv
 		level.removeBlock(pos.relative(dummyDir), false);
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public ModWorkbenchBlockEntity getGuiMaster()
 	{
 		if(!isDummy())
@@ -177,19 +162,16 @@ public class ModWorkbenchBlockEntity extends IEBaseBlockEntity implements IIEInv
 		return null;
 	}
 
-	@Override
 	public ArgContainer<ModWorkbenchBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.MOD_WORKBENCH;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		if(isDummy())

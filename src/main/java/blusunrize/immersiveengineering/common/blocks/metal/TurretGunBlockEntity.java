@@ -37,7 +37,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -55,37 +55,31 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 		super(type, pos, state);
 	}
 
-	@Override
 	protected double getRange()
 	{
 		return 16;
 	}
 
-	@Override
 	protected boolean canActivate()
 	{
 		return this.energyStorage.getEnergyStored() >= IEServerConfig.MACHINES.turret_gun_consumption.get()&&!inventory.get(0).isEmpty();
 	}
 
-	@Override
 	protected int getChargeupTicks()
 	{
 		return 5;
 	}
 
-	@Override
 	protected int getActiveTicks()
 	{
 		return 5;
 	}
 
-	@Override
 	protected boolean loopActivation()
 	{
 		return false;
 	}
 
-	@Override
 	protected void activate()
 	{
 		int energy = IEServerConfig.MACHINES.turret_gun_consumption.get();
@@ -110,7 +104,7 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 					else
 						for(int i = 0; i < count; i++)
 						{
-							Vec3 vecDir = vec.add(ApiUtils.RANDOM.nextGaussian()*.1, ApiUtils.RANDOM.nextGaussian()*.1, ApiUtils.RANDOM.nextGaussian()*.1);
+							Vec3 vecDir = vec.add(ApiUtils.getRandom().nextGaussian()*.1, ApiUtils.getRandom().nextGaussian()*.1, ApiUtils.getRandom().nextGaussian()*.1);
 							level.addFreshEntity(getBulletEntity(vecDir, bulletStack));
 						}
 					bulletStack.shrink(1);
@@ -151,7 +145,7 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 		CompoundTag tag = new CompoundTag();
 		tag.putBoolean("cycle", true);
 		PacketDistributor.sendToPlayersTrackingChunk(
-				(ServerLevel)level, new ChunkPos(worldPosition), new MessageBlockEntitySync(getBlockPos(), tag)
+				(ServerLevel)level, new ChunkPos(worldPosition.getX() >> 4, worldPosition.getZ() >> 4), new MessageBlockEntitySync(getBlockPos(), tag)
 		);
 	}
 
@@ -168,13 +162,11 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 		return shot;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		if(slot==0)
@@ -183,7 +175,6 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 			return true;
 	}
 
-	@Override
 	public void tickClient()
 	{
 		super.tickClient();
@@ -191,32 +182,29 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 			cycleRender--;
 	}
 
-	@Override
 	public void receiveMessageFromServer(CompoundTag message)
 	{
 		if(message.contains("cycle"))
 			cycleRender = 5;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
 		if(!descPacket)
 		{
-			expelCasings = nbt.getBoolean("expelCasings");
-			ContainerHelper.loadAllItems(nbt, inventory, provider);
+			expelCasings = nbt.getBooleanOr("expelCasings", false);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
 		}
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		if(!descPacket)
 		{
 			nbt.putBoolean("expelCasings", expelCasings);
-			ContainerHelper.saveAllItems(nbt, inventory, provider);
+			blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 		}
 	}
 
@@ -227,7 +215,7 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 	public static void registerCapabilities(BECapabilityRegistrar<TurretGunBlockEntity> registrar)
 	{
 		TurretBlockEntity.registerCapabilitiesBase(registrar);
-		registrar.register(ItemHandler.BLOCK, (be, facing) -> {
+		registrar.register(Capabilities.Item.BLOCK, (be, facing) -> {
 			if(!be.isDummy()&&(facing==null||facing==Direction.DOWN||facing==be.getFacing().getOpposite()))
 				return be.itemHandler;
 			else
@@ -235,7 +223,6 @@ public class TurretGunBlockEntity extends TurretBlockEntity<TurretGunBlockEntity
 		});
 	}
 
-	@Override
 	public ArgContainer<TurretGunBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.GUN_TURRET;

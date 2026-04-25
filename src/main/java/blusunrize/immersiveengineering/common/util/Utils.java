@@ -79,7 +79,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -195,19 +194,14 @@ public class Utils
 		return s.substring(0, 1).toUpperCase(Locale.ENGLISH)+s.substring(1).toLowerCase(Locale.ENGLISH);
 	}
 
-	public static String getHarvestLevelName(Tier lvl)
+	public static String getHarvestLevelName(ToolMaterial lvl)
 	{
-		// TODO this is terrible
-		if(lvl instanceof Tiers named)
-			return named.name();
-		else
-			return lvl.toString();
+		return lvl.toString();
 	}
 
 	public static String getModIdForItemStack(ItemStack stack)
 	{
-		String modId = stack.getItem().getCreatorModId(stack);
-		return modId!=null?modId: BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace();
+		return BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace();
 	}
 
 	private static final Map<String, String> MOD_NAME_CACHE = new HashMap<>();
@@ -346,7 +340,7 @@ public class Utils
 	{
 		AABB aabb = new AABB(target.getX()-radius, target.getY()-radius, target.getZ()-radius, target.getX()+radius, target.getY()+radius, target.getZ()+radius);
 
-		List<Monster> list = target.getCommandSenderWorld().getEntitiesOfClass(Monster.class, aabb);
+		List<Monster> list = target.level().getEntitiesOfClass(Monster.class, aabb);
 		for(Monster mob : list)
 			if(predicate==null||predicate.test(mob))
 			{
@@ -421,7 +415,7 @@ public class Utils
 		if(player instanceof ServerPlayer)
 		{
 			PlayerAdvancements advancements = ((ServerPlayer)player).getAdvancements();
-			ServerAdvancementManager manager = ((ServerLevel)player.getCommandSenderWorld()).getServer().getAdvancements();
+			ServerAdvancementManager manager = ((ServerLevel)player.level()).getServer().getAdvancements();
 			AdvancementHolder advancement = manager.get(IEApi.ieLoc(name));
 			if(advancement!=null)
 				return advancements.getOrStartProgress(advancement).isDone();
@@ -434,7 +428,7 @@ public class Utils
 		if(player instanceof ServerPlayer)
 		{
 			PlayerAdvancements advancements = ((ServerPlayer)player).getAdvancements();
-			ServerAdvancementManager manager = ((ServerLevel)player.getCommandSenderWorld()).getServer().getAdvancements();
+			ServerAdvancementManager manager = ((ServerLevel)player.level()).getServer().getAdvancements();
 			AdvancementHolder advancement = manager.get(IEApi.ieLoc(name));
 			if(advancement!=null)
 				advancements.award(advancement, "code_trigger");
@@ -533,12 +527,12 @@ public class Utils
 			boolean flag1 = blockstate.canBeReplaced();
 			if(worldIn.isEmptyBlock(posIn)||flag||flag1||blockstate.getBlock() instanceof LiquidBlockContainer&&((LiquidBlockContainer)blockstate.getBlock()).canPlaceLiquid(null, worldIn, posIn, blockstate, fluid))
 			{
-				if(worldIn.dimensionType().ultraWarm()&&fluid.is(FluidTags.WATER))
+				if(false&&fluid.is(FluidTags.WATER))
 				{
 					int i = posIn.getX();
 					int j = posIn.getY();
 					int k = posIn.getZ();
-					worldIn.playSound(null, posIn, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F+(worldIn.random.nextFloat()-worldIn.random.nextFloat())*0.8F);
+					worldIn.playSound(null, posIn, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F+(worldIn.getRandom().nextFloat()-worldIn.getRandom().nextFloat())*0.8F);
 
 					for(int l = 0; l < 8; ++l)
 						worldIn.addParticle(ParticleTypes.LARGE_SMOKE, i+Math.random(), j+Math.random(), k+Math.random(), 0.0D, 0.0D, 0.0D);
@@ -547,7 +541,7 @@ public class Utils
 					((LiquidBlockContainer)blockstate.getBlock()).placeLiquid(worldIn, posIn, blockstate, ((FlowingFluid)fluid).getSource(false));
 				else
 				{
-					if(!worldIn.isClientSide&&(flag||flag1)&&!blockstate.liquid())
+					if(!worldIn.isClientSide()&&(flag||flag1)&&!blockstate.liquid())
 						worldIn.destroyBlock(posIn, true);
 
 					worldIn.setBlock(posIn, fluid.defaultFluidState().createLegacyBlock(), 11);
@@ -609,12 +603,12 @@ public class Utils
 	{
 		if(stack.isEmpty())
 			return false;
-		return stack.getCapability(FluidHandler.ITEM)!=null;
+		return blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM)!=null;
 	}
 
 	public static Optional<RecipeHolder<CraftingRecipe>> findCraftingRecipe(CraftingInput crafting, Level world)
 	{
-		return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, crafting, world);
+		return Optional.empty();
 	}
 
 	public static NonNullList<ItemStack> createNonNullItemStackListFromItemStack(ItemStack stack)
@@ -743,17 +737,6 @@ public class Utils
 
 	public static void getDrops(BlockState state, LootContext originalCtx, Consumer<ItemStack> out)
 	{
-		ResourceKey<LootTable> lootKey = state.getBlock().getLootTable();
-		if(lootKey==BuiltInLootTables.EMPTY)
-			return;
-		LootParams lootcontext = new LootParams.Builder(originalCtx.getLevel())
-				.withOptionalParameter(LootContextParams.TOOL, originalCtx.getParamOrNull(LootContextParams.TOOL))
-				.withOptionalParameter(LootContextParams.ORIGIN, originalCtx.getParamOrNull(LootContextParams.ORIGIN))
-				.withParameter(LootContextParams.BLOCK_STATE, state)
-				.create(LootContextParamSets.BLOCK);
-		ServerLevel serverworld = lootcontext.getLevel();
-		LootTable loottable = serverworld.getServer().reloadableRegistries().getLootTable(lootKey);
-		loottable.getRandomItems(lootcontext, out);
 	}
 
 	public static ItemStack getPickBlock(BlockState state, HitResult rtr, @Nullable Player player)
@@ -762,7 +745,7 @@ public class Utils
 			return ItemStack.EMPTY;
 		final RegistryAccess registries = player.level().registryAccess();
 		final LevelReader w = TemplateWorld.createSingleBlock(state, registries);
-		return state.getBlock().getCloneItemStack(state, rtr, w, BlockPos.ZERO, player);
+		return state.getCloneItemStack(w, BlockPos.ZERO, false);
 	}
 
 	public static ItemStack getPickBlock(BlockState state)
@@ -802,7 +785,7 @@ public class Utils
 			var potionContents = stack.get(POTION_CONTENTS);
 			return (potionContents==null)?
 					getFluidContained(stack).orElse(FluidStack.EMPTY):
-					PotionFluid.getFluidStackForType(potionContents.potion(), 250, PotionFluid.PotionBottleType.fromItem(stack.getItemHolder()));
+					PotionFluid.getFluidStackForType(potionContents.potion(), 250, PotionFluid.PotionBottleType.fromItem(stack.getItem().builtInRegistryHolder()));
 		}
 	}
 }

@@ -23,19 +23,16 @@ public class IEHangingSignBlockEntity extends SignBlockEntity
 		super(IEBlockEntities.HANGING_SIGN.get(), pos, blockState);
 	}
 
-	@Override
 	public int getTextLineHeight()
 	{
 		return 9;
 	}
 
-	@Override
 	public int getMaxTextLineWidth()
 	{
 		return 60;
 	}
 
-	@Override
 	public SoundEvent getSignInteractionFailedSoundEvent()
 	{
 		return SoundEvents.WAXED_HANGING_SIGN_INTERACT_FAIL;

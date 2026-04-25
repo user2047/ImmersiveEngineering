@@ -36,7 +36,6 @@ public record MessageBlockEntitySync(BlockPos pos, CompoundTag nbt) implements I
 		this(be.getBlockPos(), nbt);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		if(context.flow().getReceptionSide()==LogicalSide.SERVER)
@@ -61,7 +60,6 @@ public record MessageBlockEntitySync(BlockPos pos, CompoundTag nbt) implements I
 			});
 	}
 
-	@Override
 	@NotNull
 	public Type<? extends CustomPacketPayload> type()
 	{

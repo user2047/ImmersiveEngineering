@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.common.items.DieselToolItem;
 import blusunrize.immersiveengineering.common.items.DrillItem;
 import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -37,7 +37,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 {
 	public static final DrillCallbacks INSTANCE = new DrillCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = DrillItem.getUpgradesStatic(stack);
@@ -57,7 +56,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 	}
 
 
-	@Override
 	public TextureAtlasSprite getTextureReplacement(Key key, String group, String material)
 	{
 		if(!"head".equals(material))
@@ -66,7 +64,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 			return ClientUtils.getSprite(key.headTexture());
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
 		if(group.equals("drill_frame")||group.equals("drill_grip"))
@@ -92,7 +89,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 		return false;
 	}
 
-	@Override
 	public Transformation applyTransformations(Key key, String group, Transformation transform)
 	{
 		if(group.equals("drill_head")&&key.damage() <= 0)
@@ -109,7 +105,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 			"upgrade_damage1", "upgrade_damage2", "upgrade_damage3", "upgrade_damage4"
 	));
 
-	@Override
 	public List<List<String>> getSpecialGroups(ItemStack stack, ItemDisplayContext transform, LivingEntity entity)
 	{
 		if(shouldRotate(Tools.DRILL, entity, stack, transform))
@@ -121,7 +116,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 	private static final Transformation MAT_AUGERS = new Transformation(new Vector3f(.441f, 0, 0), null, null, null);
 
 	@Nonnull
-	@Override
 	public Transformation getTransformForGroups(ItemStack stack, List<String> groups, ItemDisplayContext transform, LivingEntity entity, float partialTicks)
 	{
 		if(groups==FIXED.get(0))
@@ -154,7 +148,6 @@ public class DrillCallbacks implements ItemCallback<Key>
 						transform==ItemDisplayContext.THIRD_PERSON_RIGHT_HAND||transform==ItemDisplayContext.THIRD_PERSON_LEFT_HAND);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(null, 0, false, false, false);

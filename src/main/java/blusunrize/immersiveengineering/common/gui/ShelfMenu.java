@@ -110,16 +110,14 @@ public class ShelfMenu extends IEContainerMenu
 			addSlot(new Slot(inventoryPlayer, i, 8+playerInvX+i*18, 71+playerInvY));
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
 		super.receiveMessageFromScreen(nbt);
-		if(nbt.contains("backside", Tag.TAG_BYTE))
-			backside.set(nbt.getBoolean("backside"));
+		if(nbt.contains("backside"))
+			backside.set(nbt.getBooleanOr("backside", false));
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
@@ -158,7 +156,6 @@ public class ShelfMenu extends IEContainerMenu
 			this.getCrates = getCrates;
 		}
 
-		@Override
 		public boolean isActive()
 		{
 			if(!isActive.get())
@@ -167,7 +164,6 @@ public class ShelfMenu extends IEContainerMenu
 			return crateIndex < crates.size()&&!crates.get(crateIndex).isEmpty();
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack stack)
 		{
 			return super.mayPlace(stack)&&isActive();

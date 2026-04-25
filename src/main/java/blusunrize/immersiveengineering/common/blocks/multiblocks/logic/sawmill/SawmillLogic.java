@@ -50,7 +50,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -61,8 +61,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
@@ -93,7 +93,6 @@ public class SawmillLogic
 		MachineInterfaceHandler.register(MIF_CONDITION_SAWBLADE, MachineInterfaceHandler.buildComparativeConditions(State::getSawbladeComparatorValue));
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -136,7 +135,6 @@ public class SawmillLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> ctx)
 	{
 		final IMultiblockLevel level = ctx.getLevel();
@@ -176,14 +174,14 @@ public class SawmillLogic
 		{
 			Direction particleDir = level.toAbsolute(RelativeBlockFace.RIGHT);
 			AABB aabb = level.toAbsolute(SAWBLADE_AABB);
-			double posX = aabb.minX+rawLevel.random.nextDouble()*(aabb.maxX-aabb.minX);
-			double posY = aabb.minY+rawLevel.random.nextDouble()*(aabb.maxY-aabb.minY);
-			double posZ = aabb.minZ+rawLevel.random.nextDouble()*(aabb.maxZ-aabb.minZ);
-			double vX = rawLevel.random.nextDouble()*particleDir.getStepX()*0.3;
-			double vY = rawLevel.random.nextDouble()*0.3;
-			double vZ = rawLevel.random.nextDouble()*particleDir.getStepZ()*0.3;
+			double posX = aabb.minX+rawLevel.getRandom().nextDouble()*(aabb.maxX-aabb.minX);
+			double posY = aabb.minY+rawLevel.getRandom().nextDouble()*(aabb.maxY-aabb.minY);
+			double posZ = aabb.minZ+rawLevel.getRandom().nextDouble()*(aabb.maxZ-aabb.minZ);
+			double vX = rawLevel.getRandom().nextDouble()*particleDir.getStepX()*0.3;
+			double vY = rawLevel.getRandom().nextDouble()*0.3;
+			double vZ = rawLevel.getRandom().nextDouble()*particleDir.getStepZ()*0.3;
 			rawLevel.addAlwaysVisibleParticle(
-					new ItemParticleOption(ParticleTypes.ITEM, process.get().getCurrentStack(rawLevel, true)),
+					new ItemParticleOption(ParticleTypes.ITEM, process.get().getCurrentStack(rawLevel, true).getItem()),
 					posX, posY, posZ, vX, vY, vZ
 			);
 			//Arbitrary constant is arbitrary, but it's what sounded good in game, so we keep it. Actual length is supposed to be 10t...
@@ -199,21 +197,19 @@ public class SawmillLogic
 			state.count = -1;
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
-		register.registerAt(ItemHandler.BLOCK, INPUT, state -> state.insertionHandler);
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.registerAt(Capabilities.Item.BLOCK, INPUT, state -> state.insertionHandler);
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void onEntityCollision(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Entity collided)
 	{
 		final State state = ctx.getState();
 		final IMultiblockLevel level = ctx.getLevel();
 		final Level rawLevel = level.getRawLevel();
-		if(rawLevel.isClientSide||collided==null||!collided.isAlive()||!state.rsState.isEnabled(ctx))
+		if(rawLevel.isClientSide()||collided==null||!collided.isAlive()||!state.rsState.isEnabled(ctx))
 			return;
 		if(new BlockPos(0, 1, 1).equals(posInMultiblock)&&collided instanceof ItemEntity itemEntity)
 		{
@@ -235,8 +231,7 @@ public class SawmillLogic
 			hurtEntity(collided, ctx);
 	}
 
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
 			Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient
 	)
@@ -247,14 +242,14 @@ public class SawmillLogic
 		{
 			if(!isClient&&player.isShiftKeyDown()&&heldItem.isEmpty())
 				hurtEntity(player, ctx);
-			return ItemInteractionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 		if(player.isShiftKeyDown()&&!state.sawblade.isEmpty()&&heldItem.isEmpty())
 		{
 			player.setItemInHand(hand, state.sawblade.copy());
 			state.sawblade = ItemStack.EMPTY;
 			ctx.markDirtyAndSync();
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		else if(heldItem.is(IETags.sawblades))
 		{
@@ -266,13 +261,13 @@ public class SawmillLogic
 			{
 				if(heldItem.isEmpty())
 					player.setItemInHand(hand, tempBlade);
-				else if(!isClient)
-					player.spawnAtLocation(tempBlade, 0);
+				else if(ctx.getLevel().getRawLevel() instanceof net.minecraft.server.level.ServerLevel serverLevel)
+					player.spawnAtLocation(serverLevel, tempBlade);
 			}
 			ctx.markDirtyAndSync();
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	private void hurtEntity(Entity toHurt, IMultiblockContext<State> ctx)
@@ -329,7 +324,6 @@ public class SawmillLogic
 		return true;
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		if(!state.sawblade.isEmpty())
@@ -339,13 +333,11 @@ public class SawmillLogic
 		}
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return SawmillShapes.SHAPE_GETTER;
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
@@ -387,7 +379,6 @@ public class SawmillLogic
 			final Runnable sync = ctx.getSyncRunnable();
 			this.insertionHandler = new InsertOnlyInventory()
 			{
-				@Override
 				protected ItemStack insert(ItemStack toInsert, boolean simulate)
 				{
 					toInsert = toInsert.copy();
@@ -412,7 +403,6 @@ public class SawmillLogic
 				soundPlaying.put(state, () -> false);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			writeCommonNBT(nbt, provider);
@@ -420,31 +410,28 @@ public class SawmillLogic
 			nbt.putInt("combinedLogs", combinedLogs);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
 			readCommonNBT(nbt, provider);
-			combinedLogs = nbt.getInt("combinedLogs");
+			combinedLogs = nbt.getIntOr("combinedLogs", 0);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			writeCommonNBT(nbt, provider);
 			nbt.putInt("active", active.ordinal());
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			readCommonNBT(nbt, provider);
-			active = ActiveState.values()[nbt.getInt("active")];
+			active = ActiveState.values()[nbt.getIntOr("active", 0)];
 		}
 
 		private void writeCommonNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("sawblade", sawblade.saveOptional(provider));
+			nbt.put("sawblade", blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(sawblade, provider));
 			ListTag processes = new ListTag();
 			for(final SawmillProcess process : sawmillProcessQueue)
 				processes.add(process.writeToNBT(provider));
@@ -453,11 +440,11 @@ public class SawmillLogic
 
 		private void readCommonNBT(CompoundTag nbt, Provider provider)
 		{
-			sawblade = ItemStack.parseOptional(provider, nbt.getCompound("sawblade"));
-			ListTag processes = nbt.getList("processes", Tag.TAG_COMPOUND);
+			sawblade = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("sawblade"));
+			ListTag processes = nbt.getListOrEmpty("processes");
 			sawmillProcessQueue.clear();
 			for(int i = 0; i < processes.size(); ++i)
-				sawmillProcessQueue.add(SawmillProcess.readFromNBT(processes.getCompound(i), provider));
+				sawmillProcessQueue.add(SawmillProcess.readFromNBT(processes.getCompoundOrEmpty(i), provider));
 		}
 
 		public IEnergyStorage getEnergy()

@@ -203,7 +203,6 @@ public class NoisyToolSoundGroup
 			super(sound, SoundSource.NEUTRAL, SoundInstance.createUnseededRandom());
 		}
 
-		@Override
 		public boolean canStartSilent()
 		{
 			return true;
@@ -238,7 +237,6 @@ public class NoisyToolSoundGroup
 			this.z = noisyToolHolder.getZ();
 		}
 
-		@Override
 		public void tick()
 		{
 			if(!isStopped())
@@ -278,7 +276,6 @@ public class NoisyToolSoundGroup
 
 		}
 
-		@Override
 		public void updateCoordinates()
 		{
 			super.updateCoordinates();
@@ -308,7 +305,6 @@ public class NoisyToolSoundGroup
 			this.looping = true;
 		}
 
-		@Override
 		public void tick()
 		{
 			if(!isStopped())

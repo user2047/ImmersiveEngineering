@@ -21,11 +21,11 @@ import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +46,11 @@ public class WindmillRenderer extends IEBlockEntityRenderer<WindmillBlockEntity>
 				for(int i = 1; i <= sails; i++)
 					parts.add("sail_"+i);
 				ModelData data = ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts));
-				return model.getQuads(null, null, ApiUtils.RANDOM_SOURCE, data, RenderType.cutout());
+				return model.getQuads(null, null, ApiUtils.RANDOM_SOURCE, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout());
 			});
 		return BUFFERS[sails];
 	}
 
-	@Override
 	public void render(WindmillBlockEntity tile, float partialTicks, PoseStack transform, MultiBufferSource bufferIn,
 					   int combinedLightIn, int combinedOverlayIn)
 	{
@@ -70,7 +69,7 @@ public class WindmillRenderer extends IEBlockEntityRenderer<WindmillBlockEntity>
 
 		transform.translate(-.5, -.5, -.5);
 		getBufferHolder(tile.sails)
-				.render(RenderType.cutout(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
+				.render(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
 		transform.popPose();
 	}
 
@@ -81,7 +80,6 @@ public class WindmillRenderer extends IEBlockEntityRenderer<WindmillBlockEntity>
 				vbo.reset();
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(WindmillBlockEntity windmill)
 	{
 		if(windmill.renderAABB==null)

@@ -32,7 +32,6 @@ import java.util.function.Function;
 public class BucketWheelLogic
 		implements IMultiblockLogic<State>, IClientTickableComponent<State>, IServerTickableComponent<State>
 {
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		tickClient(context);
@@ -40,7 +39,6 @@ public class BucketWheelLogic
 			context.requestMasterBESync();
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -51,13 +49,11 @@ public class BucketWheelLogic
 		}
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> ctx)
 	{
 		return new State();
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return BucketWheelShapes.SHAPE_GETTER;
@@ -72,38 +68,34 @@ public class BucketWheelLogic
 		public boolean reverseRotation = false;
 		public boolean outputLeft = false;
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putFloat("rotation", rotation);
 			ListTag stacksNBT = new ListTag();
 			for(final ItemStack stack : digStacks)
-				stacksNBT.add(stack.saveOptional(provider));
+				stacksNBT.add(blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(stack, provider));
 			nbt.put("stacks", stacksNBT);
 			nbt.putBoolean("active", active);
 			nbt.putBoolean("renderReverse", reverseRotation);
 			nbt.putBoolean("outputLeft", outputLeft);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			rotation = nbt.getFloat("rotation");
-			final ListTag stacksNBT = nbt.getList("stacks", Tag.TAG_COMPOUND);
+			rotation = nbt.getFloatOr("rotation", 0);
+			final ListTag stacksNBT = nbt.getListOrEmpty("stacks");
 			for(int i = 0; i < stacksNBT.size(); ++i)
-				digStacks.set(i, ItemStack.parseOptional(provider, stacksNBT.getCompound(i)));
-			active = nbt.getBoolean("active");
-			reverseRotation = nbt.getBoolean("renderReverse");
-			outputLeft = nbt.getBoolean("outputLeft");
+				digStacks.set(i, blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, stacksNBT.getCompoundOrEmpty(i)));
+			active = nbt.getBooleanOr("active", false);
+			reverseRotation = nbt.getBooleanOr("renderReverse", false);
+			outputLeft = nbt.getBooleanOr("outputLeft", false);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			readSaveNBT(nbt, provider);

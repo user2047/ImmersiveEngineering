@@ -12,9 +12,9 @@ package blusunrize.immersiveengineering.client.models.obj.callback.block;
 import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.RazorWireCallbacks.Key;
 import blusunrize.immersiveengineering.common.blocks.metal.RazorWireBlockEntity;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,7 +25,6 @@ public class RazorWireCallbacks implements BlockCallback<Key>
 	public static final RazorWireCallbacks INSTANCE = new RazorWireCallbacks();
 	private static final Key INVALID = new Key(false, false, true, true);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof RazorWireBlockEntity razorWire))
@@ -35,13 +34,11 @@ public class RazorWireCallbacks implements BlockCallback<Key>
 		);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key object, String group, RenderType layer)
 	{
 		if(group==null)

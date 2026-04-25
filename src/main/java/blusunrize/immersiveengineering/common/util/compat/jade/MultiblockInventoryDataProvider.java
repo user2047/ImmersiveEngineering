@@ -17,6 +17,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SiloLogic
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.ProcessContext;
 import com.google.common.collect.Lists;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
@@ -70,15 +71,13 @@ public class MultiblockInventoryDataProvider<T extends IMultiblockState> impleme
 		return list;
 	}
 
-	@Override
 	public List<ClientViewGroup<ItemView>> getClientGroups(Accessor<?> accessor, List<ViewGroup<ItemStack>> list)
 	{
 		return ClientViewGroup.map(list, ItemView::new, null);
 	}
 
-	@Override
-	public Identifier getUid()
+	public ResourceLocation getUid()
 	{
-		return ImmersiveEngineering.rl("multiblock_inventory");
+		return ResourceLocation.fromIdentifier(ImmersiveEngineering.rl("multiblock_inventory"));
 	}
 }

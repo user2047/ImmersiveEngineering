@@ -29,13 +29,11 @@ public class AlloyRecipeSerializer extends IERecipeSerializer<AlloyRecipe>
 			AlloyRecipe::new
 	);
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.ALLOY_SMELTER.iconStack();
 	}
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, AlloyRecipe> codecs()
 	{
 		return CODECS;

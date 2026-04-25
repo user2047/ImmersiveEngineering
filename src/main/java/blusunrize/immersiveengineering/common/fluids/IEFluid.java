@@ -18,6 +18,7 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -64,25 +65,21 @@ public class IEFluid extends FlowingFluid
 	}
 
 	@Nonnull
-	@Override
 	public Item getBucket()
 	{
 		return entry.getBucket();
 	}
 
-	@Override
 	protected boolean canBeReplacedWith(FluidState fluidState, BlockGetter blockReader, BlockPos pos, Fluid fluidIn, Direction direction)
 	{
 		return direction==Direction.DOWN&&!isSame(fluidIn);
 	}
 
-	@Override
 	public boolean isSame(@Nonnull Fluid fluidIn)
 	{
 		return fluidIn==entry.getStill()||fluidIn==entry.getFlowing();
 	}
 
-	@Override
 	public int getTickDelay(LevelReader p_205569_1_)
 	{
 		// viscosity delta to water (1000)
@@ -92,13 +89,11 @@ public class IEFluid extends FlowingFluid
 		return Math.max(2, (int)v);
 	}
 
-	@Override
 	protected float getExplosionResistance()
 	{
 		return 100;
 	}
 
-	@Override
 	protected void createFluidStateDefinition(Builder<Fluid, FluidState> builder)
 	{
 		super.createFluidStateDefinition(builder);
@@ -106,7 +101,6 @@ public class IEFluid extends FlowingFluid
 			builder.add(p);
 	}
 
-	@Override
 	protected BlockState createLegacyBlock(FluidState state)
 	{
 		BlockState result = entry.getBlock().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
@@ -115,13 +109,11 @@ public class IEFluid extends FlowingFluid
 		return result;
 	}
 
-	@Override
 	public boolean isSource(FluidState state)
 	{
 		return state.getType()==entry.getStill();
 	}
 
-	@Override
 	public int getAmount(FluidState state)
 	{
 		if(isSource(state))
@@ -130,45 +122,43 @@ public class IEFluid extends FlowingFluid
 			return state.getValue(LEVEL);
 	}
 
-	@Override
 	public FluidType getFluidType()
 	{
 		return entry.type().value();
 	}
 
 	@Nonnull
-	@Override
 	public Fluid getFlowing()
 	{
 		return entry.getFlowing();
 	}
 
 	@Nonnull
-	@Override
 	public Fluid getSource()
 	{
 		return entry.getStill();
 	}
 
-	@Override
 	public boolean canConvertToSource(Level level)
 	{
 		return false;
 	}
 
-	@Override
+	protected boolean canConvertToSource(ServerLevel level)
+	{
+		return false;
+	}
+
 	protected void beforeDestroyingBlock(LevelAccessor iWorld, BlockPos blockPos, BlockState blockState)
 	{
 
 	}
 
-	@Override
 	protected int getSlopeFindDistance(LevelReader iWorldReader)
 	{
 		return 4;
 	}
 
-	@Override
 	protected int getDropOff(LevelReader iWorldReader)
 	{
 		return 1;
@@ -186,7 +176,6 @@ public class IEFluid extends FlowingFluid
 			super(entry);
 		}
 
-		@Override
 		protected void createFluidStateDefinition(Builder<Fluid, FluidState> builder)
 		{
 			super.createFluidStateDefinition(builder);
@@ -196,14 +185,12 @@ public class IEFluid extends FlowingFluid
 
 	public static class EntityFluidSerializer implements EntityDataSerializer<FluidStack>
 	{
-		@Override
 		public StreamCodec<? super RegistryFriendlyByteBuf, FluidStack> codec()
 		{
 			return FluidStack.STREAM_CODEC;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack copy(FluidStack value)
 		{
 			return value.copy();

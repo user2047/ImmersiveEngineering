@@ -36,7 +36,6 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 	private GuiButtonBoolean[] colorButtonsSend;
 	private GuiButtonBoolean[] colorButtonsReceive;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -74,7 +73,6 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity.getBlockPos(), message));
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_sending").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());

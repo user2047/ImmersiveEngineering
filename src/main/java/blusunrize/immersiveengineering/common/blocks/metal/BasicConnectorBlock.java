@@ -39,7 +39,6 @@ public class BasicConnectorBlock<T extends BlockEntity & IImmersiveConnectable> 
 		);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

@@ -53,9 +53,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -92,7 +91,6 @@ public class MixerLogic
 		MachineInterfaceHandler.copyOptions(MIF_CONDITION_TANK, MachineInterfaceHandler.BASIC_FLUID_IN);
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -184,7 +182,6 @@ public class MixerLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -205,28 +202,26 @@ public class MixerLogic
 		float amount = fs.getAmount()/(float)state.tank.getCapacity()*1.125f;
 		final Vec3 relativePos = new Vec3(2, 0.9375+amount, 1);
 		Vec3 partPos = level.toAbsolute(relativePos);
-		float r = ApiUtils.RANDOM.nextFloat()*.8125f;
+		float r = ApiUtils.getRandom().nextFloat()*.8125f;
 		float angleRad = (float)Math.toRadians(state.animation_agitator);
 		partPos = partPos.add(r*Math.cos(angleRad), 0, r*Math.sin(angleRad));
 		final Level rawLevel = level.getRawLevel();
 		for(int i = 0; i < 2; ++i)
-			if(ApiUtils.RANDOM.nextBoolean())
+			if(ApiUtils.getRandom().nextBoolean())
 				rawLevel.addParticle(IEParticles.IE_BUBBLE.get(), partPos.x, partPos.y, partPos.z, 0, 0, 0);
 			else
 				rawLevel.addParticle(new FluidSplashOptions(fs.getFluid()), partPos.x, partPos.y, partPos.z, 0, 0, 0);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_INPUT, state -> state.energy);
-		register.register(FluidHandler.BLOCK, (state, position) -> {
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_INPUT, state -> state.energy);
+		register.register(Capabilities.Fluid.BLOCK, (state, position) -> {
 			if(FLUID_INPUT.equalsOrNullFace(position))
 				return state.fluidInput;
 			else if(FLUID_OUTPUT.equals(position))
@@ -235,19 +230,17 @@ public class MixerLogic
 				return null;
 		});
 		register.register(
-				ItemHandler.BLOCK,
+				Capabilities.Item.BLOCK,
 				(state, position) -> ITEM_INPUT.equals(position.posInMultiblock())?state.inventory: null
 		);
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return MixerShapes.SHAPE_GETTER;
@@ -288,7 +281,7 @@ public class MixerLogic
 			this.processor = new InMachineProcessor<>(
 					8, 0, 8, ctx.getMarkDirtyRunnable(), MixerRecipe.RECIPES::getById
 			);
-			this.outputRef = ctx.getCapabilityAt(FluidHandler.BLOCK, OUTPUT_POS);
+			this.outputRef = ctx.getCapabilityAt(Capabilities.Fluid.BLOCK, OUTPUT_POS);
 			this.fluidInput = ArrayFluidHandler.fillOnly(tank, ctx.getMarkDirtyRunnable());
 			this.fluidOutput = ArrayFluidHandler.drainOnly(tank, ctx.getMarkDirtyRunnable());
 			this.mifHandler = () -> new MachineCheckImplementation[]{
@@ -299,25 +292,22 @@ public class MixerLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("tank", tank.writeToNBT(new CompoundTag(), provider));
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.putBoolean("outputAll", outputAll);
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			tank.readFromNBT(nbt.getCompound("tank"), provider);
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
-			outputAll = nbt.getBoolean("outputAll");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
+			outputAll = nbt.getBooleanOr("outputAll", false);
 			processor.fromNBT(nbt.get("processor"), (getRecipe, data, p) -> new MixingProcess(getRecipe, data, tank), provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("tank", tank.writeToNBT(new CompoundTag(), provider));
@@ -325,21 +315,18 @@ public class MixerLogic
 			nbt.putFloat("animation_agitator", animation_agitator);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			tank.readFromNBT(nbt.getCompound("tank"), provider);
-			isActive = nbt.getBoolean("isActive");
-			animation_agitator = nbt.getFloat("animation_agitator");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			isActive = nbt.getBooleanOr("isActive", false);
+			animation_agitator = nbt.getFloatOr("animation_agitator", 0);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return inventory.getRawHandler();

@@ -38,7 +38,6 @@ public class GunTurretScreen extends TurretScreen<GunTurretMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		List<InfoArea> result = new ArrayList<>(super.makeInfoAreas());
@@ -49,7 +48,6 @@ public class GunTurretScreen extends TurretScreen<GunTurretMenu>
 		return result;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		super.drawContainerBackgroundPre(graphics, f, mx, my);
@@ -57,7 +55,6 @@ public class GunTurretScreen extends TurretScreen<GunTurretMenu>
 		GuiHelper.drawDarkSlot(graphics, leftPos+134, topPos+49, 16, 16);
 	}
 
-	@Override
 	protected void addCustomButtons()
 	{
 		this.addRenderableWidget(new GuiButtonBoolean(

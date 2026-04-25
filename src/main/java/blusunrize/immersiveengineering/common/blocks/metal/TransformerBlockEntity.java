@@ -66,27 +66,23 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 		this.dummy = state.getValue(IEProperties.MULTIBLOCKSLAVE)?1: 0;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
 		nbt.putInt("dummy", dummy);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		dummy = nbt.getInt("dummy");
+		dummy = nbt.getIntOr("dummy", 0);
 	}
 
-	@Override
 	public BlockPos getConnectionMaster(WireType cableType, TargetingInfo target)
 	{
 		return getBlockPos().offset(0, -dummy, 0);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		if(dummy==2)
@@ -99,7 +95,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return super.canConnectCable(cableType, target, offset);
 	}
 
-	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget)
 	{
 		if(dummy!=0)
@@ -112,7 +107,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			super.connectCable(cableType, target, other, otherTarget);
 	}
 
-	@Override
 	protected Vec3 getConnectionOffset(WireType type, boolean right)
 	{
 		double conRadius = type.getRenderDiameter()/2;
@@ -129,7 +123,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo target, Vec3i offset)
 	{
 		if(offset.getY()!=2)
@@ -156,7 +149,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return rightCP;
 	}
 
-	@Override
 	protected void updateMirrorState()
 	{
 		if(dummy!=0)
@@ -179,20 +171,17 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 		}
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return dummy!=0;
 	}
 
 	@Nullable
-	@Override
 	public IGeneralMultiblock master()
 	{
 		if(!isDummy())
@@ -202,7 +191,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 		return this.getClass().isInstance(te)?(IGeneralMultiblock)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
@@ -215,7 +203,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 		}
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		for(int i = 0; i <= 2; i++)
@@ -232,7 +219,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			);
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(dummy==2)
@@ -241,7 +227,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return Shapes.block();
 	}
 
-	@Override
 	public Set<BlockPos> getIgnored(IImmersiveConnectable other)
 	{
 		return ImmutableSet.of(worldPosition.above(2));
@@ -257,7 +242,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 		return .5625F;
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		if(isDummy())
@@ -266,7 +250,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return super.getConnectionPoints();
 	}
 
-	@Override
 	public Iterable<? extends Connection> getInternalConnections()
 	{
 		if(isDummy())
@@ -275,7 +258,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return super.getInternalConnections();
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		return new BlockPos(0, dummy, 0);
@@ -292,7 +274,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			this.higherHeight = higherHeight;
 		}
 
-		@Override
 		public boolean equals(Object o)
 		{
 			if(this==o) return true;
@@ -301,7 +282,6 @@ public class TransformerBlockEntity extends AbstractTransformerBlockEntity imple
 			return Double.compare(shapeKey.lowerHeight, lowerHeight)==0&&Double.compare(shapeKey.higherHeight, higherHeight)==0;
 		}
 
-		@Override
 		public int hashCode()
 		{
 			return Objects.hash(lowerHeight, higherHeight);

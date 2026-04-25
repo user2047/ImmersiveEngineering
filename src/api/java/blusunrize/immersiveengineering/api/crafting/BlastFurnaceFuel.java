@@ -21,7 +21,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class BlastFurnaceFuel extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<BlastFurnaceFuel>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BlastFurnaceFuel>> SERIALIZER;
 
 	public static final CachedRecipeList<BlastFurnaceFuel> RECIPES = new CachedRecipeList<>(IERecipeTypes.BLAST_FUEL);
 
@@ -49,12 +49,10 @@ public class BlastFurnaceFuel extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<BlastFurnaceFuel> getIESerializer()
+	protected RecipeSerializer<BlastFurnaceFuel> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;

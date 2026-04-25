@@ -24,14 +24,14 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.bottling_
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -44,7 +44,6 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 	public static final String NAME = "bottling_machine_dynamic";
 	public static DynamicModel DYNAMIC;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		final MultiblockOrientation orientation = ctx.getLevel().getOrientation();
@@ -68,7 +67,7 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 		float lift = 0;
 
 		Level level = ctx.getLevel().getRawLevel();
-		VertexConsumer solidBuilder = bufferIn.getBuffer(RenderType.solid());
+		VertexConsumer solidBuilder = bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid());
 		for(int i = 0; i < state.processor.getQueueSize(); i++)
 		{
 			BottlingProcess process = (BottlingProcess)state.processor.getQueue().get(i);
@@ -138,7 +137,7 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 			matrixStack.translate(tankWidth/2, 0, -tankWidth/2);
 			float h = fluidLevel*9;
 			// TODO does not work on fabulous
-			VertexConsumer builder = originalBuffer.getBuffer(RenderType.translucent());
+			VertexConsumer builder = originalBuffer.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent());
 			for(int i = 0; i < 4; ++i)
 			{
 				matrixStack.pushPose();
@@ -167,10 +166,10 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 			matrixStack.translate(item.translation.x(), item.translation.y(), item.translation.z());
 			matrixStack.scale(.4375f, .4375f, .4375f);
 
-			if(!ClientUtils.mc().getMainRenderTarget().isStencilEnabled())
+			if(true)
 			{
 				for(ItemStack displayS : display)
-					ClientUtils.mc().getItemRenderer().renderStatic(
+					ClientUtils.getItemRenderer().renderStatic(
 							displayS, ItemDisplayContext.FIXED,
 							combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 							level, 0
@@ -217,7 +216,7 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 				vertexBuilder -> {
 					innerStack.pushPose();
 					innerStack.mulPose(new Quaternionf()
-							.rotateY((90.0F-ClientUtils.mc().getEntityRenderDispatcher().camera.getYRot())*Mth.DEG_TO_RAD)
+							.rotateY((90.0F-ClientUtils.mc().getEntityRenderDispatcher().camera.yRot())*Mth.DEG_TO_RAD)
 					);
 					RenderUtils.renderBox(vertexBuilder, innerStack, -.5f, minY, -.5f, .5f, maxY, .5f);
 					innerStack.popPose();
@@ -226,7 +225,7 @@ public class BottlingMachineRenderer extends IEMultiblockRenderer<State>
 				ref
 		);
 		BatchingRenderTypeBuffer batchBuffer = new BatchingRenderTypeBuffer();
-		ClientUtils.mc().getItemRenderer().renderStatic(
+		ClientUtils.getItemRenderer().renderStatic(
 				item, ItemDisplayContext.FIXED, combinedLightIn, combinedOverlayIn, matrix, batchBuffer, level, 0
 		);
 		batchBuffer.pipe(stencilWrapper);

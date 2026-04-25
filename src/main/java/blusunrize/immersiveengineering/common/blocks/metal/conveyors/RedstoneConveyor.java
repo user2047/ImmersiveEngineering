@@ -47,7 +47,6 @@ public class RedstoneConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<RedstoneConveyor> getType()
 	{
 		return TYPE;
@@ -55,13 +54,11 @@ public class RedstoneConveyor extends ConveyorBase
 
 	/* Prevent Diagonals */
 
-	@Override
 	public boolean changeConveyorDirection()
 	{
 		return false;
 	}
 
-	@Override
 	public boolean setConveyorDirection(ConveyorDirection dir)
 	{
 		return false;
@@ -69,13 +66,11 @@ public class RedstoneConveyor extends ConveyorBase
 
 	/* Redstone & Player Interaction */
 
-	@Override
 	public boolean isActive()
 	{
 		return !isPowered();
 	}
 
-	@Override
 	public boolean playerInteraction(Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ, Direction side)
 	{
 		if(super.playerInteraction(player, hand, heldItem, hitX, hitY, hitZ, side))
@@ -90,7 +85,6 @@ public class RedstoneConveyor extends ConveyorBase
 
 	/* NBT */
 
-	@Override
 	public CompoundTag writeConveyorNBT()
 	{
 		CompoundTag nbt = super.writeConveyorNBT();
@@ -98,11 +92,10 @@ public class RedstoneConveyor extends ConveyorBase
 		return nbt;
 	}
 
-	@Override
 	public void readConveyorNBT(CompoundTag nbt)
 	{
 		super.readConveyorNBT(nbt);
-		panelRight = nbt.getBoolean("panelRight");
+		panelRight = nbt.getBooleanOr("panelRight", false);
 	}
 
 	/* Selection Box */
@@ -113,7 +106,6 @@ public class RedstoneConveyor extends ConveyorBase
 			Direction.WEST, Block.box(5, 2, 0, 14.5, 16, 3),
 			Direction.EAST, Block.box(1.5, 2, 13, 11, 16, 16)));
 
-	@Override
 	public VoxelShape getSelectionShape()
 	{
 		VoxelShape ret = conveyorBounds;

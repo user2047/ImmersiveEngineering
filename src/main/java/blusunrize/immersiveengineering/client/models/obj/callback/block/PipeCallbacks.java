@@ -16,25 +16,26 @@ import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import blusunrize.immersiveengineering.api.shader.ShaderCase;
 import blusunrize.immersiveengineering.api.utils.Color4;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.PipeCallbacks.Key;
 import blusunrize.immersiveengineering.common.blocks.metal.FluidPipeBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.FluidPipeBlockEntity.ConnectionStyle;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
 import com.mojang.math.Transformation;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,7 +57,6 @@ public class PipeCallbacks implements BlockCallback<Key>
 			}), null, null
 	);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof FluidPipeBlockEntity pipeBE))
@@ -67,13 +67,11 @@ public class PipeCallbacks implements BlockCallback<Key>
 		return new Key(connections, pipeBE.cover==Blocks.AIR?null: pipeBE.cover, pipeBE.getColor());
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Key key)
 	{
 		List<String> parts = new ArrayList<>();
@@ -318,14 +316,13 @@ public class PipeCallbacks implements BlockCallback<Key>
 		return new IEObjState(VisibilityList.show(parts), new Transformation(rotationMatrix.toMatrix4f()));
 	}
 
-	@Override
 	public List<BakedQuad> modifyQuads(Key key, List<BakedQuad> quads)
 	{
 		if(key.cover()!=null)
 		{
 			BlockState state = key.cover().defaultBlockState();
-			BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state);
-			for(RenderType layer : RenderType.chunkBufferLayers())
+			BakedModel model = ClientUtils.getBlockRenderer().getBlockModelShaper().getBlockModel(state);
+			for(RenderType layer : blusunrize.immersiveengineering.client.utils.RenderTypeCompat.chunkBufferLayers())
 			{
 				for(Direction direction : Direction.values())
 					quads.addAll(model.getQuads(state, direction, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, layer));
@@ -335,7 +332,6 @@ public class PipeCallbacks implements BlockCallback<Key>
 		return quads;
 	}
 
-	@Override
 	public Color4 getRenderColor(Key key, String group, String material, ShaderCase shaderCase, Color4 original)
 	{
 		if(key.color()!=null)

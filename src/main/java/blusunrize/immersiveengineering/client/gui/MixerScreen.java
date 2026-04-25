@@ -45,7 +45,6 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -58,7 +57,6 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 		);
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -74,7 +72,6 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 		));
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		graphics.pose().pushPose();

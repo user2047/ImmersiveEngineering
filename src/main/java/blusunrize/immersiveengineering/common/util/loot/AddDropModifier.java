@@ -36,21 +36,21 @@ public class AddDropModifier extends LootModifier
 			"add_drop", () -> RecordCodecBuilder.mapCodec(
 					inst -> codecStart(inst)
 							.and(ItemStack.CODEC.fieldOf("item").forGetter(m -> m.item.get()))
-							.apply(inst, (lootItemConditions, itemStack) -> new AddDropModifier(lootItemConditions, itemStack::copy))
+							.apply(inst, (lootItemConditions, priority, itemStack) -> new AddDropModifier(lootItemConditions, priority, itemStack::copy))
 			)
 	);
 
 	private final Supplier<ItemStack> item;
 
-	protected AddDropModifier(LootItemCondition[] conditionsIn, Supplier<ItemStack> item)
+	protected AddDropModifier(LootItemCondition[] conditionsIn, int priority, Supplier<ItemStack> item)
 	{
-		super(conditionsIn);
+		super(conditionsIn, priority);
 		this.item = item;
 	}
 
 	public AddDropModifier(Supplier<ItemStack> item, LootItemCondition.Builder... conditionsIn)
 	{
-		this(Arrays.stream(conditionsIn).map(Builder::build).toArray(LootItemCondition[]::new), item);
+		this(Arrays.stream(conditionsIn).map(Builder::build).toArray(LootItemCondition[]::new), 0, item);
 	}
 
 	public static void init(IEventBus modBus)
@@ -59,14 +59,12 @@ public class AddDropModifier extends LootModifier
 	}
 
 	@Nonnull
-	@Override
 	protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context)
 	{
 		generatedLoot.add(item.get());
 		return generatedLoot;
 	}
 
-	@Override
 	public MapCodec<? extends IGlobalLootModifier> codec()
 	{
 		return GRASS_DROPS.value();

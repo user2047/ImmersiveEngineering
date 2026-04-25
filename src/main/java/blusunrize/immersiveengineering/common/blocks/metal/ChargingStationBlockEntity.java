@@ -32,7 +32,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,13 +42,12 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 
@@ -66,10 +65,9 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 		super(IEBlockEntities.CHARGING_STATION.get(), pos, state);
 	}
 
-	@Override
 	public void tickClient()
 	{
-		IEnergyStorage itemEnergy = inventory.get(0).getCapability(EnergyStorage.ITEM);
+		IEnergyStorage itemEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(inventory.get(0), Energy.ITEM);
 		if(itemEnergy!=null&&charging)
 		{
 			float charge = 0;
@@ -86,17 +84,17 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 					double x = getBlockPos().getX()+.5+(getFacing()==Direction.WEST?-.46875: getFacing()==Direction.EAST?.46875: getFacing()==Direction.NORTH?(-.1875*shift): (.1875*shift));
 					double y = getBlockPos().getY()+.25;
 					double z = getBlockPos().getZ()+.5+(getFacing()==Direction.NORTH?-.46875: getFacing()==Direction.SOUTH?.46875: getFacing()==Direction.EAST?(-.1875*shift): (.1875*shift));
-					level.addParticle(new DustParticleOptions(new Vector3f(1-charge, charge, 0), .5f), x, y, z, .25, .25, .25);
+					int color = ((int)((1-charge)*255)&255)<<16|((int)(charge*255)&255)<<8;
+					level.addParticle(new DustParticleOptions(color, .5f), x, y, z, .25, .25, .25);
 				}
 			}
 		}
 	}
 
-	@Override
 	public void tickServer()
 	{
 		this.energyStorage.updateAverage();
-		IEnergyStorage itemEnergy = inventory.get(0).getCapability(EnergyStorage.ITEM);
+		IEnergyStorage itemEnergy = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(inventory.get(0), Energy.ITEM);
 		if(itemEnergy!=null)
 		{
 			if(charging)
@@ -148,24 +146,21 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 		}
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
-		inventory.set(0, ItemStack.parseOptional(provider, nbt.getCompound("inventory")));
-		charging = nbt.getBoolean("charging");
+		inventory.set(0, blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("inventory")));
+		charging = nbt.getBooleanOr("charging", false);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
 		nbt.putBoolean("charging", charging);
 		if(!inventory.get(0).isEmpty())
-			nbt.put("inventory", inventory.get(0).saveOptional(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(inventory.get(0), provider));
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -176,31 +171,26 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 		return false;
 	}
 
-	@Override
 	public int getComparatorInputOverride()
 	{
 		return this.comparatorOutput;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return Shapes.box(
@@ -209,25 +199,21 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 		);
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return EnergyHelper.isFluxReceiver(stack);
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 1;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -238,17 +224,16 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 
 	public static void registerCapabilities(BECapabilityRegistrar<ChargingStationBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, facing) -> {
+		registrar.register(Energy.BLOCK, (be, facing) -> {
 			if(facing==null||facing==Direction.DOWN||facing==be.getFacing().getOpposite())
 				return be.energyCap;
 			else
 				return null;
 		});
-		registrar.register(ItemHandler.BLOCK, (be, facing) -> be.insertionHandler);
+		registrar.register(Capabilities.Item.BLOCK, (be, facing) -> be.insertionHandler);
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(isStackValid(0, heldItem))
 		{
@@ -257,17 +242,17 @@ public class ChargingStationBlockEntity extends IEBaseBlockEntity implements IEC
 			player.setItemInHand(hand, stored);
 			setChanged();
 			this.markContainingBlockForUpdate(null);
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else if(!inventory.get(0).isEmpty())
 		{
-			if(!level.isClientSide)
-				player.spawnAtLocation(inventory.get(0).copy(), .5f);
+			if(level instanceof net.minecraft.server.level.ServerLevel serverLevel)
+				player.spawnAtLocation(serverLevel, inventory.get(0).copy());
 			inventory.set(0, ItemStack.EMPTY);
 			setChanged();
 			this.markContainingBlockForUpdate(null);
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 }

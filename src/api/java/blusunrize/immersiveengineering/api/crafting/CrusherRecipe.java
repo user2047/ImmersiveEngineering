@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class CrusherRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<CrusherRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CrusherRecipe>> SERIALIZER;
 	public static final CachedRecipeList<CrusherRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.CRUSHER);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -49,7 +49,7 @@ public class CrusherRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<CrusherRecipe> getIESerializer()
+	protected RecipeSerializer<CrusherRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

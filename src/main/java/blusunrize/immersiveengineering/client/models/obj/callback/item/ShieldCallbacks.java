@@ -14,7 +14,7 @@ import blusunrize.immersiveengineering.api.tool.upgrade.UpgradeEffect;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.ShieldCallbacks.Key;
 import blusunrize.immersiveengineering.common.items.IEShieldItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,14 +28,12 @@ public class ShieldCallbacks implements ItemCallback<Key>
 {
 	public static final ShieldCallbacks INSTANCE = new ShieldCallbacks();
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = IEShieldItem.getUpgradesStatic(stack);
 		return new Key(upgrades.has(UpgradeEffect.FLASH), upgrades.has(UpgradeEffect.SHOCK));
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key object, String group, RenderType layer)
 	{
 		if("flash".equals(group))
@@ -45,7 +43,6 @@ public class ShieldCallbacks implements ItemCallback<Key>
 		return true;
 	}
 
-	@Override
 	public void handlePerspective(Key key, LivingEntity holder, ItemDisplayContext cameraItemDisplayContext, PoseStack mat)
 	{
 		if(holder==null||!holder.isUsingItem())
@@ -82,7 +79,6 @@ public class ShieldCallbacks implements ItemCallback<Key>
 		}
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(false, false);

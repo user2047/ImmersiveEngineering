@@ -27,7 +27,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -59,10 +58,9 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 
 	public SkyhookItem()
 	{
-		super(new Properties().stacksTo(1).component(IEDataComponents.SKYHOOK_SPEED_LIMIT, false), TYPE, 2);
+		super(itemProperties().stacksTo(1).component(IEDataComponents.SKYHOOK_SPEED_LIMIT, false), TYPE, 2);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		list.add(Component.translatable(Lib.DESC_FLAVOUR+"skyhook").withStyle(ChatFormatting.GRAY));
@@ -89,13 +87,11 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 		return !wasActive;
 	}
 
-	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity ent, int slot, boolean inHand)
 	{
 		super.inventoryTick(stack, world, ent, slot, inHand);
 	}
 
-	@Override
 	public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack)
 	{
 		var builder = ItemAttributeModifiers.builder();
@@ -117,14 +113,13 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 		return entity.fallDistance > 1.5F&&!entity.isFallFlying()&&getUpgradesStatic(entity.getMainHandItem()).has(UpgradeEffect.MACE_ATTACK);
 	}
 
-	@Override
 	public float getAttackDamageBonus(Entity target, float damage, DamageSource damageSource)
 	{
 		Entity attacker = damageSource.getDirectEntity();
 		if(attacker instanceof LivingEntity livingentity)
 			if(canSmash(livingentity))
 			{
-				float fallDistance = livingentity.fallDistance;
+				float fallDistance = (float)livingentity.fallDistance;
 				float damageBonus;
 				if(fallDistance <= 3)
 					damageBonus = 4f*fallDistance;
@@ -137,14 +132,11 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 		return 0;
 	}
 
-	@Override
-	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker)
+	public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker)
 	{
 		// need this so that postHurtEnemy triggers
-		return true;
 	}
 
-	@Override
 	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker)
 	{
 		// reset fall damage on a successful attack
@@ -153,25 +145,24 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
 
 		ItemStack stack = player.getItemInHand(hand);
-		if(player.getCooldowns().isOnCooldown(this))
-			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
+		if(player.getCooldowns().isOnCooldown(stack))
+			return InteractionResult.PASS;
 		if(player.isShiftKeyDown())
 		{
 			boolean limitSpeed = toggleSpeedLimit(stack);
 			if(limitSpeed)
-				player.displayClientMessage(Component.translatable("chat.immersiveengineering.info.skyhookLimited"), true);
+				player.sendOverlayMessage(Component.translatable("chat.immersiveengineering.info.skyhookLimited"));
 			else
-				player.displayClientMessage(Component.translatable("chat.immersiveengineering.info.skyhookUnlimited"), true);
+				player.sendOverlayMessage(Component.translatable("chat.immersiveengineering.info.skyhookUnlimited"));
 		}
 		else
 		{
 			SkyhookUserData data = player.getData(IEDataAttachments.SKYHOOK_USER.get());
-			if(data.hook!=null&&!world.isClientSide)
+			if(data.hook!=null&&!world.isClientSide())
 			{
 				data.dismount();
 				IELogger.logger.info("Player left voluntarily");
@@ -182,10 +173,9 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 				player.startUsingItem(hand);
 			}
 		}
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void onUseTick(Level level, LivingEntity player, ItemStack stack, int count)
 	{
 		super.onUseTick(level, player, stack, count);
@@ -197,12 +187,12 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 			SkylineHelper.spawnHook(player, con, player.getUsedItemHand(), shouldLimitSpeed(stack), getSlopeModifier(stack));
 	}
 
-	@Override
-	public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity player, int timeLeft)
+	public boolean releaseUsing(ItemStack stack, Level worldIn, LivingEntity player, int timeLeft)
 	{
 		super.releaseUsing(stack, worldIn, player, timeLeft);
-		if(!worldIn.isClientSide)
+		if(!worldIn.isClientSide())
 			player.getData(IEDataAttachments.SKYHOOK_USER.get()).release();
+		return true;
 	}
 
 	public float getSlopeModifier(ItemStack stack)
@@ -211,7 +201,6 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 		return Math.max(upgrades.get(UpgradeEffect.SLOPE_MODIFIER), 0.5f);
 	}
 
-	@Override
 	public void onStrike(ItemStack equipped, EquipmentSlot eqSlot, LivingEntity owner, Map<String, Object> cache, @Nullable DamageSource dmg, ElectricSource desc)
 	{
 		if(dmg instanceof ElectricDamageSource eds&&dmg.is(DamageTypes.WIRE_SHOCK)&&this.getUpgrades(equipped).has(UpgradeEffect.INSULATED)
@@ -221,19 +210,16 @@ public class SkyhookItem extends UpgradeableToolItem implements IElectricEquipme
 		}
 	}
 
-	@Override
 	public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_)
 	{
 		return 72000;
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{

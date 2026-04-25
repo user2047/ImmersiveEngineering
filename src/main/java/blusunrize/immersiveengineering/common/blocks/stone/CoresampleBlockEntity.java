@@ -31,7 +31,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -69,7 +69,6 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 		super(IEBlockEntities.CORE_SAMPLE.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		containedSample = ItemData.CODECS.codec().decode(NbtOps.INSTANCE, nbt.get("coresample"))
@@ -78,36 +77,31 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 				.orElse(ItemData.EMPTY);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.put("coresample", ItemData.CODECS.codec().encodeStart(NbtOps.INSTANCE, containedSample).getOrThrow());
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return true;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		if(player.isShiftKeyDown())
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
 				ItemEntity entityitem = new ItemEntity(
 						level, player.getX(), player.getY(), player.getZ(), makeSampleStack(), 0, 0, 0
@@ -115,19 +109,19 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 				level.removeBlock(worldPosition, false);
 				level.addFreshEntity(entityitem);
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
 		else if(!heldItem.isEmpty()&&heldItem.getItem()==Items.FILLED_MAP)
 		{
-			if(!level.isClientSide)
+			if(!level.isClientSide())
 			{
-				MapItemSavedData mapData = MapItem.getSavedData(heldItem, player.getCommandSenderWorld());
+				MapItemSavedData mapData = MapItem.getSavedData(heldItem, player.level());
 				if(mapData!=null)
 				{
 					if(mapData.dimension!=containedSample.position().dimension())
 					{
 						player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"coresample.mapDimension"));
-						return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+						return InteractionResult.SUCCESS;
 					}
 
 					String ident = CORESAMPLE_MAP_PREFIX+containedSample.position().position();
@@ -168,9 +162,9 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 					}
 				}
 			}
-			return ItemInteractionResult.sidedSuccess(getLevelNonnull().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
 	//TODO @Override
@@ -183,13 +177,11 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 	// 		return Component.translatable("item.immersiveengineering.coresample.name");
 	// }
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		drop.accept(makeSampleStack());
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		this.containedSample = ctx.getItemInHand().getOrDefault(IEDataComponents.CORESAMPLE, ItemData.EMPTY);
@@ -197,7 +189,6 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 
 	private Component[] overlay = null;
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(overlay==null)
@@ -212,7 +203,6 @@ public class CoresampleBlockEntity extends IEBaseBlockEntity implements IStateBa
 	private static final VoxelShape AABB_CORESAMPLE_X = Shapes.box(0, 0, .28125f, 1, 1, .71875f);
 	private static final VoxelShape AABB_CORESAMPLE_Z = Shapes.box(.28125f, 0, 0, .71875f, 1, 1);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return getFacing().getAxis()==Axis.Z?AABB_CORESAMPLE_Z: AABB_CORESAMPLE_X;

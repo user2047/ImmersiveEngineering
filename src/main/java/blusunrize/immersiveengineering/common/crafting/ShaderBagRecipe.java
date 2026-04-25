@@ -29,10 +29,9 @@ public class ShaderBagRecipe extends CustomRecipe
 {
 	public ShaderBagRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(CraftingInput inv, @Nonnull Level world)
 	{
 		ItemStack stack = ItemStack.EMPTY;
@@ -54,8 +53,7 @@ public class ShaderBagRecipe extends CustomRecipe
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(CraftingInput inv, Provider access)
+	public ItemStack assemble(CraftingInput inv)
 	{
 		for(int i = 0; i < inv.size(); i++)
 		{
@@ -74,21 +72,18 @@ public class ShaderBagRecipe extends CustomRecipe
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width >= 2&&height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return new ItemStack(Misc.SHADER_BAG.get(Rarity.COMMON), 2);
 	}
 
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.SHADER_BAG_SERIALIZER.get();
 	}

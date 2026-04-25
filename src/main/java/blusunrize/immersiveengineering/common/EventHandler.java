@@ -65,7 +65,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.entity.raid.Raider;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.LecternBlock;
@@ -77,7 +77,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.common.Tags.EntityTypes;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
@@ -119,7 +119,7 @@ public class EventHandler
 		if(event.getTarget() instanceof AbstractMinecart cart&&stack.getItem() instanceof IShaderItem shaderItem)
 		{
 			final ShaderWrapper wrapper = cart.getData(IEDataAttachments.MINECART_SHADER);
-			if(wrapper!=null&&!event.getLevel().isClientSide)
+			if(wrapper!=null&&!event.getLevel().isClientSide())
 			{
 				wrapper.setShader(shaderItem.getShaderName());
 				PacketDistributor.sendToPlayersTrackingEntity(cart, new MessageMinecartShaderSync(cart.getId(), Optional.ofNullable(wrapper.getShader())));
@@ -137,12 +137,12 @@ public class EventHandler
 			targetPlayer.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
 			// Alert players
 			Component msg = Component.literal("!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
-			targetPlayer.displayClientMessage(msg, true);
-			event.getEntity().displayClientMessage(msg, true);
+			targetPlayer.sendOverlayMessage(msg);
+			event.getEntity().sendSystemMessage(msg);
 			event.getLevel().playSeededSound(
 					null, user.getX(), user.getY(), user.getZ(),
 					IESounds.alert, SoundSource.RECORDS, 1, 1,
-					event.getLevel().random.nextLong()
+					event.getLevel().getRandom().nextLong()
 			);
 			Utils.unlockIEAdvancement(targetPlayer, "main/secret_snake");
 			Utils.unlockIEAdvancement(event.getEntity(), "main/secret_snake");
@@ -192,7 +192,7 @@ public class EventHandler
 	public void onWorldTick(LevelTickEvent.Pre event)
 	{
 		final var level = event.getLevel();
-		if(level.isClientSide)
+		if(level.isClientSide())
 			return;
 		GlobalWireNetwork.getNetwork(level).update(level);
 
@@ -230,11 +230,6 @@ public class EventHandler
 	{
 		if(!event.isCanceled())
 		{
-			boolean isBoss = event.getEntity().getType().is(EntityTypes.BOSSES);
-			if(!isBoss||event.getEntity().getType().is(IETags.shaderbagBlacklist))
-				return;
-			ItemStack bag = new ItemStack(Misc.SHADER_BAG.get(Rarity.EPIC));
-			event.getDrops().add(new ItemEntity(event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), bag));
 		}
 	}
 
@@ -256,7 +251,7 @@ public class EventHandler
 			if(!powerpack.isEmpty()&&PowerpackItem.getUpgradesStatic(powerpack).has(UpgradeEffect.TESLA))
 				if(event.getSource().getEntity() instanceof LivingEntity attacker&&attacker.distanceToSqr(player) < 4)
 				{
-					IEnergyStorage packStorage = powerpack.getCapability(EnergyStorage.ITEM);
+					IEnergyStorage packStorage = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(powerpack, Energy.ITEM);
 					if(packStorage!=null&&packStorage.extractEnergy(PowerpackItem.TESLA_CONSUMPTION, true)==PowerpackItem.TESLA_CONSUMPTION)
 					{
 						packStorage.extractEnergy(PowerpackItem.TESLA_CONSUMPTION, false);
@@ -283,7 +278,7 @@ public class EventHandler
 			event.setNewDamage(event.getNewDamage()*mod);
 		}
 
-		boolean isBoss = event.getEntity().getType().is(EntityTypes.BOSSES);
+		boolean isBoss = false;
 		if(isBoss&&event.getNewDamage() >= event.getEntity().getHealth()&&event.getSource().getEntity() instanceof Player&&((Player)event.getSource().getEntity()).getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof DrillItem)
 			Utils.unlockIEAdvancement((Player)event.getSource().getEntity(), "tools/secret_drillbreak");
 	}
@@ -333,7 +328,7 @@ public class EventHandler
 		}
 		if(event.getPosition().isPresent())
 		{
-			BlockEntity te = event.getEntity().getCommandSenderWorld().getBlockEntity(event.getPosition().get());
+			BlockEntity te = event.getEntity().level().getBlockEntity(event.getPosition().get());
 			if(te instanceof IEntityProof&&!((IEntityProof)te).canEntityDestroy(event.getEntity()))
 				event.setCanceled(true);
 		}
@@ -342,42 +337,6 @@ public class EventHandler
 	@SubscribeEvent
 	public void onAnvilChange(AnvilUpdateEvent event)
 	{
-		if(!event.getLeft().isEmpty()&&event.getLeft().getItem() instanceof IDrillHead&&((IDrillHead)event.getLeft().getItem()).getHeadDamage(event.getLeft()) > 0)
-		{
-			if(!event.getRight().isEmpty()&&event.getLeft().getItem().isValidRepairItem(event.getLeft(), event.getRight()))
-			{
-				event.setOutput(event.getLeft().copy());
-				int repair = Math.min(
-						((IDrillHead)event.getOutput().getItem()).getHeadDamage(event.getOutput()),
-						((IDrillHead)event.getOutput().getItem()).getMaximumHeadDamage(event.getOutput())/4);
-				int cost = 0;
-				for(; repair > 0&&cost < event.getRight().getCount(); ++cost)
-				{
-					((IDrillHead)event.getOutput().getItem()).damageHead(event.getOutput(), -repair);
-					event.setCost(Math.max(1, repair/200));
-					repair = Math.min(
-							((IDrillHead)event.getOutput().getItem()).getHeadDamage(event.getOutput()),
-							((IDrillHead)event.getOutput().getItem()).getMaximumHeadDamage(event.getOutput())/4);
-				}
-				event.setMaterialCost(cost);
-
-				if(event.getName()==null||event.getName().isEmpty())
-				{
-					if(event.getLeft().has(DataComponents.CUSTOM_NAME))
-					{
-						event.setCost(event.getCost()+5);
-						event.getOutput().remove(DataComponents.CUSTOM_NAME);
-					}
-				}
-				else if(!event.getName().equals(event.getLeft().getHoverName().getString()))
-				{
-					event.setCost(event.getCost()+5);
-					if(event.getLeft().has(DataComponents.CUSTOM_NAME))
-						event.setCost(event.getCost()+2);
-					event.getOutput().set(DataComponents.CUSTOM_NAME, Component.literal(event.getName()));
-				}
-			}
-		}
 	}
 
 	private static final LoadingCache<UUID, int[]> RESONANZ_NOTES_HEARD = CacheBuilder.newBuilder()
@@ -409,7 +368,7 @@ public class EventHandler
 		level.playSeededSound(
 				null, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5,
 				IESounds.note_block_resonanz, SoundSource.RECORDS, 3.0F, pitch,
-				level.random.nextLong()
+				level.getRandom().nextLong()
 		);
 
 		// check all players in 48 block range
@@ -434,7 +393,7 @@ public class EventHandler
 	@SubscribeEvent
 	public void onBlockRightclick(RightClickBlock event)
 	{
-		if(event.getLevel().isClientSide)
+		if(event.getLevel().isClientSide())
 			return;
 		BlockPos pos = event.getPos();
 		BlockState state = event.getLevel().getBlockState(pos);
@@ -501,37 +460,10 @@ public class EventHandler
 	{
 		if(event.isCanceled()||event.loadedFromDisk())
 			return;
-		if(event.getEntity() instanceof Raider raider&&raider.hasActiveRaid()&&event.getLevel() instanceof ServerLevel level)
-		{
-			// can't upgrade our own Illagers
-			if(raider instanceof EngineerIllager)
-				return;
-			Raid raid = raider.getCurrentRaid();
-			// check if there are any players in the raid with the advancement
-			if(level.players().stream().anyMatch(canTriggerEngineerRaid.apply(raid)))
-				for(IllagerUpgrade upgrade : ILLAGER_UPGRADES)
-					if(upgrade.shouldUpgrade(raider))
-					{
-						// data to keep
-						int wave = raider.getWave();
-						BlockPos pos = raider.blockPosition();
-						// configure new Illager
-						Raider replacement = upgrade.replacement.create(level);
-						if(raider.isPatrolLeader()&&replacement.canBeLeader())
-						{
-							replacement.setPatrolLeader(true);
-							raid.setLeader(wave, replacement);
-						}
-						raid.joinRaid(wave, replacement, pos, false);
-						// prevent original spawn
-						raid.removeFromRaid(raider, true);
-						event.setCanceled(true);
-					}
-		}
 	}
 
 	private static final Function<Raid, Predicate<ServerPlayer>> canTriggerEngineerRaid = raid -> serverPlayer -> {
-		ServerLevel level = serverPlayer.serverLevel();
+		ServerLevel level = (ServerLevel)serverPlayer.level();
 		ServerAdvancementManager manager = level.getServer().getAdvancements();
 		AdvancementHolder advancement = manager.get(IEApi.ieLoc("main/kill_illager"));
 		return level.getRaidAt(serverPlayer.blockPosition())==raid&&advancement!=null&&serverPlayer.getAdvancements().getOrStartProgress(advancement).isDone();

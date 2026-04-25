@@ -15,27 +15,26 @@ import blusunrize.immersiveengineering.common.entities.ChemthrowerShotEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 
-public class ChemthrowerShotRenderer extends EntityRenderer<ChemthrowerShotEntity>
+public class ChemthrowerShotRenderer extends IEEntityRenderer<ChemthrowerShotEntity>
 {
 	public ChemthrowerShotRenderer(EntityRendererProvider.Context renderManager)
 	{
 		super(renderManager);
 	}
 
-	@Override
 	public void render(ChemthrowerShotEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn)
 	{
 		FluidStack f = entity.getFluid();
@@ -48,15 +47,8 @@ public class ChemthrowerShotRenderer extends EntityRenderer<ChemthrowerShotEntit
 
 		matrixStackIn.pushPose();
 
-		matrixStackIn.mulPose(new Quaternionf()
-				.rotateXYZ(0.0F, (float) Math.toRadians(180.0F-this.entityRenderDispatcher.camera.getYRot()), 0)
-				.rotateXYZ((float) Math.toRadians(-this.entityRenderDispatcher.camera.getXRot()), 0, 0)
-		);
-
 		IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(f.getFluid());
-		TextureAtlasSprite sprite = ClientUtils.mc().getModelManager()
-				.getAtlas(InventoryMenu.BLOCK_ATLAS)
-				.getSprite(props.getStillTexture(f));
+		TextureAtlasSprite sprite = ClientUtils.getSprite(props.getStillTexture(f));
 		int colour = props.getTintColor(f);
 		float a = (colour>>24&255)/255f;
 		float r = (colour>>16&255)/255f;
@@ -68,7 +60,7 @@ public class ChemthrowerShotRenderer extends EntityRenderer<ChemthrowerShotEntit
 		packedLightIn = LightTexture.pack(blockLight, skyLight);
 		matrixStackIn.scale(.25f, .25f, .25f);
 		TransformingVertexBuilder builder = new TransformingVertexBuilder(
-				bufferIn, RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS), matrixStackIn
+				bufferIn, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entityTranslucent(TextureAtlas.LOCATION_BLOCKS), matrixStackIn
 		);
 		builder.defaultColor(r, g, b, a);
 		builder.setDefaultNormal(0, 1, 0);
@@ -85,7 +77,6 @@ public class ChemthrowerShotRenderer extends EntityRenderer<ChemthrowerShotEntit
 		matrixStackIn.popPose();
 	}
 
-	@Override
 	@Nonnull
 	public Identifier getTextureLocation(@Nonnull ChemthrowerShotEntity chemthrowerShotEntity)
 	{

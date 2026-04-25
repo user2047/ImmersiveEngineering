@@ -15,24 +15,20 @@ import org.jetbrains.annotations.NotNull;
 
 public class EmptyTickAccess<T> implements LevelTickAccess<T>
 {
-	@Override
 	public boolean willTickThisTick(@NotNull BlockPos p_193197_, @NotNull T p_193198_)
 	{
 		return false;
 	}
 
-	@Override
 	public void schedule(@NotNull ScheduledTick<T> p_193428_)
 	{
 	}
 
-	@Override
 	public boolean hasScheduledTick(@NotNull BlockPos p_193429_, @NotNull T p_193430_)
 	{
 		return false;
 	}
 
-	@Override
 	public int count()
 	{
 		return 0;

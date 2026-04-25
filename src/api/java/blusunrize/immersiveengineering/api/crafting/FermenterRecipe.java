@@ -33,7 +33,7 @@ import java.util.function.Function;
  */
 public class FermenterRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<FermenterRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FermenterRecipe>> SERIALIZER;
 	public static final CachedRecipeList<FermenterRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.FERMENTER);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -55,7 +55,7 @@ public class FermenterRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<FermenterRecipe> getIESerializer()
+	protected RecipeSerializer<FermenterRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

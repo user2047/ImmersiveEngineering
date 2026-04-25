@@ -14,15 +14,14 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockS
 import blusunrize.immersiveengineering.common.register.IEMenuTypes.MultiblockContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
 public record MultiblockGui<S extends IMultiblockState>(
 		MultiblockContainer<S, ?> menu) implements IMultiblockComponent<S>
 {
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<S> ctx,
 			BlockPos posInMultiblock,
 			Player player,
@@ -33,6 +32,6 @@ public record MultiblockGui<S extends IMultiblockState>(
 	{
 		if(!isClient)
 			player.openMenu(menu.provide(ctx, posInMultiblock));
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

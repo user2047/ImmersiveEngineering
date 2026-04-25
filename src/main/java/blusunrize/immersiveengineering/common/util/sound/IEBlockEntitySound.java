@@ -39,26 +39,28 @@ public class IEBlockEntitySound implements TickableSoundInstance
 
 	public IEBlockEntitySound(SoundEvent event, float volume, float pitch, BlockPos pos)
 	{
-		this.resource = event.getLocation();
+		this.resource = event.location();
 		this.volume = volume;
 		this.pitch = pitch;
 		this.tilePos = pos;
 	}
 
-	@Override
 	public Attenuation getAttenuation()
 	{
 		return Attenuation.LINEAR;
 	}
 
-	@Override
 	public Identifier getLocation()
 	{
 		return resource;
 	}
 
+	public Identifier getIdentifier()
+	{
+		return resource;
+	}
+
 	@Nullable
-	@Override
 	public WeighedSoundEvents resolve(SoundManager handler)
 	{
 		WeighedSoundEvents soundEvent = handler.getSoundEvent(this.resource);
@@ -69,61 +71,51 @@ public class IEBlockEntitySound implements TickableSoundInstance
 		return soundEvent;
 	}
 
-	@Override
 	public Sound getSound()
 	{
 		return sound;
 	}
 
-	@Override
 	public SoundSource getSource()
 	{
 		return SoundSource.BLOCKS;
 	}
 
-	@Override
 	public float getVolume()
 	{
 		return volume*volumeAjustment;
 	}
 
-	@Override
 	public float getPitch()
 	{
 		return pitch;
 	}
 
-	@Override
 	public double getX()
 	{
 		return tilePos.getX();
 	}
 
-	@Override
 	public double getY()
 	{
 		return tilePos.getY();
 	}
 
-	@Override
 	public double getZ()
 	{
 		return tilePos.getZ();
 	}
 
-	@Override
 	public boolean isLooping()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isRelative()
 	{
 		return false;
 	}
 
-	@Override
 	public int getDelay()
 	{
 		return 0;
@@ -161,14 +153,12 @@ public class IEBlockEntitySound implements TickableSoundInstance
 	}
 
 
-	@Override
 	public void tick()
 	{
 		if(ClientUtils.mc().player!=null&&ClientUtils.mc().player.level().getGameTime()%40==0)
 			evaluateVolume();
 	}
 
-	@Override
 	public boolean isStopped()
 	{
 		return donePlaying;

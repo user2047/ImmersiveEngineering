@@ -37,7 +37,6 @@ public class ClocheScreen extends IEContainerScreen<ClocheMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -47,7 +46,6 @@ public class ClocheScreen extends IEContainerScreen<ClocheMenu>
 		);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		float process = menu.guiProgress.get();

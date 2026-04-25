@@ -14,6 +14,7 @@ import blusunrize.immersiveengineering.common.util.RecipeSerializers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
@@ -36,11 +37,14 @@ public class ShapelessFluidAwareRecipe extends AbstractFluidAwareRecipe<MatchLoc
 
 	public ShapelessFluidAwareRecipe(ShapelessRecipe in)
 	{
-		this(in.getGroup(), in.getIngredients(), in.getResultItem(null));
+		this(
+				in!=null?in.group(): "",
+				NonNullList.create(),
+				in!=null?in.assemble(null): ItemStack.EMPTY
+		);
 	}
 
 	@Nullable
-	@Override
 	public MatchLocation findMatch(CraftingInput inv)
 	{
 		List<ItemStack> inputs = new ArrayList<>();
@@ -78,18 +82,16 @@ public class ShapelessFluidAwareRecipe extends AbstractFluidAwareRecipe<MatchLoc
 
 	public ShapelessRecipe toVanilla()
 	{
-		return new ShapelessRecipe(getGroup(), category(), getResultItem(null), getIngredients());
+		return null;
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= getIngredients().size();
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<?> getSerializer()
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer()
 	{
 		return RecipeSerializers.IE_SHAPELESS_SERIALIZER.get();
 	}
@@ -103,7 +105,6 @@ public class ShapelessFluidAwareRecipe extends AbstractFluidAwareRecipe<MatchLoc
 			this.map = map;
 		}
 
-		@Override
 		public int getListIndex(int x, int y)
 		{
 			return map[x][y];

@@ -15,10 +15,10 @@ import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import blusunrize.immersiveengineering.common.blocks.metal.LanternBlock;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -44,19 +44,16 @@ public class LanternCallbacks implements BlockCallback<Direction>
 				.collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 	});
 
-	@Override
 	public Direction extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		return state.getValue(LanternBlock.FACING);
 	}
 
-	@Override
 	public Direction getDefaultKey()
 	{
 		return Direction.NORTH;
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Direction direction)
 	{
 		return DISPLAY_LISTS.get(direction);

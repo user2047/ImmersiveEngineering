@@ -42,7 +42,7 @@ public class HempBlock extends CropBlock implements BonemealableBlock
 			.mapColor(MapColor.PLANT)
 			.pushReaction(PushReaction.DESTROY)
 			.sound(SoundType.CROP)
-			.noCollission()
+			.noCollision()
 			.instabreak()
 			.randomTicks();
 
@@ -56,31 +56,26 @@ public class HempBlock extends CropBlock implements BonemealableBlock
 		this.registerDefaultState(this.defaultBlockState().setValue(HALF, DoubleBlockHalf.LOWER));
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		builder.add(AGE).add(HALF);
 	}
 
-	@Override
 	protected IntegerProperty getAgeProperty()
 	{
 		return AGE;
 	}
 
-	@Override
 	public int getMaxAge()
 	{
 		return 4;
 	}
 
-	@Override
 	protected ItemLike getBaseSeedId()
 	{
 		return Misc.HEMP_SEEDS.asItem();
 	}
 
-	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
 		boolean b = super.canSurvive(state, world, pos);
@@ -100,7 +95,6 @@ public class HempBlock extends CropBlock implements BonemealableBlock
 			Shapes.block()
 	};
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
@@ -118,13 +112,11 @@ public class HempBlock extends CropBlock implements BonemealableBlock
 		return !world.getBlockState(pos.above()).getBlock().equals(this);
 	}
 
-	@Override
 	public boolean isRandomlyTicking(BlockState state)
 	{
 		return state.getValue(HALF)==DoubleBlockHalf.LOWER;
 	}
 
-	@Override
 	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand)
 	{
 		if(!world.isAreaLoaded(pos, 1))
@@ -158,13 +150,11 @@ public class HempBlock extends CropBlock implements BonemealableBlock
 
 	}
 
-	@Override
 	public boolean isValidBonemealTarget(LevelReader world, BlockPos pos, BlockState state)
 	{
 		return (!this.isMaxAge(state)&&state.getValue(HALF)==DoubleBlockHalf.LOWER)||canGrowTop(world, pos, state);
 	}
 
-	@Override
 	public void growCrops(Level world, BlockPos pos, BlockState state)
 	{
 		int newAge = this.getAge(state)+this.getBonemealAgeIncrease(world);

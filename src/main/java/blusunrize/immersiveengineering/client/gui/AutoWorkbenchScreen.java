@@ -42,13 +42,11 @@ public class AutoWorkbenchScreen extends IEContainerScreen<AutoWorkbenchMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(new EnergyInfoArea(leftPos+80, topPos+36, menu.energyStorage));
 	}
 
-	@Override
 	public void init()
 	{
 		this.clearWidgets();
@@ -91,7 +89,6 @@ public class AutoWorkbenchScreen extends IEContainerScreen<AutoWorkbenchMenu>
 		return new GuiButtonItem(xx+(i%3)*18, yy+(i/3)*18, stack, false, handler);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)
 	{
 		for(int i = 0; i < selectionButtons.size(); ++i)

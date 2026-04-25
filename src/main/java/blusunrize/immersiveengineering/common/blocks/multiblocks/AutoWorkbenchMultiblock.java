@@ -21,7 +21,6 @@ public class AutoWorkbenchMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.AUTO_WORKBENCH);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 15;

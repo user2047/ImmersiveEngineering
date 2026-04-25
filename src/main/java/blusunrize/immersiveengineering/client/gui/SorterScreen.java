@@ -64,7 +64,6 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int side = 0; side < 6; side++)
@@ -77,7 +76,6 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 		}
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -113,7 +111,6 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 			}
 	}
 
-	@Override
 	protected void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y)
 	{
 		if(!this.menu.getCarried().isEmpty())
@@ -156,7 +153,6 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 	}
 
 
-	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
 	{
 		if(this.menu.getCarried().isEmpty()&&this.hoveredSlot instanceof IESlot.ItemHandlerGhost ghostSlot)

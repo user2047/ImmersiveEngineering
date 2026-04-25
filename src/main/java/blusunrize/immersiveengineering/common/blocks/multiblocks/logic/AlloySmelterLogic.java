@@ -47,7 +47,6 @@ public class AlloySmelterLogic implements IMultiblockLogic<State>, IServerTickab
 {
 	public static final int NUM_SLOTS = 4;
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -58,19 +57,16 @@ public class AlloySmelterLogic implements IMultiblockLogic<State>, IServerTickab
 			NonMirrorableWithActiveBlock.setActive(level, IEMultiblocks.ALLOY_SMELTER, active);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return $ -> Shapes.block();
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
@@ -94,7 +90,7 @@ public class AlloySmelterLogic implements IMultiblockLogic<State>, IServerTickab
 			// This inv is not exposed as a capability, so the constraints just specify player interaction
 			inventory = new SlotwiseItemHandler(List.of(
 					IOConstraint.NO_CONSTRAINT, IOConstraint.NO_CONSTRAINT,
-					new IOConstraint(true, FurnaceBlockEntity::isFuel), IOConstraint.OUTPUT
+					new IOConstraint(true, stack -> !stack.isEmpty()), IOConstraint.OUTPUT
 			), ctx.getMarkDirtyRunnable());
 			cachedRecipe = CachedRecipe.cached(
 					AlloyRecipe::findRecipe,
@@ -104,37 +100,32 @@ public class AlloySmelterLogic implements IMultiblockLogic<State>, IServerTickab
 			);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.put("furnace", furnace.toNBT());
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 			furnace.readNBT(nbt.get("furnace"));
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return inventory;
 		}
 
-		@Override
 		public @Nullable AlloyRecipe getRecipeForInput()
 		{
 			return cachedRecipe.get();
 		}
 
-		@Override
 		public int getBurnTimeOf(Level level, ItemStack fuel)
 		{
 			//TODO more specific type?
-			return fuel.getBurnTime(RecipeType.SMELTING);
+			return fuel.getBurnTime(RecipeType.SMELTING, level.fuelValues());
 		}
 
 		public ContainerData getStateView()

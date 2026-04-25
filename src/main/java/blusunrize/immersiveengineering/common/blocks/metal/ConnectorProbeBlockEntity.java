@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.api.wires.WireType;
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.util.Utils;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -23,7 +23,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -53,7 +53,6 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		super(IEBlockEntities.CONNECTOR_PROBE.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		super.tickServer();
@@ -69,13 +68,11 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		}
 	}
 
-	@Override
 	public boolean isRSInput()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isRSOutput()
 	{
 		return true;
@@ -86,13 +83,13 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		BlockPos pos = this.getBlockPos().relative(getFacing());
 		BlockState state = level.getBlockState(pos);
 		if(state.hasAnalogOutputSignal())
-			return state.getAnalogOutputSignal(level, pos);
+			return state.getAnalogOutputSignal(level, pos, getFacing());
 		else if(state.isRedstoneConductor(level, pos))
 		{
 			pos = pos.relative(getFacing());
 			state = level.getBlockState(pos);
 			if(state.hasAnalogOutputSignal())
-				return state.getAnalogOutputSignal(level, pos);
+				return state.getAnalogOutputSignal(level, pos, getFacing());
 			else if(state.isAir())
 			{
 				ItemFrame entityitemframe = this.findItemFrame(level, getFacing(), pos);
@@ -109,34 +106,30 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		return list.size()==1?list.get(0): null;
 	}
 
-	@Override
 	public void updateInput(byte[] signals, ConnectionPoint cp)
 	{
 		signals[redstoneChannelSending.ordinal()] = (byte)lastOutput;
 		rsDirty = false;
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(level.isClientSide)
+		if(level.isClientSide())
 			ImmersiveEngineering.proxy.openTileScreen(Lib.GUIID_RedstoneProbe, this);
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void receiveMessageFromClient(CompoundTag message)
 	{
 		if(message.contains("redstoneChannel"))
-			redstoneChannel = DyeColor.byId(message.getInt("redstoneChannel"));
+			redstoneChannel = DyeColor.byId(message.getIntOr("redstoneChannel", 0));
 		if(message.contains("redstoneChannelSending"))
-			redstoneChannelSending = DyeColor.byId(message.getInt("redstoneChannelSending"));
+			redstoneChannelSending = DyeColor.byId(message.getIntOr("redstoneChannelSending", 0));
 		if(message.contains("outputThreshold"))
-			outputThreshold = message.getInt("outputThreshold");
+			outputThreshold = message.getIntOr("outputThreshold", 0);
 		updateAfterConfigure();
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -144,15 +137,13 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		nbt.putInt("outputThreshold", outputThreshold);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		redstoneChannelSending = DyeColor.byId(nbt.getInt("redstoneChannelSending"));
-		outputThreshold = nbt.getInt("outputThreshold");
+		redstoneChannelSending = DyeColor.byId(nbt.getIntOr("redstoneChannelSending", 0));
+		outputThreshold = nbt.getIntOr("outputThreshold", 0);
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Direction side = getFacing().getOpposite();
@@ -170,13 +161,11 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 			}
 	);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(getFacing().getAxis());
 	}
 
-	@Override
 	public Pair<DyeColor, Byte>[] overrideVoltmeterRead()
 	{
 		return new Pair[]{
@@ -185,7 +174,6 @@ public class ConnectorProbeBlockEntity extends ConnectorRedstoneBlockEntity
 		};
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
 	{
 		if(Utils.isScrewdriver(player.getMainHandItem()))

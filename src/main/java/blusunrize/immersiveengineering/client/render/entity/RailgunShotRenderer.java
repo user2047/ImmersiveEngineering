@@ -25,7 +25,7 @@ import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 
-public class RailgunShotRenderer extends EntityRenderer<RailgunShotEntity>
+public class RailgunShotRenderer extends IEEntityRenderer<RailgunShotEntity>
 {
 	private static final RailgunRenderColors DEFAULT_RENDER_COLORS = new RailgunRenderColors(
 			0x686868, 0xa4a4a4, 0xa4a4a4, 0xa4a4a4, 0x686868
@@ -36,7 +36,6 @@ public class RailgunShotRenderer extends EntityRenderer<RailgunShotEntity>
 		super(renderManager);
 	}
 
-	@Override
 	public void render(RailgunShotEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn)
 	{
 		double yaw = entity.yRotO+(entity.getYRot()-entity.yRotO)*partialTicks-90.0F;
@@ -128,7 +127,6 @@ public class RailgunShotRenderer extends EntityRenderer<RailgunShotEntity>
 		matrixStackIn.popPose();
 	}
 
-	@Override
 	public Identifier getTextureLocation(@Nonnull RailgunShotEntity entity)
 	{
 		return IEApi.ieLoc("textures/models/white.png");

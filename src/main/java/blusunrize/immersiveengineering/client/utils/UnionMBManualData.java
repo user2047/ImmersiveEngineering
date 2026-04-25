@@ -55,19 +55,16 @@ public class UnionMBManualData implements MultiblockManualData
 				.toList();
 	}
 
-	@Override
 	public NonNullList<ItemStack> getTotalMaterials()
 	{
 		return materials.get();
 	}
 
-	@Override
 	public boolean canRenderFormedStructure()
 	{
 		return true;
 	}
 
-	@Override
 	public void renderFormedStructure(PoseStack transform, MultiBufferSource buffer)
 	{
 		for(ClientSubMultiblock part : partData)

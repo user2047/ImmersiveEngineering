@@ -19,8 +19,8 @@ import blusunrize.immersiveengineering.common.blocks.metal.conveyors.ConveyorBas
 import blusunrize.immersiveengineering.common.blocks.metal.conveyors.VerticalConveyor;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -43,13 +43,11 @@ public class VerticalConveyorRender extends BasicConveyorRender<VerticalConveyor
 		super(active, inactive);
 	}
 
-	@Override
 	public boolean shouldRenderWall(Direction facing, ConveyorWall wall, RenderContext<VerticalConveyor> context)
 	{
 		return true;
 	}
 
-	@Override
 	public Object getModelCacheKey(RenderContext<VerticalConveyor> context)
 	{
 		BasicConveyorCacheData basic = IConveyorModelRender.getDefaultData(this, context);
@@ -71,7 +69,6 @@ public class VerticalConveyorRender extends BasicConveyorRender<VerticalConveyor
 		);
 	}
 
-	@Override
 	public Transformation modifyBaseRotationMatrix(Transformation matrix)
 	{
 		return matrix.compose(new Transformation(
@@ -84,7 +81,6 @@ public class VerticalConveyorRender extends BasicConveyorRender<VerticalConveyor
 		return super.shouldRenderWall(facing, wall, context);
 	}
 
-	@Override
 	public List<BakedQuad> modifyQuads(List<BakedQuad> baseModel, RenderContext<VerticalConveyor> context, @Nullable RenderType renderType)
 	{
 		VerticalConveyor instance = context.instance();
@@ -105,7 +101,7 @@ public class VerticalConveyorRender extends BasicConveyorRender<VerticalConveyor
 						renderBottomWall(facing, ConveyorWall.LEFT, context),
 						renderBottomWall(facing, ConveyorWall.RIGHT, context)
 				};
-				if(renderType==null||renderType==RenderType.cutout())
+				if(renderType==null||renderType==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout())
 					baseModel.addAll(ModelConveyor.getBaseConveyor(
 							facing, .875f, ClientUtils.rotateTo(facing), ConveyorDirection.HORIZONTAL, sprite, walls,
 							new boolean[]{true, false}, spriteColour, dyeColour

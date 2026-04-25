@@ -94,24 +94,22 @@ public class SorterMenu extends IEContainerMenu
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack quickMoveStack(Player player, int slot)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag message)
 	{
-		if(message.contains("sideConfigId", Tag.TAG_INT))
+		if(message.contains("sideConfigId"))
 		{
 			var filter = FilterConfig.CODEC.fromNBT(message.get("sideConfigVal"));
-			filterMasks.get(Direction.values()[message.getInt("sideConfigId")]).set(filter);
+			filterMasks.get(Direction.values()[message.getIntOr("sideConfigId", 0)]).set(filter);
 		}
-		else if(message.contains("tagSlot", Tag.TAG_INT))
+		else if(message.contains("tagSlot"))
 		{
-			var selected = Identifier.parse(message.getString("selectedTag"));
-			selectedTags.get(message.getInt("tagSlot")).set(Optional.of(selected));
+			var selected = Identifier.parse(message.getStringOr("selectedTag", ""));
+			selectedTags.get(message.getIntOr("tagSlot", 0)).set(Optional.of(selected));
 		}
 	}
 }

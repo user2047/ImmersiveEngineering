@@ -32,7 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -57,7 +57,6 @@ public abstract class IESlot extends Slot
 		this.containerMenu = containerMenu;
 	}
 
-	@Override
 	public boolean mayPlace(ItemStack itemStack)
 	{
 		return true;
@@ -70,7 +69,6 @@ public abstract class IESlot extends Slot
 			super(container, inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return false;
@@ -84,7 +82,6 @@ public abstract class IESlot extends Slot
 			super(inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return false;
@@ -98,13 +95,11 @@ public abstract class IESlot extends Slot
 			super(inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack stack)
 		{
-			return AbstractFurnaceBlockEntity.isFuel(stack)||isBucket(stack);
+			return !stack.isEmpty()||isBucket(stack);
 		}
 
-		@Override
 		public int getMaxStackSize(@NotNull ItemStack stack)
 		{
 			return isBucket(stack)?1: super.getMaxStackSize(stack);
@@ -126,10 +121,9 @@ public abstract class IESlot extends Slot
 			this.filter = filter;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
-			IFluidHandlerItem handler = itemStack.getCapability(FluidHandler.ITEM);
+			IFluidHandlerItem handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(itemStack, Capabilities.Fluid.ITEM);
 			if(handler==null)
 				return false;
 			if(handler.getTanks() <= 0)
@@ -158,10 +152,9 @@ public abstract class IESlot extends Slot
 			this.filter = filter;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
-			IFluidHandlerItem handler = itemStack.getCapability(FluidHandler.ITEM);
+			IFluidHandlerItem handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(itemStack, Capabilities.Fluid.ITEM);
 			if(handler==null)
 				return false;
 			if(handler.getTanks() <= 0)
@@ -185,7 +178,6 @@ public abstract class IESlot extends Slot
 			this.level = level;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return BlastFurnaceFuel.isValidBlastFuel(level, itemStack);
@@ -202,13 +194,11 @@ public abstract class IESlot extends Slot
 			this.limit = limit;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return !itemStack.isEmpty()&&itemStack.getItem() instanceof BulletItem;
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return limit;
@@ -233,19 +223,16 @@ public abstract class IESlot extends Slot
 			this.onChange = onChange;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return !itemStack.isEmpty()&&this.predicate.test(itemStack);
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 1;
 		}
 
-		@Override
 		public void setChanged()
 		{
 			super.setChanged();
@@ -276,7 +263,6 @@ public abstract class IESlot extends Slot
 			this.getPlayer = getPlayer;
 		}
 
-		@Override
 		public boolean mayPlace(@Nonnull ItemStack itemStack)
 		{
 			if(preventDoubles)
@@ -289,32 +275,28 @@ public abstract class IESlot extends Slot
 					&&upgrade.canApplyUpgrades(((IUpgradeableTool)toolStack.getItem()).getUpgrades(toolStack), itemStack);
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 64;
 		}
 
 		@Nonnull
-		@Override
 		public ItemStack getItem()
 		{
 			return upgradeableTool.getUpgradeAfterRemoval(toolStack, super.getItem());
 		}
 
-		@Override
 		public void onTake(Player thePlayer, ItemStack stack)
 		{
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 				upgradeableTool.removeUpgrade(toolStack, thePlayer, stack);
 			super.onTake(thePlayer, stack);
 		}
 
-		@Override
 		public void setChanged()
 		{
 			super.setChanged();
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
 				upgradeableTool.recalculateUpgrades(toolStack, world, getPlayer.get());
 				if(container instanceof ModWorkbenchContainer)
@@ -333,21 +315,18 @@ public abstract class IESlot extends Slot
 		{
 			super(container, inv, id, x, y);
 			this.tool = tool;
-			this.setBackground(InventoryMenu.BLOCK_ATLAS, ImmersiveEngineering.rl("item/shader_slot"));
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			if(!(itemStack.getItem() instanceof IShaderItem shaderItem)||tool.isEmpty())
 				return false;
-			ShaderWrapper shaderCap = tool.getCapability(CapabilityShader.ITEM);
+			ShaderWrapper shaderCap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(tool, CapabilityShader.ITEM);
 			if(shaderCap==null)
 				return false;
 			return ShaderRegistry.getShader(shaderItem.getShaderName(), shaderCap.getShaderType())!=null;
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 1;
@@ -364,7 +343,6 @@ public abstract class IESlot extends Slot
 			this.size = size;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			if(itemStack.isEmpty())
@@ -378,13 +356,11 @@ public abstract class IESlot extends Slot
 			return false;
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return size;
 		}
 
-		@Override
 		public void setChanged()
 		{
 			super.setChanged();
@@ -392,13 +368,11 @@ public abstract class IESlot extends Slot
 				workbench.rebindSlots();
 		}
 
-		@Override
 		public boolean mayPickup(Player player)
 		{
 			return !(getItem().getItem() instanceof IUpgradeableTool tool&&!tool.canTakeFromWorkbench(getItem()));
 		}
 
-		@Override
 		public void onTake(Player player, ItemStack stack)
 		{
 			super.onTake(player, stack);
@@ -414,7 +388,6 @@ public abstract class IESlot extends Slot
 			super(container, inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			if(itemStack.isEmpty())
@@ -426,7 +399,6 @@ public abstract class IESlot extends Slot
 			return false;
 		}
 
-		@Override
 		public void setChanged()
 		{
 			super.setChanged();
@@ -434,13 +406,11 @@ public abstract class IESlot extends Slot
 				((MaintenanceKitContainer)containerMenu).updateSlots();
 		}
 
-		@Override
 		public boolean mayPickup(Player player)
 		{
 			return !(!this.getItem().isEmpty()&&getItem().getItem() instanceof IUpgradeableTool&&!((IUpgradeableTool)getItem().getItem()).canTakeFromWorkbench(getItem()));
 		}
 
-		@Override
 		public void onTake(Player player, ItemStack stack)
 		{
 			super.onTake(player, stack);
@@ -456,19 +426,16 @@ public abstract class IESlot extends Slot
 			super(inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return !itemStack.isEmpty()&&itemStack.getItem() instanceof EngineersBlueprintItem;
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 1;
 		}
 
-		@Override
 		public void setChanged()
 		{
 			super.setChanged();
@@ -484,7 +451,6 @@ public abstract class IESlot extends Slot
 			super(itemHandler, index, xPosition, yPosition);
 		}
 
-		@Override
 		public boolean mayPickup(Player playerIn)
 		{
 			return false;
@@ -498,13 +464,11 @@ public abstract class IESlot extends Slot
 			super(container, inv, id, x, y);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return false;
 		}
 
-		@Override
 		public boolean mayPickup(Player player)
 		{
 			return false;
@@ -521,7 +485,6 @@ public abstract class IESlot extends Slot
 			this.outputInventory = outputInventory;
 		}
 
-		@Override
 		public void setChanged()
 		{
 			outputInventory.updateOutputs(this.container);
@@ -541,7 +504,6 @@ public abstract class IESlot extends Slot
 			this.recipe = recipe;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return false;
@@ -552,19 +514,16 @@ public abstract class IESlot extends Slot
 			return ((ModWorkbenchContainer)this.containerMenu).isOutputSlotOnPage(this);
 		}
 
-		@Override
 		public boolean isActive()
 		{
 			return this.hasItem()&&isOnPage();
 		}
 
-		@Override
 		public boolean mayPickup(Player player)
 		{
 			return isOnPage();
 		}
 
-		@Override
 		public void onTake(Player player, ItemStack stack)
 		{
 			((BlueprintInventory)this.container).reduceIputs(this.inputInventory, recipe, stack);
@@ -582,7 +541,6 @@ public abstract class IESlot extends Slot
 			this.level = level;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return !itemStack.isEmpty()&&ArcFurnaceRecipe.isValidRecipeInput(level, itemStack);
@@ -599,7 +557,6 @@ public abstract class IESlot extends Slot
 			this.level = level;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return !itemStack.isEmpty()&&ArcFurnaceRecipe.isValidRecipeAdditive(level, itemStack);
@@ -613,13 +570,11 @@ public abstract class IESlot extends Slot
 			super(inv, id, x, y);
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 1;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return Misc.GRAPHITE_ELECTRODE.get().equals(itemStack.getItem());
@@ -638,13 +593,11 @@ public abstract class IESlot extends Slot
 			this.level = level;
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return type!=Type.FERTILIZER?1: 64;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			if(itemStack.isEmpty())
@@ -675,7 +628,6 @@ public abstract class IESlot extends Slot
 			this.tag = tag;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return itemStack.is(tag);
@@ -690,13 +642,11 @@ public abstract class IESlot extends Slot
 			super(containerMenu, EmptyContainer.INSTANCE, 0, 0, 0);
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return false;
 		}
 
-		@Override
 		public boolean isActive()
 		{
 			return false;
@@ -713,13 +663,11 @@ public abstract class IESlot extends Slot
 			this.container = container;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return this.container.canInsert(itemStack, getSlotIndex(), this);
 		}
 
-		@Override
 		public boolean mayPickup(Player player)
 		{
 			return this.container.canTake(this.getItem(), getSlotIndex(), this);
@@ -733,13 +681,11 @@ public abstract class IESlot extends Slot
 			super(inv, id, x, y);
 		}
 
-		@Override
 		public int getMaxStackSize()
 		{
 			return 1;
 		}
 
-		@Override
 		public boolean mayPlace(ItemStack itemStack)
 		{
 			return itemStack.getItem().equals(Misc.LOGIC_CIRCUIT_BOARD.get());
@@ -753,7 +699,6 @@ public abstract class IESlot extends Slot
 			super(itemHandler, index, xPosition, yPosition);
 		}
 
-		@Override
 		public int getMaxStackSize(@NotNull ItemStack stack)
 		{
 			return Math.min(Math.min(this.getMaxStackSize(), stack.getMaxStackSize()), super.getMaxStackSize(stack));

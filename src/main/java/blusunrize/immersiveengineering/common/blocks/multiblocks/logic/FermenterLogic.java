@@ -46,9 +46,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -82,7 +81,6 @@ public class FermenterLogic
 	public static final int FILLED_FLUID_SLOT = EMPTY_FLUID_SLOT+1;
 	public static final int NUM_SLOTS = FILLED_FLUID_SLOT+1;
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -106,7 +104,6 @@ public class FermenterLogic
 			context.markMasterDirty();
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -173,18 +170,16 @@ public class FermenterLogic
 		return false;
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_POS, state -> state.energy);
-		register.registerAtOrNull(FluidHandler.BLOCK, FLUID_OUTPUT_CAP, state -> state.fluidHandler);
-		register.register(ItemHandler.BLOCK, (state, position) -> {
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_POS, state -> state.energy);
+		register.registerAtOrNull(Capabilities.Fluid.BLOCK, FLUID_OUTPUT_CAP, state -> state.fluidHandler);
+		register.register(Capabilities.Item.BLOCK, (state, position) -> {
 			if(new BlockPos(0, 1, 0).equals(position.posInMultiblock()))
 				return state.insertionHandler;
 			else if(new BlockPos(1, 1, 1).equals(position.posInMultiblock()))
@@ -195,13 +190,11 @@ public class FermenterLogic
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return FermenterShapes.SHAPE_GETTER;
@@ -244,9 +237,9 @@ public class FermenterLogic
 					new IOConstraintGroup(IOConstraint.FLUID_INPUT, 1),
 					new IOConstraintGroup(IOConstraint.OUTPUT, 1)
 			), ctx.getMarkDirtyRunnable());
-			this.fluidOutput = ctx.getCapabilityAt(FluidHandler.BLOCK, FLUID_OUTPUT);
+			this.fluidOutput = ctx.getCapabilityAt(Capabilities.Fluid.BLOCK, FLUID_OUTPUT);
 			this.itemOutput = ctx.getCapabilityAt(
-					ItemHandler.BLOCK, new BlockPos(2, 1, 1), RelativeBlockFace.LEFT
+					Capabilities.Item.BLOCK, new BlockPos(2, 1, 1), RelativeBlockFace.LEFT
 			);
 			this.insertionHandler = new WrappingItemHandler(
 					this.inventory, true, false, new IntRange(0, NUM_INPUT_SLOTS)
@@ -266,21 +259,19 @@ public class FermenterLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("energy", energy.serializeNBT(provider));
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 			processor.fromNBT(
 					nbt.get("processor"),
 					(getRecipe, data, p) -> new MultiblockProcessInMachine<>(getRecipe, data),
@@ -288,43 +279,36 @@ public class FermenterLogic
 			);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			active = nbt.getBoolean("active");
+			active = nbt.getBooleanOr("active", false);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public int[] getOutputSlots()
 		{
 			return new int[]{OUTPUT_SLOT};
 		}
 
-		@Override
 		public int[] getOutputTanks()
 		{
 			return new int[]{0};
 		}
 
-		@Override
 		public IFluidTank[] getInternalTanks()
 		{
 			return new IFluidTank[]{tank};
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return inventory;

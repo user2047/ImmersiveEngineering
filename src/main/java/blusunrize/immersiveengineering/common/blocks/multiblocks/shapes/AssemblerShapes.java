@@ -30,7 +30,6 @@ public class AssemblerShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(posInMultiblock.getY()==0||FULL_BLOCKS.contains(posInMultiblock))

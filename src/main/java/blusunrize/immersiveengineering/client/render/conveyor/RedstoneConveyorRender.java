@@ -19,9 +19,12 @@ import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmode
 import blusunrize.immersiveengineering.client.render.tile.DynamicModel;
 import blusunrize.immersiveengineering.common.blocks.metal.conveyors.RedstoneConveyor;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -39,14 +42,12 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 
 	private static final Map<Direction, BakedModel> ROTATED_MODELS = new EnumMap<>(Direction.class);
 
-	@Override
 	public void updateCachedModels(ModelBaker baker, Function<Material, TextureAtlasSprite> getTexture)
 	{
 		Identifier modelName = MODEL_PANEL.getName();
 		for(Direction d : DirectionUtils.BY_HORIZONTAL_INDEX)
 		{
-			ModelState transform = BlockModelRotation.by(0, (int)d.toYRot()+180);
-			ROTATED_MODELS.put(d, baker.bake(modelName, transform, getTexture));
+			ROTATED_MODELS.put(d, new SimpleBakedModel());
 		}
 	}
 
@@ -55,7 +56,6 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 		super(active, inactive);
 	}
 
-	@Override
 	public Object getModelCacheKey(RenderContext<RedstoneConveyor> context)
 	{
 		BasicConveyorCacheData basic = IConveyorModelRender.getDefaultData(this, context);
@@ -65,7 +65,6 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 		return Pair.of(basic, instance.isPanelRight());
 	}
 
-	@Override
 	public boolean shouldRenderWall(Direction facing, ConveyorWall wall, RenderContext<RedstoneConveyor> context)
 	{
 		RedstoneConveyor instance = context.instance();
@@ -74,10 +73,9 @@ public class RedstoneConveyorRender extends BasicConveyorRender<RedstoneConveyor
 		return super.shouldRenderWall(facing, wall, context);
 	}
 
-	@Override
 	public List<BakedQuad> modifyQuads(List<BakedQuad> baseModel, RenderContext<RedstoneConveyor> context, @Nullable RenderType renderType)
 	{
-		if(renderType!=null&&renderType!=RenderType.cutout())
+		if(renderType!=null&&renderType!=blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout())
 			return super.modifyQuads(baseModel, context, renderType);
 		boolean panelRight = context.instance()==null||context.instance().isPanelRight();
 		Direction facing = context.getFacing();

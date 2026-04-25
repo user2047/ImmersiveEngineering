@@ -43,13 +43,11 @@ public class IEHeightProvider extends HeightProvider
 		});
 	}
 
-	@Override
 	public int sample(RandomSource random, WorldGenerationContext context)
 	{
 		return this.internalProvider.get().sample(random, context);
 	}
 
-	@Override
 	public HeightProviderType<?> getType()
 	{
 		return IEWorldGen.IE_HEIGHT_PROVIDER.value();

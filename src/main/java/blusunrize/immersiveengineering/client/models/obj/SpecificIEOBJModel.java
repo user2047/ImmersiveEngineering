@@ -28,12 +28,12 @@ import com.mojang.math.Transformation;
 import malte0811.modelsplitter.model.Group;
 import malte0811.modelsplitter.model.MaterialLibrary.OBJMaterial;
 import malte0811.modelsplitter.model.Polygon;
-import net.minecraft.Util;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.util.Util;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
@@ -94,7 +94,6 @@ public class SpecificIEOBJModel<T> implements BakedModel
 				baseModel.getParticleIcon(), ItemTransforms.NO_TRANSFORMS, baseModel.getOverrides()
 		)
 		{
-			@Override
 			public boolean isCustomRenderer()
 			{
 				return SpecificIEOBJModel.this.isCustomRenderer();
@@ -103,7 +102,6 @@ public class SpecificIEOBJModel<T> implements BakedModel
 	}
 
 	@Nonnull
-	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState pState, @Nullable Direction pSide, @Nonnull RandomSource pRand)
 	{
 		if(pSide!=null)
@@ -111,25 +109,21 @@ public class SpecificIEOBJModel<T> implements BakedModel
 		return quads;
 	}
 
-	@Override
 	public boolean useAmbientOcclusion()
 	{
 		return baseModel.useAmbientOcclusion();
 	}
 
-	@Override
 	public boolean isGui3d()
 	{
 		return baseModel.isGui3d();
 	}
 
-	@Override
 	public boolean usesBlockLight()
 	{
 		return baseModel.usesBlockLight();
 	}
 
-	@Override
 	public boolean isCustomRenderer()
 	{
 		GlobalTempData.setActiveModel(this);
@@ -137,21 +131,18 @@ public class SpecificIEOBJModel<T> implements BakedModel
 	}
 
 	@Nonnull
-	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
 		return baseModel.getParticleIcon();
 	}
 
 	@Nonnull
-	@Override
 	public ItemOverrides getOverrides()
 	{
 		return baseModel.getOverrides();
 	}
 
 	@Nonnull
-	@Override
 	public List<RenderType> getRenderTypes(@Nonnull ItemStack itemStack, boolean fabulous)
 	{
 		if(layer!=null)
@@ -168,21 +159,20 @@ public class SpecificIEOBJModel<T> implements BakedModel
 	private static final Matrix3f INVERT_NORMAL = new Matrix3f(INVERT);
 
 	@Nonnull
-	@Override
 	public BakedModel applyTransform(
 			@Nonnull ItemDisplayContext transformType, @Nonnull PoseStack transforms, boolean applyLeftHandTransform
 	)
 	{
 		BakedModel result = this;
 		ItemTransform baseItemTransform = getBaseTransforms(transformType);
-		Vector3f scale = baseItemTransform.scale;
+		Vector3f scale = new Vector3f(baseItemTransform.scale());
 		if(scale.x()*scale.y()*scale.z() < 0)
 		{
 			Vector3f newScale = new Vector3f(scale);
 			newScale.mul(-1);
 			new ItemTransform(
-					baseItemTransform.rotation, baseItemTransform.translation, newScale, baseItemTransform.rightRotation
-			).apply(applyLeftHandTransform, transforms);
+					baseItemTransform.rotation(), baseItemTransform.translation(), newScale, baseItemTransform.rightRotation()
+			).apply(applyLeftHandTransform, transforms.last());
 			transforms.last().pose().mul(INVERT);
 			transforms.last().normal().mul(INVERT_NORMAL);
 			// The custom renderer handles inversion on its own, for the default renderer we need to invert the quads
@@ -190,7 +180,7 @@ public class SpecificIEOBJModel<T> implements BakedModel
 				result = this.inverted.get();
 		}
 		else
-			baseItemTransform.apply(applyLeftHandTransform, transforms);
+			baseItemTransform.apply(applyLeftHandTransform, transforms.last());
 		ItemCallback.castOrDefault(callback).handlePerspective(
 				key, GlobalTempData.getActiveHolder(), transformType, transforms
 		);
@@ -232,7 +222,7 @@ public class SpecificIEOBJModel<T> implements BakedModel
 		else
 			numPasses = 1;
 		List<ShadedQuads> ret = new ArrayList<>();
-		Transformation optionalTransform = baseModel.getSprite().getRotation();
+		Transformation optionalTransform = baseModel.getSprite().transformation();
 		optionalTransform = callback.applyTransformations(key, groupName, optionalTransform);
 
 		final MaterialSpriteGetter<T> spriteGetter = new MaterialSpriteGetter<>(
@@ -255,7 +245,6 @@ public class SpecificIEOBJModel<T> implements BakedModel
 					);
 					ShaderLayer layer = shader!=null?shader.getLayers()[pass]: new ShaderLayer(Identifier.withDefaultNamespace("missing/no"), -1)
 					{
-						@Override
 						public RenderType getRenderType(RenderType baseType)
 						{
 							return baseType;

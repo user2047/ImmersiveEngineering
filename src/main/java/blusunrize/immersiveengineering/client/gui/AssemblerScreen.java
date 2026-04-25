@@ -58,7 +58,6 @@ public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		List<InfoArea> areas = Lists.newArrayList(
@@ -92,13 +91,9 @@ public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 		if(menu.inv.getStackInSlot(18+i).isEmpty()&&!recipeOutput.isEmpty())
 		{
 			tooltip.add(menu.patterns.get(i).getStackInSlot(9).getHoverName());
-			recipeOutput.getItem().appendHoverText(
-					recipeOutput, TooltipContext.of(ClientUtils.mc().level), tooltip, Default.NORMAL
-			);
 		}
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -127,7 +122,6 @@ public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 		));
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int i = 0; i < AssemblerLogic.NUM_PATTERNS; i++)

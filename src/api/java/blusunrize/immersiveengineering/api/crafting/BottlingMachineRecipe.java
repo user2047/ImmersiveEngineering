@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class BottlingMachineRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<BottlingMachineRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BottlingMachineRecipe>> SERIALIZER;
 	public static final CachedRecipeList<BottlingMachineRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.BOTTLING_MACHINE);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -57,7 +57,7 @@ public class BottlingMachineRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<BottlingMachineRecipe> getIESerializer()
+	protected RecipeSerializer<BottlingMachineRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}

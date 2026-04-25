@@ -44,7 +44,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,7 +60,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -86,13 +86,11 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		super(type, pos, state);
 	}
 
-	@Override
 	public void tickClient()
 	{
 		effectMap.removeIf(LightningAnimation::tick);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		int timeKey = getBlockPos().getX()^getBlockPos().getZ();
@@ -114,11 +112,11 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 			if(!targets.isEmpty())
 			{
 				ElectricDamageSource dmgsrc = IEDamageSources.causeTeslaDamage(level, IEServerConfig.MACHINES.teslacoil_damage.get().floatValue(), lowPower);
-				int randomTarget = ApiUtils.RANDOM.nextInt(targets.size());
+				int randomTarget = ApiUtils.getRandom().nextInt(targets.size());
 				target = (LivingEntity)targets.get(randomTarget);
 				if(target!=null)
 				{
-					if(!level.isClientSide)
+					if(!level.isClientSide())
 					{
 						energyDrain = IEServerConfig.MACHINES.teslacoil_consumption_active.get();
 						if(lowPower)
@@ -149,8 +147,8 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 			if(targets.isEmpty()&&level.getGameTime()%128==(timeKey&127))
 			{
 				//target up to 4 blocks away
-				double tV = (ApiUtils.RANDOM.nextDouble()-.5)*8;
-				double tH = (ApiUtils.RANDOM.nextDouble()-.5)*8;
+				double tV = (ApiUtils.getRandom().nextDouble()-.5)*8;
+				double tH = (ApiUtils.getRandom().nextDouble()-.5)*8;
 				if(lowPower)
 				{
 					tV /= 2;
@@ -192,7 +190,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 				}
 				if(!targetFound)
 				{
-					boolean positiveFirst = ApiUtils.RANDOM.nextBoolean();
+					boolean positiveFirst = ApiUtils.getRandom().nextBoolean();
 					for(int i = 0; i < 2; i++)
 					{
 						for(int ll = 0; ll <= 6; ll++)
@@ -240,7 +238,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		CompoundTag tag = new CompoundTag();
 		tag.putInt("targetEntity", target.getId());
 		PacketDistributor.sendToPlayersTrackingChunk(
-				(ServerLevel)level, new ChunkPos(worldPosition), new MessageBlockEntitySync(getBlockPos(), tag)
+				(ServerLevel)level, new ChunkPos(worldPosition.getX() >> 4, worldPosition.getZ() >> 4), new MessageBlockEntitySync(getBlockPos(), tag)
 		);
 	}
 
@@ -251,16 +249,15 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		tag.putDouble("tV", tV);
 		tag.putDouble("tH", tH);
 		PacketDistributor.sendToPlayersTrackingChunk(
-				(ServerLevel)level, new ChunkPos(worldPosition), new MessageBlockEntitySync(getBlockPos(), tag)
+				(ServerLevel)level, new ChunkPos(worldPosition.getX() >> 4, worldPosition.getZ() >> 4), new MessageBlockEntitySync(getBlockPos(), tag)
 		);
 	}
 
-	@Override
 	public void receiveMessageFromServer(CompoundTag message)
 	{
-		if(message.contains("targetEntity", Tag.TAG_INT))
+		if(message.contains("targetEntity"))
 		{
-			Entity target = level.getEntity(message.getInt("targetEntity"));
+			Entity target = level.getEntity(message.getIntOr("targetEntity", 0));
 			if(target instanceof LivingEntity)
 			{
 				double dx = target.getX()-getBlockPos().getX();
@@ -289,7 +286,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 					else
 						f = dz < 0?Direction.NORTH: Direction.SOUTH;
 				}
-				double verticalOffset = 1+ApiUtils.RANDOM.nextDouble()*.25;
+				double verticalOffset = 1+ApiUtils.getRandom().nextDouble()*.25;
 				Vec3 coilPos = Vec3.atCenterOf(getBlockPos());
 				//Vertical offset
 				coilPos = coilPos.add(getFacing().getStepX()*verticalOffset, getFacing().getStepY()*verticalOffset, getFacing().getStepZ()*verticalOffset);
@@ -299,16 +296,16 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 					coilPos = coilPos.add(f.getStepX()*.375, f.getStepY()*.375, f.getStepZ()*.375);
 					//random side offset
 					f = DirectionUtils.rotateAround(f, getFacing().getAxis());
-					double dShift = (ApiUtils.RANDOM.nextDouble()-.5)*.75;
+					double dShift = (ApiUtils.getRandom().nextDouble()-.5)*.75;
 					coilPos = coilPos.add(f.getStepX()*dShift, f.getStepY()*dShift, f.getStepZ()*dShift);
 				}
 
 				addAnimation(new LightningAnimation(coilPos, (LivingEntity)target));
-				level.playLocalSound(coilPos.x, coilPos.y, coilPos.z, IESounds.tesla.value(), SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.RANDOM.nextFloat(), true);
+				level.playLocalSound(coilPos.x, coilPos.y, coilPos.z, IESounds.tesla.value(), SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.getRandom().nextFloat(), true);
 			}
 		}
-		else if(message.contains("tL", Tag.TAG_DOUBLE))
-			initFreeStreamer(message.getDouble("tL"), message.getDouble("tV"), message.getDouble("tH"));
+		else if(message.contains("tL"))
+			initFreeStreamer(message.getDoubleOr("tL", 0), message.getDoubleOr("tV", 0), message.getDoubleOr("tH", 0));
 	}
 
 	public void initFreeStreamer(double tL, double tV, double tH)
@@ -340,7 +337,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 				f = tz < 0?Direction.NORTH: Direction.SOUTH;
 		}
 
-		double verticalOffset = 1+ApiUtils.RANDOM.nextDouble()*.25;
+		double verticalOffset = 1+ApiUtils.getRandom().nextDouble()*.25;
 		Vec3 coilPos = Vec3.atCenterOf(getBlockPos());
 		//Vertical offset
 		coilPos = coilPos.add(getFacing().getStepX()*verticalOffset, getFacing().getStepY()*verticalOffset, getFacing().getStepZ()*verticalOffset);
@@ -348,11 +345,11 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		coilPos = coilPos.add(f.getStepX()*.375, f.getStepY()*.375, f.getStepZ()*.375);
 		//random side offset
 		f = DirectionUtils.rotateAround(f, getFacing().getAxis());
-		double dShift = (ApiUtils.RANDOM.nextDouble()-.5)*.75;
+		double dShift = (ApiUtils.getRandom().nextDouble()-.5)*.75;
 		coilPos = coilPos.add(f.getStepX()*dShift, f.getStepY()*dShift, f.getStepZ()*dShift);
 		addAnimation(new LightningAnimation(coilPos, Vec3.atLowerCornerOf(getBlockPos()).add(tx, ty, tz)));
-//		world.playSound(null, getPos(), IESounds.tesla, SoundCategory.BLOCKS,2.5f, .5f + ApiUtils.RANDOM.nextFloat());
-		level.playLocalSound(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), IESounds.tesla.value(), SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.RANDOM.nextFloat(), true);
+//		world.playSound(null, getPos(), IESounds.tesla, SoundCategory.BLOCKS,2.5f, .5f + ApiUtils.getRandom().nextFloat());
+		level.playLocalSound(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), IESounds.tesla.value(), SoundSource.BLOCKS, 2.5F, 0.5F+ApiUtils.getRandom().nextFloat(), true);
 	}
 
 	private void addAnimation(LightningAnimation ani)
@@ -360,15 +357,13 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		Minecraft.getInstance().submitAsync(() -> effectMap.add(ani));
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		redstoneControlInverted = nbt.getBoolean("redstoneInverted");
-		lowPower = nbt.getBoolean("lowPower");
+		redstoneControlInverted = nbt.getBooleanOr("redstoneInverted", false);
+		lowPower = nbt.getBooleanOr("lowPower", false);
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putBoolean("redstoneInverted", redstoneControlInverted);
@@ -376,7 +371,6 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(!isDummy())
@@ -401,17 +395,16 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public AABB renderBB;
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(isDummy())
 		{
 			BlockEntity te = level.getBlockEntity(getBlockPos().relative(getFacing(), -1));
 			if(te instanceof TeslaCoilBlockEntity)
 				return ((TeslaCoilBlockEntity)te).screwdriverUseSide(side, player, hand, hitVec);
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		}
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			if(player.isShiftKeyDown())
 			{
@@ -423,46 +416,37 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 				else
 				{
 					lowPower = !lowPower;
-					player.displayClientMessage(
-							Component.translatable(Lib.CHAT_INFO+"tesla."+(lowPower?"lowPower": "highPower")), true
-					);
+					player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"tesla."+(lowPower?"lowPower": "highPower")));
 					setChanged();
 				}
 			}
 			else
 			{
 				redstoneControlInverted = !redstoneControlInverted;
-				player.displayClientMessage(
-						Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")),
-						true
-				);
+				player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
 				setChanged();
 				this.markContainingBlockForUpdate(null);
 			}
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.SIDE_CLICKED;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
 	@Nullable
-	@Override
 	public TeslaCoilBlockEntity master()
 	{
 		if(!isDummy())
@@ -472,14 +456,12 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return te instanceof TeslaCoilBlockEntity tc?tc: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		level.setBlockAndUpdate(worldPosition.relative(getFacing()), state.setValue(IEProperties.MULTIBLOCKSLAVE, true));
 		((TeslaCoilBlockEntity)level.getBlockEntity(worldPosition.relative(getFacing()))).setFacing(getFacing());
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		boolean dummy = isDummy();
@@ -490,7 +472,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public static void registerCapabilities(BECapabilityRegistrar<TeslaCoilBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> side==null||!be.isDummy()?be.energyCap.get(): null);
+		registrar.register(Energy.BLOCK, (be, side) -> side==null||!be.isDummy()?be.energyCap.get(): null);
 	}
 
 	public boolean canRun(int energyDrain)
@@ -564,7 +546,7 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 				}
 				subPoints.add(sub.add(offX, offY, offZ));
 			}
-			animationTimer = ANIMATION_MAX+ApiUtils.RANDOM.nextInt(5)-2;
+			animationTimer = ANIMATION_MAX+ApiUtils.getRandom().nextInt(5)-2;
 		}
 
 		public boolean tick()
@@ -575,7 +557,6 @@ public class TeslaCoilBlockEntity extends IEBaseBlockEntity implements IEServerT
 		}
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		if(isDummy())

@@ -21,7 +21,6 @@ public class ShelfMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.SHELF);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 13;

@@ -14,6 +14,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import net.minecraft.nbt.NbtOps;
 import malte0811.dualcodecs.DualCodec;
 import malte0811.dualcodecs.DualCodecs;
 import malte0811.dualcodecs.DualCompositeCodecs;
@@ -61,7 +62,11 @@ public record StackWithChance(TagOutput stack, float chance, List<ICondition> co
 	public CompoundTag writeToNBT(HolderLookup.Provider provider)
 	{
 		CompoundTag compoundNBT = new CompoundTag();
-		compoundNBT.put("stack", stack.get().save(provider));
+		compoundNBT.put(
+				"stack",
+				ItemStack.OPTIONAL_CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), stack.get())
+						.result().orElseThrow()
+		);
 		compoundNBT.putFloat("chance", chance);
 		return compoundNBT;
 	}
@@ -71,8 +76,10 @@ public record StackWithChance(TagOutput stack, float chance, List<ICondition> co
 		Preconditions.checkNotNull(compoundNBT);
 		Preconditions.checkArgument(compoundNBT.contains("chance"));
 		Preconditions.checkArgument(compoundNBT.contains("stack"));
-		final ItemStack stack = ItemStack.parse(provider, compoundNBT.getCompound("stack")).orElseThrow();
-		final float chance = compoundNBT.getFloat("chance");
+		final ItemStack stack = ItemStack.OPTIONAL_CODEC.parse(
+				provider.createSerializationContext(NbtOps.INSTANCE), compoundNBT.getCompoundOrEmpty("stack")
+		).result().orElseThrow();
+		final float chance = compoundNBT.getFloatOr("chance", 1);
 		return new StackWithChance(stack, chance);
 	}
 

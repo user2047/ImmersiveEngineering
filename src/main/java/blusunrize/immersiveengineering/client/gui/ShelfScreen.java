@@ -46,7 +46,6 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 		this.titleLabelY = 3;
 	}
 
-	@Override
 	protected void init()
 	{
 		this.playerInvX = COLUMN_WIDTH/2;
@@ -68,7 +67,6 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 		}));
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
@@ -77,7 +75,6 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 	}
 
 
-	@Override
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		// Crates
@@ -108,7 +105,6 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 		graphics.blit(background, leftPos+playerInvX, topPos+playerInvY, 0, 0, COLUMN_WIDTH, INV_SEGMENT);
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		List<ItemStack> crates = this.menu.backside.get()?this.menu.cratesBack.get(): this.menu.cratesFront.get();

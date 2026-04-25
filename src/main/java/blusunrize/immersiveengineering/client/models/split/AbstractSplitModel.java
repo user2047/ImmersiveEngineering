@@ -18,15 +18,15 @@ import malte0811.modelsplitter.SplitModel;
 import malte0811.modelsplitter.math.ModelSplitterVec3i;
 import malte0811.modelsplitter.model.OBJModel;
 import malte0811.modelsplitter.model.Polygon;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -45,7 +45,6 @@ public abstract class AbstractSplitModel<T extends BakedModel> extends Composite
 	}
 
 	@Nonnull
-	@Override
 	public ModelData getModelData(
 			@Nonnull BlockAndTintGetter world,
 			@Nonnull BlockPos pos,

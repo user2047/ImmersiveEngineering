@@ -28,7 +28,6 @@ public record MessageMaintenanceKit(EquipmentSlot slot, CompoundTag nbt) impleme
 			MessageMaintenanceKit::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		Player player = context.player();
@@ -38,7 +37,6 @@ public record MessageMaintenanceKit(EquipmentSlot slot, CompoundTag nbt) impleme
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

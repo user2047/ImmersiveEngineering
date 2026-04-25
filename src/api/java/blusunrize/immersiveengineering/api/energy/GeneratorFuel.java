@@ -39,7 +39,7 @@ import java.util.function.Function;
 
 public class GeneratorFuel extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<GeneratorFuel>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GeneratorFuel>> SERIALIZER;
 
 	public static final CachedRecipeList<GeneratorFuel> RECIPES = new CachedRecipeList<>(IERecipeTypes.GENERATOR_FUEL);
 
@@ -83,13 +83,12 @@ public class GeneratorFuel extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<?> getIESerializer()
+	protected RecipeSerializer<?> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;

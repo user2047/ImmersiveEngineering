@@ -43,9 +43,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -79,7 +78,6 @@ public class SqueezerLogic
 	public static final int TANK_CAPACITY = 24*FluidType.BUCKET_VOLUME;
 	public static final int ENERGY_CAPACITY = 16000;
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -136,7 +134,6 @@ public class SqueezerLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -155,18 +152,16 @@ public class SqueezerLogic
 		}
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_POS, state -> state.energy);
-		register.registerAtOrNull(FluidHandler.BLOCK, FLUID_OUTPUT_CAP, state -> state.fluidOutputCap);
-		register.register(ItemHandler.BLOCK, (state, position) -> {
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_POS, state -> state.energy);
+		register.registerAtOrNull(Capabilities.Fluid.BLOCK, FLUID_OUTPUT_CAP, state -> state.fluidOutputCap);
+		register.register(Capabilities.Item.BLOCK, (state, position) -> {
 			if(ITEM_INPUT.equals(position.posInMultiblock()))
 				return state.itemInputCap;
 			else if(ITEM_OUTPUT_CAP.equals(position))
@@ -178,13 +173,11 @@ public class SqueezerLogic
 
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return SqueezerShapes.SHAPE_GETTER;
@@ -230,8 +223,8 @@ public class SqueezerLogic
 			this.processor = new InMachineProcessor<>(
 					NUM_INPUT_SLOTS, 0, NUM_INPUT_SLOTS, markDirty, SqueezerRecipe.RECIPES::getById
 			);
-			this.itemOutput = ctx.getCapabilityAt(ItemHandler.BLOCK, ITEM_OUTPUT);
-			this.fluidOutput = ctx.getCapabilityAt(FluidHandler.BLOCK, FLUID_OUTPUT);
+			this.itemOutput = ctx.getCapabilityAt(Capabilities.Item.BLOCK, ITEM_OUTPUT);
+			this.fluidOutput = ctx.getCapabilityAt(Capabilities.Fluid.BLOCK, FLUID_OUTPUT);
 			this.fluidOutputCap = ArrayFluidHandler.drainOnly(tank, markDirty);
 			this.itemInputCap = new WrappingItemHandler(
 					inventory, true, false, new IntRange(0, NUM_INPUT_SLOTS)
@@ -248,21 +241,19 @@ public class SqueezerLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("energy", energy.serializeNBT(provider));
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			energy.deserializeNBT(provider, nbt.get("energy"));
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
 			processor.fromNBT(
 					nbt.get("processor"),
 					(getRecipe, data, p) -> new MultiblockProcessInMachine<>(getRecipe, data),
@@ -270,37 +261,31 @@ public class SqueezerLogic
 			);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
-			active = nbt.getBoolean("active");
+			active = nbt.getBooleanOr("active", false);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public IItemHandlerModifiable getInventory()
 		{
 			return inventory;
 		}
 
-		@Override
 		public int[] getOutputTanks()
 		{
 			return new int[]{0};
 		}
 
-		@Override
 		public IFluidTank[] getInternalTanks()
 		{
 			return new IFluidTank[]{tank};
@@ -311,7 +296,6 @@ public class SqueezerLogic
 			return tank;
 		}
 
-		@Override
 		public int[] getOutputSlots()
 		{
 			return new int[]{OUTPUT_SLOT};

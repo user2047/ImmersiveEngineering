@@ -22,7 +22,6 @@ public class BottlingMachineShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(new BlockPos(1, 0, 0).equals(posInMultiblock))

@@ -101,12 +101,12 @@ public class Connection
 	public Connection(CompoundTag nbt)
 	{
 		this(
-				WireType.getValue(nbt.getString("type")),
-				new ConnectionPoint(nbt.getCompound("endA")),
-				new ConnectionPoint(nbt.getCompound("endB")),
+				WireType.getValue(nbt.getStringOr("type", "")),
+				new ConnectionPoint(nbt.getCompoundOrEmpty("endA")),
+				new ConnectionPoint(nbt.getCompoundOrEmpty("endB")),
 				WireUtils.loadVec3(nbt.get("endAOffset")),
 				WireUtils.loadVec3(nbt.get("endBOffset")),
-				nbt.getBoolean("internal")
+				nbt.getBooleanOr("internal", false)
 		);
 	}
 

@@ -105,21 +105,20 @@ public abstract class TurretMenu extends IEContainerMenu
 		}
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
-		if(nbt.contains("add", Tag.TAG_STRING))
-			data.targetList.get().add(nbt.getString("add"));
-		if(nbt.contains("remove", Tag.TAG_INT))
-			data.targetList.get().remove(nbt.getInt("remove"));
-		if(nbt.contains("whitelist", Tag.TAG_BYTE))
-			data.whitelist.set(nbt.getBoolean("whitelist"));
-		if(nbt.contains("attackAnimals", Tag.TAG_BYTE))
-			data.attackAnimals.set(nbt.getBoolean("attackAnimals"));
-		if(nbt.contains("attackPlayers", Tag.TAG_BYTE))
-			data.attackPlayers.set(nbt.getBoolean("attackPlayers"));
-		if(nbt.contains("attackNeutrals", Tag.TAG_BYTE))
-			data.attackNeutrals.set(nbt.getBoolean("attackNeutrals"));
+		if(nbt.contains("add"))
+			data.targetList.get().add(nbt.getStringOr("add", ""));
+		if(nbt.contains("remove"))
+			data.targetList.get().remove(nbt.getIntOr("remove", 0));
+		if(nbt.contains("whitelist"))
+			data.whitelist.set(nbt.getBooleanOr("whitelist", false));
+		if(nbt.contains("attackAnimals"))
+			data.attackAnimals.set(nbt.getBooleanOr("attackAnimals", false));
+		if(nbt.contains("attackPlayers"))
+			data.attackPlayers.set(nbt.getBooleanOr("attackPlayers", false));
+		if(nbt.contains("attackNeutrals"))
+			data.attackNeutrals.set(nbt.getBooleanOr("attackNeutrals", false));
 		data.afterChange.run();
 	}
 
@@ -155,12 +154,11 @@ public abstract class TurretMenu extends IEContainerMenu
 			addGenericData(new GenericContainerData<>(GenericDataSerializers.BOOLEAN, ignite));
 		}
 
-		@Override
 		public void receiveMessageFromScreen(CompoundTag nbt)
 		{
 			super.receiveMessageFromScreen(nbt);
-			if(nbt.contains("ignite", Tag.TAG_BYTE))
-				ignite.set(nbt.getBoolean("ignite"));
+			if(nbt.contains("ignite"))
+				ignite.set(nbt.getBooleanOr("ignite", false));
 		}
 	}
 
@@ -192,7 +190,6 @@ public abstract class TurretMenu extends IEContainerMenu
 			this.expelCasings = expelCasings;
 			this.addSlot(new IESlot.Bullet(inv, 0, 134, 13, 64)
 			{
-				@Override
 				public boolean mayPlace(ItemStack itemStack)
 				{
 					if(!super.mayPlace(itemStack))
@@ -206,12 +203,11 @@ public abstract class TurretMenu extends IEContainerMenu
 			addGenericData(new GenericContainerData<>(GenericDataSerializers.BOOLEAN, expelCasings));
 		}
 
-		@Override
 		public void receiveMessageFromScreen(CompoundTag nbt)
 		{
 			super.receiveMessageFromScreen(nbt);
-			if(nbt.contains("expelCasings", Tag.TAG_BYTE))
-				expelCasings.set(nbt.getBoolean("expelCasings"));
+			if(nbt.contains("expelCasings"))
+				expelCasings.set(nbt.getBooleanOr("expelCasings", false));
 		}
 	}
 }

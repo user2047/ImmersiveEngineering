@@ -34,7 +34,6 @@ public record MessageCrateName(BlockPos pos, String name) implements IMessage
 		this(tile.getBlockPos(), name);
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		if(context.flow().getReceptionSide()==LogicalSide.SERVER)
@@ -49,7 +48,6 @@ public record MessageCrateName(BlockPos pos, String name) implements IMessage
 			});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

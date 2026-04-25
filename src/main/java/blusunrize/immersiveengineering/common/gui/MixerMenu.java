@@ -108,7 +108,6 @@ public class MixerMenu extends IEContainerMenu implements IESlot.ICallbackContai
 		addGenericData(new GenericContainerData<>(GenericDataSerializers.BOOLEAN, outputAll));
 	}
 
-	@Override
 	public boolean canInsert(ItemStack stack, int slotNumber, Slot slotObject)
 	{
 		for(final SlotProgress progress : this.progress.get())
@@ -117,17 +116,15 @@ public class MixerMenu extends IEContainerMenu implements IESlot.ICallbackContai
 		return true;
 	}
 
-	@Override
 	public boolean canTake(ItemStack stack, int slotNumber, Slot slotObject)
 	{
 		return canInsert(stack, slotNumber, slotObject);
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
-		if(nbt.contains("outputAll", Tag.TAG_BYTE))
-			outputAll.set(nbt.getBoolean("outputAll"));
+		if(nbt.contains("outputAll"))
+			outputAll.set(nbt.getBooleanOr("outputAll", false));
 	}
 
 	public record SlotProgress(int slot, float progress)

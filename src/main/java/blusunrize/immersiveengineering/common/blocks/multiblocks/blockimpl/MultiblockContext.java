@@ -28,32 +28,27 @@ public record MultiblockContext<State extends IMultiblockState>(
 		MultiblockLevel level
 ) implements IMultiblockContext<State>
 {
-	@Override
 	public State getState()
 	{
 		return masterHelper.getState();
 	}
 
-	@Override
 	public void markMasterDirty()
 	{
 		masterHelper.getMasterBE().setChanged();
 	}
 
-	@Override
 	public IMultiblockLevel getLevel()
 	{
 		return level;
 	}
 
-	@Override
 	public BooleanSupplier isValid()
 	{
 		final BlockEntity masterBE = masterHelper.getMasterBE();
 		return () -> !masterBE.isRemoved();
 	}
 
-	@Override
 	public void requestMasterBESync()
 	{
 		requestBESync(this.masterHelper.getMasterBE());
@@ -66,7 +61,6 @@ public record MultiblockContext<State extends IMultiblockState>(
 			chunkCache.blockChanged(be.getBlockPos());
 	}
 
-	@Override
 	public void setComparatorOutputFor(BlockPos posInMultiblock, int newValue)
 	{
 		Preconditions.checkState(masterHelper.multiblock.hasComparatorOutput());
@@ -75,7 +69,6 @@ public record MultiblockContext<State extends IMultiblockState>(
 			level.updateNeighbourForOutputSignal(posInMultiblock);
 	}
 
-	@Override
 	public int getRedstoneInputValue(BlockPos posInMultiblock, RelativeBlockFace side, int fallback)
 	{
 		Preconditions.checkState(masterHelper.multiblock.redstoneInputAware());
@@ -85,7 +78,6 @@ public record MultiblockContext<State extends IMultiblockState>(
 			return fallback;
 	}
 
-	@Override
 	public int getRedstoneInputValue(BlockPos posInMultiblock, int fallback)
 	{
 		Preconditions.checkState(masterHelper.multiblock.redstoneInputAware());

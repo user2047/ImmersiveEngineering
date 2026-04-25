@@ -77,13 +77,11 @@ public class IEManualInstance extends ManualInstance
 		 */
 	}
 
-	@Override
 	public String getDefaultResourceDomain()
 	{
 		return ImmersiveEngineering.MODID;
 	}
 
-	@Override
 	public String formatText(String s)
 	{
 		String splitKey = ";";
@@ -142,7 +140,6 @@ public class IEManualInstance extends ManualInstance
 	}
 
 	/*TODO readd
-	@Override
 	public void openManual()
 	{
 		if(improveReadability())
@@ -152,7 +149,6 @@ public class IEManualInstance extends ManualInstance
 		}
 	}
 
-	@Override
 	public void titleRenderPre()
 	{
 		if(improveReadability())
@@ -162,7 +158,6 @@ public class IEManualInstance extends ManualInstance
 		}
 	}
 
-	@Override
 	public void titleRenderPost()
 	{
 		if(improveReadability())
@@ -172,21 +167,18 @@ public class IEManualInstance extends ManualInstance
 		}
 	}
 
-	@Override
 	public void entryRenderPre()
 	{
 		if(improveReadability())
 			((IEItemFontRender)this.fontRenderer).verticalBoldness = true;
 	}
 
-	@Override
 	public void entryRenderPost()
 	{
 		if(improveReadability())
 			((IEItemFontRender)this.fontRenderer).verticalBoldness = false;
 	}
 
-	@Override
 	public void tooltipRenderPre()
 	{
 		if(improveReadability())
@@ -197,7 +189,6 @@ public class IEManualInstance extends ManualInstance
 		}
 	}
 
-	@Override
 	public void tooltipRenderPost()
 	{
 		if(improveReadability())
@@ -208,32 +199,27 @@ public class IEManualInstance extends ManualInstance
 		}
 	}*/
 
-	@Override
 	public Font fontRenderer()
 	{
 		return /*TODO new IEItemFontRender()*/ClientUtils.unicodeFontRender();
 	}
 
-	@Override
 	public String getManualName()
 	{
 		return I18n.get("item.immersiveengineering.manual");
 	}
 
-	@Override
 	public String formatCategoryName(Identifier s)
 	{
 		return (improveReadability()?ChatFormatting.BOLD: "")+I18n.get("manual."
 				+s.toString().replace(':', '.'));
 	}
 
-	@Override
 	public String formatEntryName(String s)
 	{
 		return (improveReadability()?ChatFormatting.BOLD: "")+s;
 	}
 
-	@Override
 	public String formatEntrySubtext(String s)
 	{
 		return s;
@@ -247,7 +233,6 @@ public class IEManualInstance extends ManualInstance
 		this.hiddenEntries.add(name);
 	}
 
-	@Override
 	public boolean showNodeInList(Tree.AbstractNode<Identifier, ManualEntry> node)
 	{
 		if(!super.showNodeInList(node))
@@ -259,63 +244,53 @@ public class IEManualInstance extends ManualInstance
 		return !nodeLoc.equals(SHADER_ENTRY)&&!hiddenEntries.contains(nodeLoc);
 	}
 
-	@Override
 	public boolean showCategoryInList(String category)
 	{
 		return true;
 	}
 
-	@Override
 	public String formatLink(ManualLink link)
 	{
 		return ChatFormatting.GOLD+"  -> "+link.getKey().getTitle()+", "+
 				(link.getPage()+1);
 	}
 
-	@Override
 	public void openEntry(ManualEntry entry)
 	{
 		if(SHADER_ENTRY.equals(entry.getLocation()))
 			PacketDistributor.sendToServer(new MessageShaderManual(MessageType.SYNC));
 	}
 
-	@Override
 	public int getTitleColour()
 	{
 		return 0xf78034;
 	}
 
-	@Override
 	public int getSubTitleColour()
 	{
 		return 0xf78034;
 	}
 
-	@Override
 	public int getTextColour()
 	{
 		return improveReadability()?0: 0x555555;
 	}
 
-	@Override
 	public int getHighlightColour()
 	{
 		return 0xd4804a;
 	}
 
-	@Override
 	public int getPagenumberColour()
 	{
 		return 0x9c917c;
 	}
 
-	@Override
 	public int getGuiRescale()
 	{
 		return IEClientConfig.manualGuiScale.get();
 	}
 
-	@Override
 	public boolean improveReadability()
 	{
 		return IEClientConfig.badEyesight.get();

@@ -53,9 +53,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -88,7 +87,6 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 	private final NonNullList<ItemStack> inventory = NonNullList.withSize(NUM_SLOTS, ItemStack.EMPTY);
 	public final FluidTank tank = new FluidTank(TANK_CAPACITY)
 	{
-		@Override
 		public boolean isFluidValid(FluidStack fluid)
 		{
 			return ClocheRecipe.getValidFluids(getLevel()).anyMatch(req -> req.test(fluid));
@@ -107,7 +105,7 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 	public float renderGrowth = 0;
 	public boolean renderActive = false;
 	private final IEBlockCapabilityCache<IItemHandler> output = IEBlockCapabilityCaches.create(
-			ItemHandler.BLOCK,
+			Capabilities.Item.BLOCK,
 			() -> worldPosition.above().relative(getFacing().getOpposite()),
 			this::getFacing,
 			this::getLevel
@@ -119,13 +117,11 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		super(type, pos, state);
 	}
 
-	@Override
 	public boolean canTickAny()
 	{
 		return !isRSPowered();
 	}
 
-	@Override
 	public void tickClient()
 	{
 		ItemStack seed = inventory.get(SLOT_SEED);
@@ -140,17 +136,13 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 					renderGrowth += addGrow;
 				else
 					renderGrowth = 0;
-				if(ApiUtils.RANDOM.nextInt(8)==0)
+				if(ApiUtils.getRandom().nextInt(8)==0)
 				{
-					Particle p = ((ParticleManagerAccess)Minecraft.getInstance().particleEngine).invokeMakeParticle(new DustParticleOptions(new Vector3f(.55f, .1f, .1f), 1), getBlockPos().getX()+.5, getBlockPos().getY()+2.6875, getBlockPos().getZ()+.5, .25, .25, .25);
-					p.setLifetime(20);
-					Minecraft.getInstance().particleEngine.add(p);
 				}
 			}
 		}
 	}
 
-	@Override
 	public void tickServer()
 	{
 		ItemStack seed = inventory.get(SLOT_SEED);
@@ -291,46 +283,43 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		nbt.putFloat("growth", growth);
 		nbt.putBoolean("renderActive", renderActive);
 		PacketDistributor.sendToPlayersTrackingChunk(
-				(ServerLevel)level, new ChunkPos(worldPosition), new MessageBlockEntitySync(getBlockPos(), nbt)
+				(ServerLevel)level, new ChunkPos(worldPosition.getX() >> 4, worldPosition.getZ() >> 4), new MessageBlockEntitySync(getBlockPos(), nbt)
 		);
 	}
 
-	@Override
 	public void receiveMessageFromServer(CompoundTag message)
 	{
-		renderGrowth = message.getFloat("growth");
-		renderActive = message.getBoolean("renderActive");
+		renderGrowth = message.getFloatOr("growth", 0);
+		renderActive = message.getBooleanOr("renderActive", false);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		final ItemStack oldSoil = inventory.get(SLOT_SOIL);
-		dummy = nbt.getInt("dummy");
+		dummy = nbt.getIntOr("dummy", 0);
 		// loadAllItems skips empty items, so if a slot was emptied it won't be properly synced without the fill call
 		Collections.fill(inventory, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(nbt, inventory, provider);
-		fertilizerAmount = nbt.getInt("fertilizerAmount");
-		fertilizerMod = nbt.getFloat("fertilizerMod");
-		tank.readFromNBT(provider, nbt.getCompound("tank"));
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(nbt, inventory, provider);
+		fertilizerAmount = nbt.getIntOr("fertilizerAmount", 0);
+		fertilizerMod = nbt.getFloatOr("fertilizerMod", 0);
+		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
 		if(!descPacket)
 		{
 			EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
-			growth = nbt.getFloat("growth");
+			growth = nbt.getFloatOr("growth", 0);
 		}
 		renderBB = null;
 		if(descPacket&&level!=null&&!ItemStack.matches(oldSoil, inventory.get(SLOT_SOIL)))
 			markContainingBlockForUpdate(null);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putInt("dummy", dummy);
-		ContainerHelper.saveAllItems(nbt, inventory, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inventory, provider);
 		nbt.putInt("fertilizerAmount", fertilizerAmount);
 		nbt.putFloat("fertilizerMod", fertilizerMod);
-		CompoundTag tankTag = tank.writeToNBT(provider, new CompoundTag());
+		CompoundTag tankTag = blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider);
 		nbt.put("tank", tankTag);
 		if(!descPacket)
 		{
@@ -339,19 +328,16 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		}
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public void setFacing(Direction facing)
 	{
 		BlockPos lowest = worldPosition.below(dummy);
@@ -364,14 +350,12 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		}
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return dummy!=0;
 	}
 
 	@Nullable
-	@Override
 	public ClocheBlockEntity master()
 	{
 		if(!isDummy())
@@ -384,7 +368,6 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		return te instanceof ClocheBlockEntity?(ClocheBlockEntity)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
@@ -396,7 +379,6 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		}
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		tempMasterBE = master();
@@ -408,13 +390,11 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		}
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return inventory;
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		if(slot==SLOT_FERTILIZER)
@@ -423,13 +403,11 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 			return true;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return slot < 2?1: 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 		this.setChanged();
@@ -456,7 +434,7 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 
 	public static void registerCapabilities(BECapabilityRegistrar<ClocheBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, facing) -> {
+		registrar.register(Energy.BLOCK, (be, facing) -> {
 			if(facing==null||
 					(be.dummy==0&&facing.getAxis()==be.getFacing().getClockWise().getAxis())||
 					(be.dummy==2&&facing==Direction.UP))
@@ -464,7 +442,7 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 			else
 				return null;
 		});
-		registrar.register(ItemHandler.BLOCK, (be, facing) -> {
+		registrar.register(Capabilities.Item.BLOCK, (be, facing) -> {
 			final var clocheFacing = be.getFacing();
 			if(facing==null||(be.dummy==0&&facing.getAxis()!=clocheFacing.getClockWise().getAxis()))
 				return be.inputHandler.get();
@@ -473,7 +451,7 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 			else
 				return null;
 		});
-		registrar.register(FluidHandler.BLOCK, (be, facing) -> {
+		registrar.register(Capabilities.Fluid.BLOCK, (be, facing) -> {
 			if(facing==null||(be.dummy==0&&facing.getAxis()!=be.getFacing().getClockWise().getAxis()))
 				return be.tankCap.get();
 			else
@@ -481,13 +459,11 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		});
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		return true;
 	}
 
-	@Override
 	public ClocheBlockEntity getGuiMaster()
 	{
 		if(dummy==0)
@@ -498,7 +474,6 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 		return null;
 	}
 
-	@Override
 	public ArgContainer<ClocheBlockEntity, ?> getContainerType()
 	{
 		return IEMenuTypes.CLOCHE;
@@ -506,7 +481,6 @@ public class ClocheBlockEntity extends IEBaseBlockEntity implements IEServerTick
 
 	public AABB renderBB;
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		return new BlockPos(0, dummy, 0);

@@ -11,9 +11,9 @@ package blusunrize.immersiveengineering.client.models.obj.callback.block;
 
 import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import com.mojang.datafixers.util.Unit;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -23,27 +23,23 @@ public class BottlingMachineCallbacks implements BlockCallback<Unit>
 {
 	public static final BottlingMachineCallbacks INSTANCE = new BottlingMachineCallbacks();
 
-	@Override
 	public Unit extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		return getDefaultKey();
 	}
 
-	@Override
 	public Unit getDefaultKey()
 	{
 		return Unit.INSTANCE;
 	}
 
-	@Override
 	public boolean dependsOnLayer()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Unit object, String group, RenderType layer)
 	{
-		return "glass".equals(group)==(RenderType.translucent()==layer);
+		return "glass".equals(group)==(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent()==layer);
 	}
 }

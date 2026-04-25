@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.common.blocks.wooden;
 import blusunrize.immersiveengineering.common.entities.GunpowderBarrelEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,32 +43,25 @@ public class GunpowderBarrelBlock extends TntBlock
 		super(props);
 	}
 
-	@Override
 	public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face)
 	{
 		return 100;
 	}
 
-	@Override
-	public void onCaughtFire(BlockState state, Level world, BlockPos pos, @org.jetbrains.annotations.Nullable Direction face, @org.jetbrains.annotations.Nullable LivingEntity igniter)
+	public boolean onCaughtFire(BlockState state, Level world, BlockPos pos, @org.jetbrains.annotations.Nullable Direction face, @org.jetbrains.annotations.Nullable LivingEntity igniter)
 	{
-		if(!world.isClientSide)
+		if(world instanceof ServerLevel)
 		{
 			GunpowderBarrelEntity explosive = spawnExplosive(world, pos, state, igniter);
 			world.playSound(null, explosive.getX(), explosive.getY(), explosive.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
 			world.removeBlock(pos, false);
 		}
+		return true;
 	}
 
-	@Override
-	public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion)
+	public void wasExploded(ServerLevel world, BlockPos pos, Explosion explosion)
 	{
-		super.onBlockExploded(state, world, pos, explosion);
-		if(!world.isClientSide)
-		{
-			GunpowderBarrelEntity explosive = spawnExplosive(world, pos, state, explosion.getIndirectSourceEntity());
-			explosive.setFuse((short)(world.random.nextInt(explosive.getFuse()/4)+explosive.getFuse()/8));
-		}
+		super.wasExploded(world, pos, explosion);
 	}
 
 	private GunpowderBarrelEntity spawnExplosive(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity igniter)
@@ -75,11 +69,5 @@ public class GunpowderBarrelBlock extends TntBlock
 		GunpowderBarrelEntity explosive = new GunpowderBarrelEntity(world, pos, igniter, state, 8);
 		world.addFreshEntity(explosive);
 		return explosive;
-	}
-
-	@Override
-	public void wasExploded(Level worldIn, BlockPos pos, Explosion explosionIn)
-	{
-
 	}
 }

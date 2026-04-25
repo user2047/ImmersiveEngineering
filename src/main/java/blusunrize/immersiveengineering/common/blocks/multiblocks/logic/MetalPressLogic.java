@@ -39,12 +39,14 @@ import blusunrize.immersiveengineering.common.util.DroppingMultiblockOutput;
 import blusunrize.immersiveengineering.common.util.IESounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -54,8 +56,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.function.BiFunction;
@@ -76,7 +78,6 @@ public class MetalPressLogic
 	private static final CapabilityPosition INPUT_POS = new CapabilityPosition(0, 1, 0, RelativeBlockFace.RIGHT);
 	private static final CapabilityPosition ENERGY_POS = new CapabilityPosition(1, 2, 0, RelativeBlockFace.UP);
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -102,7 +103,6 @@ public class MetalPressLogic
 		}
 	}
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -114,11 +114,10 @@ public class MetalPressLogic
 		}
 	}
 
-	@Override
 	public void onEntityCollision(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Entity entity)
 	{
 		final Level world = ctx.getLevel().getRawLevel();
-		if(world.isClientSide||!INPUT_POS.posInMultiblock().equals(posInMultiblock))
+		if(world.isClientSide()||!INPUT_POS.posInMultiblock().equals(posInMultiblock))
 			return;
 		if(entity instanceof ItemEntity itemEntity&&entity.isAlive()&&!itemEntity.getItem().isEmpty())
 		{
@@ -132,7 +131,7 @@ public class MetalPressLogic
 			ItemStack displayStack = recipe.value().getDisplayStack(stack);
 			MultiblockProcessInWorld<MetalPressRecipe> process;
 			if(recipe.value() instanceof RecipeDelegate delegate)
-				process = new SpecialMetalPressProcess(recipe.id(), delegate, displayStack);
+				process = new SpecialMetalPressProcess(recipe.id().identifier(), delegate, displayStack);
 			else
 				process = new MultiblockProcessInWorld<>(recipe, displayStack);
 
@@ -147,8 +146,7 @@ public class MetalPressLogic
 		}
 	}
 
-	@Override
-	public ItemInteractionResult click(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient)
+	public InteractionResult click(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient)
 	{
 		final State state = ctx.getState();
 		final Level level = ctx.getLevel().getRawLevel();
@@ -159,7 +157,7 @@ public class MetalPressLogic
 		else if(MetalPressRecipe.isValidMold(level, heldItem))
 			newMold = heldItem;
 		if(newMold==null)
-			return ItemInteractionResult.FAIL;
+			return InteractionResult.FAIL;
 
 		ItemStack oldMold = state.mold;
 		state.mold = newMold.copyWithCount(1);
@@ -168,29 +166,26 @@ public class MetalPressLogic
 		{
 			if(heldItem.isEmpty())
 				player.setItemInHand(hand, oldMold);
-			else if(!isClient)
-				player.spawnAtLocation(oldMold, 0);
+			else if(level instanceof net.minecraft.server.level.ServerLevel serverLevel)
+				player.spawnAtLocation(serverLevel, oldMold);
 		}
 		ctx.markMasterDirty();
 		ctx.requestMasterBESync();
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAt(ItemHandler.BLOCK, INPUT_POS, state -> state.inputCap);
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_POS, state -> state.energy);
+		register.registerAt(Capabilities.Item.BLOCK, INPUT_POS, state -> state.inputCap);
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_POS, state -> state.energy);
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		if(!state.mold.isEmpty())
@@ -200,7 +195,6 @@ public class MetalPressLogic
 		}
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return MetalPressShapes.SHAPE_GETTER;
@@ -255,55 +249,49 @@ public class MetalPressLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			writeCommonNBT(provider, nbt);
 			energy.deserializeNBT(provider, nbt.get("energy"));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			readCommonNBT(provider, nbt);
 			nbt.put("energy", energy.serializeNBT(provider));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			writeCommonNBT(provider, nbt);
 			nbt.putBoolean("active", renderAsActive);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			readCommonNBT(provider, nbt);
-			renderAsActive = nbt.getBoolean("active");
+			renderAsActive = nbt.getBooleanOr("active", false);
 		}
 
 		private void writeCommonNBT(Provider provider, CompoundTag nbt)
 		{
 			if(!mold.isEmpty())
-				nbt.put("mold", mold.save(provider, new CompoundTag()));
+				nbt.put("mold", blusunrize.immersiveengineering.common.util.ItemStackCompat.save(mold, provider));
 			// TODO write a bit less than this?
 			nbt.put("processor", processor.toNBT(provider));
 		}
 
 		private void readCommonNBT(Provider provider, CompoundTag nbt)
 		{
-			mold = ItemStack.parseOptional(provider, nbt.getCompound("mold"));
+			mold = blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("mold"));
 			processor.fromNBT(nbt.get("processor"), State::loadProcess, provider);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public void doProcessOutput(ItemStack result, IMultiblockLevel level)
 		{
 			this.output.insertOrDrop(result, level);
@@ -313,9 +301,9 @@ public class MetalPressLogic
 				BiFunction<Level, Identifier, MetalPressRecipe> getRecipe, CompoundTag tag, Provider provider
 		)
 		{
-			if(tag.contains("baseRecipe", Tag.TAG_STRING))
+			if(tag.contains("baseRecipe"))
 				return new SpecialMetalPressProcess(
-						tag, Identifier.parse(tag.getString("baseRecipe")), provider
+						tag, Identifier.parse(tag.getStringOr("baseRecipe", "")), provider
 				);
 			else
 				return new MultiblockProcessInWorld<>(getRecipe, tag, provider);
@@ -334,7 +322,7 @@ public class MetalPressLogic
 				);
 				if(baseRecipe!=null)
 					return MetalPressPackingRecipes.getRecipeDelegate(
-							new RecipeHolder<>(baseRecipeLocation, baseRecipe), name, level.registryAccess()
+							new RecipeHolder<>(recipeKey(baseRecipeLocation), baseRecipe), name, level.registryAccess()
 					).value();
 				else
 					return null;
@@ -344,15 +332,19 @@ public class MetalPressLogic
 
 		public SpecialMetalPressProcess(Identifier id, RecipeDelegate recipe, ItemStack inputItem)
 		{
-			super(new RecipeHolder<>(id, recipe), inputItem);
-			this.baseRecipeLocation = recipe.baseRecipe.id();
+			super(new RecipeHolder<>(recipeKey(id), recipe), inputItem);
+			this.baseRecipeLocation = recipe.baseRecipe.id().identifier();
 		}
 
-		@Override
 		public void writeExtraDataToNBT(CompoundTag nbt, Provider provider)
 		{
 			super.writeExtraDataToNBT(nbt, provider);
 			nbt.putString("baseRecipe", baseRecipeLocation.toString());
 		}
+	}
+
+	private static ResourceKey<net.minecraft.world.item.crafting.Recipe<?>> recipeKey(Identifier id)
+	{
+		return ResourceKey.create(Registries.RECIPE, id);
 	}
 }

@@ -24,7 +24,6 @@ public class VerticalFacingBlock extends IEBaseBlock
 		super(blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
@@ -36,7 +35,6 @@ public class VerticalFacingBlock extends IEBaseBlock
 		return Direction.UP;
 	}
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		BlockState ret = super.getInitDefaultState();

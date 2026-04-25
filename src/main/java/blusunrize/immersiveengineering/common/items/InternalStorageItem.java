@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.common.register.IEDataComponents;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.ComponentItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
@@ -29,7 +29,7 @@ public abstract class InternalStorageItem extends IEBaseItem
 
 	public static void registerCapabilitiesISI(ItemCapabilityRegistrar registrar)
 	{
-		registrar.register(ItemHandler.ITEM, InternalStorageItem::makeInternalItemHandler);
+		registrar.register(Capabilities.Item.ITEM, InternalStorageItem::makeInternalItemHandler);
 	}
 
 	public static IItemHandlerModifiable makeInternalItemHandler(ItemStack stack)

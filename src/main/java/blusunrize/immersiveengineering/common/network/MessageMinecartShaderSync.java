@@ -19,7 +19,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -36,7 +36,6 @@ public record MessageMinecartShaderSync(int entityID, Optional<Identifier> shade
 			MessageMinecartShaderSync::new
 	);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		if(context.flow().getReceptionSide()==LogicalSide.SERVER)
@@ -65,7 +64,6 @@ public record MessageMinecartShaderSync(int entityID, Optional<Identifier> shade
 			});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

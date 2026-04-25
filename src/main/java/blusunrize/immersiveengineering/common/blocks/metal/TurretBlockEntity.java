@@ -39,7 +39,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
@@ -59,7 +59,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
@@ -94,7 +94,6 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		super(type, pos, state);
 	}
 
-	@Override
 	public void tickClient()
 	{
 		tickCommon();
@@ -123,7 +122,7 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 			double dSq = delta.lengthSqr();
 			if(dSq > range*range)
 				this.target = null;
-			else if(level.isClientSide)
+			else if(level.isClientSide())
 			{
 				double yaw = (Mth.atan2(delta.x, delta.z)*(180/Math.PI))-180;
 				this.rotationPitch = (float)(Math.atan2(Math.sqrt(delta.x*delta.x+delta.z*delta.z), delta.y)*(180/Math.PI))-90;
@@ -134,7 +133,7 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 					this.rotationYaw = (float)yaw-defaultYaw;
 			}
 		}
-		else if(level.isClientSide)
+		else if(level.isClientSide())
 		{
 			this.rotationYaw *= .75;
 			if(Math.abs(rotationYaw) < 10)
@@ -145,7 +144,6 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		}
 	}
 
-	@Override
 	public void tickServer()
 	{
 		tickCommon();
@@ -300,23 +298,21 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		this.target = null;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 
 		if(nbt.contains("owner"))
-			owner = nbt.getString("owner");
+			owner = nbt.getStringOr("owner", "");
 		else
 			owner = null;
 		this.config = TurretConfig.CODECS.codec().decode(NbtOps.INSTANCE, nbt.get("config")).getOrThrow().getFirst();
 
 		target = null;
-		if(nbt.contains("target", Tag.TAG_STRING))
-			targetId = UUID.fromString(nbt.getString("target"));
+		if(nbt.contains("target"))
+			targetId = UUID.fromString(nbt.getStringOr("target", ""));
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
@@ -330,7 +326,6 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 			nbt.putString("target", target.getUUID().toString());
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(!isDummy())
@@ -347,64 +342,56 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 
 	public AABB renderBB;
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(isDummy())
 		{
 			BlockEntity te = level.getBlockEntity(getBlockPos().below());
 			if(te instanceof TurretBlockEntity<?>)
 				return ((TurretBlockEntity<?>)te).screwdriverUseSide(side, player, hand, hitVec);
-			return ItemInteractionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
-		if(player.isShiftKeyDown()&&!level.isClientSide)
+		if(player.isShiftKeyDown()&&!level.isClientSide())
 		{
 			config = new TurretConfig(
 					config.targetList, config.whitelist, config.attackAnimals, config.attackPlayers, config.attackNeutrals, !config.redstoneControlInverted
 			);
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl."+(config.redstoneControlInverted?"invertedOn": "invertedOff")),
-					true
+			player.sendOverlayMessage(
+					Component.translatable(Lib.CHAT_INFO+"rsControl."+(config.redstoneControlInverted?"invertedOn": "invertedOff"))
 			);
 			setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public NonNullList<ItemStack> getInventory()
 	{
 		return NonNullList.create();
 	}
 
-	@Override
 	public boolean isStackValid(int slot, ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public int getSlotLimit(int slot)
 	{
 		return 64;
 	}
 
-	@Override
 	public void doGraphicalUpdates()
 	{
 	}
 
-	@Override
 	public boolean canUseGui(Player player)
 	{
 		if(hasOwnerRights(player))
 			return true;
-		player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"notOwner", owner), true);
+		player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"notOwner", owner));
 		return false;
 	}
 
-	@Override
 	public T getGuiMaster()
 	{
 		if(!isDummy())
@@ -415,25 +402,21 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		return null;
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean canEntityDestroy(Entity entity)
 	{
 		if(isDummy())
@@ -447,14 +430,12 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		return true;
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return getBlockState().getValue(IEProperties.MULTIBLOCKSLAVE);
 	}
 
 	@Nullable
-	@Override
 	public TurretBlockEntity<T> master()
 	{
 		if(!isDummy())
@@ -467,13 +448,11 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		return this.getClass().isInstance(te)?(TurretBlockEntity<T>)te: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		level.setBlockAndUpdate(worldPosition.above(), getBlockState().setValue(IEProperties.MULTIBLOCKSLAVE, true));
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		tempMasterBE = master();
@@ -482,11 +461,10 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 			level.removeBlock(otherPos, false);
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
-		BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
-		Entity player = context.getParamOrNull(LootContextParams.THIS_ENTITY);
+		BlockState state = context.getOptionalParameter(LootContextParams.BLOCK_STATE);
+		Entity player = context.getOptionalParameter(LootContextParams.THIS_ENTITY);
 		ItemStack stack = new ItemStack(state.getBlock(), 1);
 		TurretBlockEntity<?> turret = this;
 		if(isDummy())
@@ -502,7 +480,6 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
@@ -524,7 +501,7 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 	protected static <T extends TurretBlockEntity<T>>
 	void registerCapabilitiesBase(BECapabilityRegistrar<T> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> {
+		registrar.register(Energy.BLOCK, (be, side) -> {
 			if(side!=null||!be.isDummy())
 				return ((TurretBlockEntity<?>)be).energyCap.get();
 			else
@@ -539,7 +516,6 @@ public abstract class TurretBlockEntity<T extends TurretBlockEntity<T>> extends 
 		level.setBlockAndUpdate(worldPosition, newState);
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		if(isDummy())

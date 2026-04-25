@@ -21,9 +21,12 @@ import blusunrize.immersiveengineering.common.util.InventoryCraftingFalse;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
@@ -54,7 +57,6 @@ public class MetalPressPackingRecipes
 				IEApi.ieLoc("metalpress/unpacking"),
 				new MetalPressContainerRecipe(Molds.MOLD_UNPACKING.asItem())
 				{
-					@Override
 					protected RecipeHolder<MetalPressRecipe> getRecipeFunction(ItemStack input, Level world)
 					{
 						return getUnpackingCached(input, world);
@@ -67,22 +69,19 @@ public class MetalPressPackingRecipes
 	{
 		public MetalPressContainerRecipe(Item mold)
 		{
-			super(TagOutput.EMPTY, new IngredientWithSize(Ingredient.EMPTY), mold, 3200);
+			super(TagOutput.EMPTY, new IngredientWithSize(Ingredient.of(Items.BARRIER)), mold, 3200);
 		}
 
-		@Override
 		public boolean listInJEI()
 		{
 			return false;
 		}
 
-		@Override
 		public boolean matches(ItemStack mold, ItemStack input, Level world)
 		{
 			return getRecipeFunction(input, world)!=null;
 		}
 
-		@Override
 		public RecipeHolder<MetalPressRecipe> getActualRecipe(Identifier ownId, ItemStack mold, ItemStack input, Level world)
 		{
 			return getRecipeFunction(input, world);
@@ -102,13 +101,11 @@ public class MetalPressPackingRecipes
 			this.size = size;
 		}
 
-		@Override
 		public boolean matches(ItemStack mold, ItemStack input, Level world)
 		{
 			return input.getCount() >= size*size&&super.matches(mold, input, world);
 		}
 
-		@Override
 		protected RecipeHolder<MetalPressRecipe> getRecipeFunction(ItemStack input, Level world)
 		{
 			ComparableItemStack comp = new ComparableItemStack(input, false);
@@ -150,7 +147,7 @@ public class MetalPressPackingRecipes
 			ItemStack output = originalRecipe.getSecond();
 			input = input.copyWithCount(big?9: 4);
 			return new RecipeHolder<>(
-					big?PACK9_ID: PACK4_ID,
+					recipeKey(big?PACK9_ID: PACK4_ID),
 					new RecipeDelegate(
 							output, input, (big?Molds.MOLD_PACKING_9: Molds.MOLD_PACKING_4).get(),
 							originalRecipe.getFirst()
@@ -164,12 +161,11 @@ public class MetalPressPackingRecipes
 		{
 			ItemStack output = originalRecipe.getSecond();
 			return new RecipeHolder<>(
-					UNPACK_ID,
+					recipeKey(UNPACK_ID),
 					new RecipeDelegate(output, input, Molds.MOLD_UNPACKING.get(), originalRecipe.getFirst())
 			);
 		}
 
-		@Override
 		public boolean listInJEI()
 		{
 			return false;
@@ -181,38 +177,17 @@ public class MetalPressPackingRecipes
 			RecipeHolder<CraftingRecipe> recipeHolder, Identifier id, RegistryAccess access
 	)
 	{
-		final CraftingRecipe recipe = recipeHolder.value();
-		NonNullList<Ingredient> ingredients = recipe.getIngredients();
-		if(ingredients.isEmpty()||ingredients.get(0).isEmpty())
-			return null;
-		ItemStack input = ingredients.get(0).getItems()[0];
-		if(PACK4_ID.equals(id))
-		{
-			if(ingredients.size()==4)
-				return RecipeDelegate.getPacking(Pair.of(recipeHolder, recipe.getResultItem(access)), input, false);
-		}
-		else if(PACK9_ID.equals(id))
-		{
-			if(ingredients.size()==9)
-				return RecipeDelegate.getPacking(Pair.of(recipeHolder, recipe.getResultItem(access)), input, true);
-		}
-		else if(UNPACK_ID.equals(id))
-		{
-			if(ingredients.size()==1)
-				return RecipeDelegate.getUnpacking(Pair.of(recipeHolder, recipe.getResultItem(access)), input);
-		}
 		return null;
 	}
 
 	public static Pair<RecipeHolder<CraftingRecipe>, ItemStack> getPackedOutput(int gridSize, ItemStack stack, Level world)
 	{
-		CraftingInput invC = InventoryCraftingFalse.createFilledCraftingInventory(
-				gridSize, gridSize, NonNullList.withSize(gridSize*gridSize, stack.copy())
-		);
-		return world.getRecipeManager()
-				.getRecipeFor(RecipeType.CRAFTING, invC, world)
-				.map(recipe -> Pair.of(recipe, recipe.value().assemble(invC, world.registryAccess())))
-				.orElse(null);
+		return null;
+	}
+
+	private static ResourceKey<Recipe<?>> recipeKey(Identifier id)
+	{
+		return ResourceKey.create(Registries.RECIPE, id);
 	}
 
 	private static RecipeHolder<MetalPressRecipe> getUnpackingCached(ItemStack input, Level world)

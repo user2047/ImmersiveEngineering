@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 public class GrindingDiskItem extends SawbladeItem
 {
 	private static final Set<ItemAbility> TOOL_ACTIONS = ImmutableSet.of(
-			ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_STRIP, ItemAbilities.AXE_SCRAPE, ItemAbilities.AXE_WAX_OFF, Lib.WIRECUTTER_DIG
+			ItemAbilities.AXE_STRIP, ItemAbilities.AXE_SCRAPE, ItemAbilities.AXE_WAX_OFF, Lib.WIRECUTTER_DIG
 	);
 	private static final ListTag ENCHANTS = new ListTag();
 	public static final Identifier TEXTURE = ImmersiveEngineering.rl("item/grindingdisk_blade");
@@ -47,31 +47,26 @@ public class GrindingDiskItem extends SawbladeItem
 		super(maxDamage, sawbladeSpeed, sawbladeDamage, TEXTURE);
 	}
 
-	@Override
 	public int getSawbladeDamageFromBlock(boolean effective)
 	{
 		return effective?1: 10;
 	}
 
-	@Override
 	public boolean canSawbladeFellTree()
 	{
 		return false;
 	}
 
-	@Override
 	public Map<ResourceKey<Enchantment>, Integer> getExtraEnchantments()
 	{
 		return Map.of(Enchantments.SILK_TOUCH, 1);
 	}
 
-	@Override
 	public Predicate<BlockState> getSawbladeMaterials()
 	{
 		return s -> s.is(IETags.grindingDiskHarvestable);
 	}
 
-	@Override
 	public Set<ItemAbility> getItemAbilities()
 	{
 		return TOOL_ACTIONS;

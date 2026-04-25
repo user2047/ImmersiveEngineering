@@ -57,25 +57,20 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		super(type, pos, state);
 	}
 
-	@Override
 	public void loadAdditional(CompoundTag nbtIn, Provider provider)
 	{
-		super.loadAdditional(nbtIn, provider);
 		this.readCustomNBT(nbtIn, false, provider);
 	}
 
 	public abstract void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider);
 
-	@Override
 	protected void saveAdditional(CompoundTag nbt, Provider provider)
 	{
-		super.saveAdditional(nbt, provider);
 		this.writeCustomNBT(nbt, false, provider);
 	}
 
 	public abstract void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider);
 
-	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket()
 	{
 		return ClientboundBlockEntityDataPacket.create(this, (be, access) -> {
@@ -85,19 +80,16 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		});
 	}
 
-	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		this.readCustomNBT(pkt.getTag(), true, provider);
 	}
 
-	@Override
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		this.readCustomNBT(tag, true, provider);
 	}
 
-	@Override
 	public CompoundTag getUpdateTag(Provider provider)
 	{
 		CompoundTag nbt = super.getUpdateTag(provider);
@@ -117,7 +109,6 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 	{
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int type)
 	{
 		if(id==0||id==255)
@@ -188,7 +179,6 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		return makeFluidHandler(tanks, false, false);
 	}
 
-	@Override
 	public final void setRemoved()
 	{
 		if(!isUnloaded)
@@ -198,14 +188,12 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 
 	private boolean isUnloaded = false;
 
-	@Override
 	public void onLoad()
 	{
 		super.onLoad();
 		isUnloaded = false;
 	}
 
-	@Override
 	public void onChunkUnloaded()
 	{
 		super.onChunkUnloaded();
@@ -239,7 +227,6 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		overrideBlockState = state;
 	}
 
-	@Override
 	public BlockState getBlockState()
 	{
 		if(overrideBlockState!=null)
@@ -248,7 +235,6 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 			return super.getBlockState();
 	}
 
-	@Override
 	@Deprecated
 	public void setBlockState(BlockState newState)
 	{
@@ -263,14 +249,12 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		invalidateCapabilities();
 	}
 
-	@Override
 	public void setState(BlockState state)
 	{
 		if(getLevelNonnull().getBlockState(worldPosition)==getState())
 			getLevelNonnull().setBlockAndUpdate(worldPosition, state);
 	}
 
-	@Override
 	public BlockState getState()
 	{
 		return getBlockState();
@@ -283,10 +267,9 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 	protected void markChunkDirty()
 	{
 		if(this.level!=null&&this.level.hasChunkAt(this.worldPosition))
-			this.level.getChunkAt(this.worldPosition).setUnsaved(true);
+			this.level.getChunkAt(this.worldPosition).markUnsaved();
 	}
 
-	@Override
 	public void setLevel(Level world)
 	{
 		super.setLevel(world);
@@ -295,7 +278,6 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 
 	// Based on the super version, but works around a Forge patch to World#markChunkDirty causing duplicate comparator
 	// updates and only performs comparator updates if this TE actually has comparator behavior
-	@Override
 	public void setChanged()
 	{
 		if(this.level!=null)
@@ -310,7 +292,7 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 	protected void onNeighborBlockChange(BlockPos otherPos)
 	{
 		BlockPos delta = otherPos.subtract(worldPosition);
-		Direction side = Direction.getNearest(delta.getX(), delta.getY(), delta.getZ());
+		Direction side = Direction.getNearest(delta.getX(), delta.getY(), delta.getZ(), null);
 		Preconditions.checkNotNull(side);
 		updateRSForSide(side);
 	}
@@ -329,7 +311,7 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 
 	protected int getRSInput(Direction from)
 	{
-		if(level.isClientSide||!redstoneBySide.containsKey(from))
+		if(level.isClientSide()||!redstoneBySide.containsKey(from))
 			updateRSForSide(from);
 		return redstoneBySide.get(from);
 	}

@@ -33,7 +33,6 @@ public class HomingBullet extends BulletHandler.DamagingBullet<Unit>
 		);
 	}
 
-	@Override
 	public Entity getProjectile(Player shooter, Unit data, Entity projectile, boolean electro)
 	{
 		RevolvershotHomingEntity shot = shooter!=null?new RevolvershotHomingEntity(projectile.level(), shooter,

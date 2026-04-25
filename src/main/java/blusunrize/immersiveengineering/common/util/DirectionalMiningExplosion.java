@@ -10,6 +10,7 @@ package blusunrize.immersiveengineering.common.util;
 
 import blusunrize.immersiveengineering.api.ApiUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-public class DirectionalMiningExplosion extends Explosion
+public class DirectionalMiningExplosion implements Explosion
 {
 	private static final int SIZE = 8;
 	private static final int SCAN = SIZE-1;
@@ -40,6 +41,9 @@ public class DirectionalMiningExplosion extends Explosion
 
 	private final Level world;
 	private final DamageSource damageSource;
+	private final Entity igniter;
+	private final Vec3 center;
+	private final List<BlockPos> toBlow = new ArrayList<>();
 
 	/**
 	 * This explosion type is a bit special because it has a constant, tuned size to behave like a mining explosive.
@@ -48,8 +52,9 @@ public class DirectionalMiningExplosion extends Explosion
 	 */
 	public DirectionalMiningExplosion(Level world, Entity igniter, double x, double y, double z, boolean isFlaming)
 	{
-		super(world, igniter, x, y, z, SIZE, isFlaming, BlockInteraction.DESTROY);
 		this.world = world;
+		this.igniter = igniter;
+		this.center = new Vec3(x, y, z);
 		this.damageSource = world.damageSources().explosion(this);
 	}
 
@@ -63,7 +68,6 @@ public class DirectionalMiningExplosion extends Explosion
 	 * These properties are then composed into a vector in which the explosion should propagate
 	 * Finally, a subtype (surface, subsurface, blasting) of explosion is selected based on these parameters, and DirectionalMiningExplosion#stagedExplosionDetonation() is called
 	 */
-	@Override
 	public void explode()
 	{
 		// variables used for the rest of the explosion
@@ -128,7 +132,7 @@ public class DirectionalMiningExplosion extends Explosion
 	private void stagedExplosionDetonation(BlockPos center, Vec3 step, float crater, float shockwave, float resistance, boolean blasting)
 	{
 		// clear toBlow in case it has blocks still in it
-		this.clearToBlow();
+		this.toBlow.clear();
 		// handle shockwave and crater block damage that come with any explosion
 		int shock = (int)shockwave;
 		for(int x = -shock; x <= shock; x++)
@@ -190,8 +194,48 @@ public class DirectionalMiningExplosion extends Explosion
 	private void scheduleBlockExplosion(BlockPos pos, float resistance, float chance)
 	{
 		BlockState state = this.world.getBlockState(pos);
-		if(!state.isAir()&&state.getExplosionResistance(world, pos, this) <= resistance&&ApiUtils.RANDOM.nextFloat() > chance)
-			this.getToBlow().add(pos);
+		if(!state.isAir()&&state.getExplosionResistance(world, pos, this) <= resistance&&ApiUtils.getRandom().nextFloat() > chance)
+			this.toBlow.add(pos);
+	}
+
+	public ServerLevel level()
+	{
+		return world instanceof ServerLevel serverLevel?serverLevel: null;
+	}
+
+	public BlockInteraction getBlockInteraction()
+	{
+		return BlockInteraction.DESTROY;
+	}
+
+	public LivingEntity getIndirectSourceEntity()
+	{
+		return Explosion.getIndirectSourceEntity(igniter);
+	}
+
+	public Entity getDirectSourceEntity()
+	{
+		return igniter;
+	}
+
+	public float radius()
+	{
+		return SIZE;
+	}
+
+	public Vec3 center()
+	{
+		return center;
+	}
+
+	public boolean canTriggerBlocks()
+	{
+		return true;
+	}
+
+	public boolean shouldAffectBlocklikeEntities()
+	{
+		return true;
 	}
 
 	/**
@@ -203,7 +247,6 @@ public class DirectionalMiningExplosion extends Explosion
 	 */
 	private void damageEntities(List<Entity> list, float intensity)
 	{
-		net.neoforged.neoforge.event.EventHooks.onExplosionDetonate(this.world, this, list, SIZE*2);
 		for(Entity entity : list)
 			if(!entity.ignoreExplosion(this)&&!(entity instanceof ItemEntity))
 			{

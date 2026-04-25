@@ -14,8 +14,8 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.DieselGen
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.DieselGeneratorLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -28,7 +28,6 @@ public class DieselGeneratorRenderer extends IEMultiblockRenderer<DieselGenerato
 	public static final String NAME = "diesel_gen_fan";
 	public static DynamicModel FAN;
 
-	@Override
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		matrixStack.pushPose();
@@ -39,14 +38,14 @@ public class DieselGeneratorRenderer extends IEMultiblockRenderer<DieselGenerato
 
 		matrixStack.mulPose(new Quaternionf().rotateAxis(
 				(state.animation_fanRotation+(state.animation_fanRotationStep*partialTicks))*Mth.DEG_TO_RAD,
-				Vec3.atLowerCornerOf(facing.getNormal()).toVector3f()
+				Vec3.atLowerCornerOf(facing.getUnitVec3i()).toVector3f()
 		));
 		matrixStack.translate(-0.5, 0, -0.5);
 
 		List<BakedQuad> quads = FAN.getNullQuads();
 		rotateForFacing(matrixStack, facing);
 		RenderUtils.renderModelTESRFast(
-				quads, bufferIn.getBuffer(RenderType.solid()), matrixStack, combinedLightIn, combinedOverlayIn
+				quads, bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), matrixStack, combinedLightIn, combinedOverlayIn
 		);
 
 		matrixStack.popPose();

@@ -36,7 +36,6 @@ public class RedstoneStateCellScreen extends ClientBlockEntityScreen<RedstoneSta
 	private GuiButtonBoolean[] colorButtonsReset;
 	private GuiButtonBoolean[] colorButtonsOut;
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -76,7 +75,6 @@ public class RedstoneStateCellScreen extends ClientBlockEntityScreen<RedstoneSta
 		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
-	@Override
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_set").getString(), guiLeft+20, guiTop, DyeColor.WHITE.getTextColor());

@@ -11,7 +11,7 @@ package blusunrize.immersiveengineering.mixin.accessors;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 

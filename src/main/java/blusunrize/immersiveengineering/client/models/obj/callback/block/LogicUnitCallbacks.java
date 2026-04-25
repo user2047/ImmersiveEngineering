@@ -18,11 +18,11 @@ import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -34,7 +34,6 @@ public class LogicUnitCallbacks implements BlockCallback<Key>
 	public static final LogicUnitCallbacks INSTANCE = new LogicUnitCallbacks();
 	private static final Key INVALID = new Key(IntLists.EMPTY_LIST);
 
-	@Override
 	public Key extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		if(!(blockEntity instanceof LogicUnitBlockEntity logicUnit))
@@ -47,25 +46,21 @@ public class LogicUnitCallbacks implements BlockCallback<Key>
 		return new Key(nonEmptySlots);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public boolean dependsOnLayer()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
-		return (layer==RenderType.translucent())==group.equals("tubes");
+		return (layer==blusunrize.immersiveengineering.client.utils.RenderTypeCompat.translucent())==group.equals("tubes");
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Key key)
 	{
 		List<String> parts = Lists.newArrayList("base", "tubes");

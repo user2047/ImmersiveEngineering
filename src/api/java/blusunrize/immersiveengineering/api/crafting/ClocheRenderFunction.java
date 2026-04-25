@@ -14,7 +14,6 @@ import com.google.common.collect.HashBiMap;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import malte0811.dualcodecs.DualCodec;
-import malte0811.dualcodecs.DualCodecs;
 import malte0811.dualcodecs.DualMapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.Identifier;
@@ -60,7 +59,10 @@ public interface ClocheRenderFunction
 	 */
 	BiMap<Identifier, DualMapCodec<? super RegistryFriendlyByteBuf, ? extends ClocheRenderFunction>> RENDER_FUNCTION_FACTORIES = HashBiMap.create();
 
-	DualCodec<RegistryFriendlyByteBuf, ClocheRenderFunction> CODECS = DualCodecs.RESOURCE_LOCATION.<RegistryFriendlyByteBuf>castStream().dispatch(
+	DualCodec<RegistryFriendlyByteBuf, Identifier> ID_CODECS = new DualCodec<>(
+			Identifier.CODEC, Identifier.STREAM_CODEC.cast()
+	);
+	DualCodec<RegistryFriendlyByteBuf, ClocheRenderFunction> CODECS = ID_CODECS.dispatch(
 			f -> RENDER_FUNCTION_FACTORIES.inverse().get(f.codec()), RENDER_FUNCTION_FACTORIES::get
 	);
 }

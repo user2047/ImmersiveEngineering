@@ -36,7 +36,6 @@ public class PostTransformerBlockEntity extends AbstractTransformerBlockEntity i
 		super(IEBlockEntities.POST_TRANSFORMER.get(), pos, state);
 	}
 
-	@Override
 	protected Vec3 getConnectionOffset(WireType type, boolean right)
 	{
 		if(right)
@@ -46,7 +45,6 @@ public class PostTransformerBlockEntity extends AbstractTransformerBlockEntity i
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo target, Vec3i offset)
 	{
 		if(target.hitY >= .5)
@@ -55,7 +53,6 @@ public class PostTransformerBlockEntity extends AbstractTransformerBlockEntity i
 			return new ConnectionPoint(worldPosition, LEFT_INDEX);
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL_PREFER_SIDE;
@@ -66,7 +63,6 @@ public class PostTransformerBlockEntity extends AbstractTransformerBlockEntity i
 	);
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(Unit.INSTANCE, getFacing());

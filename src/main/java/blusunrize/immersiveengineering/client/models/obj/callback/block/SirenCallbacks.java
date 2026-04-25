@@ -15,7 +15,7 @@ import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -28,19 +28,16 @@ public class SirenCallbacks implements BlockCallback<Boolean>
 	private static final IEObjState VERTICAL = new IEObjState(VisibilityList.show("main", "base", "extra_horn"));
 	private static final IEObjState HORIZONTAL = new IEObjState(VisibilityList.show("main", "wallmount"));
 
-	@Override
 	public Boolean extractKey(@Nonnull BlockAndTintGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, BlockEntity blockEntity)
 	{
 		return state.getValue(IEProperties.FACING_ALL).getAxis()==Axis.Y;
 	}
 
-	@Override
 	public Boolean getDefaultKey()
 	{
 		return true;
 	}
 
-	@Override
 	public IEObjState getIEOBJState(Boolean vertical)
 	{
 		return vertical?VERTICAL: HORIZONTAL;

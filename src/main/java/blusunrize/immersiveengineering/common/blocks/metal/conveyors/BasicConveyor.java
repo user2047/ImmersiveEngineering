@@ -27,7 +27,6 @@ public class BasicConveyor extends ConveyorBase
 		super(tile);
 	}
 
-	@Override
 	public IConveyorType<BasicConveyor> getType()
 	{
 		return TYPE;

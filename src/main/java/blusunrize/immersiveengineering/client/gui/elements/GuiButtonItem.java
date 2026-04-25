@@ -32,7 +32,6 @@ public class GuiButtonItem extends Button
 		this.item = stack;
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		if(this.visible)
@@ -59,12 +58,14 @@ public class GuiButtonItem extends Button
 		}
 	}
 
-	@Override
+	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+		renderWidget(graphics, mouseX, mouseY, partialTicks);
+	}
+
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
-		boolean b = super.mouseClicked(mouseX, mouseY, button);
-		if(b)
-			this.state = !state;
-		return b;
+		this.state = !state;
+		return true;
 	}
 }

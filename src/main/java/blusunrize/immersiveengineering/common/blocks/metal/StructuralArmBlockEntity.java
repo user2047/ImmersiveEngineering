@@ -53,14 +53,13 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 		super(IEBlockEntities.STRUCTURAL_ARM.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int oldLength = totalLength, oldPos = slopePosition;
-		totalLength = nbt.getInt("totalLength");
-		slopePosition = nbt.getInt("slopePosition");
-		onCeiling = nbt.getBoolean("onCeiling");
-		if(level!=null&&level.isClientSide&&(oldLength!=totalLength||slopePosition!=oldPos))
+		totalLength = nbt.getIntOr("totalLength", 0);
+		slopePosition = nbt.getIntOr("slopePosition", 0);
+		onCeiling = nbt.getBooleanOr("onCeiling", false);
+		if(level!=null&&level.isClientSide()&&(oldLength!=totalLength||slopePosition!=oldPos))
 		{
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -68,13 +67,12 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 		// In IE 134 and below the tile field is used instead of the blockstate property. The TE field is now only used
 		// to handle worlds saved with those versions and should be removed once compat is no longer a concern.
 		// Note that the blockstate is not actively replaced, so this will be the next MC version break (1.17).
-		if(nbt.contains("facing", Tag.TAG_INT))
-			this.facing = DirectionUtils.VALUES[nbt.getInt("facing")];
+		if(nbt.contains("facing"))
+			this.facing = DirectionUtils.VALUES[nbt.getIntOr("facing", 0)];
 		else
 			this.facing = null;
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putInt("totalLength", totalLength);
@@ -84,11 +82,10 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 		nbt.putBoolean("onCeiling", onCeiling);
 	}
 
-	@Override
 	public void onNeighborBlockChange(BlockPos otherPos)
 	{
 		super.onNeighborBlockChange(otherPos);
-		if(level.isClientSide)
+		if(level.isClientSide())
 			return;
 		boolean positive;
 		if(otherPos.equals(worldPosition.relative(getFacing(), 1)))
@@ -204,7 +201,6 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 		level.sendBlockUpdated(pos, state, state, 3);
 	}
 
-	@Override
 	public Direction getFacing()
 	{
 		if(this.facing!=null)
@@ -213,7 +209,6 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 			return IStateBasedDirectional.super.getFacing();
 	}
 
-	@Override
 	public void setFacing(Direction facing)
 	{
 		IStateBasedDirectional.super.setFacing(facing);
@@ -224,13 +219,11 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 			level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return StructuralArmBlock.FACING;
 	}
 
-	@Override
 	public Direction getFacingForPlacement(BlockPlaceContext ctx)
 	{
 		Direction side = ctx.getClickedFace();
@@ -239,13 +232,11 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 		return IStateBasedDirectional.super.getFacingForPlacement(ctx);
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
@@ -260,7 +251,6 @@ public class StructuralArmBlockEntity extends IEBaseBlockEntity implements IStat
 					key -> getBounds(key.slopePos(), key.slopeLength(), key.onCeiling())
 			);
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return SHAPES.get(new ShapeKey(slopePosition, totalLength, onCeiling), getFacing());

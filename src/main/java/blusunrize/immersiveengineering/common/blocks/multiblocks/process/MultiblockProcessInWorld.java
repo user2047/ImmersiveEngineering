@@ -57,9 +57,9 @@ public class MultiblockProcessInWorld<R extends MultiblockRecipe>
 	)
 	{
 		super(getRecipe, data);
-		this.inputItems = NonNullList.withSize(data.getInt("numInputs"), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(data, this.inputItems, provider);
-		this.transformationPoint = data.getFloat("process_transformationPoint");
+		this.inputItems = NonNullList.withSize(data.getIntOr("numInputs", 0), ItemStack.EMPTY);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.loadAllItems(data, this.inputItems, provider);
+		this.transformationPoint = data.getFloatOr("process_transformationPoint", 0);
 	}
 
 	public MultiblockProcessInWorld(RecipeHolder<R> recipe, ItemStack input)
@@ -79,39 +79,33 @@ public class MultiblockProcessInWorld<R extends MultiblockRecipe>
 		return inputItems;
 	}
 
-	@Override
 	public void writeExtraDataToNBT(CompoundTag nbt, Provider provider)
 	{
-		ContainerHelper.saveAllItems(nbt, inputItems, provider);
+		blusunrize.immersiveengineering.common.util.ContainerHelperCompat.saveAllItems(nbt, inputItems, provider);
 		nbt.putInt("numInputs", inputItems.size());
 		nbt.putFloat("process_transformationPoint", transformationPoint);
 	}
 
-	@Override
 	protected boolean canOutputItem(ProcessContextInWorld<R> context, ItemStack output)
 	{
 		return true;
 	}
 
-	@Override
 	protected boolean canOutputFluid(ProcessContextInWorld<R> context, FluidStack output)
 	{
 		return false;
 	}
 
-	@Override
 	protected void outputItem(ProcessContextInWorld<R> context, ItemStack output, IMultiblockLevel level)
 	{
 		context.doProcessOutput(output, level);
 	}
 
-	@Override
 	protected void outputFluid(ProcessContextInWorld<R> context, FluidStack output)
 	{
 		context.doProcessFluidOutput(output);
 	}
 
-	@Override
 	protected void processFinish(ProcessContextInWorld<R> context, IMultiblockLevel level)
 	{
 		super.processFinish(context, level);

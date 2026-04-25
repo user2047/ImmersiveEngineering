@@ -66,7 +66,6 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		this.logic = logic;
 	}
 
-	@Override
 	protected void replaceStructureBlock(StructureBlockInfo info, Level world, BlockPos actualPos, boolean mirrored, Direction clickDirection, Vec3i offsetFromMaster)
 	{
 		BlockState newState = logic.block().get().defaultBlockState();
@@ -92,7 +91,6 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		world.markAndNotifyBlock(actualPos, chunk, oldState, newState, Block.UPDATE_ALL, 512);
 	}
 
-	@Override
 	public void disassemble(Level world, BlockPos origin, boolean mirrored, Direction clickDirectionAtCreation)
 	{
 		Mirror mirror = mirrored?Mirror.FRONT_BACK: Mirror.NONE;
@@ -118,14 +116,12 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		}
 	}
 
-	@Override
 	public Vec3i getSize(@Nullable Level world)
 	{
 		return size;
 	}
 
 	@Nonnull
-	@Override
 	public TemplateData getTemplate(@Nonnull Level world)
 	{
 		TemplateData result = super.getTemplate(world);
@@ -138,7 +134,6 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		return result;
 	}
 
-	@Override
 	protected void prepareBlockForDisassembly(Level world, BlockPos pos)
 	{
 		BlockEntity be = world.getBlockEntity(pos);
@@ -148,7 +143,6 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 			IELogger.logger.error("Expected multiblock TE at {}, got {}", pos, be);
 	}
 
-	@Override
 	public void initializeClient(Consumer<MultiblockManualData> consumer)
 	{
 		consumer.accept(new BasicClientProperties(this));
@@ -159,13 +153,11 @@ public abstract class IETemplateMultiblock extends TemplateMultiblock
 		return logic.id();
 	}
 
-	@Override
 	public Component getDisplayName()
 	{
 		return logic.block().get().getName();
 	}
 
-	@Override
 	public Block getBlock()
 	{
 		return logic.block().get();

@@ -23,7 +23,6 @@ public class RazorWireBlock extends ConnectorBlock<RazorWireBlockEntity>
 		super(props, IEBlockEntities.RAZOR_WIRE);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

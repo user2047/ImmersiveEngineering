@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 
 public class MineralMix extends IESerializableRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<MineralMix>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<MineralMix>> SERIALIZER;
 
 	public static final CachedRecipeList<MineralMix> RECIPES = new CachedRecipeList<>(IERecipeTypes.MINERAL_MIX);
 
@@ -56,12 +56,10 @@ public class MineralMix extends IESerializableRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<MineralMix> getIESerializer()
+	protected RecipeSerializer<MineralMix> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
-
-	@Override
 	public ItemStack getResultItem(Provider access)
 	{
 		return ItemStack.EMPTY;

@@ -28,29 +28,25 @@ public class ToolUpgradeItem extends IEBaseItem implements IUpgrade
 
 	public ToolUpgradeItem(ToolUpgrade type)
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 		this.type = type;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		list.add(Component.translatable(Lib.DESC_FLAVOUR+BuiltInRegistries.ITEM.getKey(this).getPath()).withStyle(ChatFormatting.GRAY));
 	}
 
-	@Override
 	public int getMaxStackSize(ItemStack stack)
 	{
 		return type.stackSize;
 	}
 
-	@Override
 	public Set<String> getUpgradeTypes(ItemStack upgrade)
 	{
 		return type.toolset;
 	}
 
-	@Override
 	public boolean canApplyUpgrades(UpgradeData target, ItemStack upgrade)
 	{
 		BiPredicate<ItemStack, UpgradeData> check = type.applyCheck;
@@ -59,7 +55,6 @@ public class ToolUpgradeItem extends IEBaseItem implements IUpgrade
 		return true;
 	}
 
-	@Override
 	public UpgradeData applyUpgrades(UpgradeData base, ItemStack upgrade)
 	{
 		return type.function.apply(upgrade, base);

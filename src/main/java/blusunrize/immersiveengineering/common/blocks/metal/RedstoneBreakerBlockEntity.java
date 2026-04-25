@@ -17,7 +17,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +38,6 @@ public class RedstoneBreakerBlockEntity extends BreakerSwitchBlockEntity impleme
 		super(IEBlockEntities.REDSTONE_BREAKER.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		final boolean activeOld = getIsActive();
@@ -49,7 +48,6 @@ public class RedstoneBreakerBlockEntity extends BreakerSwitchBlockEntity impleme
 		}
 	}
 
-	@Override
 	protected boolean canTakeHV()
 	{
 		return true;
@@ -60,7 +58,6 @@ public class RedstoneBreakerBlockEntity extends BreakerSwitchBlockEntity impleme
 		return getIsActive()^inverted;
 	}
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		Vec3 start = new Vec3(0, .125f, 0);
@@ -72,7 +69,6 @@ public class RedstoneBreakerBlockEntity extends BreakerSwitchBlockEntity impleme
 		return Shapes.create(new AABB(start, end));
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		Matrix4 mat = new Matrix4(getFacing());
@@ -81,32 +77,27 @@ public class RedstoneBreakerBlockEntity extends BreakerSwitchBlockEntity impleme
 		return mat.apply(isLeft?new Vec3(.125, .5, 1): new Vec3(.875, .5, 1));
 	}
 
-	@Override
 	public int getWeakRSOutput(@Nonnull Direction side)
 	{
 		return 0;
 	}
 
-	@Override
 	public int getStrongRSOutput(@Nonnull Direction side)
 	{
 		return 0;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return false;
 	}
 
 	private static final Pair<DyeColor, Byte>[] NO_OVERRIDE = new Pair[0];
-	@Override
 	public Pair<DyeColor, Byte>[] overrideVoltmeterRead()
 	{
 		return NO_OVERRIDE;

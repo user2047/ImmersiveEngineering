@@ -33,7 +33,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.level.ChunkDataEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -45,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public class IEWorldGen
 {
 	private static final DeferredRegister<Feature<?>> FEATURE_REGISTER = DeferredRegister.create(BuiltInRegistries.FEATURE, ImmersiveEngineering.MODID);
@@ -85,7 +84,7 @@ public class IEWorldGen
 		var server = ServerLifecycleHooks.getCurrentServer();
 		if(server!=null)
 		{
-			Registry<PlacedFeature> registry = server.registryAccess().registryOrThrow(Registries.PLACED_FEATURE);
+			Registry<PlacedFeature> registry = server.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
 			for(final PlacedFeature feature : registry)
 				if(isRetrogenFeature(feature))
 					enabledFeatures.add(feature);
@@ -113,7 +112,7 @@ public class IEWorldGen
 	@SubscribeEvent
 	public static void chunkDataSave(ChunkDataEvent.Save event)
 	{
-		CompoundTag levelTag = event.getData().getCompound("Level");
+		CompoundTag levelTag = event.getData().attachmentData();
 		CompoundTag nbt = new CompoundTag();
 		levelTag.put("ImmersiveEngineering", nbt);
 		nbt.putBoolean(IEServerConfig.ORES.retrogen_key.get(), true);
@@ -127,7 +126,7 @@ public class IEWorldGen
 		LevelAccessor world = event.getLevel();
 		if(event.getChunk().getPersistedStatus()!=ChunkStatus.FULL||!(world instanceof Level))
 			return;
-		if(event.getData().getCompound("ImmersiveEngineering").contains(IEServerConfig.ORES.retrogen_key.get()))
+		if(event.getData().attachmentData().getCompoundOrEmpty("ImmersiveEngineering").contains(IEServerConfig.ORES.retrogen_key.get()))
 			return;
 		if(IEServerConfig.ORES.retrogen_log_flagChunk.get())
 			IELogger.info("Chunk "+event.getChunk().getPos()+" has been flagged for Ore RetroGeneration by IE.");
@@ -163,14 +162,14 @@ public class IEWorldGen
 					if(chunks.size() <= 0)
 						break;
 					ChunkPos loc = chunks.get(indexToRemove);
-					if(serverLevel.hasChunk(loc.x, loc.z))
+					if(serverLevel.hasChunk(loc.x(), loc.z()))
 					{
 						long worldSeed = serverLevel.getSeed();
 						RandomSource fmlRandom = RandomSource.create(worldSeed);
 						long xSeed = (fmlRandom.nextLong()>>3);
 						long zSeed = (fmlRandom.nextLong()>>3);
-						fmlRandom.setSeed(xSeed*loc.x+zSeed*loc.z^worldSeed);
-						generateOres(fmlRandom, loc.x, loc.z, serverLevel);
+						fmlRandom.setSeed(xSeed*loc.x()+zSeed*loc.z()^worldSeed);
+						generateOres(fmlRandom, loc.x(), loc.z(), serverLevel);
 						counter++;
 						chunks.remove(indexToRemove);
 					}

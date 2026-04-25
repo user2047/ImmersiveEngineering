@@ -33,17 +33,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -66,10 +65,9 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 
 	public ChemthrowerItem()
 	{
-		super(new Properties().stacksTo(1).component(CHEMTHROWER_DATA, ChemthrowerData.DEFAULT), TYPE, 4);
+		super(itemProperties().stacksTo(1).component(CHEMTHROWER_DATA, ChemthrowerData.DEFAULT), TYPE, 4);
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		int cap = getCapacity(stack, CAPACITY);
@@ -89,13 +87,11 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 	}
 
 	@Nonnull
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.NONE;
+		return ItemUseAnimation.NONE;
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
 //		ToDo: Make an Upgrade Advancement?
@@ -103,21 +99,19 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 //			Utils.unlockIEAdvancement(player, "upgrade_chemthrower");
 	}
 
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public InteractionResult use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
 		if(player.isShiftKeyDown())
 		{
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 				setIgniteEnable(stack, !isIgniteEnable(stack));
 		}
 		else
 			player.startUsingItem(hand);
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void onUseTick(Level level, LivingEntity player, ItemStack stack, int remainingUseDuration)
 	{
 		FluidStack fs = this.getFluid(stack);
@@ -153,7 +147,7 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 						player.setDeltaMovement(player.getDeltaMovement().subtract(vecDir.scale(0.0025*range)));
 					if(ignite)
 						chem.igniteForSeconds(10);
-					if(!player.level().isClientSide)
+					if(!player.level().isClientSide())
 						player.level().addFreshEntity(chem);
 				}
 				if(remainingUseDuration%4==0)
@@ -171,24 +165,22 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 			player.releaseUsingItem();
 	}
 
-	@Override
-	public void releaseUsing(ItemStack stack, Level world, LivingEntity player, int timeLeft)
+	public boolean releaseUsing(ItemStack stack, Level world, LivingEntity player, int timeLeft)
 	{
 		FluidStack fs = getFluid(stack);
 		if(fs.isEmpty())
-			return;
+			return false;
 		int duration = getUseDuration(stack, player)-timeLeft;
 		fs.shrink(IEServerConfig.TOOLS.chemthrower_consumption.get()*duration);
 		stack.set(IEDataComponents.GENERIC_FLUID, SimpleFluidContent.copyOf(fs));
+		return true;
 	}
 
-	@Override
 	public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_)
 	{
 		return 72000;
 	}
 
-	@Override
 	public void onScrollwheel(ItemStack stack, Player playerEntity, boolean forward)
 	{
 		if(getUpgrades(stack).has(UpgradeEffect.MULTITANK))
@@ -202,7 +194,6 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 		}
 	}
 
-	@Override
 	public void finishUpgradeRecalculation(ItemStack stack, RegistryAccess registries)
 	{
 		final var capacity = getCapacity(stack, CAPACITY);
@@ -214,7 +205,6 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 		}
 	}
 
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
 		if(slotChanged||CapabilityShader.shouldReequipDueToShader(oldStack, newStack))
@@ -226,26 +216,23 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
 		registerCapabilitiesISI(registrar);
-		registrar.register(FluidHandler.ITEM, stack -> new IEItemFluidHandler(stack, CAPACITY));
+		registrar.register(Capabilities.Fluid.ITEM, stack -> new IEItemFluidHandler(stack, CAPACITY));
 		registrar.register(
 				CapabilityShader.ITEM,
 				stack -> new ShaderWrapper_Item(ieLoc("chemthrower"), stack)
 		);
 	}
 
-	@Override
 	public int getCapacity(ItemStack stack, int baseCapacity)
 	{
 		return baseCapacity+getUpgrades(stack).get(UpgradeEffect.CAPACITY);
 	}
 
-	@Override
 	public boolean canModify(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		return new Slot[]{
@@ -296,7 +283,6 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 		}
 	}
 
-	@Override
 	public FluidStack getFluid(ItemStack container)
 	{
 		return getFluid(container, 0);

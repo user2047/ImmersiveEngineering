@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 import javax.annotation.Nonnull;
@@ -50,16 +50,15 @@ public class CrateMinecartEntity extends IEMinecartEntity<WoodenCrateBlockEntity
 	public static <T extends CrateMinecartEntity>
 	void registerCapabilities(RegisterCapabilitiesEvent ev, Supplier<EntityType<T>> type)
 	{
-		ev.registerEntity(ItemHandler.ENTITY_AUTOMATION, type.get(), (e, $) -> e.containedBlockEntity.getInventoryCap());
+		net.neoforged.neoforge.capabilities.EntityCapability cap = (net.neoforged.neoforge.capabilities.EntityCapability)Capabilities.Item.ENTITY_AUTOMATION;
+		ev.registerEntity(cap, type.get(), (e, $) -> e.containedBlockEntity.getInventoryCap());
 	}
 
-	@Override
 	public ItemStack getPickResult()
 	{
 		return new ItemStack(IEItems.Minecarts.CART_WOODEN_CRATE.get());
 	}
 
-	@Override
 	public void writeTileToItem(ItemStack itemStack)
 	{
 		itemStack.set(
@@ -68,27 +67,23 @@ public class CrateMinecartEntity extends IEMinecartEntity<WoodenCrateBlockEntity
 		);
 	}
 
-	@Override
 	public void readTileFromItem(LivingEntity placer, ItemStack itemStack)
 	{
 		this.containedBlockEntity.onBEPlaced(itemStack);
 	}
 
-	@Override
 	protected Supplier<WoodenCrateBlockEntity> getTileProvider()
 	{
 		return () -> new WoodenCrateBlockEntity(BlockPos.ZERO, WoodenDevices.CRATE.defaultBlockState());
 	}
 
 	@Nonnull
-	@Override
 	public BlockState getDisplayBlockState()
 	{
 		return IEBlocks.WoodenDevices.CRATE.defaultBlockState();
 	}
 
 	@Nullable
-	@Override
 	public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inv, @Nonnull Player player)
 	{
 		return new CrateEntityContainer(IEMenuTypes.WOODEN_CRATE.get(), id, inv, this);

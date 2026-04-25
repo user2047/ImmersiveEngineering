@@ -26,13 +26,11 @@ public class BucketWheelMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.BUCKET_WHEEL);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;
 	}
 
-	@Override
 	public void initializeClient(Consumer<MultiblockManualData> consumer)
 	{
 		consumer.accept(new BasicClientProperties(this, OptionalDouble.of(-Mth.HALF_PI)));

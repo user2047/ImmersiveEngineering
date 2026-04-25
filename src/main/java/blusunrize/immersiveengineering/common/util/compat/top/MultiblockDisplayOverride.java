@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class MultiblockDisplayOverride implements IBlockDisplayOverride
 {
-	@Override
 	public boolean overrideStandardInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
 		BlockState blockState, IProbeHitData data)
 	{

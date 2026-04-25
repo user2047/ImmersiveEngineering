@@ -21,7 +21,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -37,7 +36,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -53,20 +52,18 @@ public class ToolboxItem extends InternalStorageItem
 
 	public ToolboxItem()
 	{
-		super(new Properties().stacksTo(1), SLOT_COUNT);
+		super(itemProperties().stacksTo(1), SLOT_COUNT);
 	}
 
 	@Nonnull
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, @Nonnull InteractionHand hand)
+	public InteractionResult use(Level world, Player player, @Nonnull InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 			openGui(player, hand);
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public boolean overrideOtherStackedOnMe(ItemStack toolbox, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess slotAccess)
 	{
 		if(action==ClickAction.SECONDARY&&slot.allowModification(player)&&!otherStack.isEmpty())
@@ -92,7 +89,7 @@ public class ToolboxItem extends InternalStorageItem
 		if(slots.length < 1)
 			return 0;
 
-		IItemHandler handler = toolbox.getCapability(ItemHandler.ITEM);
+		IItemHandler handler = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(toolbox, Capabilities.Item.ITEM);
 		if(handler==null)
 			return 0;
 		ItemStack remain = other.copy();
@@ -106,13 +103,11 @@ public class ToolboxItem extends InternalStorageItem
 	}
 
 	@Nullable
-	@Override
 	protected ItemContainerTypeNew<?> getContainerTypeNew()
 	{
 		return IEMenuTypes.TOOLBOX;
 	}
 
-	@Override
 	@Nonnull
 	public InteractionResult useOn(@Nonnull UseOnContext context)
 	{
@@ -161,24 +156,14 @@ public class ToolboxItem extends InternalStorageItem
 		return super.useOn(context);
 	}
 
-	@Override
 	public boolean canFitInsideContainerItems()
 	{
 		return false;
 	}
 
 	@Nonnull
-	@Override
 	public Optional<TooltipComponent> getTooltipImage(@Nonnull ItemStack stack)
 	{
-		// cut all empty slots from list
-		NonNullList<ItemStack> items = getContainedItems(stack)
-				.stream()
-				.filter(s -> !s.isEmpty())
-				.collect(NonNullList::create, AbstractList::add, AbstractCollection::addAll);
-		if(!items.isEmpty())
-			return Optional.of(new BundleTooltip(new BundleContents(items)));
-		else
-			return super.getTooltipImage(stack);
+		return Optional.empty();
 	}
 }

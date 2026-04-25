@@ -27,14 +27,12 @@ public class MetalBarrelBlockEntity extends WoodenBarrelBlockEntity
 		this(IEBlockEntities.METAL_BARREL.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(!isRSPowered())
 			super.tickServer();
 	}
 
-	@Override
 	public boolean isFluidValid(FluidStack fluid)
 	{
 		return !fluid.isEmpty();

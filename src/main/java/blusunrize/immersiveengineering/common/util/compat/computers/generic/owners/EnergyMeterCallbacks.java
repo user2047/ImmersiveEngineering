@@ -20,7 +20,6 @@ public class EnergyMeterCallbacks extends CallbackOwner<EnergyMeterBlockEntity>
 		super(EnergyMeterBlockEntity.class, "current_transformer");
 	}
 
-	@Override
 	public boolean canAttachTo(EnergyMeterBlockEntity candidate)
 	{
 		return !candidate.isDummy();

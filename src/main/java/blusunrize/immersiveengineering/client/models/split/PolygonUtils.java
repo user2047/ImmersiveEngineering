@@ -19,9 +19,9 @@ import malte0811.modelsplitter.math.Vec3d;
 import malte0811.modelsplitter.model.Polygon;
 import malte0811.modelsplitter.model.UVCoords;
 import malte0811.modelsplitter.model.Vertex;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -40,7 +40,7 @@ public class PolygonUtils
 				return offset/4;
 			else
 				offset += e.byteSize();
-		throw new IllegalStateException("Did not find element with usage "+element.usage().name()+" and type "+element.type().name());
+		throw new IllegalStateException("Did not find vertex element with type "+element.type().name());
 	}
 
 	public static Polygon<ExtraQuadData> toPolygon(BakedQuad quad)
@@ -80,7 +80,7 @@ public class PolygonUtils
 
 	public static BakedQuad toBakedQuad(Polygon<ExtraQuadData> poly, ModelState transform)
 	{
-		return toBakedQuad(poly.getPoints(), poly.getTexture(), transform.getRotation().blockCenterToCorner(), true, true);
+		return toBakedQuad(poly.getPoints(), poly.getTexture(), transform.transformation().blockCenterToCorner(), true, true);
 	}
 
 	public static BakedQuad toBakedQuad(List<Vertex> points, ExtraQuadData data, Transformation rotation, boolean absoluteUV, boolean shade)
@@ -112,7 +112,7 @@ public class PolygonUtils
 					1
 			);
 		}
-		return quadBuilder.bake(-1, Direction.getNearest(normal.x(), normal.y(), normal.z()), data.sprite(), shade);
+		return quadBuilder.bake(-1, Direction.getNearest((int)Math.signum(normal.x()), (int)Math.signum(normal.y()), (int)Math.signum(normal.z()), Direction.NORTH), data.sprite(), shade);
 	}
 
 	private static float[] toArray(Vec3d vec, int length)

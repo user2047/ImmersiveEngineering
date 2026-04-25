@@ -45,26 +45,22 @@ public final class SpacerComponent implements Component
 	}
 
 	@Nonnull
-	@Override
 	public Style getStyle()
 	{
 		return Style.EMPTY;
 	}
 
 	@Nonnull
-	@Override
 	public ComponentContents getContents()
 	{
 		return PlainTextContents.EMPTY;
 	}
 
-	@Override
 	public List<Component> getSiblings()
 	{
 		return siblings;
 	}
 
-	@Override
 	public FormattedCharSequence getVisualOrderText()
 	{
 		return formatted.get();
@@ -75,7 +71,6 @@ public final class SpacerComponent implements Component
 		return font.width(widthGlyph);
 	}
 
-	@Override
 	public boolean equals(Object other)
 	{
 		if(this==other)
@@ -85,13 +80,11 @@ public final class SpacerComponent implements Component
 		return false;
 	}
 
-	@Override
 	public int hashCode()
 	{
 		return Objects.hash(widthGlyph, siblings);
 	}
 
-	@Override
 	public String toString()
 	{
 		return "SpacerComponent["+

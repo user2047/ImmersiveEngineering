@@ -21,13 +21,11 @@ public record MessageRedstoneLevel(VoltmeterItem.RemoteRedstoneData data) implem
 	public static final StreamCodec<ByteBuf, MessageRedstoneLevel> CODEC = RemoteRedstoneData.STREAM_CODEC
 			.map(MessageRedstoneLevel::new, MessageRedstoneLevel::data);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		context.enqueueWork(() -> VoltmeterItem.lastRedstoneUpdate = data);
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

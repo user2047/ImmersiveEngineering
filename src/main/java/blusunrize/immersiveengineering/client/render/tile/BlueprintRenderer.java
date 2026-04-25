@@ -16,19 +16,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -63,15 +63,14 @@ public class BlueprintRenderer
 		List<TextureAtlasSprite> images = new ArrayList<>();
 		try
 		{
-			BakedModel ibakedmodel = ClientUtils.mc().getItemRenderer().getModel(stack, world, player, 0);
+			BakedModel ibakedmodel = ClientUtils.getItemRenderer().getModel(stack, ClientUtils.mc().level, player, 0);
 			Set<Identifier> textures = new HashSet<>();
-			Collection<BakedQuad> quads = ibakedmodel.getQuads(null, null, world.random, ModelData.EMPTY, null);
-			final Function<Identifier, TextureAtlasSprite> blockAtlas = ClientUtils.mc().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+			Collection<BakedQuad> quads = ibakedmodel.getQuads(null, null, RandomSource.create(), ModelData.EMPTY, null);
 			for(BakedQuad quad : quads)
 			{
-				final Identifier texture = quad.getSprite().contents().name();
+				final Identifier texture = quad.materialInfo().sprite().contents().name();
 				if(textures.add(texture))
-					images.add(blockAtlas.apply(texture));
+					images.add(quad.materialInfo().sprite());
 			}
 		} catch(Exception e)
 		{

@@ -50,7 +50,6 @@ public record MessageShaderManual(MessageType key, List<Identifier> args) implem
 		SPAWN
 	}
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		if(context.flow().getReceptionSide()==LogicalSide.SERVER)
@@ -98,7 +97,6 @@ public record MessageShaderManual(MessageType key, List<Identifier> args) implem
 			});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

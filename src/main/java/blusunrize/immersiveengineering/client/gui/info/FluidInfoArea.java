@@ -47,7 +47,6 @@ public class FluidInfoArea extends InfoArea
 	}
 
 
-	@Override
 	public void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		fillTooltip(tank.getFluid(), tank.getCapacity(), tooltip::add);
@@ -68,7 +67,7 @@ public class FluidInfoArea extends InfoArea
 
 		if(mc().options.advancedItemTooltips&&!fluid.isEmpty())
 		{
-			if(!Screen.hasShiftDown())
+			if(!net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown())
 				tooltip.accept(Component.translatable(Lib.DESC_INFO+"holdShiftForInfo"));
 			else
 			{
@@ -87,7 +86,6 @@ public class FluidInfoArea extends InfoArea
 		//don't display amount for tankCapacity < 0, i.e. for ghost fluid stacks
 	}
 
-	@Override
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		FluidStack fluid = tank.getFluid();

@@ -117,44 +117,37 @@ public class IEWireTypes
 			this.color = IEClientConfig.wireColors.get(type);
 		}
 
-		@Override
 		public int getColour(Connection connection)
 		{
 			return color.get();
 		}
 
-		@Override
 		public double getSlack()
 		{
 			return 1.005;
 		}
 
-		@Override
 		public int getMaxLength()
 		{
 			return config.maxLength.get();
 		}
 
-		@Override
 		public ItemStack getWireCoil(Connection con)
 		{
 			return new ItemStack(Misc.WIRE_COILS.get(this), 1);
 		}
 
-		@Override
 		public String getUniqueName()
 		{
 			return type.uniqueName;
 		}
 
-		@Override
 		public double getRenderDiameter()
 		{
 			return renderDiameter[type.ordinal()%6];
 		}
 
 		@Nonnull
-		@Override
 		public String getCategory()
 		{
 			return switch(type)
@@ -167,7 +160,6 @@ public class IEWireTypes
 					};
 		}
 
-		@Override
 		public Collection<Identifier> getRequestedHandlers()
 		{
 			return ImmutableList.of();
@@ -189,19 +181,16 @@ public class IEWireTypes
 			return config.lossRatio.get();
 		}
 
-		@Override
 		public int getTransferRate()
 		{
 			return config.transferRate.get();
 		}
 
-		@Override
 		public double getBasicLossRate(Connection c)
 		{
 			return getLossRatio()*c.getLength()/getMaxLength();
 		}
 
-		@Override
 		public double getLossRate(Connection c, int transferred)
 		{
 			return 0;
@@ -221,7 +210,6 @@ public class IEWireTypes
 				eSource = new IElectricEquipment.ElectricSource(-1);
 		}
 
-		@Override
 		public double getDamageRadius()
 		{
 			return switch(type)
@@ -233,13 +221,11 @@ public class IEWireTypes
 					};
 		}
 
-		@Override
 		public IElectricEquipment.ElectricSource getElectricSource()
 		{
 			return eSource;
 		}
 
-		@Override
 		public float getDamageAmount(Entity e, Connection c, int energy)
 		{
 			float factor;
@@ -254,7 +240,6 @@ public class IEWireTypes
 			return factor*energy/getTransferRate()*8;
 		}
 
-		@Override
 		public Collection<Identifier> getRequestedHandlers()
 		{
 			return ImmutableList.of(WireDamageHandler.ID);
@@ -264,44 +249,37 @@ public class IEWireTypes
 	private static class InternalConnection extends WireType
 	{
 
-		@Override
 		public String getUniqueName()
 		{
 			return "INTERNAL";
 		}
 
-		@Override
 		public int getColour(Connection connection)
 		{
 			return 0;
 		}
 
-		@Override
 		public double getSlack()
 		{
 			return 1.001;
 		}
 
-		@Override
 		public int getMaxLength()
 		{
 			return 0;
 		}
 
-		@Override
 		public ItemStack getWireCoil(Connection con)
 		{
 			return ItemStack.EMPTY;
 		}
 
-		@Override
 		public double getRenderDiameter()
 		{
 			return 0;
 		}
 
 		@Nonnull
-		@Override
 		public String getCategory()
 		{
 			return "INTERNAL";

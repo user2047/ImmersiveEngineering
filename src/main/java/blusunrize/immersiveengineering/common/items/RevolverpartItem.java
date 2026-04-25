@@ -21,11 +21,10 @@ public class RevolverpartItem extends IEBaseItem
 {
 	public RevolverpartItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
 	@Nonnull
-	@Override
 	public Component getName(ItemStack stack)
 	{
 		Component name = super.getName(stack);
@@ -35,7 +34,6 @@ public class RevolverpartItem extends IEBaseItem
 		return name;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		var perks = stack.getOrDefault(IEDataComponents.REVOLVER_PERKS, Perks.EMPTY);

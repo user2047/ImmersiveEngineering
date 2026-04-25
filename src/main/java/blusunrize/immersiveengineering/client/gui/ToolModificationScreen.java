@@ -36,7 +36,6 @@ public abstract class ToolModificationScreen<C extends AbstractContainerMenu> ex
 	}
 
 
-	@Override
 	public void init()
 	{
 		this.clearWidgets();

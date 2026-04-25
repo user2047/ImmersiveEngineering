@@ -21,10 +21,9 @@ public class LogicCircuitBoardItem extends IEBaseItem
 {
 	public LogicCircuitBoardItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		LogicCircuitInstruction instruction = stack.get(IEDataComponents.CIRCUIT_INSTRUCTION);

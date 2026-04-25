@@ -144,10 +144,10 @@ public class ManualEntry implements Comparable<ManualEntry>
 		}
 		ManualUtils.drawSplitString(graphics, manual.fontRenderer(), toRender.renderText, x, y+offsetText,
 				manual.getTextColour());
-		graphics.pose().pushPose();
-		graphics.pose().translate(x, y+offsetSpecial, 0);
+		graphics.pose().pushMatrix();
+		graphics.pose().translate(x, y+offsetSpecial);
 		toRender.special.render(graphics, gui, 0, 0, mouseX, mouseY);
-		graphics.pose().popPose();
+		graphics.pose().popMatrix();
 	}
 
 	public String getTitle()
@@ -331,7 +331,7 @@ public class ManualEntry implements Comparable<ManualEntry>
 			).orElseThrow();
 			final JsonObject json = ManualUtils.loadFromStream(
 					resData::openAsReader,
-					dataStream -> GsonHelper.fromJson(GSON, dataStream, JsonObject.class, true),
+					dataStream -> GsonHelper.fromJson(GSON, dataStream, JsonObject.class),
 					() -> "Failed to load manual entry from "+name
 			);
 			if(json.has("require_advancement"))

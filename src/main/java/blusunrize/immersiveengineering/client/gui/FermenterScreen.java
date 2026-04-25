@@ -34,7 +34,6 @@ public class FermenterScreen extends IEContainerScreen<FermenterMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(

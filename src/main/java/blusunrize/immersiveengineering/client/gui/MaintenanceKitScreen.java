@@ -29,13 +29,11 @@ public class MaintenanceKitScreen extends ToolModificationScreen<MaintenanceKitC
 		this.imageWidth = 195;
 	}
 
-	@Override
 	protected void sendMessage(CompoundTag data)
 	{
 		PacketDistributor.sendToServer(new MessageMaintenanceKit(menu.getEquipmentSlot(), data));
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		for(int i = 0; i < menu.internalSlots; i++)

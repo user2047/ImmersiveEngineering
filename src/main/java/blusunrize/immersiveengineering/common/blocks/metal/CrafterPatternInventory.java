@@ -39,7 +39,7 @@ public class CrafterPatternInventory
 			return;
 		CraftingInput invC = InventoryCraftingFalse.createFilledCraftingInventory(3, 3, inv);
 		this.recipe = Utils.findCraftingRecipe(invC, level).map(RecipeHolder::value).orElse(null);
-		this.inv.set(9, recipe!=null?recipe.assemble(invC, level.registryAccess()): ItemStack.EMPTY);
+		this.inv.set(9, recipe!=null?recipe.assemble(invC): ItemStack.EMPTY);
 	}
 
 	public ListTag writeToNBT(Provider provider)
@@ -48,9 +48,9 @@ public class CrafterPatternInventory
 		for(int i = 0; i < this.inv.size(); i++)
 			if(!this.inv.get(i).isEmpty())
 			{
-				CompoundTag itemTag = new CompoundTag();
+				CompoundTag itemTag = blusunrize.immersiveengineering.common.util.ItemStackCompat.save(this.inv.get(i), provider);
 				itemTag.putByte("Slot", (byte)i);
-				list.add(this.inv.get(i).save(provider, itemTag));
+				list.add(itemTag);
 			}
 		return list;
 	}
@@ -60,10 +60,10 @@ public class CrafterPatternInventory
 		Collections.fill(this.inv, ItemStack.EMPTY);
 		for(int i = 0; i < list.size(); i++)
 		{
-			CompoundTag itemTag = list.getCompound(i);
-			int slot = itemTag.getByte("Slot")&255;
+			CompoundTag itemTag = list.getCompoundOrEmpty(i);
+			int slot = itemTag.getByteOr("Slot", (byte)0)&255;
 			if(slot < NUM_SLOTS)
-				this.inv.set(slot, ItemStack.parseOptional(provider, itemTag));
+				this.inv.set(slot, blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, itemTag));
 		}
 	}
 

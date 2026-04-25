@@ -50,13 +50,11 @@ public class WindmillBiomeSerializer extends IERecipeSerializer<WindmillBiome>
 	);
 	public static final DualMapCodec<RegistryFriendlyByteBuf, WindmillBiome> CODECS = new DualMapCodec<>(CODEC, STREAM_CODEC);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, WindmillBiome> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(WoodenDevices.WINDMILL);

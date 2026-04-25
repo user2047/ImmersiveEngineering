@@ -41,7 +41,6 @@ public class ChemTurretScreen extends TurretScreen<ChemTurretMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		List<InfoArea> areas = new ArrayList<>(super.makeInfoAreas());
@@ -55,14 +54,12 @@ public class ChemTurretScreen extends TurretScreen<ChemTurretMenu>
 		return areas;
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		super.drawContainerBackgroundPre(graphics, f, mx, my);
 		graphics.blit(TEXTURE, leftPos+132, topPos+14, 176, 0, 20, 51);
 	}
 
-	@Override
 	protected void addCustomButtons()
 	{
 		this.addRenderableWidget(new GuiButtonBoolean(

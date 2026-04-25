@@ -40,7 +40,6 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 		this.imageHeight = 241;
 	}
 
-	@Override
 	protected void init()
 	{
 		super.init();
@@ -63,7 +62,6 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -72,13 +70,12 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 		);
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
 		Slot s = this.menu.slots.get(0);
 		if(!s.hasItem()&&mouseX > leftPos+s.x&&mouseX < leftPos+s.x+16&&mouseY > topPos+s.y&&mouseY < topPos+s.y+16)
-			addLine.accept(Items.PAPER.getDescription());
+			addLine.accept(Component.translatable(Items.PAPER.getDescriptionId()));
 	}
 
 	private static class RefreshInfoArea extends InfoArea
@@ -91,13 +88,11 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 			this.refreshTimer = refreshTimer;
 		}
 
-		@Override
 		protected void fillTooltipOverArea(int mouseX, int mouseY, List<Component> tooltip)
 		{
 			// Todo: show some text for hovering
 		}
 
-		@Override
 		public void draw(GuiGraphicsExtractor graphics)
 		{
 			final int height = area.getHeight();

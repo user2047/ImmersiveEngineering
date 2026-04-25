@@ -29,40 +29,35 @@ public class IERepairItemRecipe extends CustomRecipe
 {
 	public IERepairItemRecipe(CraftingBookCategory category)
 	{
-		super(category);
+		super();
 	}
 
-	@Override
 	public boolean matches(@Nonnull CraftingInput inv, @Nonnull Level worldIn)
 	{
 		return findInputSlots(inv).isPresent();
 	}
 
 	@Nonnull
-	@Override
-	public ItemStack assemble(@Nonnull CraftingInput inv, Provider access)
+	public ItemStack assemble(@Nonnull CraftingInput inv)
 	{
 		return findInputSlots(inv)
 				.map(p -> combineStacks(p.getFirst(), p.getSecond()))
 				.orElse(ItemStack.EMPTY);
 	}
 
-	@Override
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		return width*height >= 2;
 	}
 
 	@Nonnull
-	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
 		return NonNullList.withSize(inv.height()*inv.width(), ItemStack.EMPTY);
 	}
 
 	@Nonnull
-	@Override
-	public RecipeSerializer<IERepairItemRecipe> getSerializer()
+	public RecipeSerializer<? extends CustomRecipe> getSerializer()
 	{
 		return RecipeSerializers.IE_REPAIR_SERIALIZER.get();
 	}

@@ -16,7 +16,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import javax.annotation.Nonnull;
@@ -34,7 +33,6 @@ public class RevolverperkLootFunction extends LootItemConditionalFunction
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack run(ItemStack stack, @Nonnull LootContext context)
 	{
 		var perks = RevolverItem.RevolverPerk.generatePerkSet(context.getRandom(), context.getLuck());
@@ -42,11 +40,9 @@ public class RevolverperkLootFunction extends LootItemConditionalFunction
 		return stack;
 	}
 
-	@Nonnull
-	@Override
-	public LootItemFunctionType getType()
+	public MapCodec<? extends LootItemConditionalFunction> codec()
 	{
-		return IELootFunctions.REVOLVERPERK.value();
+		return CODEC;
 	}
 
 	public static Builder<?> builder()

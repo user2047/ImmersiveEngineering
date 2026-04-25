@@ -18,7 +18,6 @@ import org.joml.Quaternionf;
 
 public class ChargingStationRenderer extends IEBlockEntityRenderer<ChargingStationBlockEntity>
 {
-	@Override
 	public void render(ChargingStationBlockEntity te, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(te.getLevelNonnull().hasChunkAt(te.getBlockPos()))
@@ -45,7 +44,7 @@ public class ChargingStationRenderer extends IEBlockEntityRenderer<ChargingStati
 				matrixStack.pushPose();
 				float scale = .625f;
 				matrixStack.scale(scale, scale, 1);
-				ClientUtils.mc().getItemRenderer().renderStatic(
+				ClientUtils.getItemRenderer().renderStatic(
 						te.inventory.get(0), ItemDisplayContext.FIXED,
 						combinedLightIn, combinedOverlayIn, matrixStack, bufferIn,
 						te.getLevel(), 0

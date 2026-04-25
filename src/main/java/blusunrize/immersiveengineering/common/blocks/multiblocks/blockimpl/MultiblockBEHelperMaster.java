@@ -73,40 +73,34 @@ public class MultiblockBEHelperMaster<State extends IMultiblockState>
 	}
 
 	@Nonnull
-	@Override
 	public State getState()
 	{
 		return state;
 	}
 
 	@Nonnull
-	@Override
 	public MultiblockContext<State> getContext()
 	{
 		return context;
 	}
 
 	@Nullable
-	@Override
 	protected IMultiblockBEHelperMaster<State> getMasterHelperWithChunkloads()
 	{
 		return this;
 	}
 
 	@Nullable
-	@Override
 	protected MultiblockBEHelperMaster<State> getMasterHelper()
 	{
 		return this;
 	}
 
-	@Override
 	public void load(CompoundTag tag, Provider provider)
 	{
 		load(tag, (iMultiblockState, nbt) -> iMultiblockState.readSaveNBT(nbt, provider));
 	}
 
-	@Override
 	public void saveAdditional(CompoundTag tag, Provider provider)
 	{
 		save(tag, (iMultiblockState, nbt) -> iMultiblockState.writeSaveNBT(nbt, provider));
@@ -130,19 +124,18 @@ public class MultiblockBEHelperMaster<State extends IMultiblockState>
 	private void load(CompoundTag in, BiConsumer<IMultiblockState, CompoundTag> loadSingle)
 	{
 		loadSingle.accept(state, in);
-		ListTag savedComponents = in.getList("componentNBT", Tag.TAG_COMPOUND);
+		ListTag savedComponents = in.getListOrEmpty("componentNBT");
 		int nextIndex = 0;
 		for(final ComponentInstance<?> component : componentInstances)
 			if(component.state() instanceof IMultiblockState saveable)
 			{
-				loadSingle.accept(saveable, savedComponents.getCompound(nextIndex));
+				loadSingle.accept(saveable, savedComponents.getCompoundOrEmpty(nextIndex));
 				++nextIndex;
 				if(nextIndex >= savedComponents.size())
 					break;
 			}
 	}
 
-	@Override
 	public CompoundTag getUpdateTag(Provider provider)
 	{
 		CompoundTag result = new CompoundTag();
@@ -150,43 +143,36 @@ public class MultiblockBEHelperMaster<State extends IMultiblockState>
 		return result;
 	}
 
-	@Override
 	public Packet<ClientGamePacketListener> getUpdatePacket()
 	{
 		return ClientboundBlockEntityDataPacket.create(getMasterBE());
 	}
 
-	@Override
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		load(tag, (iMultiblockState, nbt) -> iMultiblockState.readSyncNBT(nbt, provider));
 	}
 
-	@Override
 	public void onDataPacket(CompoundTag tag, Provider provider)
 	{
 		load(tag, (iMultiblockState, nbt) -> iMultiblockState.readSyncNBT(nbt, provider));
 	}
 
-	@Override
 	public MultiblockRegistration<State> getMultiblock()
 	{
 		return multiblock;
 	}
 
-	@Override
 	public BlockPos getPositionInMB()
 	{
 		return multiblock.masterPosInMB();
 	}
 
-	@Override
 	public AABB getRenderBoundingBox()
 	{
 		return renderBox.get(context.getLevel().getAbsoluteOrigin(), orientation);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(!SafeChunkUtils.isChunkSafe(be.getLevel(), be.getBlockPos()))
@@ -198,7 +184,6 @@ public class MultiblockBEHelperMaster<State extends IMultiblockState>
 			component.tickServer();
 	}
 
-	@Override
 	public void tickClient()
 	{
 		if(!SafeChunkUtils.isChunkSafe(be.getLevel(), be.getBlockPos()))
@@ -210,13 +195,11 @@ public class MultiblockBEHelperMaster<State extends IMultiblockState>
 			component.tickClient();
 	}
 
-	@Override
 	public void onRemoved()
 	{
 		multiblock.logic().onRemoved(getContext());
 	}
 
-	@Override
 	public void invalidateAllCaps()
 	{
 		Level level = be.getLevel();

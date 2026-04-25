@@ -29,7 +29,6 @@ public class SqueezerShapes implements Function<BlockPos, VoxelShape>
 	{
 	}
 
-	@Override
 	public VoxelShape apply(BlockPos posInMultiblock)
 	{
 		if(new BlockPos(2, 0, 2).equals(posInMultiblock))

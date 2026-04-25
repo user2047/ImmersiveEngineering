@@ -17,20 +17,21 @@ import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class IEProperties
 {
-	public static final DirectionProperty FACING_ALL = DirectionProperty.create("facing", DirectionUtils.VALUES);
-	public static final DirectionProperty FACING_HORIZONTAL = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
-	public static final DirectionProperty FACING_TOP_DOWN = DirectionProperty.create("facing", Direction.UP, Direction.DOWN);
+	public static final EnumProperty<Direction> FACING_ALL = EnumProperty.create("facing", Direction.class, List.of(DirectionUtils.VALUES));
+	public static final EnumProperty<Direction> FACING_HORIZONTAL = EnumProperty.create("facing", Direction.class, direction -> direction.getAxis().isHorizontal());
+	public static final EnumProperty<Direction> FACING_TOP_DOWN = EnumProperty.create("facing", Direction.class, Direction.UP, Direction.DOWN);
 
 	public static final BooleanProperty MULTIBLOCKSLAVE = BooleanProperty.create("multiblockslave");
 	public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -90,7 +91,7 @@ public class IEProperties
 	{
 		public IEObjState(VisibilityList visibility)
 		{
-			this(visibility, Transformation.identity());
+			this(visibility, Transformation.IDENTITY);
 		}
 	}
 

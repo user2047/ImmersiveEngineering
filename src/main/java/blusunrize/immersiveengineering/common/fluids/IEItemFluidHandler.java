@@ -57,7 +57,6 @@ public class IEItemFluidHandler extends FluidHandlerItemStack
 		return capacity;
 	}
 
-	@Override
 	public boolean canFillFluidType(FluidStack fluid)
 	{
 		if(container.getItem() instanceof IAdvancedFluidItem)
@@ -65,14 +64,12 @@ public class IEItemFluidHandler extends FluidHandlerItemStack
 		return true;
 	}
 
-	@Override
 	public boolean isFluidValid(int tank, @Nonnull FluidStack fluid)
 	{
 		FluidStack tankFluid = getFluidInTank(tank);
 		return (tankFluid.isEmpty()&&this.canFillFluidType(fluid))||FluidStack.isSameFluidSameComponents(tankFluid, fluid);
 	}
 
-	@Override
 	public int fill(FluidStack resource, FluidAction doFill)
 	{
 		if(container.getCount()!=1||resource.isEmpty()||!canFillFluidType(resource))
@@ -106,7 +103,6 @@ public class IEItemFluidHandler extends FluidHandlerItemStack
 		}
 	}
 
-	@Override
 	public int getTankCapacity(int tank)
 	{
 		return getCapacity();

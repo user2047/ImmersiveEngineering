@@ -46,7 +46,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -57,9 +57,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -85,7 +84,6 @@ public class BottlingMachineLogic
 	private static final CapabilityPosition ENERGY_INPUT_POS = new CapabilityPosition(2, 1, 0, RelativeBlockFace.UP);
 	public static final BlockPos REDSTONE_POS = new BlockPos(1, 0, 1);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -97,7 +95,6 @@ public class BottlingMachineLogic
 			context.requestMasterBESync();
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -117,17 +114,15 @@ public class BottlingMachineLogic
 		}
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void onEntityCollision(IMultiblockContext<State> ctx, BlockPos posInMultiblock, Entity collided)
 	{
 		final Level level = collided.level();
-		if(!new BlockPos(0, 1, 1).equals(posInMultiblock)||level.isClientSide)
+		if(!new BlockPos(0, 1, 1).equals(posInMultiblock)||level.isClientSide())
 			return;
 		else if(!(collided instanceof ItemEntity)||!collided.isAlive())
 			return;
@@ -172,40 +167,37 @@ public class BottlingMachineLogic
 						});
 	}
 
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
 			Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient
 	)
 	{
 		if(!player.getItemInHand(hand).is(IETags.hammers))
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 		if(!isClient)
 		{
 			final State state = ctx.getState();
 			state.allowPartialFill = !state.allowPartialFill;
-			player.displayClientMessage(Component.translatable(
+			player.sendSystemMessage(Component.translatable(
 					Lib.CHAT_INFO+"bottling_machine."+(state.allowPartialFill?"partialFill": "completeFill")
-			), true);
+			));
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerAt(ItemHandler.BLOCK, ITEM_INPUT_POS, (state) -> state.itemInput);
-		register.register(FluidHandler.BLOCK, (state, pos) -> {
+		register.registerAt(Capabilities.Item.BLOCK, ITEM_INPUT_POS, (state) -> state.itemInput);
+		register.register(Capabilities.Fluid.BLOCK, (state, pos) -> {
 			if(FLUID_INPUT_POS_BACK.equalsOrNullFace(pos)||FLUID_INPUT_POS_SIDE.equals(pos))
 				return state.fluidInput;
 			else
 				return null;
 		});
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_INPUT_POS, state -> state.energy);
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_INPUT_POS, state -> state.energy);
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		for(final MultiblockProcess<BottlingMachineRecipe, ?> process : state.processor.getQueue())
@@ -214,7 +206,6 @@ public class BottlingMachineLogic
 		state.processor.clear();
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return BottlingMachineShapes.SHAPE_GETTER;
@@ -274,47 +265,41 @@ public class BottlingMachineLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("processor", processor.toNBT(provider));
 			nbt.put("energy", energy.serializeNBT(provider));
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			nbt.putBoolean("allowPartialFill", allowPartialFill);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			processor.fromNBT(nbt.get("processor"), BottlingProcess.loader(this), provider);
 			energy.deserializeNBT(provider, nbt.get("energy"));
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			allowPartialFill = nbt.getBoolean("allowPartialFill");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			allowPartialFill = nbt.getBooleanOr("allowPartialFill", false);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("processor", processor.toNBT(provider));
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			nbt.putBoolean("active", active);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			processor.fromNBT(nbt.get("processor"), BottlingProcess.loader(this), provider);
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
-			active = nbt.getBoolean("active");
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
+			active = nbt.getBooleanOr("active", false);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public void doProcessOutput(ItemStack result, IMultiblockLevel level)
 		{
 			this.output.insertOrDrop(result, level);

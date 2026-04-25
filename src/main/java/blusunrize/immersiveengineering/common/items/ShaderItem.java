@@ -53,18 +53,16 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 
 	public ShaderItem(Identifier shaderName, Rarity rarity)
 	{
-		super(new Properties().stacksTo(1).rarity(rarity));
+		super(itemProperties().stacksTo(1).rarity(rarity));
 		this.shaderName = shaderName;
 	}
 
-	@Override
 	public Identifier getShaderName()
 	{
 		return this.shaderName;
 	}
 
 	@Nonnull
-	@Override
 	public InteractionResult useOn(UseOnContext ctx)
 	{
 		Level world = ctx.getLevel();
@@ -107,7 +105,6 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 		return InteractionResult.FAIL;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		Rarity rarity = stack.getRarity();
@@ -118,7 +115,7 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 						.withStyle(rarity.getStyleModifier())
 				)
 		);
-		if(!Screen.hasShiftDown())
+		if(!net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown())
 			list.add(Component.translatable(Lib.DESC_INFO+"shader.applyTo")
 					.append(" ")
 					.append(Component.translatable(Lib.DESC_INFO+"holdShift")).withStyle(ChatFormatting.GRAY)
@@ -141,18 +138,11 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 	}
 
 	@Nonnull
-	@Override
 	public Component getName(@Nonnull ItemStack stack)
 	{
 		MutableComponent itc = super.getName(stack).copy();
 		itc.append(": ").append(getShaderName(shaderName));
 		return itc;
-	}
-
-	@Override
-	public String getDescriptionId()
-	{
-		return "item.immersiveengineering.shader";
 	}
 
 	public static Component getShaderName(Identifier shader)
@@ -165,7 +155,6 @@ public class ShaderItem extends IEBaseItem implements IShaderItem, IColouredItem
 		return "item."+shader.getNamespace()+".shader.name."+shader.getPath();
 	}
 
-	@Override
 	public int getColourForIEItem(ItemStack stack, int pass)
 	{
 		Identifier name = getShaderName();

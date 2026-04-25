@@ -63,7 +63,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -79,13 +78,11 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		);
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		Font font = getMinecraft().font;
@@ -108,21 +105,16 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		}
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(font, I18n.get(Lib.GUI_CONFIG+"radio_tower.saved_frequencies"), 14, 61, 0x2d1a00, false);
 	}
 
-	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double distX, double distY)
 	{
-		if(this.getFocused()!=null&&this.isDragging()&&button==0)
-			return this.getFocused().mouseDragged(mouseX, mouseY, button, distX, distY);
-		return super.mouseDragged(mouseX, mouseY, button, distX, distY);
+		return false;
 	}
 
-	@Override
 	public void init()
 	{
 		super.init();
@@ -145,7 +137,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 					() -> this.menu.savedFrequencies.get()[ordinal],
 					button -> {
 						int[] saved = this.menu.savedFrequencies.get();
-						if(Screen.hasShiftDown())
+						if(net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown())
 						{
 							this.menu.frequency.set(saved[ordinal]);
 							sendFrequencyToServer(saved[ordinal]);
@@ -222,7 +214,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 
 		private static final DecimalFormat FRQ_FORMAT = new DecimalFormat("###");
 
-		@Override
 		protected void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			Minecraft minecraft = Minecraft.getInstance();
@@ -255,19 +246,16 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			);
 		}
 
-		@Override
 		protected void onDrag(double mouseX, double mouseY, double p_93593_, double p_93594_)
 		{
 			setValue(mouseToValue(mouseX));
 		}
 
-		@Override
 		public void onClick(double mouseX, double mouseY, int button)
 		{
 			setValue(mouseToValue(mouseX));
 		}
 
-		@Override
 		public boolean mouseScrolled(double mouseX, double mouseY, double scroll1, double scroll2)
 		{
 			if(this.isHovered())
@@ -278,7 +266,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			return false;
 		}
 
-		@Override
 		protected void updateWidgetNarration(NarrationElementOutput graphics)
 		{
 		}
@@ -296,7 +283,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			this.frequency = frequency;
 		}
 
-		@Override
 		public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			super.renderWidget(graphics, mouseX, mouseY, partialTicks);
@@ -306,7 +292,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			graphics.setColor(1, 1, 1, 1);
 		}
 
-		@Override
 		public void gatherTooltip(int mouseX, int mouseY, List<Component> tooltip)
 		{
 			tooltip.add(Component.translatable("color.minecraft."+this.color.getName()));

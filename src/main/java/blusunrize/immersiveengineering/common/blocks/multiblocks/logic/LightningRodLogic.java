@@ -30,11 +30,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +50,6 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 {
 	public static final BlockPos MASTER_OFFSET = new BlockPos(1, 1, 1);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -70,16 +71,19 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 			state.fenceNet = getFenceNet(level.getRawLevel(), level.toAbsolute(MASTER_OFFSET));
 		if(state.fenceNet.isValid()
 				&&level.shouldTickModulo(128)
-				&&(level.isThundering()||(level.isRaining()&&ApiUtils.RANDOM.nextInt(10)==0)))
+				&&(level.isThundering()||(level.isRaining()&&ApiUtils.getRandom().nextInt(10)==0)))
 		{
 			final BlockPos strikePosition = state.fenceNet.getAbsoluteStrikePosition(level);
 			if(strikePosition!=null)
 			{
 				state.energy.setStoredEnergy(IEServerConfig.MACHINES.lightning_output.get());
-				LightningBolt lightningboltentity = EntityType.LIGHTNING_BOLT.create(level.getRawLevel());
-				lightningboltentity.moveTo(Vec3.atBottomCenterOf(strikePosition));
-				lightningboltentity.setVisualOnly(true);
-				level.getRawLevel().addFreshEntity(lightningboltentity);
+				if(level.getRawLevel() instanceof ServerLevel serverLevel)
+				{
+					LightningBolt lightningboltentity = EntityType.LIGHTNING_BOLT.create(serverLevel, EntitySpawnReason.EVENT);
+					lightningboltentity.setPos(Vec3.atBottomCenterOf(strikePosition));
+					lightningboltentity.setVisualOnly(true);
+					serverLevel.addFreshEntity(lightningboltentity);
+				}
 			}
 		}
 	}
@@ -90,7 +94,7 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 		int height = 0;
 		boolean broken = false;
 		BlockPos lastFence = null;
-		for(int i = absoluteMasterPos.getY()+2; i < level.getMaxBuildHeight()-1; i++)
+		for(int i = absoluteMasterPos.getY()+2; i < level.getMaxY()-1; i++)
 		{
 			BlockPos pos = new BlockPos(absoluteMasterPos.getX(), i, absoluteMasterPos.getZ());
 			if(!broken&&isFence(level, pos))
@@ -129,16 +133,14 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 		return new FenceNet(height, closedList);
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(EnergyStorage.BLOCK, (state, position) -> {
+		register.register(Energy.BLOCK, (state, position) -> {
 			final BlockPos posInMultiblock = position.posInMultiblock();
 			if(position.side()==null||(posInMultiblock.getY()==1&&(posInMultiblock.getX()+posInMultiblock.getZ())%2==1))
 				return state.energy;
@@ -147,7 +149,6 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 		});
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return LightningRodShapes.SHAPE_GETTER;
@@ -172,20 +173,18 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 			ImmutableList.Builder<Supplier<@Nullable IEnergyStorage>> builder = ImmutableList.builder();
 			for(RelativeBlockFace face : RelativeBlockFace.HORIZONTAL)
 				builder.add(capabilitySource.getCapabilityAt(
-						EnergyStorage.BLOCK,
+						Energy.BLOCK,
 						face.offsetRelative(MASTER_OFFSET, 2),
 						face.getOpposite()
 				));
 			this.energyOutputs = builder.build();
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			EnergyHelper.serializeTo(energy, nbt, provider);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
 			EnergyHelper.deserializeFrom(energy, nbt, provider);
@@ -205,8 +204,8 @@ public class LightningRodLogic implements IMultiblockLogic<State>, IServerTickab
 		{
 			int i = height+absoluteFencePositions.size();
 			final int masterY = level.getAbsoluteOrigin().getY();
-			if(ApiUtils.RANDOM.nextInt(4096*level.getMaxBuildHeight()) < i*(masterY+i))
-				return absoluteFencePositions.get(ApiUtils.RANDOM.nextInt(absoluteFencePositions.size()));
+			if(ApiUtils.getRandom().nextInt(4096*level.getMaxBuildHeight()) < i*(masterY+i))
+				return absoluteFencePositions.get(ApiUtils.getRandom().nextInt(absoluteFencePositions.size()));
 			else
 				return null;
 		}

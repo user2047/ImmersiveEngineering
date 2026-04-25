@@ -21,7 +21,6 @@ public class CCLuaTypeConverter extends LuaTypeConverter
 {
 	public static final CCLuaTypeConverter INSTANCE = new CCLuaTypeConverter();
 
-	@Override
 	@Nullable
 	protected <T> Converter<T, ?> getInternalConverter(Class<T> type)
 	{

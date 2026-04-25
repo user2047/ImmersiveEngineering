@@ -25,21 +25,18 @@ public class ShaderBannerStandingBlock extends ShaderBannerBlock
 		super(props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(ROTATION, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		int newRotation = rot.rotate(state.getValue(ROTATION), 16);
 		return state.setValue(ROTATION, newRotation);
 	}
 
-	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn)
 	{
 		if(mirrorIn==Mirror.NONE)

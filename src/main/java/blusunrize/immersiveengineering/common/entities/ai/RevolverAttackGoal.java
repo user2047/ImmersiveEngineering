@@ -33,13 +33,11 @@ public class RevolverAttackGoal<T extends Commando> extends ShieldCombatGoal<T>
 		this.maxBullets = maxBullets;
 	}
 
-	@Override
 	protected boolean isHoldingWeapon()
 	{
 		return this.mob.isHolding(is -> is.getItem() instanceof RevolverItem);
 	}
 
-	@Override
 	public void tick()
 	{
 		super.tick();
@@ -52,7 +50,6 @@ public class RevolverAttackGoal<T extends Commando> extends ShieldCombatGoal<T>
 			this.mob.setAiming(false);
 	}
 
-	@Override
 	boolean performAttack()
 	{
 		ItemStack revolver = this.mob.getItemInHand(InteractionHand.MAIN_HAND);

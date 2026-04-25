@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.Objects;
@@ -29,11 +29,10 @@ public abstract class InternalStorageItemContainer extends ItemContainer
 	{
 		super(type, id, iinventory, world, entityEquipmentSlot, heldItem);
 		this.entityEquipmentSlot = entityEquipmentSlot;
-		this.inv = Objects.requireNonNull(heldItem.getCapability(ItemHandler.ITEM));
+		this.inv = Objects.requireNonNull(blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(heldItem, Capabilities.Item.ITEM));
 		updateSlots();
 	}
 
-	@Override
 	protected void updateSlots()
 	{
 		if(inv==null)

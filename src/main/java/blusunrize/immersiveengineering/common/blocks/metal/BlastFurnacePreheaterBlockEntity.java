@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
@@ -75,7 +75,6 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		return 0;
 	}
 
-	@Override
 	public void tickClient()
 	{
 		if(active)
@@ -93,14 +92,12 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		return null;
 	}
 
-	@Override
 	public boolean isDummy()
 	{
 		return dummy > 0;
 	}
 
 	@Nullable
-	@Override
 	public BlastFurnacePreheaterBlockEntity master()
 	{
 		BlockPos masterPos = getBlockPos().below(dummy);
@@ -108,7 +105,6 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		return te instanceof BlastFurnacePreheaterBlockEntity heater?heater: null;
 	}
 
-	@Override
 	public void placeDummies(BlockPlaceContext ctx, BlockState state)
 	{
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
@@ -120,7 +116,6 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		}
 	}
 
-	@Override
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
 		for(int i = 0; i <= 2; i++)
@@ -128,18 +123,16 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 				level.removeBlock(getBlockPos().offset(0, -dummy, 0).offset(0, i, 0), false);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		dummy = nbt.getInt("dummy");
-		active = nbt.getBoolean("active");
+		dummy = nbt.getIntOr("dummy", 0);
+		active = nbt.getBooleanOr("active", false);
 		if(descPacket)
 			this.markContainingBlockForUpdate(null);
 		else
 			EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.putInt("dummy", dummy);
@@ -150,7 +143,7 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 
 	public static void registerCapabilities(BECapabilityRegistrar<BlastFurnacePreheaterBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> {
+		registrar.register(Energy.BLOCK, (be, side) -> {
 			if(side==null||(be.dummy==2&&side==Direction.UP))
 				return be.energyCap.get();
 			else
@@ -158,19 +151,16 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		});
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_HORIZONTAL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public void afterRotation(Direction oldDir, Direction newDir)
 	{
 		for(int i = 0; i <= 2; i++)
@@ -185,13 +175,11 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		}
 	}
 
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		return new BlockPos(0, dummy, 0);
 	}
 
-	@Override
 	public boolean shouldPlaySound(String sound)
 	{
 		return active;

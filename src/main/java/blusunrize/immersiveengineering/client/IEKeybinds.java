@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client;
 
+import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.tool.ZoomHandler.IZoomTool;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -18,30 +19,29 @@ import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import org.lwjgl.glfw.GLFW;
 
 import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Lib.MODID, value = Dist.CLIENT)
 public class IEKeybinds
 {
-	public static KeyMapping keybind_magnetEquip = new KeyMapping("key.immersiveengineering.magnetEquip", GLFW.GLFW_KEY_S, "key.categories.immersiveengineering");
-	public static KeyMapping keybind_chemthrowerSwitch = new KeyMapping("key.immersiveengineering.chemthrowerSwitch", -1, "key.categories.immersiveengineering");
-	public static KeyMapping keybind_railgunZoom = new KeyMapping("key.immersiveengineering.railgunZoom", InputConstants.Type.MOUSE, 2, "key.categories.immersiveengineering");
+	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(IEApi.ieLoc("immersiveengineering"));
+
+	public static KeyMapping keybind_magnetEquip = new KeyMapping("key.immersiveengineering.magnetEquip", GLFW.GLFW_KEY_S, CATEGORY);
+	public static KeyMapping keybind_chemthrowerSwitch = new KeyMapping("key.immersiveengineering.chemthrowerSwitch", -1, CATEGORY);
+	public static KeyMapping keybind_railgunZoom = new KeyMapping("key.immersiveengineering.railgunZoom", InputConstants.Type.MOUSE, 2, CATEGORY);
 
 	@SubscribeEvent
 	public static void registerKeybinds(RegisterKeyMappingsEvent ev)
 	{
 		IKeyConflictContext noKeyConflict = new IKeyConflictContext()
 		{
-			@Override
 			public boolean isActive()
 			{
 				return mc().screen==null;
 			}
 
-			@Override
 			public boolean conflicts(IKeyConflictContext other)
 			{
 				return false;

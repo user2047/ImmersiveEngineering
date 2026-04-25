@@ -45,13 +45,11 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 		}
 	}
 
-	@Override
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
 		graphics.blit(TEXTURE, leftPos, topPos, 0, 0, 176, imageHeight);
 	}
 
-	@Override
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		drawFlameAndArrow(menu.state, graphics, leftPos, topPos, 76);
@@ -65,7 +63,6 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 			this.imageWidth = 210;
 		}
 
-		@Override
 		protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 		{
 			graphics.blit(TEXTURE, leftPos+140, topPos+11, 176, 32, 70, 46);
@@ -76,7 +73,6 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 			super.drawContainerBackgroundPre(graphics, f, mx, my);
 		}
 
-		@Override
 		protected void renderLabels(GuiGraphicsExtractor graphics, int x, int y)
 		{
 			String title = I18n.get(Lib.GUI+"blast_furnace.preheaters");

@@ -39,7 +39,6 @@ public class SqueezerRecipeCategory extends IERecipeCategory<SqueezerRecipe>
 		tankOverlay = helper.createDrawable(background, 179, 33, 16, 47);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, SqueezerRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 2, 23)

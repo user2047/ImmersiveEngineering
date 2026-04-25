@@ -19,10 +19,13 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +35,7 @@ import net.neoforged.neoforge.client.model.CompositeModel;
 import net.neoforged.neoforge.client.model.CompositeModel.Baked.Builder;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 import net.neoforged.neoforge.client.model.IQuadTransformer;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -52,13 +55,12 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 
 	public PotionBucketModel(int color)
 	{
-		this.recolorTransformer = QuadTransformer.color($ -> color);
+		this.recolorTransformer = quad -> quad;
 		JsonObject baseModelJSON = new JsonObject();
 		baseModelJSON.addProperty("fluid", IEFluids.POTION.getId().toString());
 		this.baseGeometry = DynamicFluidContainerModel.Loader.INSTANCE.read(baseModelJSON, null);
 	}
 
-	@Override
 	public BakedModel bake(
 			IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter,
 			ModelState modelTransform, ItemOverrides overrides
@@ -87,7 +89,7 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 				for(BakedQuad baseQuad : baseQuads)
 				{
 					BakedQuad newQuad;
-					if(baseQuad.getSprite().contents().name().equals(fluidMaskLocation))
+					if(baseQuad.materialInfo().sprite().contents().name().equals(fluidMaskLocation))
 						newQuad = recolorTransformer.process(baseQuad);
 					else
 						newQuad = baseQuad;
@@ -103,7 +105,6 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 		public static final Identifier LOADER_NAME = ImmersiveEngineering.rl("potion_bucket");
 
 		@Nonnull
-		@Override
 		public PotionBucketModel read(
 				@Nonnull JsonObject modelContents, @Nonnull JsonDeserializationContext deserializationContext
 		)
@@ -134,7 +135,6 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 		}
 
 		@Nullable
-		@Override
 		public BakedModel resolve(
 				@Nonnull BakedModel model, @Nonnull ItemStack stack, @Nullable ClientLevel world,
 				@Nullable LivingEntity livingEntity, int unused

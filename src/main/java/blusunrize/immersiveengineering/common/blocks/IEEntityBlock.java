@@ -21,7 +21,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -82,18 +82,16 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 	}
 
 	@Nullable
-	@Override
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState)
 	{
 		return makeEntity.apply(pPos, pState);
 	}
 
 	@Nullable
-	@Override
 	public <T2 extends BlockEntity>
 	BlockEntityTicker<T2> getTicker(Level world, BlockState state, BlockEntityType<T2> type)
 	{
-		BlockEntityTicker<T2> baseTicker = getClassData().makeBaseTicker(world.isClientSide);
+		BlockEntityTicker<T2> baseTicker = getClassData().makeBaseTicker(world.isClientSide());
 		if(makeEntity instanceof MultiblockBEType<?> multiBEType&&type!=multiBEType.master())
 			return null;
 		return baseTicker;
@@ -104,7 +102,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 			IEProperties.UP, IEProperties.DOWN, IEProperties.NORTH, IEProperties.SOUTH, IEProperties.WEST, IEProperties.EAST
 	);
 
-	@Override
 	protected BlockState getInitDefaultState()
 	{
 		BlockState ret = super.getInitDefaultState();
@@ -118,7 +115,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return ret;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving)
 	{
@@ -130,10 +126,8 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 			if(tile instanceof IHasDummyBlocks)
 				((IHasDummyBlocks)tile).breakDummies(pos, state);
 		}
-		super.onRemove(state, world, pos, newState, isMoving);
 	}
 
-	@Override
 	public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, BlockEntity tile, ItemStack stack)
 	{
 		if(tile instanceof IAdditionalDrops)
@@ -148,7 +142,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		super.playerDestroy(world, player, pos, state, tile, stack);
 	}
 
-	@Override
 	public boolean canEntityDestroy(BlockState state, BlockGetter world, BlockPos pos, Entity entity)
 	{
 		BlockEntity tile = world.getBlockEntity(pos);
@@ -157,7 +150,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return super.canEntityDestroy(state, world, pos, entity);
 	}
 
-	@Override
 	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader world, BlockPos pos, Player player)
 	{
 		BlockEntity tile = world.getBlockEntity(pos);
@@ -172,7 +164,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 	}
 
 
-	@Override
 	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam)
 	{
 		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
@@ -185,7 +176,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return Direction.NORTH;
 	}
 
-	@Override
 	public void onIEBlockPlacedBy(BlockPlaceContext context, BlockState state)
 	{
 		Level world = context.getLevel();
@@ -210,38 +200,35 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 			placementInteractionBE.onBEPlaced(context);
 	}
 
-	@Override
-	public ItemInteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
+	public InteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
 	{
 		BlockEntity tile = w.getBlockEntity(pos);
 		if(tile instanceof IHammerInteraction)
 		{
 			boolean b = ((IHammerInteraction)tile).hammerUseSide(side, player, hand, hit.getLocation());
 			if(b)
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			else
-				return ItemInteractionResult.FAIL;
+				return InteractionResult.FAIL;
 		}
 		return super.hammerUseSide(side, player, hand, w, pos, hit);
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Level w, BlockPos pos, BlockHitResult hit)
 	{
 		BlockEntity tile = w.getBlockEntity(pos);
 		if(tile instanceof IScrewdriverInteraction interaction)
 		{
-			ItemInteractionResult teResult = interaction.screwdriverUseSide(side, player, hand, hit.getLocation());
-			if(teResult!=ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION)
+			InteractionResult teResult = interaction.screwdriverUseSide(side, player, hand, hit.getLocation());
+			if(teResult!=InteractionResult.PASS)
 				return teResult;
 		}
 		return super.screwdriverUseSide(side, player, hand, w, pos, hit);
 	}
 
-	@Override
-	public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		ItemInteractionResult superResult = super.useItemOn(stack, state, world, pos, player, hand, hit);
+		InteractionResult superResult = super.useItemOn(stack, state, world, pos, player, hand, hit);
 		if(superResult.consumesAction())
 			return superResult;
 		final Direction side = hit.getDirection();
@@ -253,7 +240,7 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		if(tile instanceof IDirectionalBE&&Utils.isHammer(heldItem)&&((IDirectionalBE)tile).canHammerRotate(
 				side,
 				hit.getLocation().subtract(Vec3.atLowerCornerOf(pos)),
-				player)&&!world.isClientSide)
+				player)&&!world.isClientSide())
 		{
 			Direction f = ((IDirectionalBE)tile).getFacing();
 			Direction oldF = f;
@@ -278,12 +265,12 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 			tile.setChanged();
 			world.sendBlockUpdated(pos, state, state, 3);
 			world.blockEvent(tile.getBlockPos(), tile.getBlockState().getBlock(), 255, 0);
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		if(tile instanceof IPlayerInteraction interaction)
 		{
 			var res = interaction.interact(side, player, hand, heldItem, hitX, hitY, hitZ);
-			if(res.consumesAction()||res==ItemInteractionResult.FAIL)
+			if(res.consumesAction()||res==InteractionResult.FAIL)
 				return res;
 		}
 		if(tile instanceof MenuProvider menuProvider&&hand==InteractionHand.MAIN_HAND&&!player.isShiftKeyDown())
@@ -306,16 +293,15 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 				else
 					serverPlayer.openMenu(menuProvider);
 			}
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		return superResult;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
 	{
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 		{
 			BlockEntity tile = world.getBlockEntity(pos);
 			if(tile instanceof IEBaseBlockEntity)
@@ -329,13 +315,11 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return this;
 	}
 
-	@Override
 	public boolean hasCustomBlockColours()
 	{
 		return hasColours;
 	}
 
-	@Override
 	public int getRenderColour(BlockState state, @Nullable BlockGetter worldIn, @Nullable BlockPos pos, int tintIndex)
 	{
 		if(worldIn!=null&&pos!=null)
@@ -347,7 +331,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return 0xffffff;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
@@ -360,7 +343,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return super.getShape(state, world, pos, context);
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
@@ -377,7 +359,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return super.getCollisionShape(state, world, pos, context);
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos)
 	{
@@ -390,14 +371,12 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return super.getInteractionShape(state, world, pos);
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public boolean hasAnalogOutputSignal(BlockState state)
 	{
 		return getClassData().hasComparatorOutput;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos)
 	{
@@ -408,7 +387,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 	}
 
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public int getSignal(BlockState blockState, BlockGetter world, BlockPos pos, Direction side)
 	{
@@ -418,7 +396,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return 0;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public int getDirectSignal(BlockState blockState, BlockGetter world, BlockPos pos, Direction side)
 	{
@@ -428,14 +405,12 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return 0;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public boolean isSignalSource(BlockState state)
 	{
 		return getClassData().emitsRedstone();
 	}
 
-	@Override
 	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side)
 	{
 		BlockEntity te = world.getBlockEntity(pos);
@@ -444,7 +419,6 @@ public class IEEntityBlock<T extends BlockEntity> extends IEBaseBlock implements
 		return false;
 	}
 
-	@Override
 	@SuppressWarnings("deprecation")
 	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
 	{

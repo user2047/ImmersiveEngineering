@@ -50,7 +50,6 @@ public class ChemthrowerEffects
 
 		ChemthrowerHandler.registerEffect(fluidPotion, new ChemthrowerEffect()
 		{
-			@Override
 			public void applyToEntity(LivingEntity target, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, FluidStack fluid)
 			{
 				if(fluid.has(DataComponents.POTION_CONTENTS))
@@ -59,8 +58,8 @@ public class ChemthrowerEffects
 					for(MobEffectInstance e : potionContents.getAllEffects())
 					{
 						MobEffect effect = e.getEffect().value();
-						if(effect.isInstantenous())
-							effect.applyInstantenousEffect(projectile, shooter, target, e.getAmplifier(), 1);
+						if(effect.isInstantenous()&&target.level() instanceof ServerLevel serverLevel)
+							effect.applyInstantenousEffect(serverLevel, projectile, shooter, target, e.getAmplifier(), 1);
 						else
 						{
 							MobEffectInstance newEffect = new MobEffectInstance(e.getEffect(), (int)Math.ceil(e.getDuration()*.05), e.getAmplifier());
@@ -70,18 +69,15 @@ public class ChemthrowerEffects
 				}
 			}
 
-			@Override
 			public void applyToEntity(LivingEntity target, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 			}
 
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, FluidStack fluid)
 			{
 
 			}
 
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 			}
@@ -89,18 +85,15 @@ public class ChemthrowerEffects
 
 		ChemthrowerHandler.registerEffect(fluidConcrete, new ChemthrowerEffect()
 		{
-			@Override
 			public void applyToEntity(LivingEntity target, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, FluidStack fluid)
 			{
 				hit(target.level(), target.blockPosition(), Direction.UP);
 			}
 
-			@Override
 			public void applyToEntity(LivingEntity target, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 			}
 
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, FluidStack fluid)
 			{
 				if(!(mop instanceof BlockHitResult))
@@ -119,7 +112,6 @@ public class ChemthrowerEffects
 				}
 			}
 
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 			}
@@ -138,12 +130,10 @@ public class ChemthrowerEffects
 
 		ChemthrowerHandler.registerEffect(fluidHerbicide, new ChemthrowerEffect()
 		{
-			@Override
 			public void applyToEntity(LivingEntity target, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 			}
 
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 				if(!(mop instanceof BlockHitResult))
@@ -154,7 +144,7 @@ public class ChemthrowerEffects
 				if(hit.is(BlockTags.LEAVES))
 					world.removeBlock(brtr.getBlockPos(), false);
 					// turn grass & farmland to dirt
-				else if(hit.getBlock() instanceof SnowyDirtBlock||hit.getBlock()==Blocks.FARMLAND)
+				else if(hit.getBlock()==Blocks.GRASS_BLOCK||hit.getBlock()==Blocks.FARMLAND)
 				{
 					world.setBlockAndUpdate(brtr.getBlockPos(), Blocks.DIRT.defaultBlockState());
 					BlockPos above = brtr.getBlockPos().above();
@@ -181,14 +171,13 @@ public class ChemthrowerEffects
 		ChemthrowerHandler.registerEffect(fluidResin, new ChemthrowerEffect_Potion(null, 0, IEPotions.STICKY, 140, 1));
 		ChemthrowerHandler.registerEffect(fluidRedstoneAcid, new ChemthrowerEffect_Potion(null, 0, IEPotions.CONDUCTIVE, 140, 1)
 		{
-			@Override
 			public void applyToBlock(Level world, HitResult mop, @Nullable Player shooter, @Nullable Entity projectile, ItemStack thrower, Fluid fluid)
 			{
 				if(!(mop instanceof BlockHitResult blockHit)||!(world instanceof ServerLevel serverLevel))
 					return;
 				BlockState hit = world.getBlockState(blockHit.getBlockPos());
 				if(hit.getBlock() instanceof WeatheringCopper copperBlock)
-					copperBlock.changeOverTime(hit, serverLevel, blockHit.getBlockPos(), world.random);
+					copperBlock.changeOverTime(hit, serverLevel, blockHit.getBlockPos(), serverLevel.getRandom());
 			}
 		});
 		/*TODO

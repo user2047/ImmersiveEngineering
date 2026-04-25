@@ -40,7 +40,8 @@ import blusunrize.immersiveengineering.common.world.IEWorldGen;
 import blusunrize.immersiveengineering.common.world.Villages;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonStreamParser;
-import net.minecraft.Util;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.Util;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
@@ -50,7 +51,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData.Factory;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.InterModComms;
@@ -59,7 +59,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -84,7 +84,7 @@ public class ImmersiveEngineering
 	public static final String MODNAME = "Immersive Engineering";
 	public static final String VERSION = IEApi.getCurrentVersion();
 	public static final CommonProxy proxy = Util.make(() -> {
-		if(FMLLoader.getDist().isClient())
+		if(FMLEnvironment.getDist().isClient())
 			return new ClientProxy();
 		else
 			return new CommonProxy();
@@ -132,9 +132,8 @@ public class ImmersiveEngineering
 		ArcRecyclingChecker.allowRecipeTypeForRecycling(RecipeType.CRAFTING);
 		ArcRecyclingChecker.allowRecipeTypeForRecycling(IERecipeTypes.METAL_PRESS.get());
 		// Vanilla Tools, Swords & Armor
-		ArcRecyclingChecker.allowSimpleItemForRecycling(stack -> stack instanceof DiggerItem
-				||stack instanceof ShearsItem||stack instanceof SwordItem||
-				stack instanceof ArmorItem||stack instanceof AnimalArmorItem||
+		ArcRecyclingChecker.allowSimpleItemForRecycling(stack -> stack instanceof ShearsItem||stack instanceof SwordItem||
+				stack.components().has(DataComponents.EQUIPPABLE)||
 				stack instanceof BucketItem);
 		// IE Tools
 		ArcRecyclingChecker.allowSimpleItemForRecycling(stack -> stack instanceof HammerItem
@@ -178,7 +177,7 @@ public class ImmersiveEngineering
 		// Vanilla Metals
 		ArcRecyclingChecker.allowEnumeratedItemsForRecycling(() -> Stream.of(
 				Items.HEAVY_WEIGHTED_PRESSURE_PLATE, Items.LIGHT_WEIGHTED_PRESSURE_PLATE, Items.HOPPER,
-				Items.IRON_TRAPDOOR, Items.IRON_DOOR, Items.IRON_BARS, Items.CAULDRON, Items.CHAIN,
+				Items.IRON_TRAPDOOR, Items.IRON_DOOR, Items.IRON_BARS, Items.CAULDRON,
 				Items.MINECART, Items.ANVIL, Items.CHIPPED_ANVIL, Items.DAMAGED_ANVIL, Items.LIGHTNING_ROD
 		));
 
@@ -262,7 +261,7 @@ public class ImmersiveEngineering
 	)
 	{
 		if(direction.isEmpty())
-			registrar.playBidirectional(id, codec, T::process);
+			registrar.playBidirectional(id, codec, T::process, T::process);
 		else if(direction.get()==CLIENTBOUND)
 			registrar.playToClient(id, codec, T::process);
 		else if(direction.get()==SERVERBOUND)
@@ -292,11 +291,9 @@ public class ImmersiveEngineering
 		{
 			//TODO hardcoding DimensionType.OVERWORLD seems hacky/broken
 			ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
-			if(!world.isClientSide)
+			if(!world.isClientSide())
 			{
-				IESaveData worldData = world.getDataStorage().computeIfAbsent(
-						new Factory<>(IESaveData::new, IESaveData::new), IESaveData.dataName
-				);
+				IESaveData worldData = world.getDataStorage().computeIfAbsent(IESaveData.TYPE);
 				IESaveData.setInstance(worldData);
 			}
 		}
@@ -319,7 +316,6 @@ public class ImmersiveEngineering
 			activeThread = this;
 		}
 
-		@Override
 		public void run()
 		{
 			try

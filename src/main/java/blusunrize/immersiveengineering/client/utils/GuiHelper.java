@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client.utils;
 
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.util.Utils;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,7 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -49,17 +50,6 @@ public class GuiHelper
 
 	public static void colouredBlit(GuiGraphicsExtractor graphics, Identifier atlasLocation, int x, int y, int blitOffset, int width, int height, int u, int v, float red, float green, float blue, float alpha)
 	{
-		RenderSystem.setShaderTexture(0, atlasLocation);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-		RenderSystem.enableBlend();
-		Matrix4f matrix4f = graphics.pose().last().pose();
-		BufferBuilder bufferbuilder = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		bufferbuilder.addVertex(matrix4f, x, y, blitOffset).setUv(u/256f, v/256f).setColor(red, green, blue, alpha);
-		bufferbuilder.addVertex(matrix4f, x, y+height, blitOffset).setUv(u/256f, (v+height)/256f).setColor(red, green, blue, alpha);
-		bufferbuilder.addVertex(matrix4f, x+width, y+height, blitOffset).setUv((u+width)/256f, (v+height)/256f).setColor(red, green, blue, alpha);
-		bufferbuilder.addVertex(matrix4f, x+width, y, blitOffset).setUv((u+width)/256f, v/256f).setColor(red, green, blue, alpha);
-		BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
-		RenderSystem.disableBlend();
 	}
 
 
@@ -90,7 +80,7 @@ public class GuiHelper
 
 	public static void drawRepeatedFluidSpriteGui(MultiBufferSource buffer, PoseStack transform, FluidStack fluid, float x, float y, float w, float h)
 	{
-		VertexConsumer builder = buffer.getBuffer(RenderType.TRANSLUCENT);
+		VertexConsumer builder = buffer.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.TRANSLUCENT);
 		drawRepeatedFluidSprite(builder, transform, fluid, x, y, w, h);
 	}
 
@@ -167,10 +157,8 @@ public class GuiHelper
 
 	public static void renderItemWithOverlayIntoGUI(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, Level level)
 	{
-		ItemRenderer itemRenderer = mc().getItemRenderer();
+		ItemRenderer itemRenderer = ClientUtils.getItemRenderer();
 		BakedModel bakedModel = itemRenderer.getModel(stack, null, mc().player, 0);
-		if(!bakedModel.usesBlockLight())
-			Lighting.setupForFlatItems();
 		var transform = graphics.pose();
 		transform.pushPose();
 		transform.translate(x, y, 100);

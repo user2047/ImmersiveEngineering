@@ -158,7 +158,7 @@ public interface IConveyorBelt
 					.subtract(new Vec3(pos.getX(), pos.getY(), pos.getZ()))
 					.subtract(0.5+vX, 0.5, 0.5+vZ);
 			final double conveyorHeight = 2/16.;
-			final Vec3i directionVector = facing.getNormal();
+			final Vec3i directionVector = facing.getUnitVec3i();
 			final double centerOffsetInDirection = centerRelative.dot(new Vec3(directionVector.getX(), directionVector.getY(), directionVector.getZ()));
 			final double radius = entity.getDimensions(entity.getPose()).width()/2;
 			final double maxEntityPos = centerOffsetInDirection+radius;
@@ -247,7 +247,7 @@ public interface IConveyorBelt
 					if(item.getAge() > item.lifespan-60*20&&!outputBlocked)
 						access.setAge(item, item.lifespan-60*20);
 				}
-				else if(!w.isClientSide)
+				else if(!w.isClientSide())
 					handleInsertion(item, conveyorDirection, distX, distZ);
 			}
 		}
@@ -265,7 +265,7 @@ public interface IConveyorBelt
 		{
 			LevelChunk chunk = SafeChunkUtils.getSafeChunk(level, pos);
 			// Do not export entities into non-ticking chunks, where they would pile up at the boundary
-			if(chunk==null||(!level.isClientSide&&!chunk.getFullStatus().isOrAfter(FullChunkStatus.ENTITY_TICKING)))
+			if(chunk==null||(!level.isClientSide()&&!chunk.getFullStatus().isOrAfter(FullChunkStatus.ENTITY_TICKING)))
 				return true;
 			BlockEntity outputTile = chunk.getBlockEntity(pos);
 			if(outputTile instanceof IConveyorBlockEntity<?> convOut)

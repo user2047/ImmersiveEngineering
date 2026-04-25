@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.api.multiblocks.blocks.registry;
 
+import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistrationBuilder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -19,7 +20,7 @@ public class MultiblockItem extends BlockItem
 {
 	public MultiblockItem(Block block)
 	{
-		super(block, new Properties());
+		super(block, MultiblockRegistrationBuilder.defaultItemProperties());
 	}
 
 	@Nonnull

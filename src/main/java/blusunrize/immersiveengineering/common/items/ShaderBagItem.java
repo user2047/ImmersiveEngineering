@@ -15,7 +15,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -30,26 +29,24 @@ public class ShaderBagItem extends IEBaseItem implements IColouredItem
 
 	public ShaderBagItem(Rarity rarity)
 	{
-		super(new Properties().component(DataComponents.RARITY, rarity));
+		super(itemProperties().component(DataComponents.RARITY, rarity));
 		this.rarity = rarity;
 	}
 
-	@Override
 	public int getColourForIEItem(ItemStack stack, int pass)
 	{
 		return rarity.color().getColor();
 	}
 
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public InteractionResult use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
-		if(!world.isClientSide)
+		if(!world.isClientSide())
 			if(ShaderRegistry.totalWeight.containsKey(rarity))
 			{
 				Identifier shader = ShaderRegistry.getRandomShader(player.getUUID(), player.getRandom(), rarity, true);
 				if(shader==null)
-					return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
+					return InteractionResult.FAIL;
 				ItemStack shaderItem = ShaderRegistry.makeShaderStack(shader);
 				Rarity shaderRarity = shaderItem.getRarity();
 				if(ShaderRegistry.sortedRarityMap.indexOf(shaderRarity) <= ShaderRegistry.sortedRarityMap.indexOf(Rarity.EPIC)&&
@@ -57,10 +54,13 @@ public class ShaderBagItem extends IEBaseItem implements IColouredItem
 					Utils.unlockIEAdvancement(player, "main/secret_luckofthedraw");
 				stack.shrink(1);
 				if(stack.getCount() <= 0)
-					return new InteractionResultHolder<>(InteractionResult.SUCCESS, shaderItem);
+				{
+					player.setItemInHand(hand, shaderItem);
+					return InteractionResult.SUCCESS;
+				}
 				if(!player.getInventory().add(shaderItem))
 					player.drop(shaderItem, false, true);
 			}
-		return new InteractionResultHolder<>(InteractionResult.PASS, stack);
+		return InteractionResult.PASS;
 	}
 }

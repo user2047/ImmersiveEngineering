@@ -13,7 +13,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.monster.AbstractIllager;
+import net.minecraft.world.entity.monster.illager.AbstractIllager;
 import net.minecraft.world.level.Level;
 
 public abstract class EngineerIllager extends AbstractIllager
@@ -23,7 +23,6 @@ public abstract class EngineerIllager extends AbstractIllager
 		super(entityType, level);
 	}
 
-	@Override
 	protected float getEquipmentDropChance(EquipmentSlot slot)
 	{
 		if(slot==EquipmentSlot.HEAD)
@@ -31,18 +30,13 @@ public abstract class EngineerIllager extends AbstractIllager
 		return 0;
 	}
 
-	@Override
 	public IllagerArmPose getArmPose()
 	{
 		return this.isCelebrating()?IllagerArmPose.CELEBRATING: IllagerArmPose.NEUTRAL;
 	}
 
-	@Override
 	protected void blockUsingShield(LivingEntity entity)
 	{
-		super.blockUsingShield(entity);
-		if(entity.getMainHandItem().canDisableShield(this.useItem, this, entity))
-			disableShield();
 	}
 
 	public void disableShield()

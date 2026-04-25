@@ -23,7 +23,7 @@ import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
 public class ClocheRecipeSerializer extends IERecipeSerializer<ClocheRecipe>
 {
-	public static FluidIngredient DEFAULT_FLUID = FluidIngredient.single(Fluids.WATER);
+	public static FluidIngredient DEFAULT_FLUID = FluidIngredient.of(Fluids.WATER);
 
 	private static final DualCodec<RegistryFriendlyByteBuf, FluidIngredient> FLUID_CODEC = new DualCodec<>(FluidIngredient.CODEC, FluidIngredient.STREAM_CODEC);
 	public static final DualMapCodec<RegistryFriendlyByteBuf, ClocheRecipe> CODEC = DualCompositeMapCodecs.composite(
@@ -36,13 +36,11 @@ public class ClocheRecipeSerializer extends IERecipeSerializer<ClocheRecipe>
 			ClocheRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, ClocheRecipe> codecs()
 	{
 		return CODEC;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(MetalDevices.CLOCHE);

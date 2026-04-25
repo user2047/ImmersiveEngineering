@@ -27,13 +27,11 @@ public class MetalPressRecipeSerializer extends IERecipeSerializer<MetalPressRec
 			MetalPressRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, MetalPressRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.METAL_PRESS.iconStack();

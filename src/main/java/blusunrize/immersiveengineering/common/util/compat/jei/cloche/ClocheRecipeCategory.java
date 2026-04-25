@@ -58,14 +58,13 @@ public class ClocheRecipeCategory extends IERecipeCategory<ClocheRecipe>
 		arrow = helper.drawableBuilder(background, 181, 1, 13, 13).buildAnimated(200, IDrawableAnimated.StartDirection.LEFT, false);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, ClocheRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 62, 34)
-				.addItemStacks(Arrays.asList(recipe.seed.getItems()));
+				.addItemStacks(java.util.List.of());
 
-		builder.addSlot(RecipeIngredientRole.CATALYST, 62, 54)
-				.addItemStacks(Arrays.asList(recipe.soil.getItems()));
+		builder.addSlot(RecipeIngredientRole.INPUT, 62, 54)
+				.addItemStacks(java.util.List.of());
 
 		for(int i = 0; i < recipe.outputs.size(); i++)
 		{
@@ -83,19 +82,18 @@ public class ClocheRecipeCategory extends IERecipeCategory<ClocheRecipe>
 		builder.addSlot(RecipeIngredientRole.INPUT, 6, 6)
 				.setFluidRenderer(4000, false, 20, 51)
 				.setOverlay(tankOverlay, 0, 0)
-				.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(recipe.requiredFluid.getStacks()))
+				.addIngredients(NeoForgeTypes.FLUID_STACK, java.util.List.of())
 				.addRichTooltipCallback(JEIHelper.fluidTooltipCallback);
 
 		// TODO: Fix this to not be this unperformant and just bad, if there is a better way to do it
 		ArrayList<ItemStack> fertilizers = new ArrayList<>(Collections.singleton(ItemStack.EMPTY));
 		for(RecipeHolder<ClocheFertilizer> fertilizerList : ClocheFertilizer.RECIPES.getRecipes(Minecraft.getInstance().level))
-			fertilizers.addAll(Arrays.stream(fertilizerList.value().input.getItems()).toList());
+			fertilizers.addAll(java.util.List.of());
 
 		builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 8, 59)
 				.addItemStacks(fertilizers);
 	}
 
-	@Override
 	public void draw(ClocheRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		arrow.draw(graphics, 101, 35);

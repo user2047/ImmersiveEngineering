@@ -29,13 +29,11 @@ public class FermenterRecipeSerializer extends IERecipeSerializer<FermenterRecip
 			FermenterRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, FermenterRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.FERMENTER.iconStack();

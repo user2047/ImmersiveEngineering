@@ -29,20 +29,14 @@ public class ShaderBannerBlockEntity extends IEBaseBlockEntity
 		super(IEBlockEntities.SHADER_BANNER.get(), pos, state);
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		if(nbt.contains("shader", Tag.TAG_COMPOUND))
-			shader = ShaderWrapper_Direct.SERIALIZER.read(this, nbt.getCompound("shader"), provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		nbt.put("shader", ShaderWrapper_Direct.SERIALIZER.write(shader, provider));
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)

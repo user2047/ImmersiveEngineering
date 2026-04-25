@@ -37,7 +37,6 @@ public class AlloySmelterRecipeCategory extends IERecipeCategory<AlloyRecipe>
 		arrow = helper.drawableBuilder(background, 176, 14, 24, 17).buildAnimated(200, IDrawableAnimated.StartDirection.LEFT, false);
 	}
 
-	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, AlloyRecipe recipe, IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 2, 2)
@@ -48,7 +47,6 @@ public class AlloySmelterRecipeCategory extends IERecipeCategory<AlloyRecipe>
 				.addItemStack(recipe.output.get());
 	}
 
-	@Override
 	public void draw(AlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY)
 	{
 		flame.draw(graphics, 18, 21);

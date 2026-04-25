@@ -55,7 +55,7 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
@@ -78,11 +78,10 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 
 	public BuzzsawItem()
 	{
-		super(new Properties().stacksTo(1), TYPE, 5);
+		super(itemProperties().stacksTo(1), TYPE, 5);
 	}
 
 	/* ------------- WORKBENCH & INVENTORY ------------- */
-	@Override
 	public Slot[] getWorkbenchSlots(AbstractContainerMenu container, ItemStack stack, Level level, Supplier<Player> getPlayer, IItemHandler toolInventory)
 	{
 		final boolean hasQuiver = hasQuiverUpgrade(stack);
@@ -101,7 +100,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return slots.toArray(new Slot[0]);
 	}
 
-	@Override
 	public ItemStack getUpgradeAfterRemoval(ItemStack stack, ItemStack upgrade)
 	{
 		if(isSpareBladeUpgrade(upgrade))
@@ -113,7 +111,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return upgrade;
 	}
 
-	@Override
 	public void removeUpgrade(ItemStack stack, Player player, ItemStack upgrade)
 	{
 		if(isSpareBladeUpgrade(upgrade))
@@ -126,19 +123,17 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 			onBlade.accept(i, getSawblade(stack, i));
 	}
 
-	@Override
 	public void removeFromWorkbench(Player player, ItemStack stack)
 	{
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv!=null&&!inv.getStackInSlot(0).isEmpty()&&!inv.getStackInSlot(1).isEmpty()&&!inv.getStackInSlot(2).isEmpty())
 			Utils.unlockIEAdvancement(player, "tools/upgrade_buzzsaw");
 	}
 
-	@Override
 	public void recalculateUpgrades(ItemStack stack, Level w, Player player)
 	{
 		super.recalculateUpgrades(stack, w, player);
-		IItemHandler inv = stack.getCapability(ItemHandler.ITEM);
+		IItemHandler inv = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(stack, Capabilities.Item.ITEM);
 		if(inv instanceof IItemHandlerModifiable modifiable)
 			for(int iUpgrade = 1; iUpgrade <= 2; iUpgrade++)
 			{
@@ -158,7 +153,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 			}
 	}
 
-	@Override
 	public ItemStack getHead(ItemStack itemStack)
 	{
 		return getSawblade(itemStack, 0);
@@ -166,7 +160,7 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 
 	public static ItemStack getSawblade(ItemStack itemStack, int spare)
 	{
-		IItemHandler cap = itemStack.getCapability(ItemHandler.ITEM);
+		IItemHandler cap = blusunrize.immersiveengineering.common.util.CapabilityCompat.getItemCapability(itemStack, Capabilities.Item.ITEM);
 		if(cap==null)
 			return ItemStack.EMPTY;
 		// handle spares
@@ -175,7 +169,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return !sawblade.isEmpty()&&isSawblade(sawblade)?sawblade: ItemStack.EMPTY;
 	}
 
-	@Override
 	public void setHead(ItemStack buzzsaw, ItemStack sawblade)
 	{
 		setSawblade(buzzsaw, sawblade, 0);
@@ -187,7 +180,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		makeInternalItemHandler(buzzsaw).setStackInSlot(slot, sawblade);
 	}
 
-	@Override
 	public int getEnchantmentLevel(ItemStack stack, Holder<Enchantment> enchantment)
 	{
 		ItemStack sawblade = getSawblade(stack, 0);
@@ -200,7 +192,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return super.getEnchantmentLevel(stack, enchantment);
 	}
 
-	@Override
 	public ItemEnchantments getAllEnchantments(ItemStack stack, RegistryLookup<Enchantment> lookup)
 	{
 		ItemStack sawblade = getSawblade(stack, 0);
@@ -217,7 +208,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 			return superEnchants;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		list.add(IEItemFluidHandler.fluidItemInfoFlavor(getFluid(stack), getCapacity(stack, CAPACITY)));
@@ -241,13 +231,11 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		}
 	}
 
-	@Override
 	protected double getAttackDamage(ItemStack stack, ItemStack sawblade)
 	{
 		return ((SawbladeItem)sawblade.getItem()).getSawbladeDamage();
 	}
 
-	@Override
 	public void onScrollwheel(ItemStack stack, Player playerEntity, boolean forward)
 	{
 		if(hasQuiverUpgrade(stack))
@@ -272,7 +260,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 
 	/* ------------- DIGGING ------------- */
 
-	@Override
 	public boolean canToolBeUsed(ItemStack stack)
 	{
 		if(getHeadDamage(stack) >= getMaxHeadDamage(stack))
@@ -280,45 +267,38 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return !getFluid(stack).isEmpty();
 	}
 
-	@Override
 	public int getMaxHeadDamage(ItemStack stack)
 	{
 		ItemStack sawblade = getHead(stack);
 		return !sawblade.isEmpty()?sawblade.getMaxDamage(): 0;
 	}
 
-	@Override
 	public int getHeadDamage(ItemStack stack)
 	{
 		ItemStack sawblade = getHead(stack);
 		return !sawblade.isEmpty()?sawblade.getDamageValue(): 0;
 	}
 
-	@Override
 	public Holder<SoundEvent> getIdleSound(ItemStack stack)
 	{
 		return IESounds.buzzsaw_idle;
 	}
 
-	@Override
 	public Holder<SoundEvent> getBusySound(ItemStack stack)
 	{
 		return IESounds.buzzsaw_busy;
 	}
 
-	@Override
 	public Holder<SoundEvent> getFadingSound(ItemStack stack)
 	{
 		return IESounds.buzzsaw_fade;
 	}
 
-	@Override
 	public Holder<SoundEvent> getAttackSound(ItemStack stack)
 	{
 		return IESounds.buzzsaw_attack;
 	}
 
-	@Override
 	public Holder<SoundEvent> getHarvestSound(ItemStack stack)
 	{
 		Item headitem = getHead(stack).getItem();
@@ -327,29 +307,25 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return IESounds.buzzsaw_harvest_saw;
 	}
 
-	@Override
 	public boolean ableToMakeNoise(ItemStack stack)
 	{
 		return canToolBeUsed(stack);
 	}
 
-	@Override
 	public boolean noisySameStack(ItemStack mainStack, ItemStack otherStack)
 	{
 		return mainStack.getItem() instanceof BuzzsawItem buzzsawItem&&buzzsawItem.equals(otherStack.getItem())&&getHead(mainStack).getItem().equals(getHead(otherStack).getItem());
 	}
 
-	@Override
 	public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity living)
 	{
 		consumeDurability(stack, world, state, pos, living);
-		if(!world.isClientSide&&!living.isShiftKeyDown()&&living instanceof ServerPlayer)
+		if(!world.isClientSide()&&!living.isShiftKeyDown()&&living instanceof ServerPlayer)
 			if(canFellTree(stack)&&canToolBeUsed(stack)&&isTree(world, pos)&&!state.is(IETags.buzzsawTreeBlacklist))
 				fellTree(world, pos, (ServerPlayer)living, stack);
 		return true;
 	}
 
-	@Override
 	protected int getToolDamageFromBlock(ItemStack stack, @Nullable BlockState state)
 	{
 		ItemStack sawblade = getHead(stack);
@@ -358,29 +334,25 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return 0;
 	}
 
-	@Override
 	protected void damageHead(ItemStack head, int amount, LivingEntity living)
 	{
 		head.hurtAndBreak(amount, living, EquipmentSlot.MAINHAND);
 	}
 
-	@Override
 	protected void consumeDurability(ItemStack stack, Level world, @Nullable BlockState state, @Nullable BlockPos pos, LivingEntity living)
 	{
-		if(state==null||!state.is(BlockTags.LEAVES)||ApiUtils.RANDOM.nextInt(10)==0)
+		if(state==null||!state.is(BlockTags.LEAVES)||ApiUtils.getRandom().nextInt(10)==0)
 			super.consumeDurability(stack, world, state, pos, living);
 	}
 
-	@Override
-	public Tier getHarvestLevel(ItemStack stack, @Nullable Player player)
+	public ToolMaterial getHarvestLevel(ItemStack stack, @Nullable Player player)
 	{
 		ItemStack sawblade = getHead(stack);
 		if(!sawblade.isEmpty())
-			return Tiers.DIAMOND;
+			return ToolMaterial.DIAMOND;
 		return null;
 	}
 
-	@Override
 	public boolean isEffective(ItemStack stack, BlockState state)
 	{
 		Predicate<BlockState> mineable = null;
@@ -391,7 +363,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		return mineable!=null&&mineable.test(state);
 	}
 
-	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
 		if(isEffective(stack, state))
@@ -405,7 +376,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 
 	/* ------------- Tool Actions ------------- */
 
-	@Override
 	public boolean canPerformAction(ItemStack stack, ItemAbility toolAction)
 	{
 		ItemStack sawblade = getHead(stack);
@@ -424,7 +394,6 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 		ACTION_SOUNDS.put(ItemAbilities.SHEARS_CARVE, SoundEvents.PUMPKIN_CARVE);
 	}
 
-	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
 		ItemStack head = getHead(context.getItemInHand());
@@ -444,13 +413,13 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 				SoundEvent sound = ACTION_SOUNDS.get(action);
 				if(sound!=null)
 					level.playSound(context.getPlayer(), pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-				if(!level.isClientSide)
+				if(!level.isClientSide())
 				{
 					level.setBlock(pos, transformed, 11);
 					if(context.getPlayer()!=null)
 						this.damageHead(head, 1, context.getPlayer());
 				}
-				return InteractionResult.sidedSuccess(level.isClientSide);
+				return InteractionResult.SUCCESS;
 			}
 		}
 		return InteractionResult.PASS;
@@ -610,14 +579,14 @@ public class BuzzsawItem extends DieselToolItem implements IScrollwheel
 			{
 				if(player.getAbilities().instabuild)
 				{
-					if(block.onDestroyedByPlayer(state, world, pos, player, false, state.getFluidState()))
+					if(block.onDestroyedByPlayer(state, world, pos, player, stack, false, state.getFluidState()))
 						block.destroy(world, pos, state);
 				}
 				else
 				{
 					BlockEntity te = world.getBlockEntity(pos);
 					consumeDurability(stack, world, state, pos, player);
-					if(block.onDestroyedByPlayer(state, world, pos, player, true, state.getFluidState()))
+					if(block.onDestroyedByPlayer(state, world, pos, player, stack, true, state.getFluidState()))
 					{
 						block.destroy(world, pos, state);
 						block.playerDestroy(world, player, pos, state, te, stack);

@@ -30,19 +30,16 @@ public class ReinforcedCrateMinecartEntity extends CrateMinecartEntity
 		super(type, world);
 	}
 
-	@Override
 	public boolean ignoreExplosion(Explosion p_312868_)
 	{
 		return true;
 	}
 
-	@Override
 	public ItemStack getPickResult()
 	{
 		return new ItemStack(IEItems.Minecarts.CART_REINFORCED_CRATE.get());
 	}
 
-	@Override
 	public BlockState getDisplayBlockState()
 	{
 		return IEBlocks.WoodenDevices.REINFORCED_CRATE.defaultBlockState();

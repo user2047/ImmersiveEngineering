@@ -106,7 +106,7 @@ public class WireUtils
 
 	public static WireType getWireTypeFromNBT(CompoundTag tag, String key)
 	{
-		return WireType.getValue(tag.getString(key));
+		return WireType.getValue(tag.getStringOr(key, ""));
 	}
 
 	public static void raytraceAlongCatenary(Connection conn, Consumer<BlockIntersection> in,
@@ -162,7 +162,7 @@ public class WireUtils
 	{
 		if(!(loadFrom instanceof ListTag list))
 			return Vec3.ZERO;
-		return new Vec3(list.getDouble(0), list.getDouble(1), list.getDouble(2));
+		return new Vec3(list.getDoubleOr(0, 0), list.getDoubleOr(1, 0), list.getDoubleOr(2, 0));
 	}
 
 	public static Tag storeVec3(Vec3 vec)

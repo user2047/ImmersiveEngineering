@@ -22,7 +22,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -31,7 +30,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import static blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionFluidType.TEXTURE_FLOW;
 import static blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionFluidType.TEXTURE_STILL;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = ImmersiveEngineering.MODID, bus = Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = ImmersiveEngineering.MODID)
 public class ClientExtensions
 {
 	@SubscribeEvent
@@ -53,13 +52,11 @@ public class ClientExtensions
 			ev.registerMobEffect(
 					new IClientMobEffectExtensions()
 					{
-						@Override
 						public boolean isVisibleInGui(MobEffectInstance instance)
 						{
 							return iePotion.showInHud;
 						}
 
-						@Override
 						public boolean isVisibleInInventory(MobEffectInstance instance)
 						{
 							return iePotion.showInInventory;
@@ -71,19 +68,16 @@ public class ClientExtensions
 		ev.registerFluidType(
 				new IClientFluidTypeExtensions()
 				{
-					@Override
 					public Identifier getStillTexture()
 					{
 						return TEXTURE_STILL;
 					}
 
-					@Override
 					public Identifier getFlowingTexture()
 					{
 						return TEXTURE_FLOW;
 					}
 
-					@Override
 					public int getTintColor(FluidStack stack)
 					{
 						var potionData = stack.get(DataComponents.POTION_CONTENTS);
@@ -98,13 +92,11 @@ public class ClientExtensions
 			ev.registerFluidType(
 					new IClientFluidTypeExtensions()
 					{
-						@Override
 						public Identifier getStillTexture()
 						{
 							return fluid.stillTexture();
 						}
 
-						@Override
 						public Identifier getFlowingTexture()
 						{
 							return fluid.flowingTexture();

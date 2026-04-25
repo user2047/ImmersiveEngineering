@@ -31,10 +31,9 @@ public class EngineersBlueprintItem extends IEBaseItem
 {
 	public EngineersBlueprintItem()
 	{
-		super(new Properties().stacksTo(1));
+		super(itemProperties().stacksTo(1));
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		String key = IEApiDataComponents.getBlueprintType(stack);
@@ -52,7 +51,7 @@ public class EngineersBlueprintItem extends IEBaseItem
 		List<RecipeHolder<BlueprintCraftingRecipe>> recipes = BlueprintCraftingRecipe.findRecipes(world, key);
 		if(recipes.isEmpty())
 			return;
-		if(Screen.hasShiftDown())
+		if(net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown())
 		{
 			list.add(Component.translatable(Lib.DESC_INFO+"blueprint.creates1").withStyle(ChatFormatting.GRAY));
 			for(RecipeHolder<BlueprintCraftingRecipe> recipe : recipes)
@@ -63,7 +62,6 @@ public class EngineersBlueprintItem extends IEBaseItem
 	}
 
 
-	@Override
 	public void fillCreativeTab(Output out)
 	{
 		final Level level = ImmersiveEngineering.proxy.getClientWorld();

@@ -23,58 +23,49 @@ public class EmptyContainer implements Container
 	{
 	}
 
-	@Override
 	public int getContainerSize()
 	{
 		return 1;
 	}
 
-	@Override
 	public boolean isEmpty()
 	{
 		return true;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack getItem(int p_18941_)
 	{
 		return ItemStack.EMPTY;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack removeItem(int p_18942_, int p_18943_)
 	{
 		return ItemStack.EMPTY;
 	}
 
 	@Nonnull
-	@Override
 	public ItemStack removeItemNoUpdate(int p_18951_)
 	{
 		return ItemStack.EMPTY;
 	}
 
-	@Override
 	public void setItem(int p_18944_, @Nonnull ItemStack p_18945_)
 	{
 
 	}
 
-	@Override
 	public void setChanged()
 	{
 
 	}
 
-	@Override
 	public boolean stillValid(@Nonnull Player p_18946_)
 	{
 		return true;
 	}
 
-	@Override
 	public void clearContent()
 	{
 

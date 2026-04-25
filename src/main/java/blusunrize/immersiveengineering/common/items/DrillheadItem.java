@@ -40,18 +40,17 @@ import java.util.List;
 public class DrillheadItem extends IEBaseItem implements IDrillHead
 {
 	//Maximal damage is slightly proportionate to pickaxes
-	public static final DrillHeadPerm STEEL = new DrillHeadPerm("steel", IETags.getTagsFor(EnumMetals.STEEL).ingot, 3, 1, Tiers.DIAMOND, 10, 7, 10000, ImmersiveEngineering.rl("item/drill_diesel"));
-	public static final DrillHeadPerm IRON = new DrillHeadPerm("iron", Items.INGOTS_IRON, 2, 1, Tiers.IRON, 9, 6, 6000, ImmersiveEngineering.rl("item/drill_iron"));
+	public static final DrillHeadPerm STEEL = new DrillHeadPerm("steel", IETags.getTagsFor(EnumMetals.STEEL).ingot, 3, 1, ToolMaterial.DIAMOND, 10, 7, 10000, ImmersiveEngineering.rl("item/drill_diesel"));
+	public static final DrillHeadPerm IRON = new DrillHeadPerm("iron", Items.INGOTS_IRON, 2, 1, ToolMaterial.IRON, 9, 6, 6000, ImmersiveEngineering.rl("item/drill_iron"));
 
 	public DrillHeadPerm perms;
 
 	public DrillheadItem(DrillHeadPerm perms)
 	{
-		super(new Properties().stacksTo(1).component(DataComponents.DAMAGE, 0));
+		super(itemProperties().stacksTo(1).component(DataComponents.DAMAGE, 0));
 		this.perms = perms;
 	}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		list.add(Component.translatable(Lib.DESC_FLAVOUR+"drillhead.size", perms.drillSize, perms.drillDepth).withStyle(ChatFormatting.GRAY));
@@ -68,54 +67,45 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 		);
 	}
 
-	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack material)
 	{
 		return material.is(perms.repairMaterial);
 	}
 
-	@Override
 	public boolean beforeBlockbreak(ItemStack drill, ItemStack head, Player player)
 	{
 		return false;
 	}
 
-	@Override
 	public void afterBlockbreak(ItemStack drill, ItemStack head, Player player)
 	{
 	}
 
-	@Override
-	public Tier getMiningLevel(ItemStack head)
+	public ToolMaterial getMiningLevel(ItemStack head)
 	{
 		return perms.drillLevel;
 	}
 
-	@Override
 	public float getMiningSpeed(ItemStack head)
 	{
 		return perms.drillSpeed;
 	}
 
-	@Override
 	public float getAttackDamage(ItemStack head)
 	{
 		return perms.drillAttack;
 	}
 
-	@Override
 	public int getHeadDamage(ItemStack head)
 	{
 		return head.get(DataComponents.DAMAGE);
 	}
 
-	@Override
 	public int getMaximumHeadDamage(ItemStack head)
 	{
 		return perms.maxDamage;
 	}
 
-	@Override
 	public void damageHead(ItemStack head, int dmg)
 	{
 		setHeadDamage(head, getHeadDamage(head)+dmg);
@@ -126,19 +116,16 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 		head.set(DataComponents.DAMAGE, totalDamage);
 	}
 
-	@Override
 	public Identifier getDrillTexture(ItemStack drill, ItemStack head)
 	{
 		return perms.texture;
 	}
 
-	@Override
 	public int getBarWidth(@Nonnull ItemStack stack)
 	{
 		return Math.round(MAX_BAR_WIDTH*(1-getHeadDamage(stack)/(float)getMaximumHeadDamage(stack)));
 	}
 
-	@Override
 	public boolean isBarVisible(@Nonnull ItemStack stack)
 	{
 		return getHeadDamage(stack) > 0;
@@ -150,13 +137,13 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 		final TagKey<Item> repairMaterial;
 		final int drillSize;
 		final int drillDepth;
-		final Tier drillLevel;
+		final ToolMaterial drillLevel;
 		final float drillSpeed;
 		final float drillAttack;
 		final int maxDamage;
 		public final Identifier texture;
 
-		public DrillHeadPerm(String name, TagKey<Item> repairMaterial, int drillSize, int drillDepth, Tier drillLevel, float drillSpeed, int drillAttack, int maxDamage, Identifier texture)
+		public DrillHeadPerm(String name, TagKey<Item> repairMaterial, int drillSize, int drillDepth, ToolMaterial drillLevel, float drillSpeed, int drillAttack, int maxDamage, Identifier texture)
 		{
 			this.name = name;
 			this.repairMaterial = repairMaterial;
@@ -170,7 +157,6 @@ public class DrillheadItem extends IEBaseItem implements IDrillHead
 		}
 	}
 
-	@Override
 	public ImmutableList<BlockPos> getExtraBlocksDug(ItemStack head, Level world, Player player, HitResult rtr)
 	{
 		if(!(rtr instanceof BlockHitResult brtr))

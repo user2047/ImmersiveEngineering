@@ -23,7 +23,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
@@ -48,7 +48,6 @@ public class WolfpackBullet extends BulletHandler.DamagingBullet<Unit>
 		);
 	}
 
-	@Override
 	public void onHitTarget(Level world, HitResult hitResult, UUID shooterUUID, Entity projectile, boolean headshot, Unit bulletData)
 	{
 		super.onHitTarget(world, hitResult, shooterUUID, projectile, headshot, bulletData);
@@ -95,8 +94,8 @@ public class WolfpackBullet extends BulletHandler.DamagingBullet<Unit>
 			// target setting only works for owned wolves, but buffs are given to all allied wolves!
 			if(player.equals(wolf.getOwner()) && possibleTarget!=null && wolf.getTarget()==null && !PlayerUtils.isAllied(player, possibleTarget))
 				wolf.setTarget(possibleTarget);
-			wolf.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200));
-			wolf.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 200, 1));
+			wolf.addEffect(new MobEffectInstance(MobEffects.SPEED, 200));
+			wolf.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 200, 1));
 		});
 	}
 }

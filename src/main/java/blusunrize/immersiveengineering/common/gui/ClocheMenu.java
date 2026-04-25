@@ -81,7 +81,6 @@ public class ClocheMenu extends IEContainerMenu
 		for(int i = 0; i < 4; i++)
 			this.addSlot(new IESlot.NewOutput(inv, 3+i, 116+i%2*18, 34+i/2*18)
 			{
-				@Override
 				public void onTake(Player pPlayer, ItemStack pStack)
 				{
 					super.onTake(pPlayer, pStack);

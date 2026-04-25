@@ -41,14 +41,12 @@ public class GenericPeripheral<T extends BlockEntity> implements IDynamicPeriphe
 	}
 
 	@Nonnull
-	@Override
 	public String[] getMethodNames()
 	{
 		return creator.getMethodNames();
 	}
 
 	@Nonnull
-	@Override
 	public MethodResult callMethod(
 			@Nonnull IComputerAccess computerAccess, @Nonnull ILuaContext ctx, int index, @Nonnull IArguments luaArgs
 	) throws LuaException
@@ -57,20 +55,17 @@ public class GenericPeripheral<T extends BlockEntity> implements IDynamicPeriphe
 	}
 
 	@Nonnull
-	@Override
 	public String getType()
 	{
 		return creator.getName();
 	}
 
 	@Nullable
-	@Override
 	public Object getTarget()
 	{
 		return object;
 	}
 
-	@Override
 	public boolean equals(@Nullable IPeripheral other)
 	{
 		if(other==null) return false;
@@ -80,13 +75,11 @@ public class GenericPeripheral<T extends BlockEntity> implements IDynamicPeriphe
 		return this.creator==otherGeneric.creator&&this.object==otherGeneric.object;
 	}
 
-	@Override
 	public void attach(@Nonnull IComputerAccess computer)
 	{
 		forControlStates(ComputerControlState::addReference);
 	}
 
-	@Override
 	public void detach(@Nonnull IComputerAccess computer)
 	{
 		forControlStates(ComputerControlState::removeReference);

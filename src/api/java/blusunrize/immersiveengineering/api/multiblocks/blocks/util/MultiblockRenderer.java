@@ -13,14 +13,11 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockS
 import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.MultiblockBlockEntityMaster;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 public interface MultiblockRenderer<State extends IMultiblockState>
-		extends BlockEntityRenderer<MultiblockBlockEntityMaster<State>>
 {
-	@Override
 	default void render(
 			@NotNull MultiblockBlockEntityMaster<State> te,
 			float partialTicks, @NotNull PoseStack matrixStack, @NotNull MultiBufferSource bufferIn,
@@ -30,7 +27,6 @@ public interface MultiblockRenderer<State extends IMultiblockState>
 		render(te.getHelper().getContext(), partialTicks, matrixStack, bufferIn, combinedLightIn, combinedOverlayIn);
 	}
 
-	@Override
 	@NotNull
 	default AABB getRenderBoundingBox(@NotNull MultiblockBlockEntityMaster<State> blockEntity)
 	{

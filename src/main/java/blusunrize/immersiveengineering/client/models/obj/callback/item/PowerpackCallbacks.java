@@ -13,7 +13,7 @@ import blusunrize.immersiveengineering.api.client.ieobj.ItemCallback;
 import blusunrize.immersiveengineering.api.tool.upgrade.UpgradeEffect;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.PowerpackCallbacks.Key;
 import blusunrize.immersiveengineering.common.items.PowerpackItem;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,7 +27,6 @@ public class PowerpackCallbacks implements ItemCallback<Key>
 	// 3: Render banner for large textures
 	public static int THIRD_PERSON_PASS = 0;
 
-	@Override
 	public Key extractKey(ItemStack stack, LivingEntity owner)
 	{
 		var upgrades = PowerpackItem.getUpgradesStatic(stack);
@@ -39,13 +38,11 @@ public class PowerpackCallbacks implements ItemCallback<Key>
 		);
 	}
 
-	@Override
 	public boolean useAbsoluteUV(Key object, String material)
 	{
 		return "banner".equals(material)||"big_banner".equals(material);
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
 		// banners only render when specifically enabled
@@ -66,7 +63,6 @@ public class PowerpackCallbacks implements ItemCallback<Key>
 		return true;
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return new Key(0, false, false, false);

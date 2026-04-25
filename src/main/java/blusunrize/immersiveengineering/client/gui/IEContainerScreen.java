@@ -48,7 +48,6 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		this.infoAreas = new ResettableLazy<>(this::makeInfoAreas);
 	}
 
-	@Override
 	protected void init()
 	{
 		super.init();
@@ -61,7 +60,6 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		return ImmutableList.of();
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		// Only difference to super version is the text color
@@ -69,7 +67,6 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		graphics.drawString(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}
 
-	@Override
 	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.render(graphics, mouseX, mouseY, partialTicks);
@@ -99,7 +96,6 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		super.init(minecraft, width, height);
 	}
 
-	@Override
 	protected final void renderBg(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)
 	{
 		drawBackgroundTexture(graphics);

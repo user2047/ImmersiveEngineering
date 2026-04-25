@@ -29,7 +29,6 @@ public class WolfpackPartBullet extends BulletHandler.DamagingBullet<Unit>
 		);
 	}
 
-	@Override
 	public boolean isProperCartridge()
 	{
 		return false;

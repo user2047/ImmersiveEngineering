@@ -15,8 +15,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
@@ -25,7 +25,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,6 @@ public class MirroredModelLoader implements IGeometryLoader<MirroredGeometry>
 	public static final String INNER_MODEL = "inner_model";
 	public static final Identifier ID = ImmersiveEngineering.rl("mirror");
 
-	@Override
 	public MirroredGeometry read(
 			JsonObject modelContents, JsonDeserializationContext deserializationContext
 	) throws JsonParseException

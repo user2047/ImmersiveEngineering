@@ -35,7 +35,6 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 {
 	private static final Map<String, IVertexBufferHolder> VBO_BY_BLUEPRINT = new HashMap<>();
 
-	@Override
 	public void render(ModWorkbenchBlockEntity te, float partialTicks, PoseStack transform, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(te.isDummy()||!te.getLevelNonnull().hasChunkAt(te.getBlockPos()))
@@ -81,7 +80,7 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 				transform.mulPose(new Quaternionf().rotateY(Mth.PI).rotateX(Mth.HALF_PI));
 				transform.translate(-.875, 0, 0);
 				transform.scale(.75f, .75f, .75f);
-				ClientUtils.mc().getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
+				ClientUtils.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
 						combinedLightIn, combinedOverlayIn, transform, bufferIn, te.getLevel(), 0);
 				transform.popPose();
 			}
@@ -112,7 +111,7 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 					{
 						try
 						{
-							ClientUtils.mc().getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
+							ClientUtils.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
 									combinedLightIn, combinedOverlayIn, transform, bufferIn, te.getLevel(), 0);
 						} catch(Exception e)
 						{
@@ -168,7 +167,6 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 		});
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(ModWorkbenchBlockEntity workbench)
 	{
 		if(workbench.renderAABB==null)

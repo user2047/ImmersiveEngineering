@@ -31,7 +31,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -41,7 +41,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -84,14 +84,13 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 
 	private final Map<Direction, IEBlockCapabilityCache<IFluidHandler>> neighbors = ImmutableMap.of(
 			Direction.UP, IEBlockCapabilityCaches.forNeighbor(
-					FluidHandler.BLOCK, this, () -> Direction.UP
+					Capabilities.Fluid.BLOCK, this, () -> Direction.UP
 			),
 			Direction.DOWN, IEBlockCapabilityCaches.forNeighbor(
-					FluidHandler.BLOCK, this, () -> Direction.DOWN
+					Capabilities.Fluid.BLOCK, this, () -> Direction.DOWN
 			)
 	);
 
-	@Override
 	public void tickServer()
 	{
 		boolean update = false;
@@ -119,7 +118,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		}
 	}
 
-	@Override
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult rtr, boolean hammer)
 	{
 		if(rtr.getType()==Type.MISS)
@@ -135,15 +133,14 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		{
 			IOSideConfig side = sideConfig.getOrDefault(brtr.getDirection(), NONE);
 			IOSideConfig opposite = sideConfig.getOrDefault(brtr.getDirection().getOpposite(), NONE);
-			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectFluid.", side, opposite);
+			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectCapabilities.Fluid.", side, opposite);
 		}
 		return null;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		int[] sideCfgArray = nbt.getIntArray("sideConfig");
+		int[] sideCfgArray = nbt.getIntArray("sideConfig").orElse(new int[0]);
 		if(sideCfgArray.length < 2)
 			sideCfgArray = new int[]{-1, 0};
 		sideConfig.clear();
@@ -154,10 +151,9 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 
 	public void readTank(Provider provider, CompoundTag nbt)
 	{
-		tank.readFromNBT(provider, nbt.getCompound("tank"));
+		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideCfgArray = new int[2];
@@ -170,7 +166,7 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 	public void writeTank(Provider provider, CompoundTag nbt, boolean toItem)
 	{
 		boolean write = tank.getFluidAmount() > 0;
-		CompoundTag tankTag = tank.writeToNBT(provider, new CompoundTag());
+		CompoundTag tankTag = blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider);
 		if(!toItem||write)
 			nbt.put("tank", tankTag);
 	}
@@ -186,7 +182,7 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 	public static void registerCapabilities(BECapabilityRegistrar<? extends WoodenBarrelBlockEntity> registrar)
 	{
 		registrar.register(
-				FluidHandler.BLOCK,
+				Capabilities.Fluid.BLOCK,
 				(be, side) -> ((WoodenBarrelBlockEntity)be).sidedFluidHandler.getOrDefault(side, null)
 		);
 	}
@@ -203,7 +199,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 			this.facing = facing;
 		}
 
-		@Override
 		public int fill(FluidStack resource, FluidAction doFill)
 		{
 			if(resource.isEmpty()||(facing!=null&&barrel.sideConfig.get(facing)!=IOSideConfig.INPUT)||!barrel.isFluidValid(resource))
@@ -218,7 +213,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 			return i;
 		}
 
-		@Override
 		public FluidStack drain(FluidStack resource, FluidAction doDrain)
 		{
 			if(resource.isEmpty())
@@ -226,7 +220,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 			return this.drain(resource.getAmount(), doDrain);
 		}
 
-		@Override
 		public FluidStack drain(int maxDrain, FluidAction doDrain)
 		{
 			if(facing!=null&&barrel.sideConfig.get(facing)!=OUTPUT)
@@ -240,26 +233,22 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 			return f;
 		}
 
-		@Override
 		public int getTanks()
 		{
 			return 1;
 		}
 
 		@Nonnull
-		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			return barrel.tank.getFluidInTank(tank);
 		}
 
-		@Override
 		public int getTankCapacity(int tank)
 		{
 			return barrel.tank.getTankCapacity(tank);
 		}
 
-		@Override
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
 			return barrel.tank.isFluidValid(tank, stack);
@@ -272,13 +261,11 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 				&&!fluid.getFluid().is(Tags.Fluids.GASEOUS);
 	}
 
-	@Override
 	public IOSideConfig getSideConfig(Direction side)
 	{
 		return sideConfig.getOrDefault(side, NONE);
 	}
 
-	@Override
 	public boolean toggleSide(Direction side, Player p)
 	{
 		if(side.getAxis()!=Axis.Y)
@@ -290,7 +277,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		return true;
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==0)
@@ -301,29 +287,28 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		return false;
 	}
 
-	@Override
-	public ItemInteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
+	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
 		Optional<FluidStack> fOptional = FluidUtil.getFluidContained(heldItem);
 		boolean metal = this instanceof MetalBarrelBlockEntity;
 		if(!metal)
 		{
-			ItemInteractionResult ret = fOptional.map((f) -> {
+			InteractionResult ret = fOptional.map((f) -> {
 				if(f.getFluid().is(Tags.Fluids.GASEOUS))
 				{
-					player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"noGasAllowed"), true);
-					return ItemInteractionResult.FAIL;
+					player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"noGasAllowed"));
+					return InteractionResult.FAIL;
 				}
 				else if(f.getFluid().getFluidType().getTemperature(f) >= WoodenBarrelBlockEntity.IGNITION_TEMPERATURE)
 				{
-					player.displayClientMessage(Component.translatable(Lib.CHAT_INFO+"tooHot"), true);
+					player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"tooHot"));
 					// TODO this still places the hot fluid, not great for health&safety
-					return ItemInteractionResult.FAIL;
+					return InteractionResult.FAIL;
 				}
 				else
-					return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-			}).orElse(ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
-			if(ret!=ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION)
+					return InteractionResult.PASS;
+			}).orElse(InteractionResult.PASS);
+			if(ret!=InteractionResult.PASS)
 				return ret;
 		}
 
@@ -331,12 +316,11 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		{
 			this.setChanged();
 			this.markContainingBlockForUpdate(null);
-			return ItemInteractionResult.sidedSuccess(player.level().isClientSide);
+			return InteractionResult.SUCCESS;
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.PASS;
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -345,7 +329,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		onBEPlaced(ctx.getItemInHand());
@@ -356,7 +339,6 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 		tank.setFluid(stack.getOrDefault(IEDataComponents.GENERIC_FLUID, SimpleFluidContent.EMPTY).copy());
 	}
 
-	@Override
 	public int getComparatorInputOverride()
 	{
 		return (int)(15*(tank.getFluidAmount()/(float)tank.getCapacity()));

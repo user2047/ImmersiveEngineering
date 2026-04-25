@@ -50,7 +50,6 @@ public class GuiButtonLogicCircuitRegister extends GuiButtonState<LogicCircuitRe
 		this.state = state;
 	}
 
-	@Override
 	public Component getMessage()
 	{
 		LogicCircuitRegister state = getState();
@@ -59,13 +58,11 @@ public class GuiButtonLogicCircuitRegister extends GuiButtonState<LogicCircuitRe
 		return Component.empty();
 	}
 
-	@Override
 	public void gatherTooltip(int mouseX, int mouseY, List<Component> tooltip)
 	{
 		tooltip.add(getState().getDescription());
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderWidget(graphics, mouseX, mouseY, partialTicks);
@@ -90,7 +87,6 @@ public class GuiButtonLogicCircuitRegister extends GuiButtonState<LogicCircuitRe
 		}
 	}
 
-	@Override
 	public boolean charTyped(char codePoint, int modifiers)
 	{
 		codePoint = Character.toLowerCase(codePoint);

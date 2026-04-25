@@ -26,7 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -37,10 +37,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -51,26 +49,34 @@ import java.util.function.Consumer;
 
 import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class LevelStageRenders
 {
 	public static final Map<Connection, Pair<Collection<BlockPos>, MutableInt>> FAILED_CONNECTIONS = new HashMap<>();
 	private static final boolean ENABLE_VEIN_DEBUG = false;
 
 	@SubscribeEvent
-	public static void onRenderLevelStage(RenderLevelStageEvent event)
+	public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentParticles event)
 	{
-		if(event.getStage()==Stage.AFTER_PARTICLES&&!FractalParticle.PARTICLE_FRACTAL_DEQUE.isEmpty())
+		if(!FractalParticle.PARTICLE_FRACTAL_DEQUE.isEmpty())
 			renderFractalParticles(event);
-		if(event.getStage()==Stage.AFTER_CUTOUT_BLOCKS)
-			renderMineralVeinDebug(event);
-		if(event.getStage()==Stage.AFTER_TRANSLUCENT_BLOCKS)
-			renderFailedConnections(event);
+	}
+
+	@SubscribeEvent
+	public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event)
+	{
+		renderMineralVeinDebug(event);
+	}
+
+	@SubscribeEvent
+	public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event)
+	{
+		renderFailedConnections(event);
 	}
 
 	private static void renderFractalParticles(RenderLevelStageEvent event)
 	{
-		float partial = event.getPartialTick().getGameTimeDeltaTicks();
+		float partial = ClientUtils.partialTicks();
 		final Pair<PoseStack, BufferSource> context = prepare(event);
 		List<Pair<RenderType, List<Consumer<VertexConsumer>>>> renders = new ArrayList<>();
 		for(FractalParticle p : FractalParticle.PARTICLE_FRACTAL_DEQUE)
@@ -100,19 +106,19 @@ public class LevelStageRenders
 	private static void renderMineralVeinDebug(RenderLevelStageEvent event)
 	{
 		// !isProduction: Safety feature to make sure this doesn't run even if the enable flag is left on by accident
-		boolean show = ENABLE_VEIN_DEBUG&&!FMLLoader.isProduction();
+		boolean show = false;
 		if(!show)
 			return;
 		// Default <=> shift is sneak, use ctrl instead
 		if(Minecraft.getInstance().options.keyShift.isDefault())
 			show = Screen.hasControlDown();
 		else
-			show = Screen.hasShiftDown();
+			show = net.minecraft.client.Minecraft.getInstance().options.keyShift.isDown();
 		if(!show)
 			return;
 		final Pair<PoseStack, BufferSource> context = prepare(event);
 		final PoseStack transform = context.getFirst();
-		ResourceKey<Level> dimension = mc().player.getCommandSenderWorld().dimension();
+		ResourceKey<Level> dimension = mc().player.level().dimension();
 		List<Identifier> keyList = new ArrayList<>(MineralMix.RECIPES.getRecipeNames(mc().level));
 		keyList.sort(Comparator.comparing(Identifier::toString));
 		BlockPos feetPos = mc().player.blockPosition();
@@ -121,8 +127,8 @@ public class LevelStageRenders
 		final long maxDistance = mc().options.renderDistance().get()*24L;
 		final long maxDistanceSq = maxDistance*maxDistance;
 		Multimap<ResourceKey<Level>, MineralVein> minerals;
-		final var minHeight = mc().level.getMinBuildHeight();
-		final var maxHeight = mc().level.getMaxBuildHeight();
+		final var minHeight = -64;
+		final var maxHeight = 320;
 		synchronized(minerals = ExcavatorHandler.getMineralVeinList())
 		{
 			for(MineralVein vein : minerals.get(dimension))
@@ -231,7 +237,7 @@ public class LevelStageRenders
 	{
 		PoseStack transform = event.getPoseStack();
 		transform.pushPose();
-		final Vec3 cameraPos = event.getCamera().getPosition();
+		final Vec3 cameraPos = event.getLevelRenderState().cameraRenderState.pos;
 		transform.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 		MultiBufferSource.BufferSource buffers = mc().renderBuffers().bufferSource();
 		return Pair.of(transform, buffers);

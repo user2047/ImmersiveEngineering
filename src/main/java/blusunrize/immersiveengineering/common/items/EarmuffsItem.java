@@ -62,7 +62,7 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 
 	public EarmuffsItem()
 	{
-		super(new Properties()
+		super(itemProperties()
 				.stacksTo(1)
 				.component(IEDataComponents.EARMUFF_DATA, EarmuffData.DEFAULT)
 				.component(IEDataComponents.COLOR, Color4.fromRGB(0x486c94))
@@ -70,13 +70,11 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 	}
 
 	@Nullable
-	@Override
 	public EquipmentSlot getEquipmentSlot(ItemStack stack)
 	{
 		return EquipmentSlot.HEAD;
 	}
 
-	@Override
 	public int getColourForIEItem(ItemStack stack, int renderPass)
 	{
 		if(renderPass==1)
@@ -113,7 +111,6 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 	//	ItemNBTHelper.putInt(stack, Lib.NBT_EarmuffColour, color);
 	//}
 
-	@Override
 	public void appendHoverText(ItemStack stack, TooltipContext ctx, List<Component> list, TooltipFlag flag)
 	{
 		int color = this.getColourForIEItem(stack, 0);
@@ -139,13 +136,11 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 		return stack.getOrDefault(IEDataComponents.EARMUFF_DATA, EarmuffData.DEFAULT).volumeMod;
 	}
 
-	@Override
 	public boolean canConfigure(ItemStack stack)
 	{
 		return true;
 	}
 
-	@Override
 	public ToolConfigBoolean[] getBooleanOptions(ItemStack stack)
 	{
 		ToolConfigBoolean[] array = new ToolConfigBoolean[affectedSoundCategories.size()];
@@ -155,7 +150,6 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 		return array;
 	}
 
-	@Override
 	public ToolConfigFloat[] getFloatOptions(ItemStack stack)
 	{
 		return new ToolConfigFloat[]{
@@ -163,7 +157,6 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 		};
 	}
 
-	@Override
 	public String fomatConfigName(ItemStack stack, ToolConfig config)
 	{
 		if(config instanceof ToolConfigFloat)
@@ -171,13 +164,11 @@ public class EarmuffsItem extends IEBaseItem implements IConfigurableTool, IColo
 		return I18n.get(Lib.GUI_CONFIG+"earmuffs.soundcategory."+config.name);
 	}
 
-	@Override
 	public String fomatConfigDescription(ItemStack stack, ToolConfig config)
 	{
 		return null;
 	}
 
-	@Override
 	public void applyConfigOption(ItemStack stack, String key, Object value)
 	{
 		if(value instanceof Boolean bool)

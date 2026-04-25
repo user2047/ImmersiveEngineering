@@ -23,7 +23,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent.LivingVisibilityEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -34,7 +33,7 @@ import java.util.Set;
 
 import static net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent.LivingTargetType.MOB_TARGET;
 
-@EventBusSubscriber(modid = Lib.MODID, bus = Bus.GAME)
+@EventBusSubscriber(modid = Lib.MODID)
 public class CrateItem extends BlockItemIE
 {
 	public static Set<Integer> incognitoPlayers = new HashSet<>();
@@ -45,7 +44,6 @@ public class CrateItem extends BlockItemIE
 	}
 
 	@Nullable
-	@Override
 	public EquipmentSlot getEquipmentSlot(ItemStack stack)
 	{
 		// Only equip empty crates
@@ -55,7 +53,6 @@ public class CrateItem extends BlockItemIE
 		return EquipmentSlot.CHEST;
 	}
 
-	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity entity, int itemSlot, boolean isSelected)
 	{
 		if(!world.isClientSide()&&entity instanceof Player player&&player.isCrouching()&&itemSlot==PowerpackItem.CHEST_SLOT)

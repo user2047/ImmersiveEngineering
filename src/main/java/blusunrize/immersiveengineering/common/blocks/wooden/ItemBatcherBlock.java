@@ -22,7 +22,6 @@ public class ItemBatcherBlock extends IEEntityBlock<ItemBatcherBlockEntity>
 		super(IEBlockEntities.ITEM_BATCHER, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

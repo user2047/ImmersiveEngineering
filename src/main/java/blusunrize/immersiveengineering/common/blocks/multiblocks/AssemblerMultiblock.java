@@ -21,7 +21,6 @@ public class AssemblerMultiblock extends IETemplateMultiblock
 				IEMultiblockLogic.ASSEMBLER);
 	}
 
-	@Override
 	public float getManualScale()
 	{
 		return 12;

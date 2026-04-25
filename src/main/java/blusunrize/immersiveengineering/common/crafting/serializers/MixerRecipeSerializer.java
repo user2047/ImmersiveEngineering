@@ -27,13 +27,11 @@ public class MixerRecipeSerializer extends IERecipeSerializer<MixerRecipe>
 			MixerRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, MixerRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return IEMultiblockLogic.MIXER.iconStack();

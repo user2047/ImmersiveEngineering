@@ -30,12 +30,12 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -53,7 +53,6 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 	public static final BlockPos IO_POS = new BlockPos(1, 0, 1);
 	private static final BlockPos INPUT_POS = new BlockPos(1, 4, 1);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -80,16 +79,14 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 		}
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(FluidHandler.BLOCK, (state, position) -> {
+		register.register(Capabilities.Fluid.BLOCK, (state, position) -> {
 			if(IO_POS.equals(position.posInMultiblock()))
 				return state.ioHandler;
 			else if(INPUT_POS.equals(position.posInMultiblock()))
@@ -100,7 +97,6 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 	}
 
 	@Nullable
-	@Override
 	public List<Component> getOverlayText(State state, BlockPos posInMultiblock, BlockHitResult absoluteHit, Player player, boolean hammer)
 	{
 		if(Utils.isFluidRelatedItemStack(player.getItemInHand(InteractionHand.MAIN_HAND)))
@@ -108,14 +104,12 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 		return null;
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return SHAPE_GETTER;
 	}
 
-	@Override
-	public ItemInteractionResult click(
+	public InteractionResult click(
 			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
 			Player player, InteractionHand hand, BlockHitResult absoluteHit,
 			boolean isClient
@@ -124,19 +118,17 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 		if(FluidUtils.interactWithFluidHandler(player, hand, ctx.getState().tank))
 		{
 			ctx.markDirtyAndSync();
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		else
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.PASS;
 	}
 
-	@Override
 	public void setMemorizedBlockState(State state, BlockPos pos, BlockState blockState)
 	{
 		state.structureMemo.put(pos, blockState);
 	}
 
-	@Override
 	public BlockState getMemorizedBlockState(State state, BlockPos pos)
 	{
 		return state.structureMemo.get(pos);
@@ -160,7 +152,7 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 				if(face!=RelativeBlockFace.DOWN)
 				{
 					final BlockPos neighbor = face.offsetRelative(IO_POS, -1);
-					outputBuilder.add(capabilitySource.getCapabilityAt(FluidHandler.BLOCK, neighbor, face));
+					outputBuilder.add(capabilitySource.getCapabilityAt(Capabilities.Fluid.BLOCK, neighbor, face));
 				}
 			this.outputs = outputBuilder.build();
 			Runnable changedAndSync = () -> {
@@ -171,27 +163,23 @@ public class SheetmetalTankLogic implements IServerTickableComponent<State>, MBO
 			this.ioHandler = new ArrayFluidHandler(tank, true, true, changedAndSync);
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("tank", tank.writeToNBT(provider, new CompoundTag()));
+			nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 			structureMemo.writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			tank.readFromNBT(provider, nbt.getCompound("tank"));
+			blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
 			structureMemo.readSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			writeSaveNBT(nbt, provider);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			readSaveNBT(nbt, provider);

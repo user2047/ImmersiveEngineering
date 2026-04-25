@@ -16,29 +16,30 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.function.Supplier;
 
-public record SimpleRecipeSerializer<R extends Recipe<?>>(Supplier<R> create) implements RecipeSerializer<R>
+public record SimpleRecipeSerializer<R extends Recipe<?>>(Supplier<R> create)
 {
-	@Override
 	public MapCodec<R> codec()
 	{
 		return MapCodec.unit(create);
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, R> streamCodec()
 	{
 		return new StreamCodec<>()
 		{
-			@Override
 			public R decode(RegistryFriendlyByteBuf p_320376_)
 			{
 				return create.get();
 			}
 
-			@Override
 			public void encode(RegistryFriendlyByteBuf p_320158_, R p_320396_)
 			{
 			}
 		};
+	}
+
+	public RecipeSerializer<R> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

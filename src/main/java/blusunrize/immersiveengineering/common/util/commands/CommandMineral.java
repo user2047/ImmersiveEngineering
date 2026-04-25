@@ -62,7 +62,7 @@ public class CommandMineral
 	private static LiteralArgumentBuilder<CommandSourceStack> getMineral()
 	{
 		LiteralArgumentBuilder<CommandSourceStack> get = Commands.literal("get");
-		get.requires(source -> source.hasPermission(2)).executes(command -> {
+		get.requires(source -> true).executes(command -> {
 			ServerPlayer player = command.getSource().getPlayerOrException();
 			BlockPos playerPos = player.blockPosition();
 			getMineral(command, new ColumnPos(playerPos.getX(), playerPos.getZ()));
@@ -113,7 +113,7 @@ public class CommandMineral
 	private static LiteralArgumentBuilder<CommandSourceStack> putMineral()
 	{
 		LiteralArgumentBuilder<CommandSourceStack> set = Commands.literal("put");
-		set.requires(source -> source.hasPermission(2))
+		set.requires(source -> true)
 				.then(Commands.argument("mineral", new MineralArgument())
 						.then(Commands.argument("radius", IntegerArgumentType.integer(8, 64))
 								.then(Commands.argument("pos", ColumnPosArgument.columnPos())
@@ -137,7 +137,7 @@ public class CommandMineral
 		int radius = IntegerArgumentType.getInteger(context, "radius");
 		if(mineral!=null)
 		{
-			MineralVein vein = new MineralVein(pos, mineral.id(), radius);
+			MineralVein vein = new MineralVein(pos, mineral.id().identifier(), radius);
 			ExcavatorHandler.addVein(sender.getLevel().dimension(), vein);
 			IESaveData.markInstanceDirty();
 			sender.sendSuccess(() -> Component.translatable(Lib.CHAT_COMMAND+
@@ -151,7 +151,7 @@ public class CommandMineral
 	private static LiteralArgumentBuilder<CommandSourceStack> setMineralDepletion()
 	{
 		LiteralArgumentBuilder<CommandSourceStack> setDepletion = Commands.literal("setDepletion");
-		setDepletion.requires(source -> source.hasPermission(2))
+		setDepletion.requires(source -> true)
 				.then(Commands.argument("depletion", IntegerArgumentType.integer(0, ExcavatorHandler.mineralVeinYield))
 						.then(Commands.argument("pos", ColumnPosArgument.columnPos())
 								.executes(ctx -> {

@@ -15,6 +15,7 @@ import malte0811.dualcodecs.DualCompositeCodecs;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -31,12 +32,16 @@ import java.util.stream.Collectors;
 
 public class IEDualCodecs
 {
+	public static final DualCodec<ByteBuf, Identifier> IDENTIFIER = new DualCodec<>(
+			Identifier.CODEC, Identifier.STREAM_CODEC
+	);
+
 	public static final DualCodec<RegistryFriendlyByteBuf, FluidStack> FLUID_STACK = new DualCodec<>(
 			FluidStack.OPTIONAL_CODEC, FluidStack.OPTIONAL_STREAM_CODEC
 	);
 
 	public static final DualCodec<RegistryFriendlyByteBuf, SizedFluidIngredient> SIZED_FLUID_INGREDIENT = new DualCodec<>(
-			SizedFluidIngredient.FLAT_CODEC,
+			SizedFluidIngredient.CODEC,
 			SizedFluidIngredient.STREAM_CODEC
 	);
 

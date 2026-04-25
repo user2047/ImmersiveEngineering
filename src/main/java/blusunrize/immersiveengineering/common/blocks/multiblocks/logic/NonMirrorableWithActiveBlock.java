@@ -45,7 +45,6 @@ public class NonMirrorableWithActiveBlock<S extends IMultiblockState> extends Mu
 		}
 	}
 
-	@Override
 	protected void createBlockStateDefinition(@Nonnull Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);

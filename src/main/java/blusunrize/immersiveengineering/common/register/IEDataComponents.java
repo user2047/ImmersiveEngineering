@@ -137,7 +137,7 @@ public class IEDataComponents
 	public static void init(IEventBus bus)
 	{
 		REGISTER.register(bus);
-		for(Identifier name : BulletHandler.getAllKeys())
+		for(Identifier name : BulletHandler.keySet())
 		{
 			var bullet = BulletHandler.getBullet(name);
 			var codecs = bullet.getCodec();
@@ -152,7 +152,7 @@ public class IEDataComponents
 		}
 		IEApiDataComponents.WIRE_LINK = make("wire_link", WireLink.CODECS);
 		IEApiDataComponents.BLUEPRINT_TYPE = make("blueprint", DualCodecs.STRING);
-		IEApiDataComponents.ATTACHED_SHADER = make("shader", DualCodecs.RESOURCE_LOCATION);
+		IEApiDataComponents.ATTACHED_SHADER = make("shader", blusunrize.immersiveengineering.api.utils.codec.IEDualCodecs.IDENTIFIER);
 		IEApiDataComponents.FLUID_PRESSURIZED = make("fluid_pressurized", DualCodecs.unit(Unit.INSTANCE));
 	}
 

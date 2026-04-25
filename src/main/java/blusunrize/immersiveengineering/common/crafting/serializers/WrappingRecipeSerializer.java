@@ -18,7 +18,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import java.util.function.Function;
 
 public class WrappingRecipeSerializer<WrappingType extends Recipe<?>, WrappedType extends Recipe<?>>
-		implements RecipeSerializer<WrappingType>
 {
 	private final MapCodec<WrappingType> codec;
 	private final StreamCodec<RegistryFriendlyByteBuf, WrappingType> streamCodec;
@@ -33,15 +32,18 @@ public class WrappingRecipeSerializer<WrappingType extends Recipe<?>, WrappedTyp
 		this.streamCodec = inner.streamCodec().map(wrap, unwrap);
 	}
 
-	@Override
 	public MapCodec<WrappingType> codec()
 	{
 		return codec;
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, WrappingType> streamCodec()
 	{
 		return streamCodec;
+	}
+
+	public RecipeSerializer<WrappingType> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

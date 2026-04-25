@@ -20,7 +20,7 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -60,14 +60,12 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 		lightOpacity = 0;
 	}
 
-	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(POST_SLAVE, HORIZONTAL_OFFSET, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public void onRemove(@Nonnull BlockState state, Level world, @Nonnull BlockPos pos, BlockState newState, boolean moving)
 	{
 		if(state.getBlock()!=newState.getBlock())
@@ -84,17 +82,15 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 				{
 					BlockPos armPos = armStart.relative(d);
 					BlockState armState = world.getBlockState(armPos);
-					if(armState.getBlock()==this&&armState.getValue(HORIZONTAL_OFFSET).getOffset().equals(d.getNormal()))
+					if(armState.getBlock()==this&&armState.getValue(HORIZONTAL_OFFSET).getOffset().equals(d.getUnitVec3i()))
 						world.removeBlock(armPos, false);
 				}
 				for(int i = 0; i <= highestBlock; ++i)
 					world.removeBlock(pos.above(i), false);
 			}
 		}
-		super.onRemove(state, world, pos, newState, moving);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(@Nonnull BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos startingPos = context.getClickedPos();
@@ -110,7 +106,6 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 		return true;
 	}
 
-	@Override
 	public void onIEBlockPlacedBy(BlockPlaceContext context, BlockState state)
 	{
 		Level world = context.getLevel();
@@ -125,7 +120,6 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 		}
 	}
 
-	@Override
 	public boolean isLadder(BlockState state, LevelReader world, BlockPos pos, @Nullable LivingEntity entity)
 	{
 		return true;
@@ -139,11 +133,10 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 			return false;
 		BlockState armState = world.getBlockState(center.relative(side));
 		return armState.getBlock()==expected&&armState.getValue(POST_SLAVE)==highest
-				&&armState.getValue(HORIZONTAL_OFFSET).getOffset().equals(side.getNormal());
+				&&armState.getValue(HORIZONTAL_OFFSET).getOffset().equals(side.getUnitVec3i());
 	}
 
-	@Override
-	public ItemInteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level world, BlockPos pos, BlockHitResult hit)
+	public InteractionResult hammerUseSide(Direction side, Player player, InteractionHand hand, Level world, BlockPos pos, BlockHitResult hit)
 	{
 		BlockState state = world.getBlockState(pos);
 		int dummy = state.getValue(POST_SLAVE);
@@ -155,11 +148,11 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 			BlockPlaceContext context = new BlockPlaceContext(new UseOnContext(player, hand, hit));
 			//No Arms if space is blocked
 			if(!world.getBlockState(offsetPos).canBeReplaced(context))
-				return ItemInteractionResult.FAIL;
+				return InteractionResult.FAIL;
 			//No Arms if perpendicular arms exist
 			for(Direction forbidden : ImmutableList.of(side.getClockWise(), side.getCounterClockWise()))
 				if(hasArmFor(pos, forbidden, world, this))
-					return ItemInteractionResult.FAIL;
+					return InteractionResult.FAIL;
 
 			BlockState arm_state = this.getStateForPlacement(context).setValue(POST_SLAVE, 3)
 					.setValue(HORIZONTAL_OFFSET, HorizontalOffset.get(side));
@@ -176,12 +169,11 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 			BlockPos masterPos = pos.below(dummy).subtract(offset.getOffset());
 			BlockState masterState = world.getBlockState(masterPos);
 			world.sendBlockUpdated(masterPos, masterState, masterState, 3);
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		return super.hammerUseSide(side, player, hand, world, pos, hit);
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
 	{
 		return Shapes.joinUnoptimized(
@@ -361,7 +353,6 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 			return shape.min(face.getAxis())==0;
 	}
 
-	@Override
 	public boolean canConnectTransformer(BlockGetter world, BlockPos pos)
 	{
 		int offset = world.getBlockState(pos).getValue(POST_SLAVE);
@@ -369,14 +360,12 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 	}
 
 	@Nonnull
-	@Override
 	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		HorizontalOffset d = state.getValue(HORIZONTAL_OFFSET);
 		return new BlockPos(0, state.getValue(POST_SLAVE), 0).offset(d.getOffset());
 	}
 
-	@Override
 	public int getLightBlock(@Nonnull BlockState state, @Nonnull BlockGetter worldIn, @Nonnull BlockPos pos)
 	{
 		return 0;
@@ -406,15 +395,14 @@ public class PostBlock extends IEBaseBlock implements IPostBlock, IModelOffsetPr
 		{
 			return switch(this)
 					{
-						case NORTH -> Direction.NORTH.getNormal();
-						case SOUTH -> Direction.SOUTH.getNormal();
-						case EAST -> Direction.EAST.getNormal();
-						case WEST -> Direction.WEST.getNormal();
+						case NORTH -> Direction.NORTH.getUnitVec3i();
+						case SOUTH -> Direction.SOUTH.getUnitVec3i();
+						case EAST -> Direction.EAST.getUnitVec3i();
+						case WEST -> Direction.WEST.getUnitVec3i();
 						case NONE -> BlockPos.ZERO;
 					};
 		}
 
-		@Override
 		public String getSerializedName()
 		{
 			return name().toLowerCase(Locale.ENGLISH);

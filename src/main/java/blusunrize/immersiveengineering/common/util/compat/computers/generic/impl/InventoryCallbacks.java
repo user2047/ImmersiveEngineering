@@ -46,7 +46,6 @@ public class InventoryCallbacks<T> extends Callback<T>
 		return new InventoryCallbacks<>((t, i) -> getInv.apply(t).getStackInSlot(begin+i), count, desc);
 	}
 
-	@Override
 	public String renameMethod(String javaName)
 	{
 		return javaName.replace("Desc", capitalize(desc));

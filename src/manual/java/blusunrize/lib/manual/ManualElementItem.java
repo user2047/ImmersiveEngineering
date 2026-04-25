@@ -9,7 +9,6 @@
 package blusunrize.lib.manual;
 
 import blusunrize.lib.manual.gui.ManualScreen;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.Mth;
@@ -73,8 +72,8 @@ public class ManualElementItem extends SpecialManualElements
 		int length = stacks.size();
 		if(length > 0)
 		{
-			graphics.pose().pushPose();
-			graphics.pose().scale(scale, scale, scale);
+			graphics.pose().pushMatrix();
+			graphics.pose().scale(scale, scale);
 			for(int line = 0; line < lines; line++)
 			{
 				int perLine = line==lines-1?itemsLastLine: line%2==0?longLineLen: shortLineLen;
@@ -94,9 +93,8 @@ public class ManualElementItem extends SpecialManualElements
 						highlighted = stacks.get(item);
 				}
 			}
-			graphics.pose().popPose();
+			graphics.pose().popMatrix();
 		}
-		RenderSystem.enableBlend();
 
 		this.renderHighlightedTooltip(graphics, mx, my);
 	}

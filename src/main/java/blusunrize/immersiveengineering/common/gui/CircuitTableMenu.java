@@ -72,13 +72,11 @@ public class CircuitTableMenu extends IEContainerMenu
 
 		this.addSlot(new IESlot.NewOutput(outputInventory, 0, 194, 56)
 		{
-			@Override
 			public int getMaxStackSize()
 			{
 				return 1;
 			}
 
-			@Override
 			public void onTake(Player player, ItemStack stack)
 			{
 				consumeInputs();
@@ -109,7 +107,6 @@ public class CircuitTableMenu extends IEContainerMenu
 		return inv.getStackInSlot(getEditSlot()).get(IEDataComponents.CIRCUIT_INSTRUCTION);
 	}
 
-	@Override
 	public void slotsChanged(Container inventory)
 	{
 		updateOutput();
@@ -153,11 +150,10 @@ public class CircuitTableMenu extends IEContainerMenu
 				inv.getStackInSlot(i).shrink(getIngredientAmount(instruction, i));
 	}
 
-	@Override
 	public void receiveMessageFromScreen(CompoundTag nbt)
 	{
 		this.instruction = nbt.contains("operator")?LogicCircuitInstruction.deserialize(nbt): null;
-		this.itemName = nbt.contains("itemName")?nbt.getString("itemName"): null;
+		this.itemName = nbt.contains("itemName")?nbt.getStringOr("itemName", ""): null;
 		updateOutput();
 	}
 }

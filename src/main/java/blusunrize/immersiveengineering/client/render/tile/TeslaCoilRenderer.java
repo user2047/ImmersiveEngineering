@@ -16,13 +16,12 @@ import blusunrize.immersiveengineering.common.blocks.metal.TeslaCoilBlockEntity.
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class TeslaCoilRenderer extends IEBlockEntityRenderer<TeslaCoilBlockEntity>
 {
-	@Override
 	public void render(TeslaCoilBlockEntity tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(!tile.getLevelNonnull().hasChunkAt(tile.getBlockPos()))
@@ -65,7 +64,6 @@ public class TeslaCoilRenderer extends IEBlockEntityRenderer<TeslaCoilBlockEntit
 				.setNormal((float)normal.x, (float)normal.y, (float)normal.z);
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(TeslaCoilBlockEntity blockEntity)
 	{
 		if(blockEntity.renderBB==null)

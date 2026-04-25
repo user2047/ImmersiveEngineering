@@ -29,14 +29,12 @@ public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 		super(IEBlockEntities.WATERMILL, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.MULTIBLOCKSLAVE, IEProperties.FACING_HORIZONTAL);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos center = context.getClickedPos();

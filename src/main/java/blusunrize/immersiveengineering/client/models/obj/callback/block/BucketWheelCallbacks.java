@@ -11,20 +11,21 @@ package blusunrize.immersiveengineering.client.models.obj.callback.block;
 
 import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.MultiblockBlockEntityMaster;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.BucketWheelCallbacks.Key;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.BucketWheelLogic.State;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -36,7 +37,6 @@ public class BucketWheelCallbacks implements BlockCallback<Key>
 	public static final BucketWheelCallbacks INSTANCE = new BucketWheelCallbacks();
 	private static final BucketWheelCallbacks.Key INVALID = new BucketWheelCallbacks.Key(Collections.emptyMap());
 
-	@Override
 	public Key extractKey(@Nullable BlockAndTintGetter level, @Nullable BlockPos pos, @Nullable BlockState blockState, BlockEntity blockEntity)
 	{
 		if(blockEntity instanceof MultiblockBlockEntityMaster<?> masterBE&&
@@ -55,7 +55,7 @@ public class BucketWheelCallbacks implements BlockCallback<Key>
 			{
 				Block b = Block.byItem(stackAtIndex.getItem());
 				BlockState digState = b!=Blocks.AIR?b.defaultBlockState(): Blocks.COBBLESTONE.defaultBlockState();
-				BakedModel digModel = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(digState);
+				BakedModel digModel = ClientUtils.getBlockRenderer().getBlockModelShaper().getBlockModel(digState);
 				texMap.put("dig"+i, digModel.getParticleIcon(ModelData.EMPTY));
 			}
 		}
@@ -63,19 +63,16 @@ public class BucketWheelCallbacks implements BlockCallback<Key>
 	}
 
 	@Nullable
-	@Override
 	public TextureAtlasSprite getTextureReplacement(Key key, String group, String material)
 	{
 		return key.texMap.get(group);
 	}
 
-	@Override
 	public Key getDefaultKey()
 	{
 		return INVALID;
 	}
 
-	@Override
 	public boolean shouldRenderGroup(Key key, String group, RenderType layer)
 	{
 		return ("bucketWheel".equals(group)||key.texMap.containsKey(group));

@@ -19,8 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
@@ -30,7 +30,6 @@ public class SampleDrillRenderer extends IEBlockEntityRenderer<SampleDrillBlockE
 	public static final String NAME = "sample_drill";
 	public static DynamicModel DRILL;
 
-	@Override
 	public void render(SampleDrillBlockEntity tile, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
 		if(!tile.getLevelNonnull().hasChunkAt(tile.getBlockPos()))
@@ -59,12 +58,11 @@ public class SampleDrillRenderer extends IEBlockEntityRenderer<SampleDrillBlockE
 		matrixStack.translate(-0.5, -0.5, -0.5);
 		List<BakedQuad> quads = DRILL.getNullQuads();
 		RenderUtils.renderModelTESRFast(
-				quads, bufferIn.getBuffer(RenderType.solid()), matrixStack, combinedLightIn, combinedOverlayIn
+				quads, bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), matrixStack, combinedLightIn, combinedOverlayIn
 		);
 		matrixStack.popPose();
 	}
 
-	@Override
 	public AABB getRenderBoundingBox(SampleDrillBlockEntity blockEntity)
 	{
 		if(blockEntity.renderAABB==null)

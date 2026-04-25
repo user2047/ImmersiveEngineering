@@ -33,7 +33,6 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 		this.imageHeight = 168;
 	}
 
-	@Override
 	protected void init()
 	{
 		super.init();
@@ -53,43 +52,24 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 		this.addWidget(this.nameField);
 	}
 
-	@Override
 	public void render(@Nonnull GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
 		super.render(graphics, mx, my, partial);
-		this.nameField.render(graphics, mx, my, partial);
 	}
 
-	@Override
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		graphics.drawString(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}
 
-	@Override
 	public boolean keyPressed(int key, int scancode, int p_keyPressed_3_)
 	{
-		if(this.nameField.isFocused()&&key!=GLFW.GLFW_KEY_ESCAPE)
-			if(this.nameField.keyPressed(key, scancode, p_keyPressed_3_)||this.nameField.canConsumeInput())
-				return true;
 		return super.keyPressed(key, scancode, p_keyPressed_3_);
 	}
 
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
-		boolean ret = super.mouseClicked(mouseX, mouseY, mouseButton);
-		if(this.nameField.mouseClicked(mouseX, mouseY, mouseButton))
-		{
-			this.nameField.setFocused(true);
-			ret = true;
-		}
-		else if(this.nameField.isFocused())
-		{
-			this.nameField.setFocused(false);
-			ret = true;
-		}
-		return ret;
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 

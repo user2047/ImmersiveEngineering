@@ -78,7 +78,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		super(IEBlockEntities.FEEDTHROUGH.get(), pos, state);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.writeCustomNBT(nbt, descPacket, provider);
@@ -88,19 +87,17 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		nbt.put(MIDDLE_STATE, stateNbt);
 	}
 
-	@Override
 	public void readCustomNBT(@Nonnull CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		super.readCustomNBT(nbt, descPacket, provider);
-		reference = WireType.getValue(nbt.getString(WIRE));
-		offset = nbt.getInt(OFFSET);
+		reference = WireType.getValue(nbt.getStringOr(WIRE, ""));
+		offset = nbt.getIntOr(OFFSET, 0);
 		HolderGetter<Block> lookup = this.level != null ?
 				this.level.holderLookup(Registries.BLOCK) :
-				BuiltInRegistries.BLOCK.asLookup();
-		stateForMiddle = NbtUtils.readBlockState(lookup, nbt.getCompound(MIDDLE_STATE));
+				BuiltInRegistries.BLOCK;
+		stateForMiddle = NbtUtils.readBlockState(lookup, nbt.getCompoundOrEmpty(MIDDLE_STATE));
 	}
 
-	@Override
 	public Vec3 getConnectionOffset(ConnectionPoint here, ConnectionPoint other, WireType type)
 	{
 		double l = INFOS.get(reference).connOffset();
@@ -113,7 +110,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 				.5+(.5+l)*getFacing().getStepZ()*factor);
 	}
 
-	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset)
 	{
 		if(!WireApi.canMix(reference, cableType))
@@ -125,19 +121,16 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return true;
 	}
 
-	@Override
 	public Set<BlockPos> getIgnored(IImmersiveConnectable other)
 	{
 		return ImmutableSet.of(worldPosition.relative(getFacing(), 1), worldPosition.relative(getFacing(), -1));
 	}
 
-	@Override
 	public BlockPos getConnectionMaster(WireType cableType, TargetingInfo target)
 	{
 		return worldPosition.relative(getFacing(), -offset);
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		WireApi.FeedthroughModelInfo info = INFOS.get(reference);
@@ -147,7 +140,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 			drop.accept(new ItemStack(info.connector().getBlock()));
 	}
 
-	@Override
 	public ItemStack getPickBlock(@Nullable Player player, BlockState state, HitResult rayRes)
 	{
 		if(offset==0)
@@ -155,7 +147,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return IBlockEntityDrop.super.getPickBlock(player, state, rayRes);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
@@ -167,13 +158,11 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		}
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_LIKE;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
@@ -181,7 +170,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 
 	private VoxelShape aabb;
 
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(offset==0)
@@ -193,7 +181,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return aabb;
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		if(id==253)
@@ -204,7 +191,6 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return super.triggerEvent(id, arg);
 	}
 
-	@Override
 	public Collection<ConnectionPoint> getConnectionPoints()
 	{
 		return ImmutableList.of(getNegativePoint(), getPositivePoint());
@@ -222,25 +208,22 @@ public class FeedthroughBlockEntity extends ImmersiveConnectableBlockEntity impl
 		return new ConnectionPoint(worldPosition, getIndexForOffset(1));
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public Iterable<? extends Connection> getInternalConnections()
 	{
 		return ImmutableList.of(new Connection(worldPosition, 0, 1));
 	}
 
 	@Nullable
-	@Override
 	public ConnectionPoint getTargetedPoint(TargetingInfo info, Vec3i offset)
 	{
-		if(offset.equals(getFacing().getNormal()))
+		if(offset.equals(getFacing().getUnitVec3i()))
 			return getPositivePoint();
-		else if(offset.equals(getFacing().getOpposite().getNormal()))
+		else if(offset.equals(getFacing().getOpposite().getUnitVec3i()))
 			return getNegativePoint();
 		else
 			return null;

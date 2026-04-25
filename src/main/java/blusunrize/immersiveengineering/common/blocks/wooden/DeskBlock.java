@@ -65,21 +65,18 @@ public class DeskBlock<T extends BlockEntity> extends IEEntityBlock<T>
 		super(tileType, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(DUMMY, FACING, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		Direction newFacing = rot.rotate(state.getValue(FACING));
 		return state.setValue(FACING, newFacing);
 	}
 
-	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn)
 	{
 		if(mirrorIn==Mirror.NONE)
@@ -91,7 +88,6 @@ public class DeskBlock<T extends BlockEntity> extends IEEntityBlock<T>
 		return state.setValue(FACING, newFacing).setValue(DUMMY, newDummy);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos start = context.getClickedPos();
@@ -100,7 +96,6 @@ public class DeskBlock<T extends BlockEntity> extends IEEntityBlock<T>
 		return areAllReplaceable(start, start.relative(dummyDir), context);
 	}
 
-	@Override
 	public BlockState updateShape(BlockState stateIn, Direction updateSide, BlockState updatedState,
 										  LevelAccessor worldIn, BlockPos currentPos, BlockPos updatedPos)
 	{
@@ -151,7 +146,6 @@ public class DeskBlock<T extends BlockEntity> extends IEEntityBlock<T>
 		));
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(DUMMY), state.getValue(FACING));

@@ -28,13 +28,11 @@ public class BlueprintCraftingRecipeSerializer extends IERecipeSerializer<Bluepr
 			BlueprintCraftingRecipe::new
 	);
 
-	@Override
 	protected DualMapCodec<RegistryFriendlyByteBuf, BlueprintCraftingRecipe> codecs()
 	{
 		return CODECS;
 	}
 
-	@Override
 	public ItemStack getIcon()
 	{
 		return new ItemStack(WoodenDevices.WORKBENCH);

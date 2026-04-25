@@ -34,7 +34,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Collection;
@@ -53,7 +53,6 @@ public class FurnaceHeaterBlockEntity extends IEBaseBlockEntity implements IESer
 		super(IEBlockEntities.FURNACE_HEATER.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		boolean activeBeforeTick = getIsActive();
@@ -82,20 +81,17 @@ public class FurnaceHeaterBlockEntity extends IEBaseBlockEntity implements IESer
 		}
 	}
 
-	@Override
 	public boolean triggerEvent(int id, int arg)
 	{
 		this.markContainingBlockForUpdate(null);
 		return true;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
@@ -103,34 +99,29 @@ public class FurnaceHeaterBlockEntity extends IEBaseBlockEntity implements IESer
 
 	public static void registerCapabilities(BECapabilityRegistrar<FurnaceHeaterBlockEntity> registrar)
 	{
-		registrar.register(EnergyStorage.BLOCK, (be, side) -> side==null||side==be.getFacing()?be.energyCap: null);
+		registrar.register(Energy.BLOCK, (be, side) -> side==null||side==be.getFacing()?be.energyCap: null);
 	}
 
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return IEProperties.FACING_ALL;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.PISTON_LIKE;
 	}
 
-	@Override
 	public boolean mirrorFacingOnPlacement(LivingEntity placer)
 	{
 		return placer.isShiftKeyDown();
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public boolean hammerUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		this.setFacing(side);

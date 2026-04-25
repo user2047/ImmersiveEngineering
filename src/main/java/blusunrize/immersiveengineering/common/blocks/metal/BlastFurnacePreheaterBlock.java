@@ -26,14 +26,12 @@ public class BlastFurnacePreheaterBlock extends IEEntityBlock<BlastFurnacePrehea
 		super(IEBlockEntities.BLASTFURNACE_PREHEATER, props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, IEProperties.MULTIBLOCKSLAVE);
 	}
 
-	@Override
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos start = context.getClickedPos();

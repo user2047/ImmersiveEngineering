@@ -33,14 +33,12 @@ public class CraftingTableBlock extends IEEntityBlock<CraftingTableBlockEntity>
 		super(IEBlockEntities.CRAFTING_TABLE, blockProps);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(IEProperties.FACING_HORIZONTAL, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPE;

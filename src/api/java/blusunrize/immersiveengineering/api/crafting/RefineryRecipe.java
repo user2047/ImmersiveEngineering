@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 public class RefineryRecipe extends MultiblockRecipe
 {
-	public static DeferredHolder<RecipeSerializer<?>, IERecipeSerializer<RefineryRecipe>> SERIALIZER;
+	public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<RefineryRecipe>> SERIALIZER;
 	public static final CachedRecipeList<RefineryRecipe> RECIPES = new CachedRecipeList<>(IERecipeTypes.REFINERY);
 	public static final SetRestrictedField<RecipeMultiplier> MULTIPLIERS = SetRestrictedField.common();
 
@@ -39,14 +39,30 @@ public class RefineryRecipe extends MultiblockRecipe
 	public final SizedFluidIngredient input0;
 	@Nullable
 	public final SizedFluidIngredient input1;
-	public final Ingredient catalyst;
+	public final Optional<Ingredient> catalyst;
 
-	public RefineryRecipe(FluidStack output, SizedFluidIngredient input0, Optional<SizedFluidIngredient> input1, Ingredient catalyst, int energy)
+	public RefineryRecipe(
+			FluidStack output, SizedFluidIngredient input0, Optional<SizedFluidIngredient> input1,
+			Optional<Ingredient> catalyst, int energy
+	)
 	{
 		this(output, input0, input1.orElse(null), catalyst, energy);
 	}
 
+	public RefineryRecipe(FluidStack output, SizedFluidIngredient input0, Optional<SizedFluidIngredient> input1, Ingredient catalyst, int energy)
+	{
+		this(output, input0, input1.orElse(null), Optional.ofNullable(catalyst), energy);
+	}
+
 	public RefineryRecipe(FluidStack output, SizedFluidIngredient input0, @Nullable SizedFluidIngredient input1, Ingredient catalyst, int energy)
+	{
+		this(output, input0, input1, Optional.ofNullable(catalyst), energy);
+	}
+
+	public RefineryRecipe(
+			FluidStack output, SizedFluidIngredient input0, @Nullable SizedFluidIngredient input1,
+			Optional<Ingredient> catalyst, int energy
+	)
 	{
 		super(TagOutput.EMPTY, IERecipeTypes.REFINERY, 1, energy, MULTIPLIERS);
 		this.output = output;
@@ -61,7 +77,7 @@ public class RefineryRecipe extends MultiblockRecipe
 	}
 
 	@Override
-	protected IERecipeSerializer<RefineryRecipe> getIESerializer()
+	protected RecipeSerializer<RefineryRecipe> getIESerializer()
 	{
 		return SERIALIZER.get();
 	}
@@ -71,7 +87,7 @@ public class RefineryRecipe extends MultiblockRecipe
 		for(RecipeHolder<RefineryRecipe> holder : RECIPES.getRecipes(level))
 		{
 			RefineryRecipe recipe = holder.value();
-			if(!recipe.catalyst.test(catalyst))
+			if(recipe.catalyst.map(ingredient -> !ingredient.test(catalyst)).orElse(!catalyst.isEmpty()))
 				continue;
 			if(!input0.isEmpty())
 			{

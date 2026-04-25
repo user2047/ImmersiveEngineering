@@ -42,7 +42,6 @@ public class MultiblockBEType<T extends BlockEntity & IGeneralMultiblock> implem
 		this.dummy = register.register(name+"_dummy", makeType(make, block));
 	}
 
-	@Override
 	@Nullable
 	public T apply(BlockPos pos, BlockState state)
 	{
@@ -57,7 +56,7 @@ public class MultiblockBEType<T extends BlockEntity & IGeneralMultiblock> implem
 		return () -> {
 			Mutable<BlockEntityType<T>> typeMutable = new MutableObject<>();
 			BlockEntityType<T> type = new BlockEntityType<>(
-					(pos, state) -> create.create(typeMutable.getValue(), pos, state), ImmutableSet.of(valid.get()), null
+					(pos, state) -> create.create(typeMutable.getValue(), pos, state), ImmutableSet.of(valid.get())
 			);
 			typeMutable.setValue(type);
 			return type;

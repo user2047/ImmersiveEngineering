@@ -10,16 +10,18 @@ package blusunrize.immersiveengineering.client.fx;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 import javax.annotation.Nonnull;
 
 //A version of the vanilla bubble particle that can exist outside of water blocks
-public class IEBubbleParticle extends TextureSheetParticle
+public class IEBubbleParticle extends SingleQuadParticle
 {
-	public IEBubbleParticle(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
+	public IEBubbleParticle(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, TextureAtlasSprite sprite)
 	{
-		super(worldIn, xCoordIn, yCoordIn, zCoordIn);
+		super(worldIn, xCoordIn, yCoordIn, zCoordIn, sprite);
 		this.setSize(0.02F, 0.02F);
 		this.quadSize *= this.random.nextFloat()*0.6F+0.2F;
 		this.xd = xSpeedIn*(double)0.2F+(Math.random()*2.0D-1.0D)*(double)0.02F;
@@ -46,9 +48,9 @@ public class IEBubbleParticle extends TextureSheetParticle
 	}
 
 	@Nonnull
-	public ParticleRenderType getRenderType()
+	protected Layer getLayer()
 	{
-		return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+		return Layer.OPAQUE;
 	}
 
 	public static class Factory implements ParticleProvider<SimpleParticleType>
@@ -60,11 +62,9 @@ public class IEBubbleParticle extends TextureSheetParticle
 			this.texture = spriteSet;
 		}
 
-		public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+		public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random)
 		{
-			IEBubbleParticle bubbleparticle = new IEBubbleParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-			bubbleparticle.pickSprite(this.texture);
-			return bubbleparticle;
+			return new IEBubbleParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.texture.get(random));
 		}
 	}
 }

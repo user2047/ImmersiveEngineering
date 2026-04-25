@@ -10,9 +10,6 @@ package blusunrize.immersiveengineering.client.gui.elements;
 
 import blusunrize.immersiveengineering.api.Lib;
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.opengl.GlStateManager.DestFactor;
-import com.mojang.blaze3d.opengl.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,15 +32,11 @@ public class GuiButtonIE extends Button
 		return this.active&&this.visible&&mouseX >= this.getX()&&mouseY >= this.getY()&&mouseX < this.getX()+this.width&&mouseY < this.getY()+this.height;
 	}
 
-	@Override
 	public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();
 		Font fontrenderer = mc.font;
 		this.isHovered = isPressable(mouseX, mouseY);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
-		RenderSystem.blendFunc(770, 771);
 		graphics.blitSprite(texture.get(this.isHovered), getX(), getY(), width, height);
 		if(!getMessage().getString().isEmpty())
 		{
@@ -56,7 +49,11 @@ public class GuiButtonIE extends Button
 		}
 	}
 
-	@Override
+	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+		renderWidget(graphics, mouseX, mouseY, partialTicks);
+	}
+
 	public void onPress()
 	{
 		this.onPress.onPress(this);
@@ -66,7 +63,6 @@ public class GuiButtonIE extends Button
 	{
 		void onIEPress(B var1);
 
-		@Override
 		default void onPress(Button var1)
 		{
 			this.onIEPress((B)var1);

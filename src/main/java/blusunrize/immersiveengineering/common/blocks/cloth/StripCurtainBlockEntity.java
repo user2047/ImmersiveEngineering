@@ -23,7 +23,7 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -63,7 +63,6 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		super(IEBlockEntities.STRIP_CURTAIN.get(), pos, state);
 	}
 
-	@Override
 	public void tickServer()
 	{
 		if(level.getGameTime()%4==((getBlockPos().getX()^getBlockPos().getZ())&3))
@@ -82,7 +81,6 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		}
 	}
 
-	@Override
 	public void onEntityCollision(Level world, Entity entity)
 	{
 		if(isCeilingAttached()&&entity.isAlive()&&redstoneSignal==0&&entity.getBoundingBox().intersects(getEntityCollectionBox()))
@@ -113,7 +111,6 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		return new AABB(aabb.minX, aabb.minY-.8125, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ).move(getBlockPos());
 	}
 
-	@Override
 	public int getStrongRSOutput(@Nonnull Direction side)
 	{
 		if(!strongSignal||side!=getStrongSignalSide().getOpposite())
@@ -121,7 +118,6 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		return getWeakRSOutput(side);
 	}
 
-	@Override
 	public int getWeakRSOutput(@Nonnull Direction side)
 	{
 		if(side==Direction.DOWN)
@@ -129,20 +125,17 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		return redstoneSignal;
 	}
 
-	@Override
 	public boolean canConnectRedstone(@Nonnull Direction side)
 	{
 		return false;
 	}
 
-	@Override
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		colour = Color4.load(nbt.get("colour"));
-		this.strongSignal = nbt.getBoolean("strongSignal");
+		this.strongSignal = nbt.getBooleanOr("strongSignal", false);
 	}
 
-	@Override
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		nbt.put("colour", colour.save());
@@ -162,38 +155,32 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 			.toArray(VoxelShape[]::new);
 
 	@Nonnull
-	@Override
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		return shapes[isCeilingAttached()?(getFacing().getAxis()==Axis.Z?4: 5): ((getFacing().ordinal()-2)%4)];
 	}
 
 	@Nonnull
-	@Override
 	public Property<Direction> getFacingProperty()
 	{
 		return StripCurtainBlock.FACING;
 	}
 
-	@Override
 	public PlacementLimitation getFacingLimitation()
 	{
 		return PlacementLimitation.HORIZONTAL;
 	}
 
-	@Override
 	public boolean canHammerRotate(Direction side, Vec3 hit, LivingEntity entity)
 	{
 		return false;
 	}
 
-	@Override
 	public void onDirectionalPlacement(Direction side, float hitX, float hitY, float hitZ, LivingEntity placer)
 	{
 		setCeilingAttached(side==Direction.DOWN);
 	}
 
-	@Override
 	public int getRenderColour(int tintIndex)
 	{
 		if(tintIndex==1)
@@ -201,7 +188,6 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		return 0xffffff;
 	}
 
-	@Override
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
@@ -209,25 +195,21 @@ public class StripCurtainBlockEntity extends IEBaseBlockEntity implements IEServ
 		drop.accept(stack);
 	}
 
-	@Override
 	public void onBEPlaced(BlockPlaceContext ctx)
 	{
 		final ItemStack stack = ctx.getItemInHand();
 		this.colour = stack.getOrDefault(IEDataComponents.COLOR, Color4.WHITE);
 	}
 
-	@Override
-	public ItemInteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
+	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
-		if(!level.isClientSide)
+		if(!level.isClientSide())
 		{
 			strongSignal = !strongSignal;
-			player.displayClientMessage(
-					Component.translatable(Lib.CHAT_INFO+"rsControl.strongSignal."+strongSignal), true
-			);
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl.strongSignal."+strongSignal));
 			sendRSUpdates();
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	public boolean isCeilingAttached()

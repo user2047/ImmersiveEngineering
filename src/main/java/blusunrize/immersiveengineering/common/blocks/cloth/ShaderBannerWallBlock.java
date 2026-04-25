@@ -41,21 +41,18 @@ public class ShaderBannerWallBlock extends ShaderBannerBlock
 		super(props);
 	}
 
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
 		builder.add(FACING, BlockStateProperties.WATERLOGGED);
 	}
 
-	@Override
 	public BlockState rotate(BlockState state, Rotation rot)
 	{
 		Direction newFacing = rot.rotate(state.getValue(FACING));
 		return state.setValue(FACING, newFacing);
 	}
 
-	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn)
 	{
 		if(mirrorIn==Mirror.NONE)
@@ -65,7 +62,6 @@ public class ShaderBannerWallBlock extends ShaderBannerBlock
 		return state.setValue(FACING, newFacing);
 	}
 
-	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return SHAPES.get(state.getValue(FACING));

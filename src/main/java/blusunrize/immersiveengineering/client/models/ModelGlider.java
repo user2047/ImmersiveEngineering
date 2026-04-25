@@ -11,13 +11,14 @@ package blusunrize.immersiveengineering.client.models;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import blusunrize.immersiveengineering.client.utils.RenderTypeCompat;
 
 public class ModelGlider extends ModelIEArmorBase
 {
 	public ModelGlider(ModelPart part)
 	{
-		super(part, RenderType::entityTranslucentCull);
+		super(part, RenderTypeCompat::entityTranslucent);
 	}
 
 	public static LayerDefinition createLayers()

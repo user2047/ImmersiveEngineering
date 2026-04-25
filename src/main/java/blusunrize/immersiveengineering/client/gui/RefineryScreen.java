@@ -37,7 +37,6 @@ public class RefineryScreen extends IEContainerScreen<RefineryMenu>
 	}
 
 	@Nonnull
-	@Override
 	protected List<InfoArea> makeInfoAreas()
 	{
 		return ImmutableList.of(
@@ -48,7 +47,6 @@ public class RefineryScreen extends IEContainerScreen<RefineryMenu>
 		);
 	}
 
-	@Override
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)
 	{
 		super.gatherAdditionalTooltips(mouseX, mouseY, addLine, addGray);

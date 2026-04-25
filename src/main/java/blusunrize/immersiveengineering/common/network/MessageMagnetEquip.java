@@ -29,7 +29,6 @@ public record MessageMagnetEquip(int fetchSlot) implements IMessage
 	public static final StreamCodec<ByteBuf, MessageMagnetEquip> CODEC = ByteBufCodecs.INT
 			.map(MessageMagnetEquip::new, MessageMagnetEquip::fetchSlot);
 
-	@Override
 	public void process(IPayloadContext context)
 	{
 		Player player = context.player();
@@ -37,13 +36,13 @@ public record MessageMagnetEquip(int fetchSlot) implements IMessage
 			ItemStack held = player.getItemInHand(InteractionHand.OFF_HAND);
 			if(fetchSlot >= 0)
 			{
-				ItemStack s = player.getInventory().items.get(fetchSlot);
+				ItemStack s = player.getInventory().getItem(fetchSlot);
 				UpgradeData upgrades = UpgradeableToolItem.getUpgradesStatic(s);
 				if(s.getItem() instanceof IEShieldItem&&upgrades.has(UpgradeEffect.MAGNET))
 				{
 					var withSlot = upgrades.with(UpgradeEffect.MAGNET, new PrevSlot(fetchSlot));
 					s.set(IEDataComponents.UPGRADE_DATA, withSlot);
-					player.getInventory().items.set(fetchSlot, held);
+					player.getInventory().setItem(fetchSlot, held);
 					player.setItemInHand(InteractionHand.OFF_HAND, s);
 				}
 			}
@@ -55,15 +54,14 @@ public record MessageMagnetEquip(int fetchSlot) implements IMessage
 				{
 					var withSlot = upgrades.with(UpgradeEffect.MAGNET, PrevSlot.NONE);
 					held.set(IEDataComponents.UPGRADE_DATA, withSlot);
-					ItemStack s = player.getInventory().items.get(prevSlot.get());
-					player.getInventory().items.set(prevSlot.get(), held);
+					ItemStack s = player.getInventory().getItem(prevSlot.get());
+					player.getInventory().setItem(prevSlot.get(), held);
 					player.setItemInHand(InteractionHand.OFF_HAND, s);
 				}
 			}
 		});
 	}
 
-	@Override
 	public Type<? extends CustomPacketPayload> type()
 	{
 		return ID;

@@ -11,7 +11,6 @@ package blusunrize.immersiveengineering.client.render;
 import blusunrize.immersiveengineering.api.shader.ShaderLayer;
 import blusunrize.immersiveengineering.common.util.IELogger;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.TextureUtil;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
@@ -36,13 +35,11 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 		this.layers = layers;
 	}
 
-	@Override
 	public void load(@Nonnull ResourceManager resourceManager)
 	{
 		// Everything in this method uses ABGR, because Mojang I guess
 		// Even methods that have "RGBA" in the name actually expect ABGR as a format
 
-		this.releaseId();
 		Resource iresource = resourceManager.getResource(this.canvasTexture).orElseThrow();
 		try(
 				InputStream imageStream = iresource.open();
@@ -111,10 +108,10 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 								int interU = uInterpolate.apply(u)%bufImg2Size;
 								int interV = vInterpolate.apply(v)%bufImg2Size;
 
-								ColorABGR baseABGR = new ColorABGR(texureImage.getPixelRGBA(interU, interV));
+								ColorABGR baseABGR = new ColorABGR(texureImage.getPixel(interU, interV));
 								if(!baseABGR.isTransparent())
 								{
-									int iNoise = originalImage.getPixelRGBA(u, v);
+									int iNoise = originalImage.getPixel(u, v);
 									float[] noiseABGR = {(iNoise&255)/255f, (iNoise>>8&255)/255f, (iNoise>>16&255)/255f, (iNoise>>24&255)/255f};
 
 									// Multiply texture value with layer & noise colour
@@ -122,9 +119,9 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 									baseABGR.modify(noiseABGR);
 
 									// Apply to final texture
-									finalTexture.blendPixel(u, v, ColorABGR.blend(
+									finalTexture.setPixel(u, v, ColorABGR.blend(
 											baseABGR,
-											new ColorABGR(finalTexture.getPixelRGBA(u, v))
+											new ColorABGR(finalTexture.getPixel(u, v))
 									).toInt());
 								}
 							}
@@ -136,9 +133,6 @@ public class IEShaderLayerCompositeTexture extends AbstractTexture
 
 				++layer;
 			}
-			TextureUtil.prepareImage(this.getId(), 0, finalTexture.getWidth(), finalTexture.getHeight());
-			finalTexture.upload(0, 0, 0, 0, 0, finalTexture.getWidth(), finalTexture.getHeight(), false, false, false, false);
-
 		} catch(IOException ioexception)
 		{
 			IELogger.error("Couldn't load layered image", ioexception);

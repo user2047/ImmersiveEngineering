@@ -14,13 +14,14 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import blusunrize.immersiveengineering.client.utils.RenderTypeCompat;
 
 public class ModelEarmuffs extends ModelIEArmorBase
 {
 	public ModelEarmuffs(ModelPart part)
 	{
-		super(part, RenderType::entityCutout);
+		super(part, RenderTypeCompat::entityCutout);
 
 		hat.visible = false;
 		body.visible = false;

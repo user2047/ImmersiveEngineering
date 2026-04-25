@@ -18,27 +18,29 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
 
-public class DamageToolRecipeSerializer implements RecipeSerializer<DamageToolRecipe>
+public class DamageToolRecipeSerializer
 {
 	public static final DualMapCodec<RegistryFriendlyByteBuf, DamageToolRecipe> CODECS = DualCompositeMapCodecs.composite(
-			DualCodecs.STRING.fieldOf("group"), ShapelessRecipe::getGroup,
+			DualCodecs.STRING.fieldOf("group"), DamageToolRecipe::group,
 			DualCodecs.ITEM_STACK.fieldOf("result"), r -> r.getResultItem(null),
 			DualCodecs.INGREDIENT.fieldOf("tool"), DamageToolRecipe::getTool,
-			IEDualCodecs.NONNULL_INGREDIENTS.fieldOf("ingredients"), ShapelessRecipe::getIngredients,
+			IEDualCodecs.NONNULL_INGREDIENTS.fieldOf("ingredients"), DamageToolRecipe::getIngredients,
 			DamageToolRecipe::new
 	);
 
-	@Override
 	public MapCodec<DamageToolRecipe> codec()
 	{
 		return CODECS.mapCodec();
 	}
 
-	@Override
 	public StreamCodec<RegistryFriendlyByteBuf, DamageToolRecipe> streamCodec()
 	{
 		return CODECS.streamCodec();
+	}
+
+	public RecipeSerializer<DamageToolRecipe> serializer()
+	{
+		return new RecipeSerializer<>(codec(), streamCodec());
 	}
 }

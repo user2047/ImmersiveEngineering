@@ -50,8 +50,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities.Energy;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.List;
@@ -75,7 +75,6 @@ public class AutoWorkbenchLogic
 	public static final BlockPos PROCESS_1_POS = new BlockPos(1, 0, 0);
 	public static final BlockPos PROCESS_2_POS = new BlockPos(2, 1, 1);
 
-	@Override
 	public void tickServer(IMultiblockContext<State> context)
 	{
 		final State state = context.getState();
@@ -120,7 +119,6 @@ public class AutoWorkbenchLogic
 		}
 	}
 
-	@Override
 	public void tickClient(IMultiblockContext<State> context)
 	{
 		final IMultiblockLevel level = context.getLevel();
@@ -156,27 +154,23 @@ public class AutoWorkbenchLogic
 		return EngineersBlueprintItem.getRecipes(level, state.inventory.getStackInSlot(BLUEPRINT_SLOT));
 	}
 
-	@Override
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
 	}
 
-	@Override
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.register(ItemHandler.BLOCK, (state, pos) -> INPUT_POS.equals(pos.posInMultiblock())?state.input: null);
-		register.registerAtOrNull(EnergyStorage.BLOCK, ENERGY_POS, state -> state.energy);
+		register.register(Capabilities.Item.BLOCK, (state, pos) -> INPUT_POS.equals(pos.posInMultiblock())?state.input: null);
+		register.registerAtOrNull(Energy.BLOCK, ENERGY_POS, state -> state.energy);
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
 	}
 
-	@Override
 	public void dropExtraItems(State state, Consumer<ItemStack> drop)
 	{
 		MBInventoryUtils.dropItems(state.inventory, drop);
 	}
 
-	@Override
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)
 	{
 		return AutoWorkbenchShapes.SHAPE_GETTER;
@@ -229,49 +223,43 @@ public class AutoWorkbenchLogic
 			};
 		}
 
-		@Override
 		public void writeSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			nbt.put("inventory", inventory.serializeNBT(provider));
+			nbt.put("inventory", blusunrize.immersiveengineering.common.util.ItemHandlerCompat.serializeNBT(inventory, provider));
 			nbt.putInt("selectedRecipe", selectedRecipe);
 			nbt.put("processor", processor.toNBT(provider));
 			nbt.put("energy", energy.serializeNBT(provider));
 		}
 
-		@Override
 		public void readSaveNBT(CompoundTag nbt, Provider provider)
 		{
-			inventory.deserializeNBT(provider, nbt.getCompound("inventory"));
-			selectedRecipe = nbt.getInt("selectedRecipe");
+			blusunrize.immersiveengineering.common.util.ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
+			selectedRecipe = nbt.getIntOr("selectedRecipe", 0);
 			processor.fromNBT(nbt.get("processor"), MultiblockProcessInWorld::new, provider);
 			energy.deserializeNBT(provider, nbt.get("energy"));
 		}
 
-		@Override
 		public void writeSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			nbt.put("processor", processor.toNBT(provider));
 			nbt.putBoolean("active", active);
-			nbt.put("blueprint", inventory.getStackInSlot(BLUEPRINT_SLOT).saveOptional(provider));
+			nbt.put("blueprint", blusunrize.immersiveengineering.common.util.ItemStackCompat.saveOptional(inventory.getStackInSlot(BLUEPRINT_SLOT), provider));
 			nbt.putInt("selectedRecipe", selectedRecipe);
 		}
 
-		@Override
 		public void readSyncNBT(CompoundTag nbt, Provider provider)
 		{
 			processor.fromNBT(nbt.get("processor"), MultiblockProcessInWorld::new, provider);
-			active = nbt.getBoolean("active");
-			inventory.setStackInSlot(BLUEPRINT_SLOT, ItemStack.parseOptional(provider, nbt.getCompound("blueprint")));
-			selectedRecipe = nbt.getInt("selectedRecipe");
+			active = nbt.getBooleanOr("active", false);
+			inventory.setStackInSlot(BLUEPRINT_SLOT, blusunrize.immersiveengineering.common.util.ItemStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("blueprint")));
+			selectedRecipe = nbt.getIntOr("selectedRecipe", 0);
 		}
 
-		@Override
 		public AveragingEnergyStorage getEnergy()
 		{
 			return energy;
 		}
 
-		@Override
 		public void doProcessOutput(ItemStack result, IMultiblockLevel level)
 		{
 			this.output.insertOrDrop(result, level);

@@ -18,7 +18,7 @@ import blusunrize.immersiveengineering.api.shader.impl.ShaderCaseDrill;
 import blusunrize.immersiveengineering.api.shader.impl.ShaderCaseMinecart;
 import blusunrize.immersiveengineering.api.utils.Color4;
 import blusunrize.immersiveengineering.client.ClientUtils;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.Vec3;
@@ -219,7 +219,6 @@ public class IEShaders
 			this.translucent = translucent;
 		}
 
-		@Override
 		public Color4 getColor()
 		{
 			if(func_getColour!=null)
@@ -227,34 +226,11 @@ public class IEShaders
 			return super.getColor();
 		}
 
-		@Override
 		public RenderType getRenderType(RenderType base)
 		{
-			if(func_modifyRender==null)
-				return base;
-			else
-				return new RenderType(
-						//TODO better name?
-						"shader_"+base.toString()+func_modifyRender,
-						base.format(),
-						base.mode(),
-						256,
-						base.affectsCrumbling(),
-						true,
-						() -> {
-							base.setupRenderState();
-							func_modifyRender.accept(true);
-						},
-						() -> {
-							func_modifyRender.accept(false);
-							base.clearRenderState();
-						}
-				)
-				{
-				};
+			return base;
 		}
 
-		@Override
 		public boolean isTranslucent()
 		{
 			return translucent;
