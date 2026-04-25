@@ -178,7 +178,6 @@ public class ClientProxy extends CommonProxy
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("basic_split"));
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("potion_bucket"));
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("mirror"));
-		registerEmptyPortModelLoader(ev, Identifier.fromNamespaceAndPath("neoforge", "fluid_container"));
 	}
 
 	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)

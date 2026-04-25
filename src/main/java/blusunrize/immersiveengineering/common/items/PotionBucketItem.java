@@ -13,7 +13,6 @@ import blusunrize.immersiveengineering.common.items.ItemCapabilityRegistration.I
 import blusunrize.immersiveengineering.common.register.IEItems.Misc;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -29,10 +28,12 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.ItemAccessResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nonnull;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ public class PotionBucketItem extends IEBaseItem
 
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
-		registrar.register(Capabilities.Fluid.ITEM, (stack, $) -> new FluidHandler(stack));
+		registrar.register(Capabilities.Fluid.ITEM, (stack, context) -> new FluidHandler(stack, context));
 	}
 
 	@Nonnull
@@ -94,78 +95,57 @@ public class PotionBucketItem extends IEBaseItem
 		PotionContents.addPotionTooltip(contents.getAllEffects(), tooltip::add, 1.0F, ctx.tickRate());
 	}
 
-	private static class FluidHandler implements IFluidHandlerItem
+	private static class FluidHandler extends ItemAccessResourceHandler<FluidResource>
 	{
-		private final ItemStack stack;
-		private boolean empty = false;
+		private final net.minecraft.world.item.Item validItem;
 
-		private FluidHandler(ItemStack stack)
+		private FluidHandler(ItemStack stack, Object context)
 		{
-			this.stack = stack;
+			super(context instanceof ItemAccess itemAccess?itemAccess: ItemAccess.forStack(stack), 1);
+			this.validItem = stack.getItem();
 		}
 
-		private FluidStack getFluid()
+		private FluidStack getFluid(ItemResource resource)
 		{
-			if(empty)
+			if(!resource.is(validItem))
 				return FluidStack.EMPTY;
-			else
-				return PotionFluid.getFluidStackForType(stack.get(POTION_CONTENTS).potion(), FluidType.BUCKET_VOLUME, PotionFluid.PotionBottleType.REGULAR);
+			PotionContents contents = resource.toStack().getOrDefault(POTION_CONTENTS, PotionContents.EMPTY);
+			return PotionFluid.getFluidStackForType(
+					contents.potion(), FluidType.BUCKET_VOLUME, PotionFluid.PotionBottleType.REGULAR
+			);
 		}
 
-		@Nonnull
-		public ItemStack getContainer()
+		@Override
+		protected FluidResource getResourceFrom(ItemResource resource, int tank)
 		{
-			return empty?new ItemStack(Items.BUCKET): stack;
+			FluidStack fluid = getFluid(resource);
+			return fluid.isEmpty()?FluidResource.EMPTY: FluidResource.of(fluid);
 		}
 
-		public int getTanks()
+		@Override
+		protected int getAmountFrom(ItemResource resource, int tank)
 		{
-			return 1;
+			return getFluid(resource).isEmpty()?0: FluidType.BUCKET_VOLUME;
 		}
 
-		@Nonnull
-		public FluidStack getFluidInTank(int tank)
+		@Override
+		protected ItemResource update(ItemResource resource, int tank, FluidResource fluid, int amount)
 		{
-			if(tank==0)
-				return getFluid();
-			else
-				return FluidStack.EMPTY;
+			if(amount <= 0)
+				return ItemResource.of(Items.BUCKET);
+			return resource;
 		}
 
-		public int getTankCapacity(int tank)
+		@Override
+		public boolean isValid(int tank, FluidResource resource)
 		{
-			return tank==0?FluidType.BUCKET_VOLUME: 0;
+			return !resource.isEmpty();
 		}
 
-		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
+		@Override
+		protected int getCapacity(int tank, FluidResource resource)
 		{
-			return false;
-		}
-
-		public int fill(FluidStack resource, FluidAction action)
-		{
-			return 0;
-		}
-
-		@Nonnull
-		public FluidStack drain(FluidStack resource, FluidAction action)
-		{
-			FluidStack fluid = getFluid();
-			if(!FluidStack.isSameFluidSameComponents(fluid, resource))
-				return FluidStack.EMPTY;
-			return drain(resource.getAmount(), action);
-		}
-
-		@Nonnull
-		public FluidStack drain(int maxDrain, FluidAction action)
-		{
-			if(empty||stack.getCount() > 1||maxDrain < FluidType.BUCKET_VOLUME)
-				return FluidStack.EMPTY;
-
-			FluidStack potion = getFluid();
-			if(action.execute())
-				empty = true;
-			return potion;
+			return FluidType.BUCKET_VOLUME;
 		}
 	}
 }

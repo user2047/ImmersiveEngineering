@@ -19,6 +19,10 @@ import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,6 +52,35 @@ public class IEItemFluidHandler extends FluidHandlerItemStack
 	public IEItemFluidHandler(ItemStack container, int capacity)
 	{
 		super(IEDataComponents.GENERIC_FLUID, container, capacity);
+	}
+
+	@Nullable
+	public static ResourceHandler<FluidResource> makeResourceHandler(ItemStack container, Object context, int capacity)
+	{
+		if(!(context instanceof ItemAccess itemAccess))
+			return null;
+		return new ItemAccessFluidHandler(itemAccess, IEDataComponents.GENERIC_FLUID.get(), capacity)
+		{
+			@Override
+			protected int getCapacity(int tank, FluidResource resource)
+			{
+				if(container.getItem() instanceof IAdvancedFluidItem advanced)
+					return advanced.getCapacity(container, capacity);
+				return capacity;
+			}
+
+			@Override
+			public boolean isValid(int tank, FluidResource resource)
+			{
+				if(!super.isValid(tank, resource))
+					return false;
+				if(resource.isEmpty())
+					return true;
+				if(container.getItem() instanceof IAdvancedFluidItem advanced)
+					return advanced.allowFluid(container, resource.toStack(1));
+				return true;
+			}
+		};
 	}
 
 	public int getCapacity()

@@ -132,7 +132,8 @@ public class ImmersiveEngineering
 		ArcRecyclingChecker.allowRecipeTypeForRecycling(RecipeType.CRAFTING);
 		ArcRecyclingChecker.allowRecipeTypeForRecycling(IERecipeTypes.METAL_PRESS.get());
 		// Vanilla Tools, Swords & Armor
-		ArcRecyclingChecker.allowSimpleItemForRecycling(stack -> stack instanceof ShearsItem||stack instanceof SwordItem||
+		ArcRecyclingChecker.allowSimpleItemForRecycling(stack -> stack instanceof ShearsItem||
+				stack.components().has(DataComponents.WEAPON)||
 				stack.components().has(DataComponents.EQUIPPABLE)||
 				stack instanceof BucketItem);
 		// IE Tools

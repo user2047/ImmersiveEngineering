@@ -22,6 +22,7 @@ import blusunrize.immersiveengineering.data.DamageTypeProvider;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.Util;
+import net.minecraft.core.ClientAsset.ResourceTexture;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.*;
 import net.minecraft.core.HolderLookup.Provider;
@@ -38,7 +39,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.animal.WolfVariant;
+import net.minecraft.world.entity.animal.wolf.WolfVariant;
+import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -90,7 +92,19 @@ public class WorldGenerationProvider
 			Identifier base_texture = RobotWolfItem.REGISTRY_KEY.withPrefix("entity/wolf/");
 			context.register(
 					ResourceKey.create(Registries.WOLF_VARIANT, RobotWolfItem.REGISTRY_KEY),
-					new WolfVariant(base_texture, base_texture.withSuffix("_tame"), base_texture.withSuffix("_angry"), HolderSet.empty())
+					new WolfVariant(
+							new WolfVariant.AssetInfo(
+									new ResourceTexture(base_texture),
+									new ResourceTexture(base_texture.withSuffix("_tame")),
+									new ResourceTexture(base_texture.withSuffix("_angry"))
+							),
+							new WolfVariant.AssetInfo(
+									new ResourceTexture(base_texture),
+									new ResourceTexture(base_texture.withSuffix("_tame")),
+									new ResourceTexture(base_texture.withSuffix("_angry"))
+							),
+							SpawnPrioritySelectors.fallback(0)
+					)
 			);
 		});
 

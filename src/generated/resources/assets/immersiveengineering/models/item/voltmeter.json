@@ -147,5 +147,8 @@
   },
   "flip_v": true,
   "loader": "neoforge:obj",
-  "model": "immersiveengineering:models/item/voltmeter.obj"
+  "model": "immersiveengineering:models/item/voltmeter.obj",
+  "textures": {
+    "texture": "immersiveengineering:item/tool_voltmeter"
+  }
 }

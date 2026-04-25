@@ -12,7 +12,6 @@
     "accessors.CraftingContainerAccess",
     "accessors.CropBlockAccess",
     "accessors.DamageSourcesAccess",
-    "accessors.ExplosionAccess",
     "accessors.FlowingFluidAccess",
     "accessors.FurnaceTEAccess",
     "accessors.ItemEntityAccess",

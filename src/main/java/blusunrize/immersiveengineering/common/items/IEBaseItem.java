@@ -19,6 +19,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab.Output;
 import net.minecraft.world.item.Item;
@@ -123,14 +124,44 @@ public class IEBaseItem extends Item
 		return getDescriptionId();
 	}
 
-	public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot)
+	public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot)
 	{
 		super.inventoryTick(stack, level, entity, slot);
-		inventoryTick(stack, level, entity, slot.ordinal(), false);
+		int itemSlot = getLegacyInventorySlot(stack, entity, slot);
+		boolean selected = entity instanceof Player player&&itemSlot==player.getInventory().getSelectedSlot();
+		inventoryTick(stack, level, entity, itemSlot, selected);
 	}
 
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected)
 	{
+	}
+
+	private static int getLegacyInventorySlot(ItemStack stack, Entity entity, @Nullable EquipmentSlot slot)
+	{
+		if(entity instanceof Player player)
+		{
+			Inventory inventory = player.getInventory();
+			if(slot==EquipmentSlot.MAINHAND)
+				return inventory.getSelectedSlot();
+			if(slot==null)
+			{
+				List<ItemStack> carriedItems = inventory.getNonEquipmentItems();
+				for(int i = 0; i < carriedItems.size(); i++)
+					if(carriedItems.get(i)==stack)
+						return i;
+				return -1;
+			}
+		}
+		if(slot==null)
+			return -1;
+		return switch(slot)
+		{
+			case OFFHAND -> Inventory.SLOT_OFFHAND;
+			case BODY -> Inventory.SLOT_BODY_ARMOR;
+			case SADDLE -> Inventory.SLOT_SADDLE;
+			case FEET, LEGS, CHEST, HEAD -> slot.getIndex(Inventory.INVENTORY_SIZE);
+			case MAINHAND -> slot.getIndex();
+		};
 	}
 
 	public void onCraftedBy(ItemStack stack, Player player)

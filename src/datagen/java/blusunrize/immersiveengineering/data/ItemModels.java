@@ -317,6 +317,7 @@ public class ItemModels extends TRSRItemModelProvider
 		addItemModels("", IEItems.SpawnEggs.ROBOT_WOLF);
 
 		obj(Tools.VOLTMETER, rl("item/voltmeter.obj"))
+				.texture("texture", rl("item/tool_voltmeter"))
 				.transforms(rl("item/voltmeter"));
 		obj(Tools.TOOLBOX, rl("item/toolbox.obj"))
 				.transforms(rl("item/toolbox"));

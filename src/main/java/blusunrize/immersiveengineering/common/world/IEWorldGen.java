@@ -113,6 +113,8 @@ public class IEWorldGen
 	public static void chunkDataSave(ChunkDataEvent.Save event)
 	{
 		CompoundTag levelTag = event.getData().attachmentData();
+		if(levelTag==null)
+			return;
 		CompoundTag nbt = new CompoundTag();
 		levelTag.put("ImmersiveEngineering", nbt);
 		nbt.putBoolean(IEServerConfig.ORES.retrogen_key.get(), true);
@@ -126,7 +128,8 @@ public class IEWorldGen
 		LevelAccessor world = event.getLevel();
 		if(event.getChunk().getPersistedStatus()!=ChunkStatus.FULL||!(world instanceof Level))
 			return;
-		if(event.getData().attachmentData().getCompoundOrEmpty("ImmersiveEngineering").contains(IEServerConfig.ORES.retrogen_key.get()))
+		CompoundTag levelTag = event.getData().attachmentData();
+		if(levelTag!=null&&levelTag.getCompoundOrEmpty("ImmersiveEngineering").contains(IEServerConfig.ORES.retrogen_key.get()))
 			return;
 		if(IEServerConfig.ORES.retrogen_log_flagChunk.get())
 			IELogger.info("Chunk "+event.getChunk().getPos()+" has been flagged for Ore RetroGeneration by IE.");

@@ -25,7 +25,6 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
-import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -95,7 +94,7 @@ public class JerrycanItem extends IEBaseItem
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
 		registrar.register(
-				Capabilities.Fluid.ITEM, (stack, $) -> new FluidHandlerItemStack(GENERIC_FLUID, stack, jerrycanMaxMB)
+				Capabilities.Fluid.ITEM, (stack, context) -> IEItemFluidHandler.makeResourceHandler(stack, context, jerrycanMaxMB)
 		);
 	}
 }

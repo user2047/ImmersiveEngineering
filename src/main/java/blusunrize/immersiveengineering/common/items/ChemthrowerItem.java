@@ -216,7 +216,7 @@ public class ChemthrowerItem extends UpgradeableToolItem implements IAdvancedFlu
 	public static void registerCapabilities(ItemCapabilityRegistrar registrar)
 	{
 		registerCapabilitiesISI(registrar);
-		registrar.register(Capabilities.Fluid.ITEM, stack -> new IEItemFluidHandler(stack, CAPACITY));
+		registrar.register(Capabilities.Fluid.ITEM, (stack, context) -> IEItemFluidHandler.makeResourceHandler(stack, context, CAPACITY));
 		registrar.register(
 				CapabilityShader.ITEM,
 				stack -> new ShaderWrapper_Item(ieLoc("chemthrower"), stack)

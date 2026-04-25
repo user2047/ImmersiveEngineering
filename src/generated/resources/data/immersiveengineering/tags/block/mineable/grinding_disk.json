@@ -38,7 +38,7 @@
     "minecraft:anvil",
     "minecraft:chipped_anvil",
     "minecraft:damaged_anvil",
-    "minecraft:chain",
+    "#minecraft:chains",
     "minecraft:iron_bars",
     "minecraft:iron_door",
     "minecraft:iron_trapdoor",
