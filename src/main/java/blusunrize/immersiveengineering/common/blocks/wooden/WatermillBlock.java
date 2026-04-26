@@ -16,11 +16,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 {
@@ -78,7 +81,70 @@ public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 		return true;
 	}
 
-	private static BlockPos getWatermillCenter(Level world, BlockPos pos, BlockState state)
+	@Override
+	@SuppressWarnings("deprecation")
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	{
+		if(isOrphanedWatermillSlave(world, pos, state))
+		{
+			if(world instanceof Level level)
+				removeOrphanedWatermillSlaves(level, pos);
+			return Shapes.empty();
+		}
+		return super.getShape(state, world, pos, context);
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	{
+		if(isOrphanedWatermillSlave(world, pos, state))
+		{
+			if(world instanceof Level level)
+				removeOrphanedWatermillSlaves(level, pos);
+			return Shapes.empty();
+		}
+		return super.getCollisionShape(state, world, pos, context);
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos)
+	{
+		if(isOrphanedWatermillSlave(world, pos, state))
+		{
+			if(world instanceof Level level)
+				removeOrphanedWatermillSlaves(level, pos);
+			return Shapes.empty();
+		}
+		return super.getInteractionShape(state, world, pos);
+	}
+
+	private boolean isOrphanedWatermillSlave(BlockGetter world, BlockPos pos, BlockState state)
+	{
+		return state.getBlock()==this
+				&&state.getValue(IEProperties.MULTIBLOCKSLAVE)
+				&&getWatermillCenter(world, pos, state)==null;
+	}
+
+	private void removeOrphanedWatermillSlaves(Level world, BlockPos origin)
+	{
+		if(world.isClientSide())
+			return;
+		for(int xx = -4; xx <= 4; xx++)
+			for(int yy = -4; yy <= 4; yy++)
+				for(int zz = -4; zz <= 4; zz++)
+				{
+					BlockPos current = origin.offset(xx, yy, zz);
+					BlockState state = world.getBlockState(current);
+					if(state.getBlock()==this
+							&&state.getValue(IEProperties.MULTIBLOCKSLAVE)
+							&&getWatermillCenter(world, current, state)==null)
+						world.removeBlock(current, false);
+				}
+	}
+
+	private static BlockPos getWatermillCenter(BlockGetter world, BlockPos pos, BlockState state)
 	{
 		if(!state.getValue(IEProperties.MULTIBLOCKSLAVE))
 			return pos;
