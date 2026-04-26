@@ -10,7 +10,7 @@ package blusunrize.immersiveengineering.client.models;
 
 import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
-import blusunrize.immersiveengineering.client.utils.BakedQuadBuilder;
+import blusunrize.immersiveengineering.client.utils.ModelUtils;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -74,23 +74,23 @@ public record PortedConfigurableSidesModel(
 		QuadCollection.Builder result = new QuadCollection.Builder();
 		Transformation transform = modelState.transformation().blockCenterToCorner();
 		putFace(result, transform, Direction.DOWN, new Vec3[]{
-				new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(1, 0, 1), new Vec3(0, 0, 1)
-		}, spriteFor(Direction.DOWN, textureSlots, modelBaker, name));
+				new Vec3(0, 0, 0), new Vec3(0, 0, 1), new Vec3(1, 0, 1), new Vec3(1, 0, 0)
+		}, new double[]{0, 16, 16, 0}, true, spriteFor(Direction.DOWN, textureSlots, modelBaker, name));
 		putFace(result, transform, Direction.UP, new Vec3[]{
 				new Vec3(0, 1, 0), new Vec3(0, 1, 1), new Vec3(1, 1, 1), new Vec3(1, 1, 0)
-		}, spriteFor(Direction.UP, textureSlots, modelBaker, name));
+		}, new double[]{0, 0, 16, 16}, false, spriteFor(Direction.UP, textureSlots, modelBaker, name));
 		putFace(result, transform, Direction.NORTH, new Vec3[]{
 				new Vec3(1, 0, 0), new Vec3(1, 1, 0), new Vec3(0, 1, 0), new Vec3(0, 0, 0)
-		}, spriteFor(Direction.NORTH, textureSlots, modelBaker, name));
+		}, new double[]{0, 16, 16, 0}, true, spriteFor(Direction.NORTH, textureSlots, modelBaker, name));
 		putFace(result, transform, Direction.SOUTH, new Vec3[]{
-				new Vec3(0, 0, 1), new Vec3(0, 1, 1), new Vec3(1, 1, 1), new Vec3(1, 0, 1)
-		}, spriteFor(Direction.SOUTH, textureSlots, modelBaker, name));
+				new Vec3(1, 0, 1), new Vec3(1, 1, 1), new Vec3(0, 1, 1), new Vec3(0, 0, 1)
+		}, new double[]{16, 16, 0, 0}, false, spriteFor(Direction.SOUTH, textureSlots, modelBaker, name));
 		putFace(result, transform, Direction.WEST, new Vec3[]{
 				new Vec3(0, 0, 0), new Vec3(0, 1, 0), new Vec3(0, 1, 1), new Vec3(0, 0, 1)
-		}, spriteFor(Direction.WEST, textureSlots, modelBaker, name));
+		}, new double[]{0, 16, 16, 0}, true, spriteFor(Direction.WEST, textureSlots, modelBaker, name));
 		putFace(result, transform, Direction.EAST, new Vec3[]{
-				new Vec3(1, 0, 1), new Vec3(1, 1, 1), new Vec3(1, 1, 0), new Vec3(1, 0, 0)
-		}, spriteFor(Direction.EAST, textureSlots, modelBaker, name));
+				new Vec3(1, 0, 0), new Vec3(1, 1, 0), new Vec3(1, 1, 1), new Vec3(1, 0, 1)
+		}, new double[]{16, 16, 0, 0}, false, spriteFor(Direction.EAST, textureSlots, modelBaker, name));
 		return result.build();
 	}
 
@@ -125,21 +125,13 @@ public record PortedConfigurableSidesModel(
 
 	private static void putFace(
 			QuadCollection.Builder result, Transformation transform, Direction direction, Vec3[] vertices,
-			TextureAtlasSprite sprite
+			double[] uv, boolean invert, TextureAtlasSprite sprite
 	)
 	{
-		BakedQuadBuilder quadBuilder = new BakedQuadBuilder();
-		Vec3 normal = new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
-		for(int i = 0; i < 4; i++)
-		{
-			double u = i==0||i==1?0: 16;
-			double v = i==0||i==3?16: 0;
-			quadBuilder.putVertexData(
-					transformPosition(transform, vertices[i]), normal,
-					u, v, sprite, new float[]{1, 1, 1, 1}, 1
-			);
-		}
-		BakedQuad quad = quadBuilder.bake(-1, direction, sprite, true);
+		Vec3[] transformed = new Vec3[vertices.length];
+		for(int i = 0; i < vertices.length; i++)
+			transformed[i] = transformPosition(transform, vertices[i]);
+		BakedQuad quad = ModelUtils.createBakedQuad(transformed, direction, sprite, uv, new float[]{1, 1, 1, 1}, invert);
 		result.addCulledFace(direction, quad);
 	}
 

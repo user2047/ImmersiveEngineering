@@ -83,8 +83,8 @@ public abstract class IEBlockEntityRenderer<T extends BlockEntity> implements Bl
 
 	public static class RenderState<T extends BlockEntity> extends BlockEntityRenderState
 	{
-		private T blockEntity;
-		private float partialTicks;
+		protected T blockEntity;
+		protected float partialTicks;
 	}
 
 	protected static void rotateForFacingNoCentering(PoseStack stack, Direction facing)
