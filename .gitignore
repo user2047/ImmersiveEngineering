@@ -16,6 +16,9 @@ out
 !.idea/copyright
 classes
 
+# vscode
+.vscode/
+
 # gradle
 build
 .gradle
@@ -27,6 +30,7 @@ libs
 
 # custom
 logs
+compileJava.log
 
 *.jks
 # Local gradle customizations (e.g. added mods)
