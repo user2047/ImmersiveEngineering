@@ -35,6 +35,22 @@ public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 		builder.add(IEProperties.MULTIBLOCKSLAVE, IEProperties.FACING_HORIZONTAL);
 	}
 
+	@Override
+	@SuppressWarnings("deprecation")
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving)
+	{
+		boolean handledByBlockEntity = world.getBlockEntity(pos) instanceof WatermillBlockEntity;
+		super.onRemove(state, world, pos, newState, isMoving);
+		if(state.getBlock()!=newState.getBlock()&&!handledByBlockEntity)
+		{
+			BlockPos center = getWatermillCenter(world, pos, state);
+			if(center!=null)
+				WatermillBlockEntity.clearWatermillBlocks(
+						world, center, state.getValue(IEProperties.FACING_HORIZONTAL), state.getBlock()
+				);
+		}
+	}
+
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
 	{
 		BlockPos center = context.getClickedPos();
@@ -54,5 +70,24 @@ public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 						return false;
 				}
 		return true;
+	}
+
+	private static BlockPos getWatermillCenter(Level world, BlockPos pos, BlockState state)
+	{
+		if(!state.getValue(IEProperties.MULTIBLOCKSLAVE))
+			return pos;
+		Direction facing = state.getValue(IEProperties.FACING_HORIZONTAL);
+		for(int hh = -2; hh <= 2; hh++)
+			for(int ww = -2; ww <= 2; ww++)
+				if((hh > -2&&hh < 2)||(ww > -2&&ww < 2))
+				{
+					BlockPos center = pos.offset(facing.getAxis()==Axis.Z?-ww: 0, -hh, facing.getAxis()==Axis.Z?0: -ww);
+					BlockState centerState = world.getBlockState(center);
+					if(centerState.getBlock()==state.getBlock()
+							&&!centerState.getValue(IEProperties.MULTIBLOCKSLAVE)
+							&&centerState.getValue(IEProperties.FACING_HORIZONTAL)==facing)
+						return center;
+				}
+		return null;
 	}
 }

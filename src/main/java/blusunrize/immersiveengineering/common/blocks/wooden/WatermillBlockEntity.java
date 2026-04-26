@@ -33,6 +33,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -448,18 +449,39 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		if(beingBroken)
 			return;
-		BlockPos initPos = pos.offset(getFacing().getAxis()==Axis.Z?-offset[0]: 0, -offset[1], getFacing().getAxis()==Axis.X?-offset[0]: 0);
+		BlockPos initPos = getCenterPos(pos, getFacing(), offset[0], offset[1]);
+		clearWatermillBlocks(level, initPos, getFacing(), state.getBlock());
+	}
+
+	static void clearWatermillBlocks(Level level, BlockPos center, Direction facing, Block block)
+	{
 		for(int hh = -2; hh <= 2; hh++)
 			for(int ww = -2; ww <= 2; ww++)
-				if((hh > -2&&hh < 2)||(ww > -2&&ww < 2))
+				if(isInWatermillFootprint(hh, ww))
 				{
-					BlockPos pos2 = initPos.offset(getFacing().getAxis()==Axis.Z?ww: 0, hh, getFacing().getAxis()==Axis.X?ww: 0);
-					if(level.getBlockEntity(pos2) instanceof WatermillBlockEntity dummy)
+					BlockPos pos2 = getOffsetPos(center, facing, ww, hh);
+					if(level.getBlockState(pos2).getBlock()==block)
 					{
-						dummy.beingBroken = true;
+						if(level.getBlockEntity(pos2) instanceof WatermillBlockEntity dummy)
+							dummy.beingBroken = true;
 						level.removeBlock(pos2, false);
 					}
 				}
+	}
+
+	private static boolean isInWatermillFootprint(int heightOffset, int widthOffset)
+	{
+		return (heightOffset > -2&&heightOffset < 2)||(widthOffset > -2&&widthOffset < 2);
+	}
+
+	private static BlockPos getCenterPos(BlockPos pos, Direction facing, int widthOffset, int heightOffset)
+	{
+		return pos.offset(facing.getAxis()==Axis.Z?-widthOffset: 0, -heightOffset, facing.getAxis()==Axis.Z?0: -widthOffset);
+	}
+
+	private static BlockPos getOffsetPos(BlockPos center, Direction facing, int widthOffset, int heightOffset)
+	{
+		return center.offset(facing.getAxis()==Axis.Z?widthOffset: 0, heightOffset, facing.getAxis()==Axis.Z?0: widthOffset);
 	}
 
 	public boolean shouldPlaySound(String sound)
