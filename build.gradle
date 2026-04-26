@@ -473,6 +473,10 @@ tasks.named("datagenJar").configure {
     enabled = compilePortingDatagen
 }
 
+tasks.named("runClientData").configure {
+    enabled = compilePortingDatagen
+}
+
 tasks.named("test").configure {
     // These tests load the in-progress port through NeoForge's unit-test harness,
     // which still fails during class initialization. Re-enable with -Pie.runPortingTests=true.

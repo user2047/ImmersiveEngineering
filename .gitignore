@@ -26,7 +26,16 @@ build
 # other
 eclipse
 run
-libs
+libs/*
+!libs/maven/
+libs/maven/*
+!libs/maven/malte0811/
+libs/maven/malte0811/*
+!libs/maven/malte0811/DualCodecs/
+libs/maven/malte0811/DualCodecs/*
+!libs/maven/malte0811/DualCodecs/0.1.2/
+!libs/maven/malte0811/DualCodecs/0.1.2/DualCodecs-0.1.2.jar
+!libs/maven/malte0811/DualCodecs/0.1.2/DualCodecs-0.1.2.pom
 
 # custom
 logs
