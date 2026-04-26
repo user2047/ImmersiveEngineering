@@ -114,7 +114,7 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 		if(!getMessage().getString().isEmpty())
 		{
 			int[] offset = getTextOffset(fontrenderer);
-			graphics.drawString(fontrenderer, getMessage(), getX()+offset[0], getY()+offset[1], getTextColor(this.isHovered), false);
+			graphics.text(fontrenderer, getMessage(), getX()+offset[0], getY()+offset[1], getTextColor(this.isHovered), false);
 		}
 	}
 

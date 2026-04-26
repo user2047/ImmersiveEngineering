@@ -196,7 +196,7 @@ public class ShaderManualElement extends SpecialManualElements
 	{
 		for(FormattedCharSequence line : manual.fontRenderer().split(text, 120))
 		{
-			graphics.drawString(manual.fontRenderer(), line, (float)x, (float)y, manual.getTextColour(), false);
+			graphics.text(manual.fontRenderer(), line, x, y, manual.getTextColour(), false);
 			y += manual.fontRenderer().lineHeight;
 		}
 	}

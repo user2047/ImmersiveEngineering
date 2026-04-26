@@ -114,7 +114,7 @@ public class ArcFurnaceRecipeCategory extends IERecipeCategory<ArcFurnaceRecipe>
 		for(int j = 0; j < recipe.secondaryOutputs.size(); j++)
 		{
 			JEIHelper.slotDrawable.draw(graphics, xSecondary, j*18);
-			graphics.drawString(
+			graphics.text(
 					ClientUtils.font(),
 					Utils.formatDouble(recipe.secondaryOutputs.get(j).chance()*100, "0.##")+"%",
 					xSecondary+20,

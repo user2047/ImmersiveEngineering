@@ -241,7 +241,7 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 				else
 					col = DyeColor.RED;
 			}
-			graphics.drawString(this.font, "x "+amount, 30, 18+20*i, col.getTextColor());
+			graphics.text(this.font, "x "+amount, 30, 18+20*i, col.getTextColor());
 		}
 	}
 

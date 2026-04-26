@@ -62,7 +62,7 @@ public class CrusherRecipeCategory extends IERecipeCategory<CrusherRecipe>
 		{
 			int x = 77+i/2*44;
 			int y = yBase+i%2*18;
-			graphics.drawString(
+			graphics.text(
 					ClientUtils.font(),
 					Utils.formatDouble(validSecondaries.get(i).chance()*100, "0.##")+"%",
 					x+21,

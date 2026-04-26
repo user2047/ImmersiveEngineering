@@ -271,7 +271,7 @@ public class ManualElementMultiblock extends SpecialManualElements
 
 			if(componentTooltip!=null)
 			{
-				graphics.drawString(manual.fontRenderer(), "?", 116, yOffTotal/2-4, manual.getTextColour());
+				graphics.text(manual.fontRenderer(), "?", 116, yOffTotal/2-4, manual.getTextColour());
 				if(mouseX >= 116&&mouseX < 122&&mouseY >= yOffTotal/2-4&&mouseY < yOffTotal/2+4)
 					graphics.renderTooltip(manual.fontRenderer(), Language.getInstance().getVisualOrder(
 							Collections.unmodifiableList(componentTooltip)

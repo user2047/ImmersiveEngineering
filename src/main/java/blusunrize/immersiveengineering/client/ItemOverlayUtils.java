@@ -211,7 +211,7 @@ public class ItemOverlayUtils
 		GuiGraphicsPose.translate(transform, 30, -27.5f, 0);
 		GuiGraphicsPose.scale(transform, scale, scale, 1);
 		String chargeTxt = chargeLevel < 10?"0 "+chargeLevel: chargeLevel/10+" "+chargeLevel%10;
-		graphics.drawString(
+		graphics.text(
 				ClientUtils.font(), chargeTxt, 0, 0, Lib.COLOUR_I_ImmersiveOrange, true
 		);
 		GuiGraphicsPose.pop(transform);
@@ -300,7 +300,7 @@ public class ItemOverlayUtils
 			{
 				String name = ClientUtils.font().substrByWidth(fuel.getHoverName(), 50).getString().trim();
 				int width = ClientUtils.font().width(name);
-				graphics.drawString(ClientUtils.font(), name, -20-width/2, -88, 0x333333, false);
+				graphics.text(ClientUtils.font(), name, -20-width/2, -88, 0x333333, false);
 			}
 		});
 	}

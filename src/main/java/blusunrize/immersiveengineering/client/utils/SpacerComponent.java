@@ -16,15 +16,12 @@ import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.util.FormattedCharSequence;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.util.Lazy;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-@OnlyIn(Dist.CLIENT)
 public final class SpacerComponent implements Component
 {
 	private final String widthGlyph;

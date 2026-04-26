@@ -185,8 +185,8 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
-		graphics.drawString(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.input"), guiLeft+8, guiTop+4, DyeColor.GRAY.getTextColor());
-		graphics.drawString(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.output"), guiLeft+8, guiTop+74, DyeColor.GRAY.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.input"), guiLeft+8, guiTop+4, DyeColor.GRAY.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.DESC_INFO+"blockSide.io.output"), guiLeft+8, guiTop+74, DyeColor.GRAY.getTextColor());
 
 		ArrayList<Component> tooltip = new ArrayList<>();
 		if(mouseX > guiLeft+8&&mouseX < guiLeft+232&&((mouseY > guiTop+14&&mouseY < guiTop+48)||(mouseY > guiTop+84&&mouseY < guiTop+132)))

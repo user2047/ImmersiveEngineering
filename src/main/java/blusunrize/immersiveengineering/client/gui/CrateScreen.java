@@ -59,7 +59,7 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
-		graphics.drawString(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
+		graphics.text(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}
 
 	public boolean keyPressed(int key, int scancode, int p_keyPressed_3_)

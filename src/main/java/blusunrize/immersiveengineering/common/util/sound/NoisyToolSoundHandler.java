@@ -18,8 +18,6 @@ import net.minecraft.world.entity.EquipmentSlot.Type;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -165,7 +163,6 @@ public class NoisyToolSoundHandler
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent(priority = EventPriority.LOWEST) //lowest priority, because if the event got cancelled, we don't wanna play the sound
 	public static void clientSideAttackCheck(AttackEntityEvent ev)
 	{
@@ -200,7 +197,6 @@ public class NoisyToolSoundHandler
 	 *
 	 * @param ev the EntityLeaveLevelEvent event
 	 */
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void stopLeavingSoundSource(EntityLeaveLevelEvent ev)
 	{

@@ -84,10 +84,10 @@ public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
-		graphics.drawString(this.font, I18n.get("block.immersiveengineering.item_batcher"), 8, 6,  Lib.COLOUR_I_ImmersiveOrange, true);
+		graphics.text(this.font, I18n.get("block.immersiveengineering.item_batcher"), 8, 6,  Lib.COLOUR_I_ImmersiveOrange, true);
 
-		graphics.drawString(this.font, I18n.get(Lib.GUI_CONFIG+"item_batcher.filter"), 8, 20, 0xE0E0E0);
-		graphics.drawString(this.font, I18n.get(Lib.GUI_CONFIG+"item_batcher.buffer"), 8, 49, 0xE0E0E0);
+		graphics.text(this.font, I18n.get(Lib.GUI_CONFIG+"item_batcher.filter"), 8, 20, 0xE0E0E0);
+		graphics.text(this.font, I18n.get(Lib.GUI_CONFIG+"item_batcher.buffer"), 8, 49, 0xE0E0E0);
 	}
 
 	private static void gatherBatchmodeTooltip(List<Component> out, BatchMode mode) {

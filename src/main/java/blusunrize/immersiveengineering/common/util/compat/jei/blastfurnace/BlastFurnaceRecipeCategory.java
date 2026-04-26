@@ -58,6 +58,6 @@ public class BlastFurnaceRecipeCategory extends IERecipeCategory<BlastFurnaceRec
 		flame.draw(graphics, 12, 27);
 		arrow.draw(graphics, 33, 26);
 		String burnTime = I18n.get("desc.immersiveengineering.info.seconds", Utils.formatDouble(recipe.time/20f, "#.##"));
-		graphics.drawString(ClientUtils.font(), burnTime, 68-ClientUtils.font().width(burnTime), 48, 0x777777, false);
+		graphics.text(ClientUtils.font(), burnTime, 68-ClientUtils.font().width(burnTime), 48, 0x777777, false);
 	}
 }

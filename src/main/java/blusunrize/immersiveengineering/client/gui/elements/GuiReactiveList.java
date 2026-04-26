@@ -169,7 +169,7 @@ public class GuiReactiveList<E> extends Button
 			float tx = ((getX()+padding[2])/textScale);
 			float ty = ((getY()+padding[0]+(fr.lineHeight*i))/textScale);
 			graphics.pose().translate(tx, ty, 0);
-			graphics.drawString(fr, s, 0, 0, col, textShadow);
+			graphics.text(fr, s, 0, 0, col, textShadow);
 			graphics.pose().translate(-tx, -ty, 0);
 		}
 		graphics.pose().scale(1/textScale, 1/textScale, 1);

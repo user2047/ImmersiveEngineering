@@ -54,6 +54,6 @@ public class ClocheFertilizerCategory extends IERecipeCategory<ClocheFertilizer>
 		this.getIcon().draw(graphics, -2, 0);
 		graphics.pose().popPose();
 		String growthModifier = I18n.get("desc.immersiveengineering.jei.cloche_modifier", Utils.formatDouble(recipe.growthModifier, "#.##"));
-		graphics.drawString(ClientUtils.font(), growthModifier, 53, 17, 0x777777, false);
+		graphics.text(ClientUtils.font(), growthModifier, 53, 17, 0x777777, false);
 	}
 }

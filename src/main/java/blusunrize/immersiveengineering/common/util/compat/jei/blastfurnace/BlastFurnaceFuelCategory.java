@@ -58,6 +58,6 @@ public class BlastFurnaceFuelCategory extends IERecipeCategory<BlastFurnaceFuel>
 	{
 		this.flame.draw(graphics, 1, 0);
 		String burnTime = I18n.get("desc.immersiveengineering.info.seconds", Utils.formatDouble(recipe.burnTime/20, "#.##"));
-		graphics.drawString(ClientUtils.font(), burnTime, 24, 12, 0x777777, false);
+		graphics.text(ClientUtils.font(), burnTime, 24, 12, 0x777777, false);
 	}
 }

@@ -107,7 +107,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
-		graphics.drawString(font, I18n.get(Lib.GUI_CONFIG+"radio_tower.saved_frequencies"), 14, 61, 0x2d1a00, false);
+		graphics.text(font, I18n.get(Lib.GUI_CONFIG+"radio_tower.saved_frequencies"), 14, 61, 0x2d1a00, false);
 	}
 
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double distX, double distY)

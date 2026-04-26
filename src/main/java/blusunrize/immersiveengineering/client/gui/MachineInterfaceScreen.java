@@ -249,7 +249,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 			List<FormattedCharSequence> text = font.split(c, 122);
 			int yPos = guiTop+(ySize-74)/2+14;
 			for(int i = 0; i < text.size(); i++)
-				graphics.drawString(font, text.get(i),
+				graphics.text(font, text.get(i),
 						guiLeft+12, yPos+i*font.lineHeight, 0x555555, false
 				);
 		}
@@ -257,7 +257,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 		{
 			Component text = Component.translatable(Lib.GUI_CONFIG+"machine_interface.input_color");
 			int textWidth = font.width(text);
-			graphics.drawString(font, text,
+			graphics.text(font, text,
 					guiLeft+xSize-48-textWidth, guiTop+167, 0xE0E0E0, false
 			);
 		}

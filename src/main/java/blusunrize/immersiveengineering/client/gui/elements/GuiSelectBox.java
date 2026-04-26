@@ -140,7 +140,7 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 				Component text = getMessage();
 				int textX = getX()+TEXT_INDENT;
 				int textY = getY()+HEIGHT_BASE/2-fontrenderer.lineHeight/2;
-				graphics.drawString(fontrenderer, text, textX, textY, getTextColor(this.isHovered), false);
+				graphics.text(fontrenderer, text, textX, textY, getTextColor(this.isHovered), false);
 			}
 			else
 			{
@@ -157,7 +157,7 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 					int textX = getX()+TEXT_INDENT;
 					int textY = getY()+OPEN_OFFSET+j*fontrenderer.lineHeight;
 					boolean highlighted = isHovered&&getHighlightedIndex(mouseX, mouseY)==j;
-					graphics.drawString(fontrenderer, text, textX, textY, getTextColor(highlighted), false);
+					graphics.text(fontrenderer, text, textX, textY, getTextColor(highlighted), false);
 				}
 				graphics.pose().popPose();
 			}

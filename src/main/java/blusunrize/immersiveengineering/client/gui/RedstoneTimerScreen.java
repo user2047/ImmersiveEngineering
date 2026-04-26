@@ -92,8 +92,8 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
-		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
-		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_control").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_control").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());
 		ArrayList<Component> tooltip = new ArrayList<>();
 		for(int i = 0; i < colorButtonsOutput.length; i++)
 			if(colorButtonsOutput[i].isHovered()||colorButtonsControl[i].isHovered())

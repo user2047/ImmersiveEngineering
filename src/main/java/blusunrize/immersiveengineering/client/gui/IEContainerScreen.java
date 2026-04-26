@@ -63,8 +63,8 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		// Only difference to super version is the text color
-		graphics.drawString(this.font, title, titleLabelX, titleLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
-		graphics.drawString(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
+		graphics.text(this.font, title, titleLabelX, titleLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
+		graphics.text(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}
 
 	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)

@@ -105,7 +105,7 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 			int x = leftPos+30+(side/2)*58;
 			int y = topPos+44+(side%2)*76;
 			String s = I18n.get("desc.immersiveengineering.info.blockSide."+Direction.from3DDataValue(side)).substring(0, 1);
-			graphics.drawString(
+			graphics.text(
 					ClientUtils.font(), s, x-(ClientUtils.font().width(s)/2), y, 0xaacccccc, true
 			);
 		}

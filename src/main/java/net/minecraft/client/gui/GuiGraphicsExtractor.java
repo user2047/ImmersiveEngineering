@@ -157,46 +157,6 @@ public class GuiGraphicsExtractor
 	{
 	}
 
-	public void drawString(Font font, String text, int x, int y, int color)
-	{
-		text(font, text, x, y, color);
-	}
-
-	public void drawString(Font font, String text, float x, float y, int color, boolean shadow)
-	{
-		text(font, text, (int)x, (int)y, color, shadow);
-	}
-
-	public void drawString(Font font, String text, int x, int y, int color, boolean shadow)
-	{
-		text(font, text, x, y, color, shadow);
-	}
-
-	public void drawString(Font font, Component text, int x, int y, int color)
-	{
-		text(font, text, x, y, color);
-	}
-
-	public void drawString(Font font, Component text, int x, int y, int color, boolean shadow)
-	{
-		text(font, text, x, y, color, shadow);
-	}
-
-	public void drawString(Font font, FormattedCharSequence text, int x, int y, int color)
-	{
-		text(font, text, x, y, color);
-	}
-
-	public void drawString(Font font, FormattedCharSequence text, int x, int y, int color, boolean shadow)
-	{
-		text(font, text, x, y, color, shadow);
-	}
-
-	public void drawString(Font font, FormattedCharSequence text, float x, float y, int color, boolean shadow)
-	{
-		text(font, text, (int)x, (int)y, color, shadow);
-	}
-
 	public void text(Font font, String text, int x, int y, int color)
 	{
 	}

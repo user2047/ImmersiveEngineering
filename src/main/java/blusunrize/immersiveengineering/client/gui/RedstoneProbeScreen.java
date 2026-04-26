@@ -75,8 +75,8 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
-		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_sending").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
-		graphics.drawString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_receiving").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_sending").getString(), guiLeft, guiTop+18, DyeColor.WHITE.getTextColor());
+		graphics.text(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_receiving").getString(), guiLeft+116, guiTop+18, DyeColor.WHITE.getTextColor());
 
 		ArrayList<Component> tooltip = new ArrayList<>();
 		for(int i = 0; i < colorButtonsSend.length; i++)

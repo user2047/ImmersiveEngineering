@@ -77,9 +77,9 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 		{
 			String title = I18n.get(Lib.GUI+"blast_furnace.preheaters");
 			int w = this.font.width(title)/2;
-			graphics.drawString(font, title, 175-w, 18, 0xAEAEAE);
-			graphics.drawString(font, I18n.get(Lib.GUI+"left"), 154, 28, 0xAEAEAE);
-			graphics.drawString(font, I18n.get(Lib.GUI+"right"), 154, 40, 0xAEAEAE);
+			graphics.text(font, title, 175-w, 18, 0xAEAEAE);
+			graphics.text(font, I18n.get(Lib.GUI+"left"), 154, 28, 0xAEAEAE);
+			graphics.text(font, I18n.get(Lib.GUI+"right"), 154, 40, 0xAEAEAE);
 		}
 	}
 }

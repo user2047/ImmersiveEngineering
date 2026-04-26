@@ -113,13 +113,13 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 			{
 				int x = i%2*COLUMN_WIDTH;
 				int y = i/2*CRATE_SEGMENT;
-				graphics.drawString(
+				graphics.text(
 						this.font, crates.get(i).getHoverName(),
 						x+titleLabelX, y+titleLabelY,
 						Lib.COLOUR_I_ImmersiveOrange, false
 				);
 			}
-		graphics.drawString(
+		graphics.text(
 				this.font, playerInventoryTitle,
 				playerInvX+inventoryLabelX, inventoryLabelY,
 				Lib.COLOUR_I_ImmersiveOrange, false

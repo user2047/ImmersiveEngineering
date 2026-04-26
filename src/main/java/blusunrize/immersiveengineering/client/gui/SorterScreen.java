@@ -72,7 +72,7 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 			int y = topPos+44+(side%2)*76;
 			String s = I18n.get(Lib.DESC_INFO+"blockSide."+Direction.from3DDataValue(side)).substring(0, 1);
 			RenderSystem.enableBlend();
-			graphics.drawString(ClientUtils.font(), s, x-(ClientUtils.font().width(s)/2), y, 0xaacccccc, true);
+			graphics.text(ClientUtils.font(), s, x-(ClientUtils.font().width(s)/2), y, 0xaacccccc, true);
 		}
 	}
 
