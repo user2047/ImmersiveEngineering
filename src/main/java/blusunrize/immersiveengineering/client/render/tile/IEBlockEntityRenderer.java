@@ -57,10 +57,14 @@ public abstract class IEBlockEntityRenderer<T extends BlockEntity> implements Bl
 		nodes.submitCustomGeometry(
 				poseStack,
 				RenderTypeCompat.solid(),
-				(pose, consumer) -> render(
-						state.blockEntity, state.partialTicks, poseStack, type -> consumer,
-						state.lightCoords, OverlayTexture.NO_OVERLAY
-				)
+				(pose, consumer) -> {
+					PoseStack renderPose = new PoseStack();
+					renderPose.last().set(pose);
+					render(
+							state.blockEntity, state.partialTicks, renderPose, type -> consumer,
+							state.lightCoords, OverlayTexture.NO_OVERLAY
+					);
+				}
 		);
 	}
 
