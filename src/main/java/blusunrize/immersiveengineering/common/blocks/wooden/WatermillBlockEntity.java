@@ -455,11 +455,22 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	static void clearWatermillBlocks(Level level, BlockPos center, Direction facing, Block block)
 	{
+		clearWatermillBlocks(level, center, facing, block, true);
+	}
+
+	static void clearWatermillBlocks(Level level, BlockPos center, Direction facing, Block block, boolean includeCenter)
+	{
 		for(int hh = -2; hh <= 2; hh++)
 			for(int ww = -2; ww <= 2; ww++)
 				if(isInWatermillFootprint(hh, ww))
 				{
 					BlockPos pos2 = getOffsetPos(center, facing, ww, hh);
+					if(!includeCenter&&hh==0&&ww==0)
+					{
+						if(level.getBlockState(pos2).getBlock()==block&&level.getBlockEntity(pos2) instanceof WatermillBlockEntity dummy)
+							dummy.beingBroken = true;
+						continue;
+					}
 					if(level.getBlockState(pos2).getBlock()==block)
 					{
 						if(level.getBlockEntity(pos2) instanceof WatermillBlockEntity dummy)

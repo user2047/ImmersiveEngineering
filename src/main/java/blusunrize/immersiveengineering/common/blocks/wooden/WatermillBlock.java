@@ -39,16 +39,22 @@ public class WatermillBlock extends IEEntityBlock<WatermillBlockEntity>
 	@SuppressWarnings("deprecation")
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving)
 	{
-		boolean handledByBlockEntity = world.getBlockEntity(pos) instanceof WatermillBlockEntity;
-		super.onRemove(state, world, pos, newState, isMoving);
-		if(state.getBlock()!=newState.getBlock()&&!handledByBlockEntity)
+		if(state.getBlock()!=newState.getBlock()&&!world.isClientSide())
 		{
-			BlockPos center = getWatermillCenter(world, pos, state);
-			if(center!=null)
+			if(!state.getValue(IEProperties.MULTIBLOCKSLAVE))
 				WatermillBlockEntity.clearWatermillBlocks(
-						world, center, state.getValue(IEProperties.FACING_HORIZONTAL), state.getBlock()
+						world, pos, state.getValue(IEProperties.FACING_HORIZONTAL), state.getBlock(), false
 				);
+			else if(!(world.getBlockEntity(pos) instanceof WatermillBlockEntity))
+			{
+				BlockPos center = getWatermillCenter(world, pos, state);
+				if(center!=null)
+					WatermillBlockEntity.clearWatermillBlocks(
+							world, center, state.getValue(IEProperties.FACING_HORIZONTAL), state.getBlock()
+					);
+			}
 		}
+		super.onRemove(state, world, pos, newState, isMoving);
 	}
 
 	public boolean canIEBlockBePlaced(BlockState newState, BlockPlaceContext context)
