@@ -183,8 +183,8 @@ neoForge {
         client {
             client()
         }
-        data {
-            data()
+        clientData {
+            clientData()
             sourceSet = sourceSets.datagen
             programArguments = [
                     '--mod', 'immersiveengineering',
