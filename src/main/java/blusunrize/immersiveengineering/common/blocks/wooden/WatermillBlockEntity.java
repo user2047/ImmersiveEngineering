@@ -106,6 +106,8 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public void tickServer()
 	{
+		if(removeIfOrphanedDummy())
+			return;
 		//Update rotation to make sure we sync it with client correctly
 		rotation += speed;
 		rotation %= 1;
@@ -124,13 +126,19 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		super.onLoad();
 		if(level instanceof ServerLevel)
+		{
+			if(removeIfOrphanedDummy())
+				return;
 			if(master() instanceof WatermillBlockEntity master)
 				master.setShouldUpdate();
+		}
 	}
 
 	public void onNeighborBlockChange(BlockPos pos)
 	{
 		super.onNeighborBlockChange(pos);
+		if(removeIfOrphanedDummy())
+			return;
 		if(master() instanceof WatermillBlockEntity master)
 			master.setShouldUpdate();
 	}
@@ -420,6 +428,53 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return offset[0]!=0||offset[1]!=0;
 	}
 
+	private boolean removeIfOrphanedDummy()
+	{
+		if(level==null||level.isClientSide()||!getBlockState().getValue(IEProperties.MULTIBLOCKSLAVE))
+			return false;
+		BlockPos masterPos = getKnownOrRecoveredMasterPos();
+		if(masterPos==null)
+		{
+			beingBroken = true;
+			level.removeBlock(worldPosition, false);
+			return true;
+		}
+		if(!SafeChunkUtils.isChunkSafe(level, masterPos))
+			return false;
+		BlockState masterState = SafeChunkUtils.getBlockState(level, masterPos);
+		if(masterState.getBlock()==getBlockState().getBlock()
+				&&!masterState.getValue(IEProperties.MULTIBLOCKSLAVE)
+				&&masterState.getValue(IEProperties.FACING_HORIZONTAL)==getFacing())
+			return false;
+		clearWatermillBlocks(level, masterPos, getFacing(), getBlockState().getBlock());
+		return true;
+	}
+
+	@Nullable
+	private BlockPos getKnownOrRecoveredMasterPos()
+	{
+		if(isDummy())
+			return getCenterPos(worldPosition, getFacing(), offset[0], offset[1]);
+		for(int hh = -2; hh <= 2; hh++)
+			for(int ww = -2; ww <= 2; ww++)
+				if(isInWatermillFootprint(hh, ww)&&(hh!=0||ww!=0))
+				{
+					BlockPos masterPos = getCenterPos(worldPosition, getFacing(), ww, hh);
+					if(!SafeChunkUtils.isChunkSafe(level, masterPos))
+						continue;
+					BlockState masterState = SafeChunkUtils.getBlockState(level, masterPos);
+					if(masterState.getBlock()==getBlockState().getBlock()
+							&&!masterState.getValue(IEProperties.MULTIBLOCKSLAVE)
+							&&masterState.getValue(IEProperties.FACING_HORIZONTAL)==getFacing())
+					{
+						offset = new int[]{ww, hh};
+						setChanged();
+						return masterPos;
+					}
+				}
+		return null;
+	}
+
 	@Nullable
 	public IGeneralMultiblock master()
 	{
@@ -442,6 +497,7 @@ public class WatermillBlockEntity extends IEBaseBlockEntity implements IEServerT
 					WatermillBlockEntity dummy = (WatermillBlockEntity)level.getBlockEntity(pos2);
 					dummy.setFacing(getFacing());
 					dummy.offset = new int[]{ww, hh};
+					dummy.setChanged();
 				}
 	}
 
