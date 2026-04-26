@@ -69,15 +69,15 @@ public class ManualUnlockToast implements Toast
 		if(timeSinceLastVisible < 1000)
 		{
 			graphics.pose().scale(2,2,2);
-			graphics.text(font, EUREKA, 16, 4, 0xf78034, false);
+			graphics.text(font, EUREKA, 16, 4, 0xfff78034, false);
 		}
 		else
 		{
-			graphics.text(font, HEADLINE, 32, 6, 0xf78034, false);
+			graphics.text(font, HEADLINE, 32, 6, 0xfff78034, false);
 			if(!this.entries.isEmpty())
 			{
 				int iEntry = (int)((timeSinceLastVisible/1000)%this.entries.size());
-				graphics.text(font, entries.get(iEntry).getTitle(), 32, 18, 0x555555, false);
+				graphics.text(font, entries.get(iEntry).getTitle(), 32, 18, 0xff555555, false);
 			}
 		}
 		graphics.pose().popPose();

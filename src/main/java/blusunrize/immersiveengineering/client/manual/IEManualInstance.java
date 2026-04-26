@@ -263,27 +263,27 @@ public class IEManualInstance extends ManualInstance
 
 	public int getTitleColour()
 	{
-		return 0xf78034;
+		return 0xfff78034;
 	}
 
 	public int getSubTitleColour()
 	{
-		return 0xf78034;
+		return 0xfff78034;
 	}
 
 	public int getTextColour()
 	{
-		return improveReadability()?0: 0x555555;
+		return improveReadability()?0xff000000: 0xff555555;
 	}
 
 	public int getHighlightColour()
 	{
-		return 0xd4804a;
+		return 0xffd4804a;
 	}
 
 	public int getPagenumberColour()
 	{
-		return 0x9c917c;
+		return 0xff9c917c;
 	}
 
 	public int getGuiRescale()
