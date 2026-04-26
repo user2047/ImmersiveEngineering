@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.client.IVertexBufferHolder;
 import blusunrize.immersiveengineering.api.utils.SafeChunkUtils;
@@ -16,7 +15,6 @@ import blusunrize.immersiveengineering.common.blocks.wooden.WatermillBlockEntity
 import blusunrize.immersiveengineering.common.register.IEBlocks.WoodenDevices;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,11 +28,18 @@ public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntit
 {
 	public static final String NAME = "watermill";
 	public static DynamicModel MODEL;
-	private static final IVertexBufferHolder MODEL_BUFFER = IVertexBufferHolder.create(() -> {
-		BlockState state = WoodenDevices.WATERMILL.defaultBlockState()
-				.setValue(IEProperties.FACING_HORIZONTAL, Direction.NORTH);
-		return MODEL.get().getQuads(state, null, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, null);
-	});
+	private static IVertexBufferHolder modelBuffer;
+
+	private static IVertexBufferHolder getModelBuffer()
+	{
+		if(modelBuffer==null)
+			modelBuffer = IVertexBufferHolder.create(() -> {
+				BlockState state = WoodenDevices.WATERMILL.defaultBlockState()
+						.setValue(IEProperties.FACING_HORIZONTAL, Direction.NORTH);
+				return MODEL.get().getQuads(state, ModelData.EMPTY, null);
+			});
+		return modelBuffer;
+	}
 
 	public void render(WatermillBlockEntity tile, float partialTicks, PoseStack transform, MultiBufferSource bufferIn,
 					   int combinedLightIn, int combinedOverlayIn)
@@ -48,13 +53,14 @@ public class WatermillRenderer extends IEBlockEntityRenderer<WatermillBlockEntit
 		float wheelRotation = (float)(Mth.TWO_PI*(tile.getRotation()+partialTicks*tile.getSpeed()));
 		transform.mulPose(new Quaternionf().rotateZ(wheelRotation));
 		transform.translate(-.5, -.5, -.5);
-		MODEL_BUFFER.render(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutoutMipped(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
+		getModelBuffer().render(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutoutMipped(), combinedLightIn, combinedOverlayIn, bufferIn, transform);
 		transform.popPose();
 	}
 
 	public static void reset()
 	{
-		MODEL_BUFFER.reset();
+		if(modelBuffer!=null)
+			modelBuffer.reset();
 	}
 
 	public AABB getRenderBoundingBox(WatermillBlockEntity watermill)

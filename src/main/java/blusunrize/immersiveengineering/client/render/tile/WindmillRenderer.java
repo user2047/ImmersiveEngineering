@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.client.IVertexBufferHolder;
 import blusunrize.immersiveengineering.api.utils.client.ModelDataUtils;
@@ -21,8 +20,6 @@ import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.neoforged.neoforge.model.data.ModelData;
@@ -40,13 +37,12 @@ public class WindmillRenderer extends IEBlockEntityRenderer<WindmillBlockEntity>
 	{
 		if(BUFFERS[sails]==null)
 			BUFFERS[sails] = IVertexBufferHolder.create(() -> {
-				BakedModel model = MODEL.get();
 				List<String> parts = new ArrayList<>();
 				parts.add("base");
 				for(int i = 1; i <= sails; i++)
 					parts.add("sail_"+i);
 				ModelData data = ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts));
-				return model.getQuads(null, null, ApiUtils.RANDOM_SOURCE, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout());
+				return MODEL.get().getQuads(null, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout());
 			});
 		return BUFFERS[sails];
 	}

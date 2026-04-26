@@ -26,6 +26,7 @@ import blusunrize.immersiveengineering.client.models.obj.PortedIEOBJModel;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.*;
 import blusunrize.immersiveengineering.client.models.obj.callback.item.*;
+import blusunrize.immersiveengineering.client.models.split.PortedBasicSplitModel;
 import blusunrize.immersiveengineering.client.render.ConnectionRenderer;
 import blusunrize.immersiveengineering.client.render.IEBipedLayerRenderer;
 import blusunrize.immersiveengineering.client.render.conveyor.RedstoneConveyorRender;
@@ -111,6 +112,7 @@ import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 @EventBusSubscriber(value = Dist.CLIENT, modid = MODID)
 public class ClientProxy extends CommonProxy
 {
+	private static boolean dynamicModelsInitialized = false;
 	private static final UnbakedModel EMPTY_PORT_MODEL = new UnbakedModel()
 	{
 		@Override
@@ -187,14 +189,48 @@ public class ClientProxy extends CommonProxy
 		ev.register(IEApi.ieLoc("models/conveyor"), PortedConveyorModel.LOADER);
 		ev.register(IEApi.ieLoc("models/coresample"), PortedCoresampleModel.LOADER);
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("feedthrough"));
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("basic_split"));
+		ev.register(IEApi.ieLoc("basic_split"), PortedBasicSplitModel.LOADER);
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("potion_bucket"));
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("mirror"));
+		initDynamicModels();
 	}
 
 	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)
 	{
 		ev.register(id, EMPTY_PORT_MODEL_LOADER);
+	}
+
+	@SubscribeEvent
+	public static void registerStandaloneModels(ModelEvent.RegisterStandalone ev)
+	{
+		initDynamicModels();
+		DynamicModel.registerModels(ev);
+	}
+
+	private static void initDynamicModels()
+	{
+		if(dynamicModelsInitialized)
+			return;
+		dynamicModelsInitialized = true;
+		ArcFurnaceRenderer.ELECTRODES = new DynamicModel(ArcFurnaceRenderer.NAME);
+		AutoWorkbenchRenderer.DYNAMIC = new DynamicModel(AutoWorkbenchRenderer.NAME);
+		BottlingMachineRenderer.DYNAMIC = new DynamicModel(BottlingMachineRenderer.NAME);
+		BucketWheelRenderer.WHEEL = new DynamicModel(BucketWheelRenderer.NAME);
+		CrusherRenderer.BARREL_LEFT = new DynamicModel(CrusherRenderer.NAME_LEFT);
+		CrusherRenderer.BARREL_RIGHT = new DynamicModel(CrusherRenderer.NAME_RIGHT);
+		SawmillRenderer.BLADE = new DynamicModel(SawmillRenderer.NAME);
+		DieselGeneratorRenderer.FAN = new DynamicModel(DieselGeneratorRenderer.NAME);
+		MetalPressRenderer.PISTON = new DynamicModel(MetalPressRenderer.NAME);
+		MixerRenderer.AGITATOR = new DynamicModel(MixerRenderer.NAME);
+		SampleDrillRenderer.DRILL = new DynamicModel(SampleDrillRenderer.NAME);
+		SqueezerRenderer.PISTON = new DynamicModel(SqueezerRenderer.NAME);
+		WatermillRenderer.MODEL = new DynamicModel(WatermillRenderer.NAME);
+		WindmillRenderer.MODEL = new DynamicModel(WindmillRenderer.NAME);
+		RedstoneConveyorRender.MODEL_PANEL = new DynamicModel(RedstoneConveyorRender.MODEL_NAME);
+		SawbladeRenderer.MODEL = new DynamicModel(SawbladeRenderer.NAME);
+		BlastFurnacePreheaterRenderer.MODEL = new DynamicModel(BlastFurnacePreheaterRenderer.NAME);
+		TurretRenderer.fillModels();
+		BasicClientProperties.initModels();
 	}
 
 	@SubscribeEvent

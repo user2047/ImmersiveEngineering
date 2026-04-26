@@ -48,7 +48,9 @@ public class RevolvershotFlareEntity extends RevolvershotEntity
 
 	public Color4 getColour()
 	{
-		return getBullet().getFor(IEBullets.FLARE_TYPE);
+		var bullet = getBullet();
+		Color4 color = bullet!=null?bullet.getForOptional(IEBullets.FLARE_TYPE): null;
+		return color!=null?color: IEBullets.FLARE_TYPE.getCodec().defaultValue();
 	}
 
 	public void tick()

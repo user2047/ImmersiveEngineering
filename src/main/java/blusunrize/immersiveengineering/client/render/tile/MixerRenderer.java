@@ -10,14 +10,11 @@ package blusunrize.immersiveengineering.client.render.tile;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
-import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
+import blusunrize.immersiveengineering.client.utils.RenderUtils;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.mixer.MixerLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.model.data.ModelData;
@@ -33,7 +30,6 @@ public class MixerRenderer extends IEMultiblockRenderer<State>
 	{
 		final State state = ctx.getState();
 		final MultiblockOrientation orientation = ctx.getLevel().getOrientation();
-		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
 
 		matrixStack.pushPose();
 		matrixStack.translate(.5, .5, .5);
@@ -46,10 +42,10 @@ public class MixerRenderer extends IEMultiblockRenderer<State>
 		matrixStack.mulPose(new Quaternionf().rotateY(agitator *Mth.DEG_TO_RAD));
 
 		matrixStack.translate(-0.5, -0.5, -0.5);
-		blockRenderer.getModelRenderer().renderModel(
-				matrixStack.last(), bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, AGITATOR.get(),
-				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
+		RenderUtils.renderModelTESRFast(
+				AGITATOR.get().getQuads(null, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				matrixStack, combinedLightIn, combinedOverlayIn
 		);
 
 		matrixStack.popPose();

@@ -12,21 +12,24 @@ import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.tool.RailgunHandler;
 import blusunrize.immersiveengineering.api.tool.RailgunHandler.RailgunRenderColors;
 import blusunrize.immersiveengineering.api.tool.RailgunHandler.StandardRailgunProjectile;
-import blusunrize.immersiveengineering.client.utils.IERenderTypes;
+import blusunrize.immersiveengineering.client.utils.RenderTypeCompat;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.entities.RailgunShotEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
 import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 
 public class RailgunShotRenderer extends IEEntityRenderer<RailgunShotEntity>
 {
+	private static final Identifier WHITE_TEXTURE = IEApi.ieLoc("textures/models/white.png");
 	private static final RailgunRenderColors DEFAULT_RENDER_COLORS = new RailgunRenderColors(
 			0x686868, 0xa4a4a4, 0xa4a4a4, 0xa4a4a4, 0x686868
 	);
@@ -74,9 +77,12 @@ public class RailgunShotRenderer extends IEEntityRenderer<RailgunShotEntity>
 
 		matrixStackIn.translate(-length*.85f, 0, 0);
 		TransformingVertexBuilder builder = new TransformingVertexBuilder(
-				bufferIn, IERenderTypes.POSITION_COLOR_LIGHTMAP, matrixStackIn
+				bufferIn, RenderTypeCompat.entitySolid(WHITE_TEXTURE), matrixStackIn
 		);
+		builder.setUV(Vec2.ZERO);
 		builder.setDefaultLight(light);
+		builder.setDefaultOverlay(OverlayTexture.NO_OVERLAY);
+		builder.setDefaultNormal(0, 1, 0);
 		int[] rgb;
 		//Front&Back
 		for(int i = 0; i < colWidth; i++)
@@ -129,7 +135,7 @@ public class RailgunShotRenderer extends IEEntityRenderer<RailgunShotEntity>
 
 	public Identifier getTextureLocation(@Nonnull RailgunShotEntity entity)
 	{
-		return IEApi.ieLoc("textures/models/white.png");
+		return WHITE_TEXTURE;
 	}
 
 }

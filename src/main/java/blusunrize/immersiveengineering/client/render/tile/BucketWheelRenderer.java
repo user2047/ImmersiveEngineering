@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.client.IVertexBufferHolder;
 import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallbacks;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
@@ -21,7 +20,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.model.data.ModelData;
@@ -62,7 +60,7 @@ public class BucketWheelRenderer extends IEMultiblockRenderer<State>
 			ModelData extraData = ModelDataUtils.single(IEOBJCallbacks.getModelProperty(BucketWheelCallbacks.INSTANCE), key);
 
 			CACHED_BUFFERS.get(key, () -> IVertexBufferHolder.create(
-					() -> WHEEL.get().getQuads(null, null, ApiUtils.RANDOM_SOURCE, extraData, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid())
+					() -> WHEEL.get().getQuads(null, extraData, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid())
 			)).render(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid(), combinedLightIn, combinedOverlayIn, bufferIn, matrixStack, state.reverseRotation);
 		} catch(ExecutionException ex)
 		{

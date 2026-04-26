@@ -19,13 +19,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -33,7 +30,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 
 import static blusunrize.immersiveengineering.client.ClientUtils.getSprite;
-import static blusunrize.immersiveengineering.client.ClientUtils.mc;
 
 public class GuiHelper
 {
@@ -157,24 +153,12 @@ public class GuiHelper
 
 	public static void renderItemWithOverlayIntoGUI(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y, Level level)
 	{
-		ItemRenderer itemRenderer = ClientUtils.getItemRenderer();
-		BakedModel bakedModel = itemRenderer.getModel(stack, null, mc().player, 0);
-		var transform = graphics.pose();
-		transform.pushPose();
-		transform.translate(x, y, 100);
-		transform.pushPose();
-		transform.translate(8, 8, 0);
-		transform.scale(1, -1, 1);
-		transform.scale(16, 16, 16);
-		BatchingRenderTypeBuffer batchBuffer = new BatchingRenderTypeBuffer();
-		itemRenderer.renderStatic(
-				stack, ItemDisplayContext.GUI, 0xf000f0, OverlayTexture.NO_OVERLAY, transform, batchBuffer, level, 0
-		);
-		var buffer = graphics.bufferSource();
-		batchBuffer.pipe(buffer);
-		transform.popPose();
-		renderDurabilityBar(stack, buffer, transform);
-		transform.popPose();
+		Object transform = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(transform);
+		GuiGraphicsPose.translate(transform, x, y, 0);
+		graphics.item(stack, 0, 0);
+		graphics.itemDecorations(ClientUtils.font(), stack, 0, 0);
+		GuiGraphicsPose.pop(transform);
 	}
 
 	public static void renderDurabilityBar(ItemStack stack, MultiBufferSource buffer, PoseStack transform)

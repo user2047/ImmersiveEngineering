@@ -190,15 +190,12 @@ public class RenderUtils
 	public static void renderModelTESRFast(List<BakedQuad> quads, VertexConsumer renderer, PoseStack transform,
 										   int color, int light, int overlay)
 	{
-		float red = 1;
-		float green = 1;
-		float blue = 1;
-		if(color >= 0)
-		{
-			red = (color>>16&255)/255F;
-			green = (color>>8&255)/255F;
-			blue = (color&255)/255F;
-		}
+		QuadInstance instance = new QuadInstance();
+		instance.setColor(color >= 0?0xff000000|color: 0xffffffff);
+		instance.setLightCoords(light);
+		instance.setOverlayCoords(overlay);
+		for(BakedQuad quad : quads)
+			renderer.putBakedQuad(transform.last(), quad, instance);
 	}
 
 	//Cheers boni =P

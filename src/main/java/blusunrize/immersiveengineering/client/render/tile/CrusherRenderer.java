@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
 import blusunrize.immersiveengineering.client.utils.RenderUtils;
@@ -16,7 +15,6 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.CrusherLo
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.CrusherLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -69,7 +67,7 @@ public class CrusherRenderer extends IEMultiblockRenderer<CrusherLogic.State>
 	{
 		matrix.pushPose();
 		matrix.translate(-.5, -.5, -.5);
-		List<BakedQuad> quads = barrel.get().getQuads(null, null, ApiUtils.RANDOM_SOURCE, ModelData.EMPTY, null);
+		List<BakedQuad> quads = barrel.get().getQuads(null, ModelData.EMPTY, null);
 		rotateForFacing(matrix, facing);
 		RenderUtils.renderModelTESRFast(quads, buffer.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), matrix, light, overlay);
 		matrix.popPose();

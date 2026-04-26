@@ -15,6 +15,7 @@ import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallback;
 import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallbacks;
 import blusunrize.immersiveengineering.api.shader.ShaderCase;
 import blusunrize.immersiveengineering.api.utils.Color4;
+import blusunrize.immersiveengineering.client.render.tile.DynamicModel;
 import blusunrize.immersiveengineering.client.models.split.PolygonUtils;
 import blusunrize.immersiveengineering.client.models.split.PolygonUtils.ExtraQuadData;
 import com.google.gson.JsonDeserializationContext;
@@ -28,6 +29,7 @@ import malte0811.modelsplitter.model.OBJModel;
 import malte0811.modelsplitter.model.Polygon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
@@ -38,8 +40,12 @@ import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
@@ -93,15 +99,21 @@ public record PortedIEOBJModel(
 			TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState, ModelDebugName name
 	)
 	{
-		return bakeForCallback(cast(callback), textureSlots, modelBaker, modelState, name);
+		return bakeForCallback(cast(callback), cast(callback).getDefaultKey(), textureSlots, modelBaker, modelState, name);
+	}
+
+	public DynamicModel.BakedDynamicModel bakeStandaloneModel(
+			TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState, ModelDebugName name
+	)
+	{
+		return makeStandaloneModel(cast(callback), textureSlots, modelBaker, modelState, name);
 	}
 
 	private <T> QuadCollection bakeForCallback(
-			IEOBJCallback<T> callback, TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState,
-			ModelDebugName name
+			IEOBJCallback<T> callback, T key, TextureSlots textureSlots, ModelBaker modelBaker,
+			ModelState modelState, ModelDebugName name
 	)
 	{
-		T key = callback.getDefaultKey();
 		IEObjState state = callback.getIEOBJState(key);
 		List<BakedQuad> quads = new ArrayList<>();
 		TextureCoordinateRemapper coordinateRemapper = new TextureCoordinateRemapper(null);
@@ -134,6 +146,43 @@ public record PortedIEOBJModel(
 		for(BakedQuad quad : quads)
 			result.addUnculledFace(quad);
 		return result.build();
+	}
+
+	private <T> DynamicModel.BakedDynamicModel makeStandaloneModel(
+			IEOBJCallback<T> callback, TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState,
+			ModelDebugName name
+	)
+	{
+		return new StandaloneModel<>(callback, textureSlots, modelBaker, modelState, name);
+	}
+
+	private class StandaloneModel<T> implements DynamicModel.BakedDynamicModel
+	{
+		private final IEOBJCallback<T> callback;
+		private final TextureSlots textureSlots;
+		private final ModelBaker modelBaker;
+		private final ModelState modelState;
+		private final ModelDebugName name;
+		private final ModelProperty<T> keyProperty;
+
+		private StandaloneModel(
+				IEOBJCallback<T> callback, TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState,
+				ModelDebugName name
+		)
+		{
+			this.callback = callback;
+			this.textureSlots = textureSlots;
+			this.modelBaker = modelBaker;
+			this.modelState = modelState;
+			this.name = name;
+			this.keyProperty = IEOBJCallbacks.getModelProperty(callback);
+		}
+
+		public List<BakedQuad> getQuads(BlockState state, ModelData extraData, RenderType renderType)
+		{
+			T key = extraData.has(keyProperty)?extraData.get(keyProperty): callback.getDefaultKey();
+			return bakeForCallback(callback, key, textureSlots, modelBaker, modelState, name).getQuads(null);
+		}
 	}
 
 	private <T> TextureAtlasSprite getTexture(

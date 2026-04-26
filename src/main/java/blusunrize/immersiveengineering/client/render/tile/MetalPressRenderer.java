@@ -12,14 +12,11 @@ import blusunrize.immersiveengineering.api.crafting.MetalPressRecipe;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
 import blusunrize.immersiveengineering.client.ClientUtils;
+import blusunrize.immersiveengineering.client.utils.RenderUtils;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.MultiblockProcess;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.MultiblockProcessInWorld;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -80,12 +77,10 @@ public class MetalPressRenderer extends IEMultiblockRenderer<State>
 		matrixStack.translate(0, -piston*.6875f, 0);
 		matrixStack.pushPose();
 		matrixStack.translate(-0.5, -0.5, -0.5);
-		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
-		BakedModel pistonModel = PISTON.get();
-		blockRenderer.getModelRenderer().renderModel(
-				matrixStack.last(), bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, pistonModel,
-				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
+		RenderUtils.renderModelTESRFast(
+				PISTON.get().getQuads(null, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				bufferIn.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				matrixStack, combinedLightIn, combinedOverlayIn
 		);
 		matrixStack.popPose();
 

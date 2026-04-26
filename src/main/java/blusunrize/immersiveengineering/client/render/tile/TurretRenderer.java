@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.utils.client.ModelDataUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
@@ -27,9 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -60,7 +57,7 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 		BlockState state = tile.getBlockState();
 		if(state.getBlock()!=MetalDevices.TURRET_CHEM.get()&&state.getBlock()!=MetalDevices.TURRET_GUN.get())
 			return;
-		BakedModel model = MODELS_BY_BLOCK.get(BuiltInRegistries.BLOCK.getKey(state.getBlock())).get();
+		DynamicModel.BakedDynamicModel model = MODELS_BY_BLOCK.get(BuiltInRegistries.BLOCK.getKey(state.getBlock())).get();
 
 		//Outer GL Wrapping, initial translation
 		matrixStack.pushPose();
@@ -92,7 +89,7 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 	}
 
 	public static void renderModelPart(MultiBufferSource buffer, PoseStack matrix, Level world, BlockState state,
-									   BakedModel model, BlockPos pos, boolean isFirst, int light, String... parts)
+									   DynamicModel.BakedDynamicModel model, BlockPos pos, boolean isFirst, int light, String... parts)
 	{
 		pos = pos.above();
 
@@ -100,7 +97,7 @@ public class TurretRenderer extends IEBlockEntityRenderer<TurretBlockEntity<?>>
 		matrix.pushPose();
 		matrix.translate(-.5, 0, -.5);
 		List<BakedQuad> quads = model.getQuads(
-				state, null, ApiUtils.RANDOM_SOURCE,
+				state,
 				ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts)),
 				blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
 		);

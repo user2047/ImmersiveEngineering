@@ -3,6 +3,7 @@ package blusunrize.immersiveengineering.client.utils;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.client.IVertexBufferHolder;
 import blusunrize.immersiveengineering.api.utils.ResettableLazy;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -20,7 +21,25 @@ public class VertexBufferHolder implements IVertexBufferHolder
 
 	private static VertexBufferHolder forQuads(Supplier<List<BakedQuad>> quads)
 	{
-		return new VertexBufferHolder((builder, transform, light, overlay) -> {
+		final ResettableLazy<List<BakedQuad>> cachedQuads = new ResettableLazy<>(quads);
+		return new VertexBufferHolder(new Renderer()
+		{
+			@Override
+			public void render(com.mojang.blaze3d.vertex.VertexConsumer builder, PoseStack transform, int light, int overlay)
+			{
+				QuadInstance instance = new QuadInstance();
+				instance.setColor(0xffffffff);
+				instance.setLightCoords(light);
+				instance.setOverlayCoords(overlay);
+				for(BakedQuad quad : cachedQuads.get())
+					builder.putBakedQuad(transform.last(), quad, instance);
+			}
+
+			@Override
+			public void reset()
+			{
+				cachedQuads.reset();
+			}
 		});
 	}
 

@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.render.tile;
 
-import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
@@ -23,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
@@ -61,7 +59,7 @@ public class ArcFurnaceRenderer extends IEMultiblockRenderer<State>
 			renderedParts.add("active");
 
 		matrixStack.pushPose();
-		List<BakedQuad> quads = ELECTRODES.get().getQuads(null, null, ApiUtils.RANDOM_SOURCE, ModelDataUtils.single(
+		List<BakedQuad> quads = ELECTRODES.get().getQuads(null, ModelDataUtils.single(
 				DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(renderedParts)
 		), blusunrize.immersiveengineering.client.utils.RenderTypeCompat.cutout());
 		matrixStack.pushPose();

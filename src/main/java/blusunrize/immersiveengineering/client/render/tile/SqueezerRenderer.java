@@ -10,15 +10,11 @@ package blusunrize.immersiveengineering.client.render.tile;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockOrientation;
-import blusunrize.immersiveengineering.client.ClientUtils;
+import blusunrize.immersiveengineering.client.utils.RenderUtils;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.SqueezerLogic.State;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.resources.model.BakedModel;
 import net.neoforged.neoforge.model.data.ModelData;
 
 public class SqueezerRenderer extends IEMultiblockRenderer<State>
@@ -28,8 +24,6 @@ public class SqueezerRenderer extends IEMultiblockRenderer<State>
 
 	public void render(IMultiblockContext<State> ctx, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
 	{
-		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
-		BakedModel model = PISTON.get();
 		final MultiblockOrientation orientation = ctx.getLevel().getOrientation();
 
 		matrixStack.pushPose();
@@ -45,10 +39,9 @@ public class SqueezerRenderer extends IEMultiblockRenderer<State>
 
 		matrixStack.translate(-.5, -.5, -.5);
 		rotateForFacing(matrixStack, orientation.front());
-		blockRenderer.getModelRenderer().renderModel(
-				matrixStack.last(), buffer, null, model,
-				1, 1, 1,
-				combinedLightIn, combinedOverlayIn, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
+		RenderUtils.renderModelTESRFast(
+				PISTON.get().getQuads(null, ModelData.EMPTY, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				buffer, matrixStack, combinedLightIn, combinedOverlayIn
 		);
 
 		matrixStack.popPose();

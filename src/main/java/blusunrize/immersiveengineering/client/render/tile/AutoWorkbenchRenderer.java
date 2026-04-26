@@ -17,17 +17,14 @@ import blusunrize.immersiveengineering.api.utils.client.ModelDataUtils;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.render.tile.BlueprintRenderer.BlueprintLines;
+import blusunrize.immersiveengineering.client.utils.RenderUtils;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.AutoWorkbenchLogic;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.AutoWorkbenchLogic.State;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.MultiblockProcess;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.process.MultiblockProcessInWorld;
 import blusunrize.immersiveengineering.common.register.IEMultiblockLogic;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
@@ -57,8 +54,7 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 			int combinedOverlayIn
 	)
 	{
-		final BlockRenderDispatcher blockRenderer = ClientUtils.getBlockRenderer();
-		BakedModel model = DYNAMIC.get();
+		DynamicModel.BakedDynamicModel model = DYNAMIC.get();
 		final State state = ctx.getState();
 
 		//Item Displacement
@@ -176,11 +172,11 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 		matrixStack.pushPose();
 		ItemStack blueprintStack = state.inventory.getStackInSlot(AutoWorkbenchLogic.BLUEPRINT_SLOT);
 		if(!blueprintStack.isEmpty())
-			renderModelPart(matrixStack, blockRenderer, bufferIn, model, combinedLightIn, combinedOverlayIn, "blueprint");
+			renderModelPart(matrixStack, bufferIn, model, combinedLightIn, combinedOverlayIn, "blueprint");
 
 
 		matrixStack.translate(0, lift, 0);
-		renderModelPart(matrixStack, blockRenderer, bufferIn, model, combinedLightIn, combinedOverlayIn, "lift");
+		renderModelPart(matrixStack, bufferIn, model, combinedLightIn, combinedOverlayIn, "lift");
 		matrixStack.translate(0, -lift, 0);
 
 		float tx = 0;
@@ -188,7 +184,7 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 		matrixStack.pushPose();
 		matrixStack.translate(tx, 0, tz);
 		matrixStack.mulPose(new Quaternionf().rotateXYZ(0, drill, 0));
-		renderModelPart(matrixStack, blockRenderer, bufferIn, model, combinedLightIn, combinedOverlayIn, "drill");
+		renderModelPart(matrixStack, bufferIn, model, combinedLightIn, combinedOverlayIn, "drill");
 		matrixStack.popPose();
 
 		tx = 0;
@@ -196,11 +192,11 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 		matrixStack.pushPose();
 		matrixStack.translate(tx, -.21875, tz);
 		matrixStack.mulPose(new Quaternionf().rotateXYZ(press*Mth.HALF_PI, 0, 0));
-		renderModelPart(matrixStack, blockRenderer, bufferIn, model, combinedLightIn, combinedOverlayIn, "press");
+		renderModelPart(matrixStack, bufferIn, model, combinedLightIn, combinedOverlayIn, "press");
 		matrixStack.popPose();
 
 		matrixStack.translate(0, liftPress, 0);
-		renderModelPart(matrixStack, blockRenderer, bufferIn, model, combinedLightIn, combinedOverlayIn, "pressLift");
+		renderModelPart(matrixStack, bufferIn, model, combinedLightIn, combinedOverlayIn, "pressLift");
 
 		matrixStack.popPose();
 
@@ -298,18 +294,18 @@ public class AutoWorkbenchRenderer extends IEMultiblockRenderer<State>
 	}
 
 	public static void renderModelPart(
-			PoseStack matrix, final BlockRenderDispatcher blockRenderer, MultiBufferSource buffers,
-			BakedModel model, int light, int overlay, String parts
+			PoseStack matrix, MultiBufferSource buffers,
+			DynamicModel.BakedDynamicModel model, int light, int overlay, String parts
 	)
 	{
 		matrix.pushPose();
 		matrix.translate(-0.5, -0.5, -0.5);
 		ModelData data = ModelDataUtils.single(DynamicSubmodelCallbacks.getProperty(), VisibilityList.show(parts));
 
-		blockRenderer.getModelRenderer().renderModel(
-				matrix.last(), buffers.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()), null, model,
-				1, 1, 1,
-				light, overlay, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()
+		RenderUtils.renderModelTESRFast(
+				model.getQuads(null, data, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				buffers.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.solid()),
+				matrix, light, overlay
 		);
 		matrix.popPose();
 	}
