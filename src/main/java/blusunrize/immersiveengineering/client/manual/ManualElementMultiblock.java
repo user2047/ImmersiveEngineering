@@ -12,17 +12,17 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks.MultiblockManualData;
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler.IMultiblock;
-import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
-import blusunrize.immersiveengineering.client.utils.IERenderTypes;
-import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.util.fakeworld.TemplateWorld;
 import blusunrize.lib.manual.ManualInstance;
 import blusunrize.lib.manual.ManualUtils;
 import blusunrize.lib.manual.SpecialManualElements;
 import blusunrize.lib.manual.gui.GuiButtonManualNavigation;
 import blusunrize.lib.manual.gui.ManualScreen;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Transformation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -32,11 +32,14 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockStateModelSet;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -44,14 +47,18 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.CardinalLighting;
+import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
-import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fc;
 import org.joml.Quaternionf;
@@ -67,6 +74,7 @@ import static blusunrize.immersiveengineering.api.client.TextUtils.applyFormat;
 public class ManualElementMultiblock extends SpecialManualElements
 {
 	private static final int RENDER_WIDTH = 160;
+	private static final int FULL_BRIGHT_LIGHT = 0xf000f0;
 
 	private final IMultiblock multiblock;
 	private final MultiblockManualData renderProperties;
@@ -86,6 +94,7 @@ public class ManualElementMultiblock extends SpecialManualElements
 
 	private long lastStep = -1;
 	private long lastPrintedErrorTimeMs = -1;
+	private final List<BlockStateModelPart> reusableModelParts = new ArrayList<>();
 
 	public ManualElementMultiblock(ManualInstance manual, IMultiblock multiblock)
 	{
@@ -219,7 +228,7 @@ public class ManualElementMultiblock extends SpecialManualElements
 						this, guiPose, 0, 0, RENDER_WIDTH, Math.max(1, yOffTotal), 1,
 						graphics.peekScissorStack()
 				));
-			} catch(Exception e)
+			} catch(Exception|LinkageError e)
 			{
 				printRenderException(e);
 			}
@@ -273,7 +282,10 @@ public class ManualElementMultiblock extends SpecialManualElements
 			transform.pushPose();
 			transform.translate(-width/2f, 0, 0);
 
-			final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
+			Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
+			BlockStateModelSet blockModels = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+			BlockAndTintGetter previewWorld = new MultiblockPreviewWorld(structureWorld, level);
+			QuadInstance quadInstance = new QuadInstance();
 
 			transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
 			transform.scale(scale, -scale, 1);
@@ -286,9 +298,6 @@ public class ManualElementMultiblock extends SpecialManualElements
 				renderProperties.renderFormedStructure(transform, bufferSource);
 			else
 			{
-				TransformingVertexBuilder translucentFullbright = new TransformingVertexBuilder(
-						bufferSource, IERenderTypes.TRANSLUCENT_FULLBRIGHT
-				);
 				for(int h = 0; h < structureHeight; h++)
 					for(int l = 0; l < structureLength; l++)
 						for(int w = 0; w < structureWidth; w++)
@@ -297,38 +306,62 @@ public class ManualElementMultiblock extends SpecialManualElements
 							BlockState state = structureWorld.getBlockState(pos);
 							if(!state.isAir())
 							{
-								transform.pushPose();
-								transform.translate(l, h, w);
 								int overlay;
 								if(pos.equals(multiblock.getTriggerOffset()))
 									overlay = OverlayTexture.pack(0, true);
 								else
 									overlay = OverlayTexture.NO_OVERLAY;
-								translucentFullbright.setDefaultOverlay(overlay);
-								ModelData modelData = ModelData.EMPTY;
-								BlockEntity te = structureWorld.getBlockEntity(pos);
-								if(te!=null)
-									modelData = te.getModelData();
-								final BakedModel model = blockRender.getBlockModel(state);
-								blockRender.getModelRenderer().tesselateBlock(
-										structureWorld, model, state, pos, transform,
-										translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
-										overlay, modelData, null
-								);
-								transform.popPose();
+								if(state.getRenderShape()==RenderShape.MODEL)
+								{
+									BlockStateModel model = blockModels.get(state);
+									model.collectParts(
+											previewWorld, pos, state, RandomSource.create(state.getSeed(pos)), reusableModelParts
+									);
+									quadInstance.setOverlayCoords(overlay);
+									quadInstance.setLightCoords(FULL_BRIGHT_LIGHT);
+									transform.pushPose();
+									transform.translate(l, h, w);
+									for(BlockStateModelPart part : reusableModelParts)
+										renderModelPart(part, transform, bufferSource, quadInstance);
+									transform.popPose();
+									reusableModelParts.clear();
+								}
 							}
 						}
 			}
 			transform.popPose();
-		} catch(Exception e)
+		} catch(Exception|LinkageError e)
 		{
 			printRenderException(e);
 			while(lastEntryBeforeTry!=transform.last())
 				transform.popPose();
+			reusableModelParts.clear();
 		}
 	}
 
-	private void printRenderException(Exception e)
+	private static void renderModelPart(
+			BlockStateModelPart part, PoseStack transform, MultiBufferSource.BufferSource bufferSource,
+			QuadInstance quadInstance
+	)
+	{
+		for(Direction direction : Direction.values())
+			renderQuads(part.getQuads(direction), transform, bufferSource, quadInstance);
+		renderQuads(part.getQuads(null), transform, bufferSource, quadInstance);
+	}
+
+	private static void renderQuads(
+			List<net.minecraft.client.resources.model.geometry.BakedQuad> quads, PoseStack transform,
+			MultiBufferSource.BufferSource bufferSource, QuadInstance quadInstance
+	)
+	{
+		for(net.minecraft.client.resources.model.geometry.BakedQuad quad : quads)
+		{
+			VertexConsumer consumer = bufferSource.getBuffer(quad.materialInfo().itemRenderType());
+			consumer.putBakedQuad(transform.last(), quad, quadInstance);
+		}
+	}
+
+	private void printRenderException(Throwable e)
 	{
 		final long now = System.currentTimeMillis();
 		if(now > lastPrintedErrorTimeMs+1000)
@@ -401,6 +434,49 @@ public class ManualElementMultiblock extends SpecialManualElements
 			int right = (int)Math.ceil(Math.max(Math.max(x00, x10), Math.max(x01, x11)));
 			int bottom = (int)Math.ceil(Math.max(Math.max(y00, y10), Math.max(y01, y11)));
 			return PictureInPictureRenderState.getBounds(left, top, right, bottom, scissorArea);
+		}
+	}
+
+	private record MultiblockPreviewWorld(TemplateWorld structureWorld, ClientLevel clientLevel) implements BlockAndTintGetter
+	{
+		public CardinalLighting cardinalLighting()
+		{
+			return clientLevel.cardinalLighting();
+		}
+
+		public int getBlockTint(BlockPos pos, ColorResolver colorResolver)
+		{
+			return clientLevel.getBlockTint(pos, colorResolver);
+		}
+
+		public BlockEntity getBlockEntity(BlockPos pos)
+		{
+			return structureWorld.getBlockEntity(pos);
+		}
+
+		public BlockState getBlockState(BlockPos pos)
+		{
+			return structureWorld.getBlockState(pos);
+		}
+
+		public FluidState getFluidState(BlockPos pos)
+		{
+			return structureWorld.getFluidState(pos);
+		}
+
+		public LevelLightEngine getLightEngine()
+		{
+			return structureWorld.getLightEngine();
+		}
+
+		public int getHeight()
+		{
+			return structureWorld.getHeight();
+		}
+
+		public int getMinY()
+		{
+			return structureWorld.getMinY();
 		}
 	}
 

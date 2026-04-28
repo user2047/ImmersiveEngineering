@@ -25,9 +25,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import malte0811.modelsplitter.model.UVCoords;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
@@ -83,6 +83,21 @@ public class ConnectionRenderer implements ResourceManagerReloadListener
 			BlockPos sectionOrigin, SectionRenderingContext context, List<ConnectionSegments> segments
 	)
 	{
+		final VertexConsumer out = context.getOrCreateChunkBuffer(ChunkSectionLayer.CUTOUT);
+		final BlockAndTintGetter region = context.getRegion();
+		final PoseStack transform = new PoseStack();
+		for(ConnectionSegments segment : segments)
+		{
+			final BlockPos connectionOrigin = segment.connection().getEndA().position();
+			transform.pushPose();
+			transform.translate(
+					connectionOrigin.getX()-sectionOrigin.getX(),
+					connectionOrigin.getY()-sectionOrigin.getY(),
+					connectionOrigin.getZ()-sectionOrigin.getZ()
+			);
+			renderSegments(out, segment, region, transform);
+			transform.popPose();
+		}
 	}
 
 	public static void renderSegments(
@@ -153,7 +168,7 @@ public class ConnectionRenderer implements ResourceManagerReloadListener
 
 	private static int getLight(Connection connection, Vec3i point, BlockAndTintGetter level)
 	{
-		return 0;
+		return LevelRenderer.getLightCoords(level, connection.getEndA().position().offset(point));
 	}
 
 	//TODO move somewhere else
@@ -186,7 +201,7 @@ public class ConnectionRenderer implements ResourceManagerReloadListener
 				(float)point.x, (float)point.y, (float)point.z,
 				(float)uv.u(), (float)uv.v(),
 				getByte(color, 16)/255f, getByte(color, 8)/255f, getByte(color, 0)/255f,
-				(float)normal.x, (float)normal.y, (float)normal.y,
+				(float)normal.x, (float)normal.y, (float)normal.z,
 				lightForStart
 		);
 	}

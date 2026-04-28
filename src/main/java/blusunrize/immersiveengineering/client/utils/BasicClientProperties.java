@@ -19,7 +19,6 @@ import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -37,6 +36,7 @@ import java.util.function.Supplier;
 public class BasicClientProperties implements MultiblockManualData
 {
 	private static final Map<Identifier, DynamicModel> MODELS = new HashMap<>();
+	private static final int FULL_BRIGHT_LIGHT = 0xf000f0;
 
 	private final IETemplateMultiblock multiblock;
 	@Nullable
@@ -106,7 +106,7 @@ public class BasicClientProperties implements MultiblockManualData
 		List<BakedQuad> nullQuads = model.get().getNullQuads();
 		VertexConsumer buffer = bufferSource.getBuffer(IERenderTypes.TRANSLUCENT_FULLBRIGHT);
 		RenderUtils.renderModelTESRFast(
-				nullQuads, buffer, transform, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
+				nullQuads, buffer, transform, FULL_BRIGHT_LIGHT, OverlayTexture.NO_OVERLAY
 		);
 		transform.popPose();
 	}

@@ -280,8 +280,9 @@ public class ItemModels extends TRSRItemModelProvider
 
 		addItemModels(
 				"tool_", mcLoc("item/handheld"), Tools.HAMMER, Tools.WIRECUTTER, Tools.SCREWDRIVER,
-				Tools.MANUAL, Tools.STEEL_PICK, Tools.STEEL_SHOVEL, Tools.STEEL_AXE, Tools.STEEL_HOE, Tools.STEEL_SWORD
+				Tools.STEEL_PICK, Tools.STEEL_SHOVEL, Tools.STEEL_AXE, Tools.STEEL_HOE, Tools.STEEL_SWORD
 		);
+		addItemModel("tool_manual", Tools.MANUAL);
 		addItemModels("", Tools.SURVEY_TOOLS);
 		addItemModels("", Tools.GLIDER);
 		addItemModels("", IEItems.Misc.WIRE_COILS.values().toArray(new ItemLike[0]));
