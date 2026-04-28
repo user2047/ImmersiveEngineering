@@ -93,6 +93,6 @@ public class RedstoneStateCellScreen extends ClientBlockEntityScreen<RedstoneSta
 			}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 }

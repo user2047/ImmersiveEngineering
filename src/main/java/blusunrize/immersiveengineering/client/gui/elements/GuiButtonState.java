@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
 import java.util.HashMap;
@@ -109,6 +110,7 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 		RenderSystem.blendFuncSeparate(770, 771, 1, 0);
 		RenderSystem.blendFunc(770, 771);
 		graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED,
 				texture.get(this.states[state.getAsInt()]).get(this.isHovered), getX(), getY(), width, height
 		);
 		if(!getMessage().getString().isEmpty())

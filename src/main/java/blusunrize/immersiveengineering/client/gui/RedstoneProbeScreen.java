@@ -90,6 +90,6 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 			}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 }

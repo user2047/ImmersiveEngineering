@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.client.gui;
 import blusunrize.immersiveengineering.client.gui.elements.GuiReactiveList;
 import blusunrize.immersiveengineering.client.gui.info.EnergyInfoArea;
 import blusunrize.immersiveengineering.client.gui.info.InfoArea;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.gui.ChunkLoaderMenu;
 import blusunrize.immersiveengineering.common.gui.ChunkLoaderMenu.NearbyBlockEntity;
 import com.google.common.collect.ImmutableList;
@@ -96,7 +97,7 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 		{
 			final int height = area.getHeight();
 			int stored = (int)(height*(refreshTimer.get()/(float)(60*20)));
-			graphics.blit(TEXTURE,
+			GuiHelper.blit(graphics, TEXTURE,
 					area.getX(), area.getY()+(height-stored),
 					176, 75+(height-stored),
 					area.getWidth(), stored

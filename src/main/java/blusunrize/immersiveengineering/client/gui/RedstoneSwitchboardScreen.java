@@ -12,16 +12,16 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonBoolean;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.blocks.metal.RedstoneSwitchboardBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.RedstoneSwitchboardBlockEntity.SwitchboardSetting;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -29,7 +29,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -162,12 +161,12 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 		super.renderBackground(graphics, mouseX, mouseY, partialTicks);
-		graphics.blit(TEXTURE, guiLeft, guiTop, 0, 0, xSize, ySize);
+		GuiHelper.blit(graphics, TEXTURE, guiLeft, guiTop, 0, 0, xSize, ySize);
 
 		if(this.clickedInput!=null)
 		{
 			// input plug
-			graphics.blitSprite(PLUG, guiLeft+7+clickedInput.getId()*14, guiTop+31, 16, 16);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PLUG, guiLeft+7+clickedInput.getId()*14, guiTop+31, 16, 16);
 			CableQuad.build(this, clickedInput, new Vec2(mouseX, mouseY)).draw(graphics);
 		}
 	}
@@ -203,7 +202,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
 
@@ -238,18 +237,23 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 
 		public void draw(GuiGraphicsExtractor graphics)
 		{
-			Matrix4f matrix4f = graphics.pose().last().pose();
-			// Quad
-			VertexConsumer vertexconsumer = graphics.bufferSource().getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.debugQuads());
-			vertexconsumer.addVertex(matrix4f, topLeft.x, topLeft.y, 1)
-					.setColor(colour);
-			vertexconsumer.addVertex(matrix4f, botLeft.x, botLeft.y, 1)
-					.setColor(colour);
-			vertexconsumer.addVertex(matrix4f, botRight.x, botRight.y, 1)
-					.setColor(colour);
-			vertexconsumer.addVertex(matrix4f, topRight.x, topRight.y, 1)
-					.setColor(colour);
-			graphics.flush();
+			float fromX = (topLeft.x+topRight.x)/2;
+			float fromY = (topLeft.y+topRight.y)/2;
+			float toX = (botLeft.x+botRight.x)/2;
+			float toY = (botLeft.y+botRight.y)/2;
+			float midX = (fromX+toX)/2;
+			drawSegment(graphics, fromX, fromY, midX, fromY);
+			drawSegment(graphics, midX, fromY, midX, toY);
+			drawSegment(graphics, midX, toY, toX, toY);
+		}
+
+		private void drawSegment(GuiGraphicsExtractor graphics, float x0, float y0, float x1, float y1)
+		{
+			int minX = (int)Math.floor(Math.min(x0, x1))-2;
+			int maxX = (int)Math.ceil(Math.max(x0, x1))+3;
+			int minY = (int)Math.floor(Math.min(y0, y1))-2;
+			int maxY = (int)Math.ceil(Math.max(y0, y1))+3;
+			graphics.fill(minX, minY, maxX, maxY, colour);
 		}
 	}
 
@@ -270,9 +274,9 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		protected void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 		{
 			// input plug
-			graphics.blitSprite(PLUG, getX()+7+setting.input().getId()*14, getY()+31, 16, 16);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PLUG, getX()+7+setting.input().getId()*14, getY()+31, 16, 16);
 			// output plug
-			graphics.blitSprite(PLUG, getX()+7+setting.output().getId()*14, getY()+87, 16, 16);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PLUG, getX()+7+setting.output().getId()*14, getY()+87, 16, 16);
 			// cable
 			this.quad.draw(graphics);
 		}

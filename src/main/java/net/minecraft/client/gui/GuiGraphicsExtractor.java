@@ -121,6 +121,10 @@ public class GuiGraphicsExtractor
 	{
 	}
 
+	public void blitSprite(RenderPipeline pipeline, TextureAtlasSprite sprite, int x, int y, int width, int height, int color)
+	{
+	}
+
 	public void renderItem(ItemStack stack, int x, int y)
 	{
 		item(stack, x, y);
@@ -216,6 +220,14 @@ public class GuiGraphicsExtractor
 	}
 
 	public void setTooltipForNextFrame(Font font, List<Component> lines, Optional<TooltipComponent> image, int x, int y)
+	{
+	}
+
+	public void setTooltipForNextFrame(Font font, List<Component> lines, Optional<TooltipComponent> image, int x, int y, Identifier style)
+	{
+	}
+
+	public void setTooltipForNextFrame(Font font, List<? extends FormattedCharSequence> lines, int x, int y)
 	{
 	}
 }

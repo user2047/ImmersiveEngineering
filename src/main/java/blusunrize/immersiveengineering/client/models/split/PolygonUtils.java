@@ -12,8 +12,7 @@ package blusunrize.immersiveengineering.client.models.split;
 import blusunrize.immersiveengineering.api.utils.Color4;
 import blusunrize.immersiveengineering.client.utils.BakedQuadBuilder;
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.client.model.geom.builders.UVPair;
 import com.mojang.math.Transformation;
 import malte0811.modelsplitter.math.Vec3d;
 import malte0811.modelsplitter.model.Polygon;
@@ -22,9 +21,11 @@ import malte0811.modelsplitter.model.Vertex;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 import java.util.ArrayList;
@@ -32,49 +33,33 @@ import java.util.List;
 
 public class PolygonUtils
 {
-	private static int getOffset(VertexFormatElement element)
-	{
-		int offset = 0;
-		for(VertexFormatElement e : DefaultVertexFormat.BLOCK.getElements())
-			if(e==element)
-				return offset/4;
-			else
-				offset += e.byteSize();
-		throw new IllegalStateException("Did not find vertex element with type "+element.type().name());
-	}
-
 	public static Polygon<ExtraQuadData> toPolygon(BakedQuad quad)
 	{
 		List<Vertex> vertices = new ArrayList<>(4);
-		final int posOffset = getOffset(VertexFormatElement.POSITION);
-		final int uvOffset = getOffset(VertexFormatElement.UV);
-		final int normalOffset = getOffset(VertexFormatElement.NORMAL);
-		final int colorOffset = getOffset(VertexFormatElement.COLOR);
-		final int color = quad.getVertices()[colorOffset];
+		Vector3fc normal = quad.direction().getUnitVec3f();
 		for(int v = 0; v < 4; ++v)
 		{
-			final int baseOffset = v*DefaultVertexFormat.BLOCK.getVertexSize()/4;
-			int packedNormal = quad.getVertices()[normalOffset+baseOffset];
 			final Vec3d normalVec = new Vec3d(
-					(byte)(packedNormal),
-					(byte)(packedNormal >> 8),
-					(byte)(packedNormal >> 16)
+					normal.x(),
+					normal.y(),
+					normal.z()
 			).normalize();
+			long packedUv = quad.packedUV(v);
 			final UVCoords uv = new UVCoords(
-					Float.intBitsToFloat(quad.getVertices()[uvOffset+baseOffset]),
-					Float.intBitsToFloat(quad.getVertices()[uvOffset+baseOffset+1])
+					UVPair.unpackU(packedUv),
+					UVPair.unpackV(packedUv)
 			);
+			Vector3fc position = quad.position(v);
 			final Vec3d pos = new Vec3d(
-					Float.intBitsToFloat(quad.getVertices()[baseOffset+posOffset]),
-					Float.intBitsToFloat(quad.getVertices()[baseOffset+posOffset+1]),
-					Float.intBitsToFloat(quad.getVertices()[baseOffset+posOffset+2])
+					position.x(),
+					position.y(),
+					position.z()
 			);
 			vertices.add(new Vertex(pos, normalVec, uv));
-			Preconditions.checkState(quad.getVertices()[baseOffset+colorOffset]==color, "All vertices in a quad must have the same color, otherwise we need changes in BMS");
 		}
 		return new Polygon<>(vertices, new ExtraQuadData(
-				quad.getSprite(),
-				new Color4((color&255)/255f, ((color>>8)&255)/255f, ((color>>16)&255)/255f, (color>>24)/255f))
+				quad.materialInfo(),
+				Color4.WHITE)
 		);
 	}
 
@@ -106,13 +91,19 @@ public class PolygonUtils
 			quadBuilder.putVertexData(
 					new Vec3(pos.x(), pos.y(), pos.z()),
 					new Vec3(normal),
-					absoluteUV?v.uv().u(): data.sprite().getU((float)v.uv().u()),
-					absoluteUV?v.uv().v(): data.sprite().getV((float)(1-v.uv().v())),
+					absoluteUV?v.uv().u(): data.materialInfo().sprite().getU((float)v.uv().u()),
+					absoluteUV?v.uv().v(): data.materialInfo().sprite().getV((float)(1-v.uv().v())),
 					new float[]{data.color.r(), data.color.g(), data.color.b(), data.color.a()},
 					1
 			);
 		}
-		return quadBuilder.bake(-1, Direction.getNearest((int)Math.signum(normal.x()), (int)Math.signum(normal.y()), (int)Math.signum(normal.z()), Direction.NORTH), data.sprite(), shade);
+		return quadBuilder.bake(
+				Direction.getNearest(
+						(int)Math.signum(normal.x()), (int)Math.signum(normal.y()), (int)Math.signum(normal.z()),
+						Direction.NORTH
+				),
+				data.materialInfo()
+		);
 	}
 
 	private static float[] toArray(Vec3d vec, int length)
@@ -125,7 +116,19 @@ public class PolygonUtils
 		return ret;
 	}
 
-	public record ExtraQuadData(TextureAtlasSprite sprite, Color4 color)
+	public record ExtraQuadData(BakedQuad.MaterialInfo materialInfo, Color4 color)
 	{
+		public ExtraQuadData(TextureAtlasSprite sprite, Color4 color, boolean shade)
+		{
+			this(
+					BakedQuad.MaterialInfo.of(new Material.Baked(sprite, false), sprite.transparency(), -1, shade, 0),
+					color
+			);
+		}
+
+		public ExtraQuadData(TextureAtlasSprite sprite, Color4 color)
+		{
+			this(sprite, color, true);
+		}
 	}
 }

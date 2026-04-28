@@ -9,6 +9,7 @@
 package blusunrize.immersiveengineering.api.multiblocks.blocks.registry;
 
 import blusunrize.immersiveengineering.api.IEProperties;
+import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistration;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockBEHelperDummy;
@@ -23,12 +24,14 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -77,11 +80,13 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		helper.handleUpdateTag(tag, provider);
+		requestModelDataUpdate();
 	}
 
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		helper.onDataPacket(pkt.getTag(), provider);
+		requestModelDataUpdate();
 	}
 
 	@Nullable
@@ -105,15 +110,31 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	}
 
 	@Override
-	public BlockPos getModelOffset(BlockState state, Vec3i size)
+	public ModelData getModelData()
+	{
+		return ModelData.of(Model.SUBMODEL_OFFSET, getModelOffset(getBlockState(), getMultiblockSize()));
+	}
+
+	@Override
+	public BlockPos getModelOffset(BlockState state, @Nullable Vec3i size)
 	{
 		BlockPos mirroredPosInMB = helper.getPositionInMB();
 		if(helper.getMultiblock().mirrorable()&&state.getValue(IEProperties.MIRRORED))
+		{
+			if(size==null)
+				size = getMultiblockSize();
 			mirroredPosInMB = new BlockPos(
 					size.getX()-mirroredPosInMB.getX()-1,
 					mirroredPosInMB.getY(),
 					mirroredPosInMB.getZ()
 			);
+		}
 		return mirroredPosInMB.subtract(helper.getMultiblock().masterPosInMB());
+	}
+
+	private Vec3i getMultiblockSize()
+	{
+		Level level = getLevel();
+		return helper.getMultiblock().size(level);
 	}
 }

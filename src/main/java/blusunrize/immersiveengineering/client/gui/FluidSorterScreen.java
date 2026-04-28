@@ -14,16 +14,13 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.SorterScreen.FilterBit;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonBoolean;
 import blusunrize.immersiveengineering.client.gui.info.FluidInfoArea;
-import blusunrize.immersiveengineering.client.utils.IERenderTypes;
 import blusunrize.immersiveengineering.common.gui.FluidSorterMenu;
 import blusunrize.immersiveengineering.common.util.Utils;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Direction;
@@ -79,8 +76,6 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
-		MultiBufferSource.BufferSource buffers = graphics.bufferSource();
-		VertexConsumer builder = buffers.getBuffer(IERenderTypes.getGui(TextureAtlas.LOCATION_BLOCKS));
 		for(int side = 0; side < 6; side++)
 			for(int i = 0; i < 8; i++)
 			{
@@ -90,12 +85,11 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 					IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(filter.getFluid());
 					TextureAtlasSprite sprite = ClientUtils.getSprite(props.getStillTexture(filter));
 					Rect2i slotArea = getSlotArea(side, i);
-					int col = props.getTintColor(filter);
-					graphics.blit(
+					graphics.blitSprite(
+							RenderPipelines.GUI_TEXTURED, sprite,
 							slotArea.getX(), slotArea.getY(),
-							0, slotArea.getWidth(), slotArea.getHeight(),
-							sprite,
-							(col>>16&255)/255.0f, (col>>8&255)/255.0f, (col&255)/255.0f, 1
+							slotArea.getWidth(), slotArea.getHeight(),
+							props.getTintColor(filter)
 					);
 				}
 			}

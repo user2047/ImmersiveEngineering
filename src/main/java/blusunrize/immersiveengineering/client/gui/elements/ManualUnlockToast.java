@@ -10,6 +10,7 @@ package blusunrize.immersiveengineering.client.gui.elements;
 
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.Lib;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import blusunrize.lib.manual.ManualEntry;
 import net.minecraft.client.gui.Font;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -59,16 +61,17 @@ public class ManualUnlockToast implements Toast
 
 	public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long timeSinceLastVisible)
 	{
-		graphics.pose().pushPose();
+		Object pose = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(pose);
 		originalToast.ifPresent(toast -> {
 			toast.extractRenderState(graphics, font, timeSinceLastVisible);
-			graphics.pose().translate(0, toast.height(), 0);
+			GuiGraphicsPose.translate(pose, 0, toast.height(), 0);
 		});
-		graphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), 48);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, 0, 0, this.width(), 48);
 		graphics.renderFakeItem(Tools.MANUAL.asItem().getDefaultInstance(), 7, 8);
 		if(timeSinceLastVisible < 1000)
 		{
-			graphics.pose().scale(2,2,2);
+			GuiGraphicsPose.scale(pose, 2, 2, 2);
 			graphics.text(font, EUREKA, 16, 4, 0xfff78034, false);
 		}
 		else
@@ -80,6 +83,6 @@ public class ManualUnlockToast implements Toast
 				graphics.text(font, entries.get(iEntry).getTitle(), 32, 18, 0xff555555, false);
 			}
 		}
-		graphics.pose().popPose();
+		GuiGraphicsPose.pop(pose);
 	}
 }

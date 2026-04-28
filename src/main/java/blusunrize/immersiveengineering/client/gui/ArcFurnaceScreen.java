@@ -17,6 +17,7 @@ import blusunrize.immersiveengineering.common.gui.ArcFurnaceMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -66,6 +67,7 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 			int slot = process.slot();
 			int h = process.processStep();
 			graphics.blitSprite(
+					RenderPipelines.GUI_TEXTURED,
 					PROGRESS, 3, 16, 0, 16-h, leftPos+27+slot%3*21, topPos+34+slot/3*18+(16-h), 2, h
 			);
 		}

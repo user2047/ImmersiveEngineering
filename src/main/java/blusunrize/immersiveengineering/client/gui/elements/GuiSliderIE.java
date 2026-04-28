@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.gui.widget.ExtendedSlider;
@@ -54,11 +55,11 @@ public class GuiSliderIE extends ExtendedSlider
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(770, 771, 1, 0);
 		RenderSystem.blendFunc(770, 771);
-		graphics.blitSprite(LEFT, getX(), getY(), 4, height);
-		graphics.blitSprite(RIGHT, getX()+width-4, getY(), 4, height);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, LEFT, getX(), getY(), 4, height);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, RIGHT, getX()+width-4, getY(), 4, height);
 		for(int i = 0; i < width-8; i += 2)
-			graphics.blitSprite(CENTER, getX()+4+i, getY(), 2, height);
-		graphics.blitSprite(BUTTON, this.getX()+2+(int)(value*(float)(this.width-2))-2, this.getY(), 4, 8);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER, getX()+4+i, getY(), 2, height);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON, this.getX()+2+(int)(value*(float)(this.width-2))-2, this.getY(), 4, 8);
 		int color = 0xe0e0e0;
 		if(!this.active)
 			color = 0xa0a0a0;

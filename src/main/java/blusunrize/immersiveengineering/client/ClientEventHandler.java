@@ -267,6 +267,8 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 	@SubscribeEvent
 	public void onRenderOverlayPre(RenderGuiLayerEvent.Pre event)
 	{
+		if(event.getName().equals(VanillaGuiLayers.SUBTITLE_OVERLAY))
+			ItemOverlayUtils.handleTooltipOffset(event.getGuiGraphics(), true);
 	}
 
 	@SubscribeEvent

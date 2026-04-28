@@ -144,11 +144,14 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 						);
 					});
 				}
-				GuiGraphicsExtractor.renderTooltip(this.font, tagTooltip, item.getTooltipImage(), item, x, y);
+				GuiGraphicsExtractor.setTooltipForNextFrame(
+						this.font, tagTooltip, item.getTooltipImage(), x, y,
+						item.get(DataComponents.TOOLTIP_STYLE)
+				);
 				return;
 			}
 		}
-		super.renderTooltip(GuiGraphicsExtractor, x, y);
+		super.extractTooltip(GuiGraphicsExtractor, x, y);
 	}
 
 

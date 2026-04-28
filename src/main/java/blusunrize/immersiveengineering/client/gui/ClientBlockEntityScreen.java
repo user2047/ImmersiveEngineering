@@ -36,12 +36,23 @@ public abstract class ClientBlockEntityScreen<T extends BlockEntity> extends Scr
 
 	protected abstract void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick);
 
+	@Override
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mx, int my, float partial)
+	{
+		renderBackground(graphics, mx, my, partial);
+		super.extractRenderState(graphics, mx, my, partial);
+		drawGuiContainerForegroundLayer(graphics, mx, my, partial);
+	}
+
 	public void render(GuiGraphicsExtractor graphics, int mx, int my, float partial)
 	{
-		// Background & widgets
-		super.render(graphics, mx, my, partial);
-		// Additional foreground elements
+		renderBackground(graphics, mx, my, partial);
+		super.extractRenderState(graphics, mx, my, partial);
 		drawGuiContainerForegroundLayer(graphics, mx, my, partial);
+	}
+
+	public void renderBackground(GuiGraphicsExtractor graphics, int mx, int my, float partial)
+	{
 	}
 
 	public boolean isPauseScreen()

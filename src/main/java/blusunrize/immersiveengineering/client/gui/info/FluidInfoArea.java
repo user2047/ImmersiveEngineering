@@ -14,8 +14,8 @@ import blusunrize.immersiveengineering.common.fluids.PotionFluid;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -90,21 +90,21 @@ public class FluidInfoArea extends InfoArea
 	{
 		FluidStack fluid = tank.getFluid();
 		float capacity = tank.getCapacity();
-		graphics.pose().pushPose();
-		MultiBufferSource.BufferSource buffer = graphics.bufferSource();
 		if(!fluid.isEmpty())
 		{
 			int fluidHeight = (int)(area.getHeight()*(fluid.getAmount()/capacity));
-			// TODO broken?
-			GuiHelper.drawRepeatedFluidSpriteGui(buffer, graphics.pose(), fluid, area.getX(), area.getY()+area.getHeight()-fluidHeight, area.getWidth(), fluidHeight);
+			GuiHelper.drawFluidSpriteGui(
+					graphics, fluid,
+					area.getX(), area.getY()+area.getHeight()-fluidHeight,
+					area.getWidth(), fluidHeight
+			);
 		}
 		int xOff = (area.getWidth()-overlayWidth)/2;
 		int yOff = (area.getHeight()-overlayHeight)/2;
 		graphics.blitSprite(
-				overlayTexture,
+				RenderPipelines.GUI_TEXTURED, overlayTexture,
 				area.getX()+xOff, area.getY()+yOff,
 				overlayWidth, overlayHeight
 		);
-		graphics.pose().popPose();
 	}
 }

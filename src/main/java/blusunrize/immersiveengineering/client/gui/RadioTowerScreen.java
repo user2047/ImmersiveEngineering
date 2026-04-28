@@ -15,6 +15,7 @@ import blusunrize.immersiveengineering.client.gui.elements.ITooltipWidget;
 import blusunrize.immersiveengineering.client.gui.info.EnergyInfoArea;
 import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.client.gui.info.TooltipArea;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.RadioTowerLogic;
 import blusunrize.immersiveengineering.common.gui.RadioTowerMenu;
 import blusunrize.immersiveengineering.common.gui.sync.GetterAndSetter;
@@ -29,6 +30,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -221,13 +223,13 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			RenderSystem.enableDepthTest();
 
 			// render background
-			graphics.blit(RadioTowerScreen.TEXTURE, getX(), getY(), 0, 150, width, height);
+			GuiHelper.blit(graphics, RadioTowerScreen.TEXTURE, getX(), getY(), 0, 150, width, height);
 			if(this.isHoveredOrFocused())
-				graphics.blit(RadioTowerScreen.TEXTURE, getX(), getY(), 0, 150+height, width, 32);
+				GuiHelper.blit(graphics, RadioTowerScreen.TEXTURE, getX(), getY(), 0, 150+height, width, 32);
 
 			// render cursor
 			int cursorU = isHoveredOrFocused()?243: 240;
-			graphics.blit(RadioTowerScreen.TEXTURE, getInnerX()+valueToOffset(value.get())-1, getY()+19, cursorU, 0, 3, 6);
+			GuiHelper.blit(graphics, RadioTowerScreen.TEXTURE, getInnerX()+valueToOffset(value.get())-1, getY()+19, cursorU, 0, 3, 6);
 			graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 			for(int step = minValue; step <= maxValue; step += 64)
 			{
@@ -286,7 +288,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 			var rgb = Utils.vec4fFromDye(this.color);
 			graphics.setColor(rgb.x, rgb.y, rgb.z, 1);
-			graphics.blitSprite(SAVE_COLOR, getX(), getY(), width, height);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SAVE_COLOR, getX(), getY(), width, height);
 			graphics.setColor(1, 1, 1, 1);
 		}
 

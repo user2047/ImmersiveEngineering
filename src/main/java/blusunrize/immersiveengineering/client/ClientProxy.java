@@ -195,6 +195,12 @@ public class ClientProxy extends CommonProxy
 		initDynamicModels();
 	}
 
+	@SubscribeEvent
+	public static void registerBlockStateModels(RegisterBlockStateModels ev)
+	{
+		ev.registerModel(IEApi.ieLoc("basic_split"), PortedBasicSplitModel.BLOCK_STATE_CODEC);
+	}
+
 	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)
 	{
 		ev.register(id, EMPTY_PORT_MODEL_LOADER);

@@ -11,10 +11,12 @@ package blusunrize.immersiveengineering.client.gui.elements;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -130,11 +132,11 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 			RenderSystem.blendFuncSeparate(770, 771, 1, 0);
 			RenderSystem.blendFunc(770, 771);
 
-			graphics.blitSprite(BUTTON, getX()+width-WIDTH_BUTTON, getY(), WIDTH_BUTTON, HEIGHT_BASE);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON, getX()+width-WIDTH_BUTTON, getY(), WIDTH_BUTTON, HEIGHT_BASE);
 			if(!this.opened)
 			{
 				// basic field
-				graphics.blitSprite(TEXTURE, getX(), getY(), width-WIDTH_BUTTON, height);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), width-WIDTH_BUTTON, height);
 
 				// text
 				Component text = getMessage();
@@ -144,11 +146,12 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 			}
 			else
 			{
-				graphics.pose().pushPose();
-				graphics.pose().translate(0, 0, 2);
+				Object pose = GuiGraphicsPose.pose(graphics);
+				GuiGraphicsPose.push(pose);
+				GuiGraphicsPose.translate(pose, 0, 0, 2);
 				// background
 
-				graphics.blitSprite(TEXTURE, getX(), getY(), width-WIDTH_BUTTON, openedHeight+OPEN_OFFSET+2);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), width-WIDTH_BUTTON, openedHeight+OPEN_OFFSET+2);
 
 				// text
 				for(int j = 0; j < states.length; j++)
@@ -159,7 +162,7 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 					boolean highlighted = isHovered&&getHighlightedIndex(mouseX, mouseY)==j;
 					graphics.text(fontrenderer, text, textX, textY, getTextColor(highlighted), false);
 				}
-				graphics.pose().popPose();
+				GuiGraphicsPose.pop(pose);
 			}
 
 		}

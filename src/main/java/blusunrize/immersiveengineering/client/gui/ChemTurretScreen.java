@@ -14,6 +14,7 @@ import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTex
 import blusunrize.immersiveengineering.client.gui.info.FluidInfoArea;
 import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.client.gui.info.TooltipArea;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.gui.TurretMenu.ChemTurretMenu;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
@@ -57,7 +58,7 @@ public class ChemTurretScreen extends TurretScreen<ChemTurretMenu>
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
 		super.drawContainerBackgroundPre(graphics, f, mx, my);
-		graphics.blit(TEXTURE, leftPos+132, topPos+14, 176, 0, 20, 51);
+		GuiHelper.blit(graphics, TEXTURE, leftPos+132, topPos+14, 176, 0, 20, 51);
 	}
 
 	protected void addCustomButtons()

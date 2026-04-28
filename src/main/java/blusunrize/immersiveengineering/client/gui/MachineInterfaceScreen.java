@@ -15,6 +15,7 @@ import blusunrize.immersiveengineering.api.tool.MachineInterfaceHandler.MachineC
 import blusunrize.immersiveengineering.client.gui.elements.*;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.blocks.wooden.MachineInterfaceBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.wooden.MachineInterfaceBlockEntity.MachineInterfaceConfig;
 import blusunrize.immersiveengineering.common.network.MessageBlockEntitySync;
@@ -230,14 +231,14 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
 		if(availableChecks==null)
-			graphics.blit(TEXTURE, guiLeft, guiTop+(ySize-74)/2, 112, 80, xSize, 106);
+			GuiHelper.blit(graphics, TEXTURE, guiLeft, guiTop+(ySize-74)/2, 112, 80, xSize, 106);
 		else
 		{
-			graphics.blit(TEXTURE, guiLeft, guiTop, 0, 0, GUI_WIDTH_LEFT, ySize);
+			GuiHelper.blit(graphics, TEXTURE, guiLeft, guiTop, 0, 0, GUI_WIDTH_LEFT, ySize);
 			int offset = GUI_WIDTH_LEFT;
 			for(int i = 0; i < middleSegmentCount; i++, offset += GUI_WIDTH_MIDDLE)
-				graphics.blit(TEXTURE, guiLeft+offset, guiTop, GUI_WIDTH_LEFT+2, 0, GUI_WIDTH_MIDDLE, ySize);
-			graphics.blit(TEXTURE, guiLeft+offset, guiTop, GUI_WIDTH_LEFT+GUI_WIDTH_MIDDLE+4, 0, GUI_WIDTH_RIGHT, ySize);
+				GuiHelper.blit(graphics, TEXTURE, guiLeft+offset, guiTop, GUI_WIDTH_LEFT+2, 0, GUI_WIDTH_MIDDLE, ySize);
+			GuiHelper.blit(graphics, TEXTURE, guiLeft+offset, guiTop, GUI_WIDTH_LEFT+GUI_WIDTH_MIDDLE+4, 0, GUI_WIDTH_RIGHT, ySize);
 		}
 	}
 
@@ -268,7 +269,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 				ttw.gatherTooltip(mouseX, mouseY, tooltip);
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
 	private static class GuiButtonDelete extends GuiButtonIE implements ITooltipWidget

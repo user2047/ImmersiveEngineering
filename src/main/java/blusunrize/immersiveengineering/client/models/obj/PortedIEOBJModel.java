@@ -135,10 +135,13 @@ public record PortedIEOBJModel(
 				Color4 color = callback.getRenderColor(key, groupName, material.name(), (ShaderCase)null, Color4.WHITE);
 				Polygon<OBJMaterial> remappedFace = coordinateRemapper.remapCoord(face);
 				if(remappedFace!=null)
+				{
+					boolean shade = callback.shadeQuads(key, material.name());
 					quads.add(PolygonUtils.toBakedQuad(
-							remappedFace.getPoints(), new ExtraQuadData(sprite, color), transform,
-							callback.useAbsoluteUV(key, material.name()), callback.shadeQuads(key, material.name())
+							remappedFace.getPoints(), new ExtraQuadData(sprite, color, shade), transform,
+							callback.useAbsoluteUV(key, material.name()), shade
 					));
+				}
 			}
 		}
 

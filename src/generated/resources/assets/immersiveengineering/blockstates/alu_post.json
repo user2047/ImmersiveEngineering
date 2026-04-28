@@ -1,6 +1,7 @@
 {
   "variants": {
     "": {
+      "type": "immersiveengineering:basic_split",
       "model": "immersiveengineering:block/alu_post_split"
     }
   }

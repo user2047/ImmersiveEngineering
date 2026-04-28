@@ -106,7 +106,7 @@ public class RedstoneConnectorScreen extends ClientBlockEntityScreen<ConnectorRe
 			}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)

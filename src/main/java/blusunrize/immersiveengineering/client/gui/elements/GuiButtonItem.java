@@ -12,6 +12,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +40,7 @@ public class GuiButtonItem extends Button
 			this.isHovered = mouseX >= this.getX()&&mouseY >= this.getY()&&mouseX < this.getX()+this.width&&mouseY < this.getY()+this.height;
 			RenderSystem.defaultBlendFunc();
 			graphics.blitSprite(
-					state?TRUE_TEXTURE: FALSE_TEXTURE, getX(), getY(), width, height
+					RenderPipelines.GUI_TEXTURED, state?TRUE_TEXTURE: FALSE_TEXTURE, getX(), getY(), width, height
 			);
 			//TODO this.mouseDragged(mc, mouseX, mouseY);
 

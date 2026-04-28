@@ -12,6 +12,7 @@ import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks.MultiblockManualData;
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler.IMultiblock;
 import blusunrize.immersiveengineering.client.ClientUtils;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import blusunrize.immersiveengineering.client.utils.IERenderTypes;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.util.fakeworld.TemplateWorld;
@@ -187,93 +188,96 @@ public class ManualElementMultiblock extends SpecialManualElements
 	{
 		if(multiblock.getStructure(level)!=null)
 		{
-			PoseStack transform = graphics.pose();
-			PoseStack.Pose lastEntryBeforeTry = transform.last();
-			try
+			Object pose = GuiGraphicsPose.pose(graphics);
+			if(pose instanceof PoseStack transform)
 			{
-				long currentTime = System.currentTimeMillis();
-				if(lastStep < 0)
-					lastStep = currentTime;
-				else if(canTick&&currentTime-lastStep > 500)
+				PoseStack.Pose lastEntryBeforeTry = transform.last();
+				try
 				{
-					renderInfo.step();
-					lastStep = currentTime;
-				}
+					long currentTime = System.currentTimeMillis();
+					if(lastStep < 0)
+						lastStep = currentTime;
+					else if(canTick&&currentTime-lastStep > 500)
+					{
+						renderInfo.step();
+						lastStep = currentTime;
+					}
 
-				int structureLength = renderInfo.structureLength;
-				int structureWidth = renderInfo.structureWidth;
-				int structureHeight = renderInfo.structureHeight;
+					int structureLength = renderInfo.structureLength;
+					int structureWidth = renderInfo.structureWidth;
+					int structureHeight = renderInfo.structureHeight;
 
-				transform.pushPose();
-
-				final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
-
-				transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
-				transform.scale(scale, -scale, 1);
-				transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
-
-				transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
-
-				if(showCompleted&&renderProperties.canRenderFormedStructure())
-				{
 					transform.pushPose();
-					renderProperties.renderFormedStructure(transform, graphics.bufferSource());
-					transform.popPose();
-				}
-				else
-				{
-					TransformingVertexBuilder translucentFullbright = new TransformingVertexBuilder(
-							graphics.bufferSource(), IERenderTypes.TRANSLUCENT_FULLBRIGHT
-					);
-					for(int h = 0; h < structureHeight; h++)
-						for(int l = 0; l < structureLength; l++)
-							for(int w = 0; w < structureWidth; w++)
-							{
-								BlockPos pos = new BlockPos(l, h, w);
-								BlockState state = structureWorld.getBlockState(pos);
-								if(!state.isAir())
+
+					final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
+
+					transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
+					transform.scale(scale, -scale, 1);
+					transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
+
+					transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
+
+					if(showCompleted&&renderProperties.canRenderFormedStructure())
+					{
+						transform.pushPose();
+						renderProperties.renderFormedStructure(transform, graphics.bufferSource());
+						transform.popPose();
+					}
+					else
+					{
+						TransformingVertexBuilder translucentFullbright = new TransformingVertexBuilder(
+								graphics.bufferSource(), IERenderTypes.TRANSLUCENT_FULLBRIGHT
+						);
+						for(int h = 0; h < structureHeight; h++)
+							for(int l = 0; l < structureLength; l++)
+								for(int w = 0; w < structureWidth; w++)
 								{
-									transform.pushPose();
-									transform.translate(l, h, w);
-									int overlay;
-									if(pos.equals(multiblock.getTriggerOffset()))
-										overlay = OverlayTexture.pack(0, true);
-									else
-										overlay = OverlayTexture.NO_OVERLAY;
-									translucentFullbright.setDefaultOverlay(overlay);
-									ModelData modelData = ModelData.EMPTY;
-									BlockEntity te = structureWorld.getBlockEntity(pos);
-									if(te!=null)
-										modelData = te.getModelData();
-									final BakedModel model = blockRender.getBlockModel(state);
-									blockRender.getModelRenderer().tesselateBlock(
-											structureWorld, model, state, pos, transform,
-											translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
-											overlay, modelData, null
-									);
-									transform.popPose();
+									BlockPos pos = new BlockPos(l, h, w);
+									BlockState state = structureWorld.getBlockState(pos);
+									if(!state.isAir())
+									{
+										transform.pushPose();
+										transform.translate(l, h, w);
+										int overlay;
+										if(pos.equals(multiblock.getTriggerOffset()))
+											overlay = OverlayTexture.pack(0, true);
+										else
+											overlay = OverlayTexture.NO_OVERLAY;
+										translucentFullbright.setDefaultOverlay(overlay);
+										ModelData modelData = ModelData.EMPTY;
+										BlockEntity te = structureWorld.getBlockEntity(pos);
+										if(te!=null)
+											modelData = te.getModelData();
+										final BakedModel model = blockRender.getBlockModel(state);
+										blockRender.getModelRenderer().tesselateBlock(
+												structureWorld, model, state, pos, transform,
+												translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
+												overlay, modelData, null
+										);
+										transform.popPose();
+									}
 								}
-							}
-				}
-				transform.popPose();
-				transform.popPose();
-			} catch(Exception e)
-			{
-				final long now = System.currentTimeMillis();
-				if(now > lastPrintedErrorTimeMs+1000)
-				{
-					e.printStackTrace();
-					lastPrintedErrorTimeMs = now;
-				}
-				while(lastEntryBeforeTry!=transform.last())
+					}
 					transform.popPose();
+					transform.popPose();
+				} catch(Exception e)
+				{
+					final long now = System.currentTimeMillis();
+					if(now > lastPrintedErrorTimeMs+1000)
+					{
+						e.printStackTrace();
+						lastPrintedErrorTimeMs = now;
+					}
+					while(lastEntryBeforeTry!=transform.last())
+						transform.popPose();
+				}
 			}
 
 			if(componentTooltip!=null)
 			{
 				graphics.text(manual.fontRenderer(), "?", 116, yOffTotal/2-4, manual.getTextColour());
 				if(mouseX >= 116&&mouseX < 122&&mouseY >= yOffTotal/2-4&&mouseY < yOffTotal/2+4)
-					graphics.renderTooltip(manual.fontRenderer(), Language.getInstance().getVisualOrder(
+					graphics.setTooltipForNextFrame(manual.fontRenderer(), Language.getInstance().getVisualOrder(
 							Collections.unmodifiableList(componentTooltip)
 					), mouseX, mouseY);
 			}

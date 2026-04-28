@@ -42,6 +42,11 @@ public class BakedQuadBuilder
 		BakedQuad.MaterialInfo material = BakedQuad.MaterialInfo.of(
 				new Material.Baked(texture, false), texture.transparency(), tint, shade, 0
 		);
+		return bake(side, material);
+	}
+
+	public BakedQuad bake(Direction side, BakedQuad.MaterialInfo material)
+	{
 		return new BakedQuad(
 				positions[0], positions[1], positions[2], positions[3],
 				uvs[0], uvs[1], uvs[2], uvs[3],

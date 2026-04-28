@@ -20,6 +20,7 @@ import blusunrize.immersiveengineering.common.gui.MixerMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -73,15 +74,14 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)
 	{
-		graphics.pose().pushPose();
 		for(final var slotProgress : menu.progress.get())
 		{
 			final int slot = slotProgress.slot();
 			final int h = (int)Math.max(1, slotProgress.progress()*16);
 			graphics.blitSprite(
+					RenderPipelines.GUI_TEXTURED,
 					PROGRESS, 3, 16, 0, 16-h, leftPos+24+slot%2*21, topPos+7+slot/2*18+(16-h), 2, h
 			);
 		}
-		graphics.pose().popPose();
 	}
 }

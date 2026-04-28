@@ -18,6 +18,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -35,17 +36,26 @@ public class GuiHelper
 {
 	public static void drawColouredRect(GuiGraphicsExtractor graphics, int x, int y, int w, int h, DyeColor dyeColor)
 	{
-		Matrix4f mat = graphics.pose().last().pose();
-		var bufferbuilder = graphics.bufferSource().getBuffer(IERenderTypes.TRANSLUCENT_POSITION_COLOR);
 		var color = Utils.vec4fFromDye(dyeColor);
-		bufferbuilder.addVertex(mat, x, y+h, 0).setColor(color.x, color.y, color.z, 1);
-		bufferbuilder.addVertex(mat, x+w, y+h, 0).setColor(color.x, color.y, color.z, 1);
-		bufferbuilder.addVertex(mat, x+w, y, 0).setColor(color.x, color.y, color.z, 1);
-		bufferbuilder.addVertex(mat, x, y, 0).setColor(color.x, color.y, color.z, 1);
+		int argb = 0xff000000
+				|((int)(color.x*255)&255)<<16
+				|((int)(color.y*255)&255)<<8
+				|((int)(color.z*255)&255);
+		graphics.fill(x, y, x+w, y+h, argb);
 	}
 
 	public static void colouredBlit(GuiGraphicsExtractor graphics, Identifier atlasLocation, int x, int y, int blitOffset, int width, int height, int u, int v, float red, float green, float blue, float alpha)
 	{
+		int color = ((int)(alpha*255)&255)<<24
+				|((int)(red*255)&255)<<16
+				|((int)(green*255)&255)<<8
+				|((int)(blue*255)&255);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, atlasLocation, x, y, u, v, width, height, 256, 256, color);
+	}
+
+	public static void blit(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, int u, int v, int width, int height)
+	{
+		graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, 256, 256);
 	}
 
 
@@ -78,6 +88,15 @@ public class GuiHelper
 	{
 		VertexConsumer builder = buffer.getBuffer(blusunrize.immersiveengineering.client.utils.RenderTypeCompat.TRANSLUCENT);
 		drawRepeatedFluidSprite(builder, transform, fluid, x, y, w, h);
+	}
+
+	public static void drawFluidSpriteGui(GuiGraphicsExtractor graphics, FluidStack fluid, int x, int y, int w, int h)
+	{
+		if(w <= 0||h <= 0||fluid.isEmpty())
+			return;
+		IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluid.getFluid());
+		TextureAtlasSprite sprite = getSprite(props.getStillTexture(fluid));
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h, props.getTintColor(fluid));
 	}
 
 	public static void drawRepeatedFluidSprite(VertexConsumer builder, PoseStack transform, FluidStack fluid, float x, float y, float w, float h)

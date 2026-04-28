@@ -9,6 +9,7 @@
 package blusunrize.immersiveengineering.client.gui;
 
 import blusunrize.immersiveengineering.api.Lib;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.gui.ToolboxMenu;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -43,6 +44,6 @@ public class ToolboxScreen extends IEContainerScreen<ToolboxMenu>
 
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
-		graphics.blit(background, leftPos, topPos-17, 0, 0, 176, imageHeight+17);
+		GuiHelper.blit(graphics, background, leftPos, topPos-17, 0, 0, 176, imageHeight+17);
 	}
 }

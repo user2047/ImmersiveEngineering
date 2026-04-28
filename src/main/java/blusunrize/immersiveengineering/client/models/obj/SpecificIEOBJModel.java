@@ -277,10 +277,13 @@ public class SpecificIEOBJModel<T> implements BakedModel
 
 			Polygon<OBJMaterial> remappedFace = coordinateRemapper.remapCoord(face);
 			if(remappedFace!=null)
+			{
+				boolean shade = callback.shadeQuads(key, mat.name());
 				out.accept(PolygonUtils.toBakedQuad(
-						remappedFace.getPoints(), new ExtraQuadData(texture, colorTint), transform,
-						callback.useAbsoluteUV(key, mat.name()), callback.shadeQuads(key, mat.name())
+						remappedFace.getPoints(), new ExtraQuadData(texture, colorTint, shade), transform,
+						callback.useAbsoluteUV(key, mat.name()), shade
 				));
+			}
 		}
 	}
 

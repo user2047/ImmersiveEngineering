@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -72,9 +73,40 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		graphics.text(this.font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Lib.COLOUR_I_ImmersiveOrange, true);
 	}
 
+	@Override
+	public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+		drawBackgroundTexture(graphics);
+		drawContainerBackgroundPre(graphics, partialTicks, mouseX, mouseY);
+		for(InfoArea area : infoAreas.get())
+			area.draw(graphics);
+		super.extractContents(graphics, mouseX, mouseY, partialTicks);
+	}
+
+	@Override
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
+	{
+		renderLabels(graphics, mouseX, mouseY);
+	}
+
+	@Override
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
+	{
+		List<Component> tooltip = getAdditionalTooltip(mouseX, mouseY);
+		if(!tooltip.isEmpty())
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
+		else
+			renderTooltip(graphics, mouseX, mouseY);
+	}
+
 	public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
-		super.render(graphics, mouseX, mouseY, partialTicks);
+		extractContents(graphics, mouseX, mouseY, partialTicks);
+		extractTooltip(graphics, mouseX, mouseY);
+	}
+
+	private List<Component> getAdditionalTooltip(int mouseX, int mouseY)
+	{
 		List<Component> tooltip = new ArrayList<>();
 		for(InfoArea area : infoAreas.get())
 			area.fillTooltip(mouseX, mouseY, tooltip);
@@ -84,10 +116,12 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 		gatherAdditionalTooltips(
 				mouseX, mouseY, tooltip::add, t -> tooltip.add(TextUtils.applyFormat(t, ChatFormatting.GRAY))
 		);
-		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
-		else
-			this.renderTooltip(graphics, mouseX, mouseY);
+		return tooltip;
+	}
+
+	protected void renderTooltip(GuiGraphicsExtractor graphics, int x, int y)
+	{
+		super.extractTooltip(graphics, x, y);
 	}
 
 	protected boolean isMouseIn(int mouseX, int mouseY, int x, int y, int w, int h)
@@ -98,7 +132,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 
 	public void fullInit()
 	{
-		super.init(minecraft, width, height);
+		this.init(width, height);
 	}
 
 	protected final void renderBg(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)
@@ -111,7 +145,7 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
-		graphics.blit(background, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
 	}
 
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y)

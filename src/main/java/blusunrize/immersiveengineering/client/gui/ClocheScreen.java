@@ -16,6 +16,7 @@ import blusunrize.immersiveengineering.common.gui.ClocheMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -52,7 +53,7 @@ public class ClocheScreen extends IEContainerScreen<ClocheMenu>
 		if(process > 0)
 		{
 			int w = (int)Math.max(1, process*12);
-			graphics.blitSprite(PROGRESS, 12, 12, 0, 0, leftPos+101, topPos+36, w, 12);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, PROGRESS, 12, 12, 0, 0, leftPos+101, topPos+36, w, 12);
 		}
 	}
 }

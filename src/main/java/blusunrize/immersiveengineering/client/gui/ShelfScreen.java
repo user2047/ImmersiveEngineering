@@ -94,13 +94,13 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 					);
 				}
 				else
-					graphics.blit(
-							background, leftPos+x, topPos+y,
+					GuiHelper.blit(
+							graphics, background, leftPos+x, topPos+y,
 							0, INV_SEGMENT+variant.screenVOffset(), COLUMN_WIDTH, CRATE_SEGMENT
 					);
 			}
 		// Player Inventory
-		graphics.blit(background, leftPos+playerInvX, topPos+playerInvY, 0, 0, COLUMN_WIDTH, INV_SEGMENT);
+		GuiHelper.blit(graphics, background, leftPos+playerInvX, topPos+playerInvY, 0, 0, COLUMN_WIDTH, INV_SEGMENT);
 	}
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)

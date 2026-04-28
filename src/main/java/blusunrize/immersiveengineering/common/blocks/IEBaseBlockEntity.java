@@ -8,6 +8,8 @@
 
 package blusunrize.immersiveengineering.common.blocks;
 
+import blusunrize.immersiveengineering.api.IEProperties.Model;
+import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
 import blusunrize.immersiveengineering.api.energy.WrappingEnergyStorage;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
 import blusunrize.immersiveengineering.api.utils.SafeChunkUtils;
@@ -34,6 +36,7 @@ import net.minecraft.world.ticks.ScheduledTick;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,11 +86,15 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		this.readCustomNBT(pkt.getTag(), true, provider);
+		if(this instanceof IModelOffsetProvider)
+			requestModelDataUpdate();
 	}
 
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		this.readCustomNBT(tag, true, provider);
+		if(this instanceof IModelOffsetProvider)
+			requestModelDataUpdate();
 	}
 
 	public CompoundTag getUpdateTag(Provider provider)
@@ -95,6 +102,21 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		CompoundTag nbt = super.getUpdateTag(provider);
 		writeCustomNBT(nbt, true, provider);
 		return nbt;
+	}
+
+	@Override
+	public ModelData getModelData()
+	{
+		ModelData modelData = super.getModelData();
+		if(this instanceof IModelOffsetProvider offsetProvider)
+		{
+			BlockPos offset = offsetProvider.getModelOffset(getBlockState(), null);
+			if(offset!=null)
+				modelData = modelData.derive()
+						.with(Model.SUBMODEL_OFFSET, offset)
+						.build();
+		}
+		return modelData;
 	}
 
 	public void receiveMessageFromClient(CompoundTag message)

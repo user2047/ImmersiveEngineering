@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -37,7 +38,7 @@ public class GuiButtonIE extends Button
 		Minecraft mc = Minecraft.getInstance();
 		Font fontrenderer = mc.font;
 		this.isHovered = isPressable(mouseX, mouseY);
-		graphics.blitSprite(texture.get(this.isHovered), getX(), getY(), width, height);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture.get(this.isHovered), getX(), getY(), width, height);
 		if(!getMessage().getString().isEmpty())
 		{
 			int txtCol = 0xE0E0E0;

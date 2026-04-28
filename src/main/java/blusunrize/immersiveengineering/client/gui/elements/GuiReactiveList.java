@@ -11,9 +11,11 @@ package blusunrize.immersiveengineering.client.gui.elements;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -119,21 +121,23 @@ public class GuiReactiveList<E> extends Button
 		int strWidth = width-padding[2]-padding[3]-(needsSlider?6: 0);
 		if(needsSlider)
 		{
-			graphics.blitSprite(SCROLL_TOP, getX()+width-6, getY(), 6, 4);
-			graphics.blitSprite(SCROLL_BOTTOM, getX()+width-6, getY()+height-4, 6, 4);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_TOP, getX()+width-6, getY(), 6, 4);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_BOTTOM, getX()+width-6, getY()+height-4, 6, 4);
 			for(int i = 0; i < height-8; i += 2)
-				graphics.blitSprite(SCROLL_CENTER, getX()+width-6, getY()+4+i, 6, 2);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_CENTER, getX()+width-6, getY()+4+i, 6, 2);
 
 			int sliderSize = Math.max(6, height-maxOffset*fr.lineHeight);
 			float silderShift = (height-sliderSize)/(float)maxOffset*offset;
 
-			graphics.blitSprite(SCROLL_BUTTON_TOP, getX()+width-5, (int)(getY()+silderShift+1), 4, 2);
-			graphics.blitSprite(SCROLL_BUTTON_BOTTOM, getX()+width-5, (int)(getY()+silderShift+sliderSize-4), 4, 3);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_BUTTON_TOP, getX()+width-5, (int)(getY()+silderShift+1), 4, 2);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_BUTTON_BOTTOM, getX()+width-5, (int)(getY()+silderShift+sliderSize-4), 4, 3);
 			for(int i = 0; i < sliderSize-7; i++)
-				graphics.blitSprite(SCROLL_BUTTON_CENTER, getX()+width-5, (int)(getY()+silderShift+3+i), 4, 1);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_BUTTON_CENTER, getX()+width-5, (int)(getY()+silderShift+3+i), 4, 1);
 		}
 
-		graphics.pose().scale(textScale, textScale, 1);
+		Object pose = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(pose);
+		GuiGraphicsPose.scale(pose, textScale, textScale, 1);
 		this.isHovered = active&&mx >= getX()&&mx < getX()+width&&my >= getY()&&my < getY()+height;
 		boolean hasTarget = false;
 		for(int i = 0; i < Math.min(perPage, entries.size()); i++)
@@ -168,11 +172,11 @@ public class GuiReactiveList<E> extends Button
 			}
 			float tx = ((getX()+padding[2])/textScale);
 			float ty = ((getY()+padding[0]+(fr.lineHeight*i))/textScale);
-			graphics.pose().translate(tx, ty, 0);
+			GuiGraphicsPose.translate(pose, tx, ty, 0);
 			graphics.text(fr, s, 0, 0, col, textShadow);
-			graphics.pose().translate(-tx, -ty, 0);
+			GuiGraphicsPose.translate(pose, -tx, -ty, 0);
 		}
-		graphics.pose().scale(1/textScale, 1/textScale, 1);
+		GuiGraphicsPose.pop(pose);
 		if(!hasTarget)
 		{
 			targetEntry = -1;

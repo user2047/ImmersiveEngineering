@@ -10,6 +10,7 @@
 package blusunrize.immersiveengineering.client.render.tooltip;
 
 import blusunrize.immersiveengineering.client.gui.RevolverScreen;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -28,10 +29,11 @@ public record RevolverClientTooltip(RevolverServerTooltip data) implements Clien
 
 	public void renderImage(Font font, int mouseX, int mouseY, GuiGraphicsExtractor graphics)
 	{
-		graphics.pose().pushPose();
-		graphics.pose().translate(mouseX, mouseY, 0);
-		graphics.pose().scale(.5f, .5f, 1);
+		Object pose = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(pose);
+		GuiGraphicsPose.translate(pose, mouseX, mouseY, 0);
+		GuiGraphicsPose.scale(pose, .5f, .5f, 1);
 		RevolverScreen.drawExternalGUI(data.bullets(), data.bulletCount(), graphics);
-		graphics.pose().popPose();
+		GuiGraphicsPose.pop(pose);
 	}
 }

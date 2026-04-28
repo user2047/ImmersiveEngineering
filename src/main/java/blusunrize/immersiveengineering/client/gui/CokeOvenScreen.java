@@ -15,6 +15,7 @@ import blusunrize.immersiveengineering.common.gui.CokeOvenMenu;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,7 +51,7 @@ public class CokeOvenScreen extends IEContainerScreen<CokeOvenMenu>
 		if(processMax > 0&&process > 0)
 		{
 			int h = (int)(12*(process/(float)processMax));
-			graphics.blitSprite(FLAME, 9, 12, 0, 12-h, leftPos+59, topPos+37+12-h, 9, h);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FLAME, 9, 12, 0, 12-h, leftPos+59, topPos+37+12-h, 9, h);
 		}
 	}
 }

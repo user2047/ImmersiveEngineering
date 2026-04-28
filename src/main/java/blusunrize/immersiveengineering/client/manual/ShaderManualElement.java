@@ -15,6 +15,7 @@ import blusunrize.immersiveengineering.api.shader.CapabilityShader;
 import blusunrize.immersiveengineering.api.shader.CapabilityShader.ShaderWrapper;
 import blusunrize.immersiveengineering.api.shader.ShaderRegistry;
 import blusunrize.immersiveengineering.api.utils.IngredientUtils;
+import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
 import blusunrize.immersiveengineering.common.network.MessageShaderManual;
 import blusunrize.immersiveengineering.common.network.MessageShaderManual.MessageType;
 import blusunrize.lib.manual.ManualInstance;
@@ -24,7 +25,6 @@ import blusunrize.lib.manual.gui.GuiButtonManual;
 import blusunrize.lib.manual.gui.GuiButtonManualNavigation;
 import blusunrize.lib.manual.gui.ManualScreen;
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -167,17 +167,17 @@ public class ShaderManualElement extends SpecialManualElements
 	public void render(GuiGraphicsExtractor graphics, ManualScreen gui, int x, int y, int mouseX, int mouseY)
 	{
 		float scale = 2;
-		PoseStack transform = graphics.pose();
-		transform.pushPose();
-		transform.translate(x, y, 0);
-		transform.scale(scale, scale, scale);
+		Object transform = GuiGraphicsPose.pose(graphics);
+		GuiGraphicsPose.push(transform);
+		GuiGraphicsPose.translate(transform, x, y, 0);
+		GuiGraphicsPose.scale(transform, scale, scale, scale);
 		boolean examples = exampleItems!=null&&exampleItems.length > 0;
 
 		ManualUtils.renderItemStack(graphics, shaderItem, (int)((10+(examples?0: 34))/scale), (int)((-8)/scale), false);
 		if(examples&&example >= 0&&example < exampleItems.length)
 			ManualUtils.renderItemStack(graphics, exampleItems[example], (int)((63)/scale), (int)((-8)/scale), false);
 
-		transform.scale(1/scale, 1/scale, 1/scale);
+		GuiGraphicsPose.scale(transform, 1/scale, 1/scale, 1/scale);
 		if(unlocked)
 			ManualUtils.renderItemStack(graphics, replicationCost.getRandomizedExampleStack(mc().player.tickCount), 102, 118, false);
 
@@ -187,7 +187,7 @@ public class ShaderManualElement extends SpecialManualElements
 		if(this.text!=null&&!this.text.getString().isEmpty())
 			drawWrappedWithTransform(graphics, this.text, 0, 38);
 
-		transform.popPose();
+		GuiGraphicsPose.pop(transform);
 	}
 
 	private void drawWrappedWithTransform(

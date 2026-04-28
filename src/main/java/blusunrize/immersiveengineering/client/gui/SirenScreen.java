@@ -85,7 +85,7 @@ public class SirenScreen extends ClientBlockEntityScreen<SirenBlockEntity>
 			}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)

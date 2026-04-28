@@ -16,8 +16,12 @@ import blusunrize.immersiveengineering.client.render.tile.BlueprintRenderer.Blue
 import blusunrize.immersiveengineering.common.blocks.wooden.ModWorkbenchBlockEntity;
 import blusunrize.immersiveengineering.common.items.EngineersBlueprintItem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -35,8 +39,15 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 {
 	private static final Map<String, IVertexBufferHolder> VBO_BY_BLUEPRINT = new HashMap<>();
 
-	public void render(ModWorkbenchBlockEntity te, float partialTicks, PoseStack transform, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn)
+	@Override
+	public void submit(
+			RenderState<ModWorkbenchBlockEntity> state, PoseStack transform, SubmitNodeCollector nodes,
+			CameraRenderState cameraState
+	)
 	{
+		ModWorkbenchBlockEntity te = state.blockEntity;
+		if(te==null)
+			return;
 		if(te.isDummy()||!te.getLevelNonnull().hasChunkAt(te.getBlockPos()))
 			return;
 
@@ -66,7 +77,7 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 						if(!recipes.isEmpty())
 						{
 							IVertexBufferHolder vbo = VBO_BY_BLUEPRINT.computeIfAbsent(category, this::buildVBO);
-							vbo.render(BlueprintRenderer.RENDER_TYPE, combinedLightIn, combinedOverlayIn, bufferIn, transform);
+							submitBlueprint(vbo, transform, nodes, state.lightCoords);
 						}
 					}
 				}
@@ -80,8 +91,7 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 				transform.mulPose(new Quaternionf().rotateY(Mth.PI).rotateX(Mth.HALF_PI));
 				transform.translate(-.875, 0, 0);
 				transform.scale(.75f, .75f, .75f);
-				ClientUtils.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
-						combinedLightIn, combinedOverlayIn, transform, bufferIn, te.getLevel(), 0);
+				submitItem(te, stack, transform, nodes, state.lightCoords);
 				transform.popPose();
 			}
 		}
@@ -108,21 +118,36 @@ public class ModWorkbenchRenderer extends IEBlockEntityRenderer<ModWorkbenchBloc
 					transform.mulPose(new Quaternionf().rotateY(Mth.PI).rotateX(Mth.HALF_PI));
 					transform.translate(dX, dZ, -.515);
 					transform.scale(.25f, .25f, .25f);
-					{
-						try
-						{
-							ClientUtils.getItemRenderer().renderStatic(stack, ItemDisplayContext.FIXED,
-									combinedLightIn, combinedOverlayIn, transform, bufferIn, te.getLevel(), 0);
-						} catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-					}
+					submitItem(te, stack, transform, nodes, state.lightCoords);
 					transform.popPose();
 				}
 			}
 		}
 		transform.popPose();
+	}
+
+	private static void submitItem(
+			ModWorkbenchBlockEntity te, ItemStack stack, PoseStack transform, SubmitNodeCollector nodes, int light
+	)
+	{
+		ItemStackRenderState itemState = new ItemStackRenderState();
+		Minecraft.getInstance().getItemModelResolver().updateForTopItem(
+				itemState, stack, ItemDisplayContext.FIXED, te.getLevel(), null, 0
+		);
+		itemState.submit(transform, nodes, light, OverlayTexture.NO_OVERLAY, 0);
+	}
+
+	private static void submitBlueprint(IVertexBufferHolder vbo, PoseStack transform, SubmitNodeCollector nodes, int light)
+	{
+		nodes.submitCustomGeometry(
+				transform,
+				BlueprintRenderer.RENDER_TYPE,
+				(pose, consumer) -> {
+					PoseStack renderPose = new PoseStack();
+					renderPose.last().set(pose);
+					vbo.render(BlueprintRenderer.RENDER_TYPE, light, OverlayTexture.NO_OVERLAY, type -> consumer, renderPose);
+				}
+		);
 	}
 
 	private IVertexBufferHolder buildVBO(String category)

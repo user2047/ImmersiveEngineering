@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.api.multiblocks.blocks.registry;
 
+import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.MultiblockRegistration;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockBEHelperMaster;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -84,11 +86,13 @@ public class MultiblockBlockEntityMaster<State extends IMultiblockState>
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		helper.handleUpdateTag(tag, provider);
+		requestModelDataUpdate();
 	}
 
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		helper.onDataPacket(pkt.getTag(), provider);
+		requestModelDataUpdate();
 	}
 
 	@Override
@@ -101,6 +105,12 @@ public class MultiblockBlockEntityMaster<State extends IMultiblockState>
 	public BlockPos getModelOffset(BlockState state, @javax.annotation.Nullable Vec3i size)
 	{
 		return BlockPos.ZERO;
+	}
+
+	@Override
+	public ModelData getModelData()
+	{
+		return ModelData.of(Model.SUBMODEL_OFFSET, BlockPos.ZERO);
 	}
 
 	@Override

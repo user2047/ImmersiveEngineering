@@ -50,6 +50,10 @@ public class Screen
 	{
 	}
 
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+	}
+
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
 	{
 	}

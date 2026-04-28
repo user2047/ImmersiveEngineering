@@ -106,7 +106,7 @@ public class RedstoneTimerScreen extends ClientBlockEntityScreen<RedstoneTimerBl
 			}
 
 		if(!tooltip.isEmpty())
-			graphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
 	}
 
 	private static class TimerSlider extends GuiSliderIE

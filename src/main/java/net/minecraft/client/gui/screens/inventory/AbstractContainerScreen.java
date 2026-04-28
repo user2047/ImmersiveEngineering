@@ -60,6 +60,18 @@ public abstract class AbstractContainerScreen<T extends AbstractContainerMenu> e
 		renderLabels(graphics, mouseX, mouseY);
 	}
 
+	public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+	}
+
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
+	{
+	}
+
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
+	{
+	}
+
 	protected void renderBg(GuiGraphicsExtractor graphics, float partialTicks, int mouseX, int mouseY)
 	{
 	}
