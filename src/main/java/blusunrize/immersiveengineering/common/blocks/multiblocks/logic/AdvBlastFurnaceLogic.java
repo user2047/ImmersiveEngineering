@@ -209,7 +209,7 @@ public class AdvBlastFurnaceLogic
 		public BlastFurnacePreheaterBlockEntity getPreheater(IMultiblockLevel level, BlockPos pos)
 		{
 			BlockEntity te = level.getBlockEntity(pos);
-			return te instanceof BlastFurnacePreheaterBlockEntity heater?heater: null;
+			return te instanceof BlastFurnacePreheaterBlockEntity heater&&!heater.isDummy()?heater: null;
 		}
 
 		public GetterAndSetter<Boolean> preheaterActive(IMultiblockLevel level, int index)

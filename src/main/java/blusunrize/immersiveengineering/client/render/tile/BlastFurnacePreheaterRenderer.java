@@ -28,6 +28,8 @@ public class BlastFurnacePreheaterRenderer extends IEBlockEntityRenderer<BlastFu
 			float partial, @Nonnull PoseStack transform, @Nonnull MultiBufferSource buffers, int light, int overlay
 	)
 	{
+		if(bEntity.isDummy())
+			return;
 		transform.pushPose();
 		transform.translate(0.5, 0.5, 0.5);
 		rotateForFacingNoCentering(transform, bEntity.getFacing());

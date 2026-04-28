@@ -97,9 +97,37 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		return dummy > 0;
 	}
 
+	@Override
+	public void onLoad()
+	{
+		super.onLoad();
+		if(dummy==0&&getBlockState().getValue(IEProperties.MULTIBLOCKSLAVE))
+			recoverDummyOffset();
+	}
+
+	private void recoverDummyOffset()
+	{
+		for(int i = 1; i <= 2; i++)
+		{
+			BlockPos masterPos = worldPosition.below(i);
+			BlockState masterState = level.getBlockState(masterPos);
+			if(masterState.is(getBlockState().getBlock())&&!masterState.getValue(IEProperties.MULTIBLOCKSLAVE)
+					&&level.getBlockEntity(masterPos) instanceof BlastFurnacePreheaterBlockEntity master)
+			{
+				dummy = i;
+				setFacing(master.getFacing());
+				setChanged();
+				markContainingBlockForUpdate(null);
+				return;
+			}
+		}
+	}
+
 	@Nullable
 	public BlastFurnacePreheaterBlockEntity master()
 	{
+		if(!isDummy())
+			return this;
 		BlockPos masterPos = getBlockPos().below(dummy);
 		BlockEntity te = Utils.getExistingTileEntity(level, masterPos);
 		return te instanceof BlastFurnacePreheaterBlockEntity heater?heater: null;
@@ -110,9 +138,14 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 		state = state.setValue(IEProperties.MULTIBLOCKSLAVE, true);
 		for(int i = 1; i <= 2; i++)
 		{
-			level.setBlockAndUpdate(worldPosition.offset(0, i, 0), state);
-			((BlastFurnacePreheaterBlockEntity)level.getBlockEntity(worldPosition.offset(0, i, 0))).dummy = i;
-			((BlastFurnacePreheaterBlockEntity)level.getBlockEntity(worldPosition.offset(0, i, 0))).setFacing(this.getFacing());
+			BlockPos dummyPos = worldPosition.above(i);
+			level.setBlockAndUpdate(dummyPos, state);
+			if(level.getBlockEntity(dummyPos) instanceof BlastFurnacePreheaterBlockEntity dummyBlock)
+			{
+				dummyBlock.dummy = i;
+				dummyBlock.setFacing(this.getFacing());
+				dummyBlock.setChanged();
+			}
 		}
 	}
 
@@ -144,7 +177,7 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 	public static void registerCapabilities(BECapabilityRegistrar<BlastFurnacePreheaterBlockEntity> registrar)
 	{
 		registrar.register(Energy.BLOCK, (be, side) -> {
-			if(side==null||(be.dummy==2&&side==Direction.UP))
+			if(side==null&&!be.isDummy()||(be.dummy==2&&side==Direction.UP))
 				return be.energyCap.get();
 			else
 				return null;
