@@ -185,7 +185,7 @@ public abstract class MultiblockRegistrationBuilder<
 		ResourceKey<Item> itemId = CURRENT_ITEM_ID.get();
 		if(itemId!=null)
 			properties.setId(itemId);
-		return properties;
+		return properties.useBlockDescriptionPrefix();
 	}
 
 	private static <T extends Item> T makeItemWithId(Identifier id, Supplier<T> makeItem)

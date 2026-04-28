@@ -45,7 +45,7 @@ public class BlockItemIE extends BlockItem
 
 	public BlockItemIE(Block b, Item.Properties props)
 	{
-		super(b, props);
+		super(b, props.useBlockDescriptionPrefix());
 	}
 
 	public BlockItemIE(Block b)

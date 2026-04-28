@@ -918,11 +918,17 @@ public final class IEBlocks
 		{
 			register.register(
 					baseName+"_sign",
-					id -> new SignItem(this.sign().get(), this.wall().get(), IEItems.defaultProperties(id).stacksTo(16))
+					id -> new SignItem(
+							this.sign().get(), this.wall().get(),
+							IEItems.defaultProperties(id).useBlockDescriptionPrefix().stacksTo(16)
+					)
 			);
 			register.register(
 					baseName+"_hanging_sign",
-					id -> new HangingSignItem(this.hanging().get(), this.wallHanging.get(), IEItems.defaultProperties(id).stacksTo(16))
+					id -> new HangingSignItem(
+							this.hanging().get(), this.wallHanging.get(),
+							IEItems.defaultProperties(id).useBlockDescriptionPrefix().stacksTo(16)
+					)
 			);
 		}
 
