@@ -5,11 +5,13 @@ import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -203,6 +205,10 @@ public class GuiGraphicsExtractor
 	{
 	}
 
+	public void centeredText(Font font, FormattedCharSequence text, int x, int y, int color)
+	{
+	}
+
 	public void renderTooltip(Font font, List<Component> lines, Optional<?> image, int x, int y)
 	{
 	}
@@ -229,5 +235,14 @@ public class GuiGraphicsExtractor
 
 	public void setTooltipForNextFrame(Font font, List<? extends FormattedCharSequence> lines, int x, int y)
 	{
+	}
+
+	public void submitPictureInPictureRenderState(PictureInPictureRenderState renderState)
+	{
+	}
+
+	public ScreenRectangle peekScissorStack()
+	{
+		return null;
 	}
 }

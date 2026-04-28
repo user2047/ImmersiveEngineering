@@ -40,7 +40,7 @@ public class GuiButtonCheckbox extends GuiButtonBoolean
 				color = Lib.COLOUR_I_ImmersiveOrange;
 			else
 				color = 0xE0E0E0;
-			graphics.drawCenteredString(Minecraft.getInstance().font, "\u2714", getX()+width/2, getY()-2, color);
+			graphics.centeredText(Minecraft.getInstance().font, "\u2714", getX()+width/2, getY()-2, color);
 		}
 	}
 }

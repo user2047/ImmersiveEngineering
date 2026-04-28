@@ -27,6 +27,6 @@ public class LogicUnitScreen extends IEContainerScreen<LogicUnitMenu>
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		for(int i = 0; i < 10; i++)
-			graphics.drawCenteredString(this.font, ""+(i+1), 52+(i%5)*18, 23+(i/5)*18, DyeColor.GRAY.getTextColor());
+			graphics.centeredText(this.font, ""+(i+1), 52+(i%5)*18, 23+(i/5)*18, DyeColor.GRAY.getTextColor());
 	}
 }

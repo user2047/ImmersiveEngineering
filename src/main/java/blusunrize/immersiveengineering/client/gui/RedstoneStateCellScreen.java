@@ -77,9 +77,9 @@ public class RedstoneStateCellScreen extends ClientBlockEntityScreen<RedstoneSta
 
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
 	{
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_set").getString(), guiLeft+20, guiTop, DyeColor.WHITE.getTextColor());
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_reset").getString(), guiLeft+156, guiTop, DyeColor.WHITE.getTextColor());
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft+88, guiTop+76, DyeColor.WHITE.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_set").getString(), guiLeft+20, guiTop, DyeColor.WHITE.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_reset").getString(), guiLeft+156, guiTop, DyeColor.WHITE.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"redstone_color_output").getString(), guiLeft+88, guiTop+76, DyeColor.WHITE.getTextColor());
 
 		ArrayList<Component> tooltip = new ArrayList<>();
 		for(int i = 0; i < colorButtonsSet.length; i++)

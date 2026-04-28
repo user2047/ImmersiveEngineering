@@ -155,7 +155,7 @@ public class ItemOverlayUtils
 			if(d > max*max)
 				col = 0xdd3333;
 		}
-		graphics.drawCenteredString(ClientUtils.font(), s, scaledWidth/2, scaledHeight-20-leftHeight(), col);
+		graphics.centeredText(ClientUtils.font(), s, scaledWidth/2, scaledHeight-20-leftHeight(), col);
 	}
 
 	private static void renderFluorescentTubeOverlay(
@@ -164,7 +164,7 @@ public class ItemOverlayUtils
 	{
 		int color = FluorescentTubeItem.getRGBInt(equipped, 1);
 		String s = I18n.get(Lib.DESC_INFO+"colour")+"#"+FontUtils.hexColorString(color);
-		graphics.drawCenteredString(
+		graphics.centeredText(
 				ClientUtils.font(), s, scaledWidth/2, scaledHeight-20-leftHeight(), FluorescentTubeItem.getRGBInt(equipped, 1)
 		);
 	}

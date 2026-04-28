@@ -223,9 +223,9 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.operator"), 76, 4, DyeColor.LIGHT_GRAY.getTextColor());
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.inputs"), 130, 8, DyeColor.LIGHT_GRAY.getTextColor());
-		graphics.drawCenteredString(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.outputs"), 130, 42, DyeColor.LIGHT_GRAY.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.operator"), 76, 4, DyeColor.LIGHT_GRAY.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.inputs"), 130, 8, DyeColor.LIGHT_GRAY.getTextColor());
+		graphics.centeredText(this.font, Component.translatable(Lib.GUI_CONFIG+"circuit_table.outputs"), 130, 42, DyeColor.LIGHT_GRAY.getTextColor());
 
 		for(int i = 0; i < SLOT_TYPES.length; i++)
 		{

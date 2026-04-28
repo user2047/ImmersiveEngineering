@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client.manual;
 
+import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks;
 import blusunrize.immersiveengineering.api.multiblocks.ClientMultiblocks.MultiblockManualData;
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler.IMultiblock;
@@ -27,8 +28,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -42,7 +47,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 import net.neoforged.neoforge.model.data.ModelData;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fc;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -52,8 +63,11 @@ import java.util.function.Predicate;
 
 import static blusunrize.immersiveengineering.api.client.TextUtils.applyFormat;
 
+@EventBusSubscriber(value = Dist.CLIENT, modid = Lib.MODID)
 public class ManualElementMultiblock extends SpecialManualElements
 {
+	private static final int RENDER_WIDTH = 160;
+
 	private final IMultiblock multiblock;
 	private final MultiblockManualData renderProperties;
 
@@ -189,90 +203,25 @@ public class ManualElementMultiblock extends SpecialManualElements
 	{
 		if(multiblock.getStructure(level)!=null)
 		{
-			Object pose = GuiGraphicsPose.pose(graphics);
-			if(pose instanceof PoseStack transform)
+			try
 			{
-				PoseStack.Pose lastEntryBeforeTry = transform.last();
-				try
+				long currentTime = System.currentTimeMillis();
+				if(lastStep < 0)
+					lastStep = currentTime;
+				else if(canTick&&currentTime-lastStep > 500)
 				{
-					long currentTime = System.currentTimeMillis();
-					if(lastStep < 0)
-						lastStep = currentTime;
-					else if(canTick&&currentTime-lastStep > 500)
-					{
-						renderInfo.step();
-						lastStep = currentTime;
-					}
-
-					int structureLength = renderInfo.structureLength;
-					int structureWidth = renderInfo.structureWidth;
-					int structureHeight = renderInfo.structureHeight;
-
-					transform.pushPose();
-
-					final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
-
-					transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
-					transform.scale(scale, -scale, 1);
-					applyAdditionalTransform(transform);
-					transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
-
-					transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
-
-					if(showCompleted&&renderProperties.canRenderFormedStructure())
-					{
-						transform.pushPose();
-						renderProperties.renderFormedStructure(transform, graphics.bufferSource());
-						transform.popPose();
-					}
-					else
-					{
-						TransformingVertexBuilder translucentFullbright = new TransformingVertexBuilder(
-								graphics.bufferSource(), IERenderTypes.TRANSLUCENT_FULLBRIGHT
-						);
-						for(int h = 0; h < structureHeight; h++)
-							for(int l = 0; l < structureLength; l++)
-								for(int w = 0; w < structureWidth; w++)
-								{
-									BlockPos pos = new BlockPos(l, h, w);
-									BlockState state = structureWorld.getBlockState(pos);
-									if(!state.isAir())
-									{
-										transform.pushPose();
-										transform.translate(l, h, w);
-										int overlay;
-										if(pos.equals(multiblock.getTriggerOffset()))
-											overlay = OverlayTexture.pack(0, true);
-										else
-											overlay = OverlayTexture.NO_OVERLAY;
-										translucentFullbright.setDefaultOverlay(overlay);
-										ModelData modelData = ModelData.EMPTY;
-										BlockEntity te = structureWorld.getBlockEntity(pos);
-										if(te!=null)
-											modelData = te.getModelData();
-										final BakedModel model = blockRender.getBlockModel(state);
-										blockRender.getModelRenderer().tesselateBlock(
-												structureWorld, model, state, pos, transform,
-												translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
-												overlay, modelData, null
-										);
-										transform.popPose();
-									}
-								}
-					}
-					transform.popPose();
-					transform.popPose();
-				} catch(Exception e)
-				{
-					final long now = System.currentTimeMillis();
-					if(now > lastPrintedErrorTimeMs+1000)
-					{
-						e.printStackTrace();
-						lastPrintedErrorTimeMs = now;
-					}
-					while(lastEntryBeforeTry!=transform.last())
-						transform.popPose();
+					renderInfo.step();
+					lastStep = currentTime;
 				}
+				Object pose = GuiGraphicsPose.pose(graphics);
+				Matrix3x2f guiPose = pose instanceof Matrix3x2fc matrix?new Matrix3x2f(matrix): new Matrix3x2f();
+				graphics.submitPictureInPictureRenderState(new MultiblockRenderState(
+						this, guiPose, 0, 0, RENDER_WIDTH, Math.max(1, yOffTotal), 1,
+						graphics.peekScissorStack()
+				));
+			} catch(Exception e)
+			{
+				printRenderException(e);
 			}
 
 			if(componentTooltip!=null)
@@ -306,6 +255,89 @@ public class ManualElementMultiblock extends SpecialManualElements
 		return new Transformation(null, new Quaternionf().rotateAxis((float)Math.toRadians(angle), axis), null, null);
 	}
 
+	@SubscribeEvent
+	public static void registerPictureInPictureRenderer(RegisterPictureInPictureRenderersEvent ev)
+	{
+		ev.register(MultiblockRenderState.class, MultiblockPictureInPictureRenderer::new);
+	}
+
+	private void renderToTexture(PoseStack transform, MultiBufferSource.BufferSource bufferSource, int width)
+	{
+		PoseStack.Pose lastEntryBeforeTry = transform.last();
+		try
+		{
+			int structureLength = renderInfo.structureLength;
+			int structureWidth = renderInfo.structureWidth;
+			int structureHeight = renderInfo.structureHeight;
+
+			transform.pushPose();
+			transform.translate(-width/2f, 0, 0);
+
+			final BlockRenderDispatcher blockRender = ClientUtils.getBlockRenderer();
+
+			transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
+			transform.scale(scale, -scale, 1);
+			applyAdditionalTransform(transform);
+			transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
+
+			transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
+
+			if(showCompleted&&renderProperties.canRenderFormedStructure())
+				renderProperties.renderFormedStructure(transform, bufferSource);
+			else
+			{
+				TransformingVertexBuilder translucentFullbright = new TransformingVertexBuilder(
+						bufferSource, IERenderTypes.TRANSLUCENT_FULLBRIGHT
+				);
+				for(int h = 0; h < structureHeight; h++)
+					for(int l = 0; l < structureLength; l++)
+						for(int w = 0; w < structureWidth; w++)
+						{
+							BlockPos pos = new BlockPos(l, h, w);
+							BlockState state = structureWorld.getBlockState(pos);
+							if(!state.isAir())
+							{
+								transform.pushPose();
+								transform.translate(l, h, w);
+								int overlay;
+								if(pos.equals(multiblock.getTriggerOffset()))
+									overlay = OverlayTexture.pack(0, true);
+								else
+									overlay = OverlayTexture.NO_OVERLAY;
+								translucentFullbright.setDefaultOverlay(overlay);
+								ModelData modelData = ModelData.EMPTY;
+								BlockEntity te = structureWorld.getBlockEntity(pos);
+								if(te!=null)
+									modelData = te.getModelData();
+								final BakedModel model = blockRender.getBlockModel(state);
+								blockRender.getModelRenderer().tesselateBlock(
+										structureWorld, model, state, pos, transform,
+										translucentFullbright, false, RandomSource.create(), state.getSeed(pos),
+										overlay, modelData, null
+								);
+								transform.popPose();
+							}
+						}
+			}
+			transform.popPose();
+		} catch(Exception e)
+		{
+			printRenderException(e);
+			while(lastEntryBeforeTry!=transform.last())
+				transform.popPose();
+		}
+	}
+
+	private void printRenderException(Exception e)
+	{
+		final long now = System.currentTimeMillis();
+		if(now > lastPrintedErrorTimeMs+1000)
+		{
+			e.printStackTrace();
+			lastPrintedErrorTimeMs = now;
+		}
+	}
+
 	private void applyAdditionalTransform(PoseStack transform)
 	{
 		Vector3fc translation = additionalTransform.translation();
@@ -329,6 +361,75 @@ public class ManualElementMultiblock extends SpecialManualElements
 	public IMultiblock getMultiblock()
 	{
 		return this.multiblock;
+	}
+
+	private record MultiblockRenderState(
+			ManualElementMultiblock element,
+			Matrix3x2f pose,
+			int x0,
+			int y0,
+			int x1,
+			int y1,
+			float scale,
+			ScreenRectangle scissorArea,
+			ScreenRectangle bounds
+	) implements PictureInPictureRenderState
+	{
+		private MultiblockRenderState(
+				ManualElementMultiblock element, Matrix3x2f pose, int x0, int y0, int x1, int y1, float scale,
+				ScreenRectangle scissorArea
+		)
+		{
+			this(element, pose, x0, y0, x1, y1, scale, scissorArea,
+					transformedBounds(pose, x0, y0, x1, y1, scissorArea));
+		}
+
+		private static ScreenRectangle transformedBounds(
+				Matrix3x2fc pose, int x0, int y0, int x1, int y1, ScreenRectangle scissorArea
+		)
+		{
+			float x00 = pose.m00()*x0+pose.m10()*y0+pose.m20();
+			float y00 = pose.m01()*x0+pose.m11()*y0+pose.m21();
+			float x10 = pose.m00()*x1+pose.m10()*y0+pose.m20();
+			float y10 = pose.m01()*x1+pose.m11()*y0+pose.m21();
+			float x01 = pose.m00()*x0+pose.m10()*y1+pose.m20();
+			float y01 = pose.m01()*x0+pose.m11()*y1+pose.m21();
+			float x11 = pose.m00()*x1+pose.m10()*y1+pose.m20();
+			float y11 = pose.m01()*x1+pose.m11()*y1+pose.m21();
+			int left = (int)Math.floor(Math.min(Math.min(x00, x10), Math.min(x01, x11)));
+			int top = (int)Math.floor(Math.min(Math.min(y00, y10), Math.min(y01, y11)));
+			int right = (int)Math.ceil(Math.max(Math.max(x00, x10), Math.max(x01, x11)));
+			int bottom = (int)Math.ceil(Math.max(Math.max(y00, y10), Math.max(y01, y11)));
+			return PictureInPictureRenderState.getBounds(left, top, right, bottom, scissorArea);
+		}
+	}
+
+	private static class MultiblockPictureInPictureRenderer extends PictureInPictureRenderer<MultiblockRenderState>
+	{
+		protected MultiblockPictureInPictureRenderer(MultiBufferSource.BufferSource bufferSource)
+		{
+			super(bufferSource);
+		}
+
+		public Class<MultiblockRenderState> getRenderStateClass()
+		{
+			return MultiblockRenderState.class;
+		}
+
+		protected void renderToTexture(MultiblockRenderState state, PoseStack transform)
+		{
+			state.element().renderToTexture(transform, bufferSource, state.x1()-state.x0());
+		}
+
+		protected String getTextureLabel()
+		{
+			return "immersiveengineering_manual_multiblock";
+		}
+
+		protected float getTranslateY(int height, int guiScale)
+		{
+			return 0;
+		}
 	}
 
 	//Stolen back from boni's StructureInfo

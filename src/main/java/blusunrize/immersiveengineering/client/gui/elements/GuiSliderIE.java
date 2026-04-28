@@ -65,7 +65,7 @@ public class GuiSliderIE extends ExtendedSlider
 			color = 0xa0a0a0;
 		else if(this.isHovered)
 			color = 0xffffa0;
-		graphics.drawCenteredString(fontrenderer, getMessage(), getX()+width/2, getY()-10+height/2-3, color);
+		graphics.centeredText(fontrenderer, getMessage(), getX()+width/2, getY()-10+height/2-3, color);
 	}
 
 	protected void applyValue()

@@ -88,7 +88,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		Font font = getMinecraft().font;
 
 		// display range string
-		graphics.drawCenteredString(
+		graphics.centeredText(
 				font, I18n.get(Lib.GUI_CONFIG+"radio_tower.range_m", Utils.formatDouble(menu.range.get()*16, "##,###")),
 				getGuiLeft()+202, getGuiTop()+130, 0xffffff
 		);
@@ -234,13 +234,13 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 			for(int step = minValue; step <= maxValue; step += 64)
 			{
 				int offset = valueToOffset(step);
-				graphics.drawCenteredString(
+				graphics.centeredText(
 						minecraft.font, FRQ_FORMAT.format(step),
 						getInnerX()+offset, getY()+4, 0xffffff
 				);
 				graphics.fill(getInnerX()+offset, getY()+minecraft.font.lineHeight+4, getInnerX()+offset+1, getY()+minecraft.font.lineHeight+8, 0xffffffff);
 			}
-			graphics.drawCenteredString(
+			graphics.centeredText(
 					minecraft.font, I18n.get(Lib.GUI_CONFIG+"radio_tower.khz", value.get()),
 					getX()+100, getY()+34, 0xffffff
 			);

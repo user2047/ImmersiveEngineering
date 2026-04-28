@@ -46,7 +46,7 @@ public class GuiButtonIE extends Button
 				txtCol = 0xA0A0A0;
 			else if(this.isHovered)
 				txtCol = Lib.COLOUR_I_ImmersiveOrange;
-			graphics.drawCenteredString(fontrenderer, getMessage(), this.getX()+this.width/2, this.getY()+(this.height-8)/2, txtCol);
+		graphics.centeredText(fontrenderer, getMessage(), this.getX()+this.width/2, this.getY()+(this.height-8)/2, txtCol);
 		}
 	}
 
