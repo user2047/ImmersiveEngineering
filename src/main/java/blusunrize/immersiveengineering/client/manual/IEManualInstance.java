@@ -30,7 +30,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -258,7 +258,7 @@ public class IEManualInstance extends ManualInstance
 	public void openEntry(ManualEntry entry)
 	{
 		if(SHADER_ENTRY.equals(entry.getLocation()))
-			PacketDistributor.sendToServer(new MessageShaderManual(MessageType.SYNC));
+			ClientPacketDistributor.sendToServer(new MessageShaderManual(MessageType.SYNC));
 	}
 
 	public int getTitleColour()

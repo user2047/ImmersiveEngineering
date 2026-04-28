@@ -22,6 +22,7 @@ import blusunrize.immersiveengineering.client.manual.ManualElementMultiblock;
 import blusunrize.immersiveengineering.client.models.PortedConfigurableSidesModel;
 import blusunrize.immersiveengineering.client.models.PortedConveyorModel;
 import blusunrize.immersiveengineering.client.models.PortedCoresampleModel;
+import blusunrize.immersiveengineering.client.models.mirror.PortedMirroredModel;
 import blusunrize.immersiveengineering.client.models.obj.PortedIEOBJModel;
 import blusunrize.immersiveengineering.client.models.obj.callback.DynamicSubmodelCallbacks;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.*;
@@ -191,7 +192,7 @@ public class ClientProxy extends CommonProxy
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("feedthrough"));
 		ev.register(IEApi.ieLoc("basic_split"), PortedBasicSplitModel.LOADER);
 		registerEmptyPortModelLoader(ev, IEApi.ieLoc("potion_bucket"));
-		registerEmptyPortModelLoader(ev, IEApi.ieLoc("mirror"));
+		ev.register(IEApi.ieLoc("mirror"), PortedMirroredModel.LOADER);
 		initDynamicModels();
 	}
 

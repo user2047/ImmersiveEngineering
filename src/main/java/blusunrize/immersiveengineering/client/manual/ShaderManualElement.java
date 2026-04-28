@@ -35,7 +35,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +139,7 @@ public class ShaderManualElement extends SpecialManualElements
 					Component.literal(I18n.get("ie.manual.entry.shaderList.order")+" "+cost+"x   ").withStyle(ChatFormatting.BOLD),
 					btn -> {
 						if(IngredientUtils.hasPlayerIngredient(mc().player, replicationCost)||mc().player.getAbilities().instabuild)
-							PacketDistributor.sendToServer(
+							ClientPacketDistributor.sendToServer(
 									new MessageShaderManual(MessageType.SPAWN, shader.getName())
 							);
 						gui.fullInit();
@@ -154,7 +154,7 @@ public class ShaderManualElement extends SpecialManualElements
 						Component.translatable("ie.manual.entry.shaderList.unlock"),
 						btn -> {
 							UUID playerId = mc().player.getUUID();
-							PacketDistributor.sendToServer(new MessageShaderManual(MessageType.UNLOCK, shader.getName()));
+							ClientPacketDistributor.sendToServer(new MessageShaderManual(MessageType.UNLOCK, shader.getName()));
 							ShaderRegistry.receivedShaders.put(playerId, shader.getName());
 							gui.fullInit();
 						})

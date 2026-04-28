@@ -20,7 +20,7 @@ import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.List;
 import java.util.Optional;
@@ -76,7 +76,7 @@ public class IEGhostItemHandler implements IGhostIngredientHandler<IEContainerSc
 		{
 			Int2ObjectMap<ItemStack> change = new Int2ObjectOpenHashMap<>();
 			change.put(((Slot)slot).index, ingredient);
-			PacketDistributor.sendToServer(new MessageSetGhostSlots(change));
+			ClientPacketDistributor.sendToServer(new MessageSetGhostSlots(change));
 		}
 	}
 }

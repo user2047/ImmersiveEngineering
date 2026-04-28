@@ -19,7 +19,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class RedstoneProbeScreen extends ClientBlockEntityScreen<ConnectorProbeB
 	{
 		CompoundTag message = new CompoundTag();
 		message.putInt(key, value);
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity.getBlockPos(), message));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity.getBlockPos(), message));
 	}
 
 	protected void drawGuiContainerForegroundLayer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)

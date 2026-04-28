@@ -28,7 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.DyeColor;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -215,7 +215,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 			message.put("configuration", config.writeToNBT());
 		else
 			message.putBoolean("delete", true);
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
 	private void sendInputColor(DyeColor col)
@@ -225,7 +225,7 @@ public class MachineInterfaceScreen extends ClientBlockEntityScreen<MachineInter
 		//update server
 		CompoundTag message = new CompoundTag();
 		message.putInt("inputColor", col.getId());
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, message));
 	}
 
 	public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)

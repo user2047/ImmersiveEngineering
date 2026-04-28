@@ -32,6 +32,8 @@ import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.ticks.ScheduledTick;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.IFluidTank;
@@ -42,6 +44,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public abstract class IEBaseBlockEntity extends BlockEntity implements BlockstateProvider
 {
@@ -65,11 +68,27 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 		this.readCustomNBT(nbtIn, false, provider);
 	}
 
+	@Override
+	protected void loadAdditional(ValueInput input)
+	{
+		super.loadAdditional(input);
+		this.readCustomNBT(input.read("ieData", CompoundTag.CODEC).orElseGet(CompoundTag::new), false, input.lookup());
+	}
+
 	public abstract void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider);
 
 	protected void saveAdditional(CompoundTag nbt, Provider provider)
 	{
 		this.writeCustomNBT(nbt, false, provider);
+	}
+
+	@Override
+	protected void saveAdditional(ValueOutput output)
+	{
+		super.saveAdditional(output);
+		CompoundTag nbt = new CompoundTag();
+		this.writeCustomNBT(nbt, false, Provider.create(Stream.empty()));
+		output.store("ieData", CompoundTag.CODEC, nbt);
 	}
 
 	public abstract void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider);

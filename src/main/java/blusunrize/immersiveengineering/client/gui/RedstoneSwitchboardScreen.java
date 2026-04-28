@@ -28,7 +28,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -138,7 +138,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		// create new widget
 		addConnectionWidget(newSetting);
 		// send to server
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, newSetting.writeToNBT()));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, newSetting.writeToNBT()));
 	}
 
 	private void removeSetting(DyeColor output, boolean selectInput)
@@ -154,7 +154,7 @@ public class RedstoneSwitchboardScreen extends ClientBlockEntityScreen<RedstoneS
 		// send to server
 		CompoundTag msg = new CompoundTag();
 		msg.putInt("remove", output.getId());
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, msg));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(blockEntity, msg));
 	}
 
 

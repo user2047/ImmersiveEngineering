@@ -110,10 +110,15 @@ public class GlobalWireNetwork extends SavedData implements IWorldTickable
 	@SubscribeEvent
 	public static void onWorldUnload(LevelEvent.Unload ev)
 	{
-		if(ev.getLevel()==lastServerWorld)
+		if(ev.getLevel()==lastServerWorld.get())
 		{
-			lastServerNet = null;
-			lastServerWorld = null;
+			lastServerNet = new WeakReference<>(null);
+			lastServerWorld = new WeakReference<>(null);
+		}
+		if(ev.getLevel()==lastClientWorld.get())
+		{
+			lastClientNet = null;
+			lastClientWorld = new WeakReference<>(null);
 		}
 	}
 

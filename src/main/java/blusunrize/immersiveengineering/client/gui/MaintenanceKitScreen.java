@@ -17,7 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import javax.annotation.Nonnull;
 
@@ -30,7 +30,7 @@ public class MaintenanceKitScreen extends ToolModificationScreen<MaintenanceKitC
 
 	protected void sendMessage(CompoundTag data)
 	{
-		PacketDistributor.sendToServer(new MessageMaintenanceKit(menu.getEquipmentSlot(), data));
+		ClientPacketDistributor.sendToServer(new MessageMaintenanceKit(menu.getEquipmentSlot(), data));
 	}
 
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)

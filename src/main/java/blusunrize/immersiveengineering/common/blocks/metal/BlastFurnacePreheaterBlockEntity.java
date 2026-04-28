@@ -151,9 +151,29 @@ public class BlastFurnacePreheaterBlockEntity extends IEBaseBlockEntity implemen
 
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
+		int dummyOffset = getDummyOffsetForBreaking(pos, state);
+		BlockPos masterPos = pos.below(dummyOffset);
 		for(int i = 0; i <= 2; i++)
-			if(level.getBlockEntity(getBlockPos().offset(0, -dummy, 0).offset(0, i, 0)) instanceof BlastFurnacePreheaterBlockEntity)
-				level.removeBlock(getBlockPos().offset(0, -dummy, 0).offset(0, i, 0), false);
+		{
+			BlockPos blockPos = masterPos.above(i);
+			if(level.getBlockEntity(blockPos) instanceof BlastFurnacePreheaterBlockEntity)
+				level.removeBlock(blockPos, false);
+		}
+	}
+
+	private int getDummyOffsetForBreaking(BlockPos pos, BlockState state)
+	{
+		if(dummy > 0)
+			return dummy;
+		if(state.hasProperty(IEProperties.MULTIBLOCKSLAVE)&&state.getValue(IEProperties.MULTIBLOCKSLAVE))
+			for(int i = 1; i <= 2; i++)
+			{
+				BlockState masterState = level.getBlockState(pos.below(i));
+				if(masterState.is(state.getBlock())&&masterState.hasProperty(IEProperties.MULTIBLOCKSLAVE)
+						&&!masterState.getValue(IEProperties.MULTIBLOCKSLAVE))
+					return i;
+			}
+		return 0;
 	}
 
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)

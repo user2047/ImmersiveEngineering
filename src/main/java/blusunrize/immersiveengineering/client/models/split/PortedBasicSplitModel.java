@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client.models.split;
 
+import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
@@ -22,8 +23,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import malte0811.modelsplitter.ClumpedModel;
 import malte0811.modelsplitter.SplitModel;
 import malte0811.modelsplitter.math.ModelSplitterVec3i;
+import malte0811.modelsplitter.model.Group;
+import malte0811.modelsplitter.model.MaterialLibrary.OBJMaterial;
 import malte0811.modelsplitter.model.OBJModel;
 import malte0811.modelsplitter.model.Polygon;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -56,9 +60,12 @@ import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 import net.neoforged.neoforge.model.data.ModelData;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -324,9 +331,7 @@ public record PortedBasicSplitModel(
 			BoundingBox box = pointBB(parts.getFirst());
 			for(Vec3i part : parts)
 				box.encapsulate(pointBB(part));
-			TextureSlots.Data textures = modelContents.has("textures")?
-					TextureSlots.parseTextureMap(modelContents.getAsJsonObject("textures")):
-					TextureSlots.Data.EMPTY;
+			TextureSlots.Data textures = TextureSlots.parseTextureMap(collectTextureSlots(modelContents));
 			ItemTransforms transforms = modelContents.has("display")?
 					context.deserialize(modelContents.get("display"), ItemTransforms.class):
 					null;
@@ -358,6 +363,80 @@ public record PortedBasicSplitModel(
 		private static BoundingBox pointBB(Vec3i point)
 		{
 			return new BoundingBox(new BlockPos(point));
+		}
+
+		private static JsonObject collectTextureSlots(JsonObject modelContents)
+		{
+			JsonObject textures = modelContents.has("textures")?
+					modelContents.getAsJsonObject("textures").deepCopy():
+					new JsonObject();
+			collectNestedObjTextureSlots(modelContents.get(INNER_MODEL), textures);
+			return textures;
+		}
+
+		private static void collectNestedObjTextureSlots(JsonElement modelElement, JsonObject textures)
+		{
+			if(modelElement==null||!modelElement.isJsonObject())
+				return;
+			JsonObject model = modelElement.getAsJsonObject();
+			if(model.has("textures"))
+				for(Entry<String, JsonElement> entry : model.getAsJsonObject("textures").entrySet())
+					if(!textures.has(entry.getKey()))
+						textures.add(entry.getKey(), entry.getValue().deepCopy());
+			if(model.has("model"))
+			{
+				String modelPath = model.get("model").getAsString();
+				if(modelPath.endsWith(".obj"))
+					for(String texture : getObjTextures(toRL(modelPath, null)))
+						if(texture!=null&&!texture.isBlank()&&texture.charAt(0)!='#'&&!textures.has(texture))
+							textures.addProperty(texture, texture);
+			}
+			if(model.has(INNER_MODEL))
+				collectNestedObjTextureSlots(model.get(INNER_MODEL), textures);
+		}
+
+		private static Set<String> getObjTextures(Identifier modelLoc)
+		{
+			try(InputStream input = getStream(modelLoc))
+			{
+				OBJModel<OBJMaterial> model = OBJModel.readFromStream(input, s -> getStream(toRL(s, modelLoc)));
+				Set<String> result = new LinkedHashSet<>();
+				for(Group<OBJMaterial> group : model.getFacesByGroup().values())
+					for(Polygon<OBJMaterial> face : group.getFaces())
+					{
+						OBJMaterial material = face.getTexture();
+						if(material!=null)
+							result.add(material.map_Kd());
+					}
+				return result;
+			} catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+
+		private static Identifier toRL(String name, @Nullable Identifier basePath)
+		{
+			if(name.contains(":"))
+				return Identifier.parse(name);
+			else if(basePath!=null)
+			{
+				String baseDir = basePath.getPath().substring(0, basePath.getPath().lastIndexOf('/')+1);
+				return basePath.withPath(baseDir+name);
+			}
+			else
+				return ImmersiveEngineering.rl(name);
+		}
+
+		private static InputStream getStream(Identifier path)
+		{
+			try
+			{
+				return Minecraft.getInstance().getResourceManager().getResource(path).orElseThrow().open();
+			} catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

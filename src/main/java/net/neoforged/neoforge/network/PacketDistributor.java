@@ -8,10 +8,6 @@ import net.minecraft.world.level.ChunkPos;
 
 public class PacketDistributor
 {
-	public static void sendToServer(CustomPacketPayload message, CustomPacketPayload... others)
-	{
-	}
-
 	public static void sendToAllPlayers(CustomPacketPayload message, CustomPacketPayload... others)
 	{
 	}
@@ -24,11 +20,28 @@ public class PacketDistributor
 	{
 	}
 
+	public static void sendToPlayersTrackingEntityAndSelf(Entity entity, CustomPacketPayload message, CustomPacketPayload... others)
+	{
+	}
+
 	public static void sendToPlayersTrackingChunk(ServerLevel level, ChunkPos chunk, CustomPacketPayload message, CustomPacketPayload... others)
 	{
 	}
 
 	public static void sendToPlayersInDimension(ServerLevel level, CustomPacketPayload message, CustomPacketPayload... others)
+	{
+	}
+
+	public static void sendToPlayersNear(
+			ServerLevel level,
+			ServerPlayer excluded,
+			double x,
+			double y,
+			double z,
+			double radius,
+			CustomPacketPayload message,
+			CustomPacketPayload... others
+	)
 	{
 	}
 }

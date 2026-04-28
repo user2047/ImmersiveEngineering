@@ -17,7 +17,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -44,7 +44,7 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 			{
 				CompoundTag message = new CompoundTag();
 				message.putString("name", s);
-				PacketDistributor.sendToServer(new MessageContainerUpdate(getMenu().containerId, message));
+				ClientPacketDistributor.sendToServer(new MessageContainerUpdate(getMenu().containerId, message));
 			}
 		});
 		this.nameField.setValue(this.title.getString());

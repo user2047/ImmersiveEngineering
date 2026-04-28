@@ -30,7 +30,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 
 	protected void sendMessage(CompoundTag data)
 	{
-		PacketDistributor.sendToServer(new MessageBlockEntitySync(this.workbench.getBlockPos(), data));
+		ClientPacketDistributor.sendToServer(new MessageBlockEntitySync(this.workbench.getBlockPos(), data));
 	}
 
 	public void init()

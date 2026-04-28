@@ -29,7 +29,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -89,7 +89,7 @@ public class AssemblerRecipeTransferHandler implements IRecipeTransferHandler<As
 					Int2ObjectMap<ItemStack> changes = new Int2ObjectOpenHashMap<>();
 					for(int slot = 0; slot < Math.min(convertedInput.size(), 9); slot++)
 						changes.put(i*10+slot, convertedInput.get(slot));
-					PacketDistributor.sendToServer(new MessageSetGhostSlots(changes));
+					ClientPacketDistributor.sendToServer(new MessageSetGhostSlots(changes));
 				}
 				return null;
 			}

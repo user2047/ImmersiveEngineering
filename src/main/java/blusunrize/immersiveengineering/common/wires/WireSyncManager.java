@@ -22,7 +22,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Collection;
@@ -104,6 +106,19 @@ public class WireSyncManager implements IWireSyncManager
 					if(wireWatchedChunksByPlayer.remove(ev.getPlayer().getUUID(), ev.getPos()))
 						sendMessagesForChunk(ev.getLevel(), ev.getPos(), ev.getPlayer(), false);
 				}, true);
+	}
+
+	@SubscribeEvent
+	public static void onPlayerLoggedOut(PlayerLoggedOutEvent ev)
+	{
+		wireWatchedChunksByPlayer.removeAll(ev.getEntity().getUUID());
+	}
+
+	@SubscribeEvent
+	public static void onLevelUnload(LevelEvent.Unload ev)
+	{
+		if(ev.getLevel() instanceof ServerLevel)
+			wireWatchedChunksByPlayer.clear();
 	}
 
 	private final Level world;

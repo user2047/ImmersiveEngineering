@@ -56,7 +56,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,7 +363,7 @@ public class ItemOverlayUtils
 		boolean matches = VoltmeterItem.lastEnergyUpdate.pos().equals(pos);
 		long sinceLast = player.level().getGameTime()-VoltmeterItem.lastEnergyUpdate.measuredInTick();
 		if(!matches||sinceLast > 20)
-			PacketDistributor.sendToServer(new MessageRequestEnergyUpdate(pos));
+			ClientPacketDistributor.sendToServer(new MessageRequestEnergyUpdate(pos));
 
 		if(VoltmeterItem.lastEnergyUpdate.isValid()&&matches)
 		{
@@ -379,7 +379,7 @@ public class ItemOverlayUtils
 			matches = VoltmeterItem.lastRedstoneUpdate.pos().equals(mop.getBlockPos());
 			sinceLast = player.level().getGameTime()-VoltmeterItem.lastRedstoneUpdate.measuredInTick();
 			if(!matches||sinceLast > 20)
-				PacketDistributor.sendToServer(new MessageRequestRedstoneUpdate(mop.getBlockPos()));
+				ClientPacketDistributor.sendToServer(new MessageRequestRedstoneUpdate(mop.getBlockPos()));
 
 			if(VoltmeterItem.lastRedstoneUpdate.isSignalSource()&&matches)
 				VoltmeterItem.lastRedstoneUpdate.rsLevels().consume(

@@ -20,8 +20,8 @@ import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class WireNetworkCreator
 {
@@ -41,15 +41,23 @@ public class WireNetworkCreator
 
 	private static class Serializer implements IAttachmentSerializer<GlobalWireNetwork>
 	{
+		private static final String NETWORK_KEY = "network";
+
 		public boolean write(GlobalWireNetwork attachment, ValueOutput output)
 		{
-			return false;
+			CompoundTag savedNBT = attachment.save(new CompoundTag(), Provider.create(Stream.empty()));
+			if(savedNBT.isEmpty())
+				return false;
+			output.store(NETWORK_KEY, CompoundTag.CODEC, savedNBT);
+			return true;
 		}
 
 		@Nonnull
 		public GlobalWireNetwork read(@Nonnull IAttachmentHolder holder, @Nonnull ValueInput input)
 		{
-			return CREATOR.apply(holder);
+			GlobalWireNetwork network = CREATOR.apply(holder);
+			input.read(NETWORK_KEY, CompoundTag.CODEC).ifPresent(network::readFromNBT);
+			return network;
 		}
 	}
 }
