@@ -24,7 +24,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -57,6 +56,7 @@ public class LevelStageRenders
 {
 	public static final Map<Connection, Pair<Collection<BlockPos>, MutableInt>> FAILED_CONNECTIONS = new HashMap<>();
 	private static final boolean ENABLE_VEIN_DEBUG = false;
+	private static final int FULL_BRIGHT_LIGHTMAP = 0xf000f0;
 
 	@SubscribeEvent
 	public static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentParticles event)
@@ -227,7 +227,7 @@ public class LevelStageRenders
 		builder.defaultColor(255, 0, 0, 128);
 		builder.setUV(Vec2.ZERO);
 		builder.setDefaultOverlay(OverlayTexture.NO_OVERLAY);
-		builder.setDefaultLight(LightTexture.FULL_BRIGHT);
+		builder.setDefaultLight(FULL_BRIGHT_LIGHTMAP);
 		builder.setDefaultNormal(0, 1, 0);
 		for(Entry<Connection, Pair<Collection<BlockPos>, MutableInt>> entry : FAILED_CONNECTIONS.entrySet())
 		{

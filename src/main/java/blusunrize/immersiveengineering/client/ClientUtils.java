@@ -24,9 +24,10 @@ import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -70,7 +71,7 @@ public class ClientUtils
 
 	public static TextureAtlasSprite getSprite(Identifier rl)
 	{
-		return null;
+		return mc().getAtlasManager().get(new SpriteId(TextureAtlas.LOCATION_BLOCKS, rl));
 	}
 
 	public static Font font()
