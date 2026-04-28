@@ -8,6 +8,7 @@
 
 package blusunrize.immersiveengineering.client.models.split;
 
+import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
 import blusunrize.immersiveengineering.client.models.split.PolygonUtils.ExtraQuadData;
@@ -227,7 +228,10 @@ public record PortedBasicSplitModel(
 		{
 			BlockPos offset = getModelOffset(level, pos, state);
 			if(offset==null)
-				parts.add(fallback);
+			{
+				if(!state.hasProperty(IEProperties.MULTIBLOCKSLAVE))
+					parts.add(fallback);
+			}
 			else
 			{
 				BlockStateModelPart splitPart = splitParts.get(offset);

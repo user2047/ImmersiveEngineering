@@ -59,6 +59,7 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	{
 		super.loadAdditional(input);
 		helper.load(input.read("ieData", CompoundTag.CODEC).orElseGet(CompoundTag::new), input.lookup());
+		requestModelDataUpdate();
 	}
 
 	@Override
@@ -74,19 +75,30 @@ public class MultiblockBlockEntityDummy<State extends IMultiblockState>
 	@Override
 	public CompoundTag getUpdateTag(Provider provider)
 	{
-		return helper.getUpdateTag(provider);
+		CompoundTag tag = super.getUpdateTag(provider);
+		CompoundTag ieData = new CompoundTag();
+		helper.saveAdditional(ieData, provider);
+		tag.put("ieData", ieData);
+		return tag;
 	}
 
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
-		helper.handleUpdateTag(tag, provider);
+		helper.handleUpdateTag(getIEData(tag), provider);
 		requestModelDataUpdate();
 	}
 
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
-		helper.onDataPacket(pkt.getTag(), provider);
+		helper.onDataPacket(getIEData(pkt.getTag()), provider);
 		requestModelDataUpdate();
+	}
+
+	private static CompoundTag getIEData(CompoundTag tag)
+	{
+		if(tag.contains("ieData"))
+			return tag.getCompoundOrEmpty("ieData");
+		return tag;
 	}
 
 	@Nullable

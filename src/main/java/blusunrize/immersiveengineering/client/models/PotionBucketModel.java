@@ -12,6 +12,7 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.api.utils.QuadTransformer;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.client.utils.ModelUtils;
 import blusunrize.immersiveengineering.common.register.IEFluids;
 import com.google.gson.JsonDeserializationContext;
@@ -30,7 +31,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.RenderTypeGroup;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.model.CompositeModel;
 import net.neoforged.neoforge.client.model.CompositeModel.Baked.Builder;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
@@ -47,6 +47,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
+
+import static blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionFluidType.TEXTURE_STILL;
 
 public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketModel>
 {
@@ -77,7 +79,7 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 				new OverrideHandler(baseModel.getOverrides(), bakery, context, spriteGetter),
 				context.getTransforms()
 		);
-		Identifier fluidMaskLocation = IClientFluidTypeExtensions.of(IEFluids.POTION.get()).getStillTexture();
+		Identifier fluidMaskLocation = TEXTURE_STILL;
 		for(var layerModel : baseModel.getRenderPasses(ItemStack.EMPTY, false))
 		{
 			var layerGroup = layerModel instanceof SimpleBakedModel simple?ModelUtils.copyTypes(simple): RenderTypeGroup.EMPTY;
@@ -143,7 +145,7 @@ public final class PotionBucketModel implements IUnbakedGeometry<PotionBucketMod
 			final FluidStack fluid = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 			if(fluid.isEmpty())
 				return nested.resolve(model, stack, world, livingEntity, unused);
-			int color = IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid);
+			int color = GuiHelper.getFluidColor(fluid);
 			// flip to AGBR, because Mojang I guess
 			color = (color&0xFF00FF00) // alpha and green same spot
 					|((color>>16)&0x000000FF) // red moves to blue

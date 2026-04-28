@@ -14,6 +14,7 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.SorterScreen.FilterBit;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonBoolean;
 import blusunrize.immersiveengineering.client.gui.info.FluidInfoArea;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.common.gui.FluidSorterMenu;
 import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -29,7 +30,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
@@ -82,14 +82,13 @@ public class FluidSorterScreen extends IEContainerScreen<FluidSorterMenu>
 				FluidStack filter = menu.getFilter(side, i);
 				if(!filter.isEmpty())
 				{
-					IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(filter.getFluid());
-					TextureAtlasSprite sprite = ClientUtils.getSprite(props.getStillTexture(filter));
+					TextureAtlasSprite sprite = GuiHelper.getFluidStillSprite(filter);
 					Rect2i slotArea = getSlotArea(side, i);
 					graphics.blitSprite(
 							RenderPipelines.GUI_TEXTURED, sprite,
 							slotArea.getX(), slotArea.getY(),
 							slotArea.getWidth(), slotArea.getHeight(),
-							props.getTintColor(filter)
+							GuiHelper.getFluidColor(filter)
 					);
 				}
 			}

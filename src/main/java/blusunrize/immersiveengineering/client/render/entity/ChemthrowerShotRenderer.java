@@ -9,7 +9,7 @@
 package blusunrize.immersiveengineering.client.render.entity;
 
 import blusunrize.immersiveengineering.api.IEApi;
-import blusunrize.immersiveengineering.client.ClientUtils;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.entities.ChemthrowerShotEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Quaternionf;
 
@@ -47,9 +46,8 @@ public class ChemthrowerShotRenderer extends IEEntityRenderer<ChemthrowerShotEnt
 
 		matrixStackIn.pushPose();
 
-		IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(f.getFluid());
-		TextureAtlasSprite sprite = ClientUtils.getSprite(props.getStillTexture(f));
-		int colour = props.getTintColor(f);
+		TextureAtlasSprite sprite = GuiHelper.getFluidStillSprite(f);
+		int colour = GuiHelper.getFluidColor(f);
 		float a = (colour>>24&255)/255f;
 		float r = (colour>>16&255)/255f;
 		float g = (colour>>8&255)/255f;

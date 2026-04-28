@@ -8,7 +8,7 @@
 
 package blusunrize.immersiveengineering.client.fx;
 
-import blusunrize.immersiveengineering.client.ClientUtils;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SingleQuadParticle;
@@ -18,7 +18,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 
@@ -33,7 +32,7 @@ public class FluidSplashParticle extends SingleQuadParticle
 	public FluidSplashParticle(Fluid fluid, ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
 							   double xSpeedIn, double ySpeedIn, double zSpeedIn)
 	{
-		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, ClientUtils.getSprite(IClientFluidTypeExtensions.of(fluid).getStillTexture(new FluidStack(fluid, FluidType.BUCKET_VOLUME))));
+		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, GuiHelper.getFluidStillSprite(new FluidStack(fluid, FluidType.BUCKET_VOLUME)));
 
 		this.xd *= 0.3D;
 		this.yd = Math.random()*0.2D+0.1D;
@@ -88,9 +87,8 @@ public class FluidSplashParticle extends SingleQuadParticle
 
 	public void setFluidTexture(FluidStack fluid)
 	{
-		IClientFluidTypeExtensions fluidProperties = IClientFluidTypeExtensions.of(fluid.getFluid());
-		setSprite(ClientUtils.getSprite(fluidProperties.getStillTexture(fluid)));
-		int argb = fluidProperties.getTintColor(fluid);
+		setSprite(GuiHelper.getFluidStillSprite(fluid));
+		int argb = GuiHelper.getFluidColor(fluid);
 		this.alpha = ((argb>>24)&255)/255f;
 		this.rCol = ((argb>>16)&255)/255f;
 		this.gCol = ((argb>>8&255))/255f;

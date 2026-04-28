@@ -10,25 +10,17 @@ package blusunrize.immersiveengineering.client;
 
 import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.client.ieobj.ItemCallback;
-import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.common.register.IEItems.Misc;
 import blusunrize.immersiveengineering.common.register.IEItems.Tools;
 import blusunrize.immersiveengineering.common.register.IEItems.Weapons;
 import blusunrize.immersiveengineering.common.register.IEPotions;
 import blusunrize.immersiveengineering.common.register.IEPotions.IEPotion;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-
-import static blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionFluidType.TEXTURE_FLOW;
-import static blusunrize.immersiveengineering.common.fluids.PotionFluid.PotionFluidType.TEXTURE_STILL;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = ImmersiveEngineering.MODID)
 public class ClientExtensions
@@ -65,44 +57,5 @@ public class ClientExtensions
 					iePotion
 			);
 		}
-		ev.registerFluidType(
-				new IClientFluidTypeExtensions()
-				{
-					public Identifier getStillTexture()
-					{
-						return TEXTURE_STILL;
-					}
-
-					public Identifier getFlowingTexture()
-					{
-						return TEXTURE_FLOW;
-					}
-
-					public int getTintColor(FluidStack stack)
-					{
-						var potionData = stack.get(DataComponents.POTION_CONTENTS);
-						if(potionData==null)
-							return 0xff0000ff;
-						return 0xff000000|potionData.getColor();
-					}
-				},
-				IEFluids.POTION_TYPE.value()
-		);
-		for(var fluid : IEFluids.ALL_ENTRIES)
-			ev.registerFluidType(
-					new IClientFluidTypeExtensions()
-					{
-						public Identifier getStillTexture()
-						{
-							return fluid.stillTexture();
-						}
-
-						public Identifier getFlowingTexture()
-						{
-							return fluid.flowingTexture();
-						}
-					},
-					fluid.type().value()
-			);
 	}
 }

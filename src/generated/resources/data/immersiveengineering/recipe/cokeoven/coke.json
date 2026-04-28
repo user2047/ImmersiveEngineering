@@ -2,13 +2,9 @@
   "type": "immersiveengineering:coke_oven",
   "creosote": 500,
   "input": {
-    "basePredicate": {
-      "item": "minecraft:coal"
-    },
+    "basePredicate": "minecraft:coal",
     "count": 16
   },
-  "result": {
-    "tag": "c:coal_coke"
-  },
+  "result": "#c:coal_coke",
   "time": 6000
 }

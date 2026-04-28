@@ -16,6 +16,7 @@ import blusunrize.immersiveengineering.api.shader.ShaderCase;
 import blusunrize.immersiveengineering.api.utils.Color4;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.obj.callback.block.ClocheCallbacks.Key;
+import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import blusunrize.immersiveengineering.client.utils.ModelUtils;
 import blusunrize.immersiveengineering.common.blocks.metal.ClocheBlockEntity;
 import blusunrize.immersiveengineering.common.util.Utils;
@@ -28,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidUtil;
 
 import javax.annotation.Nonnull;
@@ -98,7 +98,7 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		}
 		if(rl==null&&!soil.isEmpty()&&Utils.isFluidRelatedItemStack(soil))
 			rl = FluidUtil.getFluidContained(soil)
-					.map(fs -> IClientFluidTypeExtensions.of(fs.getFluid()).getStillTexture(fs))
+					.map(GuiHelper::getFluidStillTexture)
 					.orElse(null);
 		return rl;
 	}
@@ -109,7 +109,7 @@ public class ClocheCallbacks implements BlockCallback<Key>
 		if(!soil.isEmpty()&&"farmland".equals(material)&&Utils.isFluidRelatedItemStack(soil))
 			return Color4.fromARGB(
 					FluidUtil.getFluidContained(soil)
-							.map(fs -> IClientFluidTypeExtensions.of(fs.getFluid()).getTintColor(fs))
+							.map(GuiHelper::getFluidColor)
 							.orElse(0xffffffff)
 			);
 		return original;

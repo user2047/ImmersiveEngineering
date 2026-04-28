@@ -99,8 +99,9 @@ public class SlotwiseItemHandler implements IItemHandlerModifiable, Iterable<Ite
 
 	public boolean isItemValid(int slot, @NotNull ItemStack stack)
 	{
-		// TODO may not be entirely correct
-		return rawHandler.isItemValid(slot, stack);
+		return slot < this.slotConstraints.size()
+				&&this.slotConstraints.get(slot).allowInsert.test(stack)
+				&&rawHandler.isItemValid(slot, stack);
 	}
 
 	public void setStackInSlot(int slot, @NotNull ItemStack stack)

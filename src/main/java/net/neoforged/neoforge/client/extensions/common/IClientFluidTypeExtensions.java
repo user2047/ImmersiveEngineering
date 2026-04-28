@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.joml.Vector4f;
 
@@ -33,21 +32,6 @@ public interface IClientFluidTypeExtensions
 	static IClientFluidTypeExtensions of(FluidType fluid)
 	{
 		return DEFAULT;
-	}
-
-	default Identifier getStillTexture()
-	{
-		return Identifier.withDefaultNamespace("block/water_still");
-	}
-
-	default Identifier getStillTexture(FluidStack stack)
-	{
-		return getStillTexture();
-	}
-
-	default int getTintColor(FluidStack stack)
-	{
-		return 0xFFFFFFFF;
 	}
 
 	default Identifier getRenderOverlayTexture(Minecraft minecraft)

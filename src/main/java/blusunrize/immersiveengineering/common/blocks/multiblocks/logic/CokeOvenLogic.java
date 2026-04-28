@@ -24,6 +24,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.CokeOvenL
 import blusunrize.immersiveengineering.common.fluids.ArrayFluidHandler;
 import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.common.util.CachedRecipe;
+import blusunrize.immersiveengineering.common.util.ItemHandlerCompat;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler.IOConstraint;
 import net.minecraft.core.BlockPos;
@@ -45,6 +46,8 @@ import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -106,7 +109,7 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 					ItemStack recipeOutput = recipe.output.get();
 					// get available space
 					final ItemStack currentOutputStack = state.inventory.getStackInSlot(OUTPUT_SLOT);
-					int itemSpace = currentOutputStack.isEmpty()?64: currentOutputStack.getCount();
+					int itemSpace = currentOutputStack.isEmpty()?64: 64-currentOutputStack.getCount();
 					int fluidSpace = state.tank.getSpace();
 					int spaceLimit = Math.min(
 							itemSpace/recipeOutput.getCount(),
@@ -190,7 +193,7 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 
 	public void registerCapabilities(CapabilityRegistrar<State> register)
 	{
-		register.registerEverywhere(Capabilities.Item.BLOCK, state -> state.inventory);
+		register.registerEverywhere(Capabilities.Item.BLOCK, state -> state.itemCap);
 		register.registerEverywhere(Capabilities.Fluid.BLOCK, state -> state.fluidCap);
 	}
 
@@ -212,6 +215,7 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 
 		private final FluidTank tank = new FluidTank(TANK_CAPACITY);
 		private final SlotwiseItemHandler inventory;
+		private final ResourceHandler<ItemResource> itemCap;
 
 		private final Function<Level, CokeOvenRecipe> cachedRecipe;
 		private int process = 0;
@@ -224,13 +228,17 @@ public class CokeOvenLogic implements IMultiblockLogic<State>, IServerTickableCo
 			final Supplier<@org.jetbrains.annotations.Nullable Level> levelGetter = ctx.levelSupplier();
 			inventory = new SlotwiseItemHandler(
 					List.of(
-							IOConstraint.input(i -> CokeOvenRecipe.findRecipe(levelGetter.get(), i)!=null),
+							IOConstraint.input(i -> {
+								final Level level = levelGetter.get();
+								return level!=null&&CokeOvenRecipe.findRecipe(level, i)!=null;
+							}),
 							IOConstraint.OUTPUT,
 							IOConstraint.FLUID_INPUT,
 							IOConstraint.OUTPUT
 					),
 					ctx.getMarkDirtyRunnable()
 			);
+			this.itemCap = ItemHandlerCompat.asResourceHandler(inventory);
 			cachedRecipe = CachedRecipe.cachedSkip1(
 					CokeOvenRecipe::findRecipe, () -> inventory.getStackInSlot(INPUT_SLOT)
 			);

@@ -14,7 +14,9 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,11 +28,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
-
-import static blusunrize.immersiveengineering.client.ClientUtils.getSprite;
 
 public class GuiHelper
 {
@@ -94,22 +94,45 @@ public class GuiHelper
 	{
 		if(w <= 0||h <= 0||fluid.isEmpty())
 			return;
-		IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluid.getFluid());
-		TextureAtlasSprite sprite = getSprite(props.getStillTexture(fluid));
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h, props.getTintColor(fluid));
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, getFluidStillSprite(fluid), x, y, w, h, getFluidColor(fluid));
 	}
 
 	public static void drawRepeatedFluidSprite(VertexConsumer builder, PoseStack transform, FluidStack fluid, float x, float y, float w, float h)
 	{
-		IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluid.getFluid());
-		TextureAtlasSprite sprite = getSprite(props.getStillTexture(fluid));
-		int col = props.getTintColor(fluid);
+		if(fluid.isEmpty())
+			return;
+		TextureAtlasSprite sprite = getFluidStillSprite(fluid);
+		int col = getFluidColor(fluid);
 		int iW = sprite.contents().width();
 		int iH = sprite.contents().height();
 		if(iW > 0&&iH > 0)
 			drawRepeatedSprite(builder, transform, x, y, w, h, iW, iH,
 					sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1(),
 					(col>>16&255)/255.0f, (col>>8&255)/255.0f, (col&255)/255.0f, (col>>24&255)/255f);
+	}
+
+	public static TextureAtlasSprite getFluidStillSprite(FluidStack fluid)
+	{
+		return getFluidModel(fluid).stillMaterial().sprite();
+	}
+
+	public static Identifier getFluidStillTexture(FluidStack fluid)
+	{
+		return getFluidStillSprite(fluid).contents().name();
+	}
+
+	public static int getFluidColor(FluidStack fluid)
+	{
+		if(fluid.isEmpty())
+			return 0xffffffff;
+		FluidTintSource tint = getFluidModel(fluid).fluidTintSource();
+		return tint==null?0xffffffff: tint.colorAsStack(fluid);
+	}
+
+	private static FluidModel getFluidModel(FluidStack fluid)
+	{
+		return Minecraft.getInstance().getModelManager().getFluidStateModelSet()
+				.get(fluid.getFluid().defaultFluidState());
 	}
 
 	public static void drawRepeatedSprite(VertexConsumer builder, PoseStack transform, float x, float y, float w,

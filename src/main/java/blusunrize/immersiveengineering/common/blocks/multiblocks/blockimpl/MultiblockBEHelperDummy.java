@@ -140,6 +140,7 @@ public class MultiblockBEHelperDummy<State extends IMultiblockState>
 	{
 		Preconditions.checkArgument(!multiblock.masterPosInMB().equals(pos));
 		this.positionInMB = pos;
+		this.be.requestModelDataUpdate();
 		this.be.setChanged();
 	}
 
