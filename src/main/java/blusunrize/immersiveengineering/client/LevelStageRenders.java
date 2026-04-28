@@ -24,15 +24,18 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -222,6 +225,10 @@ public class LevelStageRenders
 				context.getSecond(), IERenderTypes.TRANSLUCENT_POSITION_COLOR
 		);
 		builder.defaultColor(255, 0, 0, 128);
+		builder.setUV(Vec2.ZERO);
+		builder.setDefaultOverlay(OverlayTexture.NO_OVERLAY);
+		builder.setDefaultLight(LightTexture.FULL_BRIGHT);
+		builder.setDefaultNormal(0, 1, 0);
 		for(Entry<Connection, Pair<Collection<BlockPos>, MutableInt>> entry : FAILED_CONNECTIONS.entrySet())
 		{
 			for(BlockPos obstruction : entry.getValue().getFirst())
