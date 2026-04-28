@@ -58,7 +58,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -259,30 +258,24 @@ public class ArcFurnaceLogic
 
 	private void outputItems(State state)
 	{
-		IItemHandler outputHandler = state.output.get();
-		if(outputHandler!=null)
-			for(int j : OUTPUT_SLOTS)
-			{
-				final ItemStack nextStack = state.inventory.getStackInSlot(j);
-				if(nextStack.isEmpty())
-					continue;
-				ItemStack stack = nextStack.copyWithCount(1);
-				stack = ItemHandlerHelper.insertItem(outputHandler, stack, false);
-				if(stack.isEmpty())
-					nextStack.shrink(1);
-			}
+		for(int j : OUTPUT_SLOTS)
+		{
+			final ItemStack nextStack = state.inventory.getStackInSlot(j);
+			if(nextStack.isEmpty())
+				continue;
+			ItemStack stack = nextStack.copyWithCount(1);
+			stack = Utils.insertStackIntoInventory(state.output, stack, false);
+			if(stack.isEmpty())
+				nextStack.shrink(1);
+		}
 		final ItemStack slagStack = state.inventory.getStackInSlot(SLAG_SLOT);
 		if(slagStack.isEmpty())
 			return;
-		IItemHandler slagOutputHandler = state.slagOutput.get();
-		if(slagOutputHandler!=null)
-		{
-			int out = Math.min(slagStack.getCount(), 16);
-			ItemStack stack = slagStack.copyWithCount(out);
-			stack = ItemHandlerHelper.insertItem(slagOutputHandler, stack, false);
-			out -= stack.getCount();
-			slagStack.shrink(out);
-		}
+		int out = Math.min(slagStack.getCount(), 16);
+		ItemStack stack = slagStack.copyWithCount(out);
+		stack = Utils.insertStackIntoInventory(state.slagOutput, stack, false);
+		out -= stack.getCount();
+		slagStack.shrink(out);
 	}
 
 	public void registerCapabilities(CapabilityRegistrar<State> register)

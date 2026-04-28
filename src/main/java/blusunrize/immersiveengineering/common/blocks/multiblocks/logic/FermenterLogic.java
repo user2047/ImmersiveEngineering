@@ -32,6 +32,7 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.process.Process
 import blusunrize.immersiveengineering.common.blocks.multiblocks.shapes.FermenterShapes;
 import blusunrize.immersiveengineering.common.fluids.ArrayFluidHandler;
 import blusunrize.immersiveengineering.common.util.IESounds;
+import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler.IOConstraint;
 import blusunrize.immersiveengineering.common.util.inventory.SlotwiseItemHandler.IOConstraintGroup;
@@ -54,7 +55,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -157,11 +157,8 @@ public class FermenterLogic
 		final ItemStack outputStack = state.inventory.getStackInSlot(OUTPUT_SLOT);
 		if(outputStack.isEmpty()||!ctx.getLevel().shouldTickModulo(8))
 			return false;
-		IItemHandler outputHandler = state.itemOutput.get();
-		if(outputHandler==null)
-			return false;
 		ItemStack stack = outputStack.copyWithCount(1);
-		stack = ItemHandlerHelper.insertItem(outputHandler, stack, false);
+		stack = Utils.insertStackIntoInventory(state.itemOutput, stack, false);
 		if(stack.isEmpty())
 		{
 			outputStack.shrink(1);

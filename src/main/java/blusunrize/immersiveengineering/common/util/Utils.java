@@ -85,6 +85,9 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 
@@ -564,22 +567,28 @@ public class Utils
 		return null;
 	}
 
-	public static ItemStack insertStackIntoInventory(IEBlockCapabilityCache<IItemHandler> ref, ItemStack stack, boolean simulate)
+	public static ItemStack insertStackIntoInventory(IEBlockCapabilityCache<?> ref, ItemStack stack, boolean simulate)
 	{
 		return insertStackIntoInventory(ref.getCapability(), stack, simulate);
 	}
 
-	public static ItemStack insertStackIntoInventory(Supplier<@Nullable IItemHandler> ref, ItemStack stack, boolean simulate)
+	public static ItemStack insertStackIntoInventory(Supplier<?> ref, ItemStack stack, boolean simulate)
 	{
 		return insertStackIntoInventory(ref.get(), stack, simulate);
 	}
 
-	private static ItemStack insertStackIntoInventory(IItemHandler handler, ItemStack stack, boolean simulate)
+	@SuppressWarnings("unchecked")
+	private static ItemStack insertStackIntoInventory(@Nullable Object handler, ItemStack stack, boolean simulate)
 	{
-		if(handler!=null&&!stack.isEmpty())
-			return ItemHandlerHelper.insertItem(handler, stack.copy(), simulate);
-		else
+		if(handler==null||stack.isEmpty())
 			return stack;
+		if(handler instanceof IItemHandler itemHandler)
+			return ItemHandlerHelper.insertItem(itemHandler, stack.copy(), simulate);
+		if(handler instanceof ResourceHandler<?> resourceHandler)
+			return ItemUtil.insertItemReturnRemaining(
+					(ResourceHandler<ItemResource>)resourceHandler, stack.copy(), simulate, null
+			);
+		return stack;
 	}
 
 
