@@ -48,9 +48,8 @@ public class ModWorkbenchScreen extends ToolModificationScreen<ModWorkbenchConta
 
 	public ModWorkbenchScreen(ModWorkbenchContainer container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
+		super(container, inventoryPlayer, title, TEXTURE, 176, 168);
 		workbench = container.tile;
-		this.imageHeight = 168;
 	}
 
 	protected void sendMessage(CompoundTag data)

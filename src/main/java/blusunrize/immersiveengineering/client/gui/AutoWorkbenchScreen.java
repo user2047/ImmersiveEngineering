@@ -36,8 +36,7 @@ public class AutoWorkbenchScreen extends IEContainerScreen<AutoWorkbenchMenu>
 
 	public AutoWorkbenchScreen(AutoWorkbenchMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, makeTextureLocation("auto_workbench"));
-		this.imageHeight = 184;
+		super(container, inventoryPlayer, title, makeTextureLocation("auto_workbench"), 176, 184);
 		this.inventoryLabelY = 93;
 	}
 

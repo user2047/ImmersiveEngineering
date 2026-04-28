@@ -36,8 +36,7 @@ public class ChunkLoaderScreen extends IEContainerScreen<ChunkLoaderMenu>
 
 	public ChunkLoaderScreen(ChunkLoaderMenu container, Inventory inventoryPlayer, Component component)
 	{
-		super(container, inventoryPlayer, component, TEXTURE);
-		this.imageHeight = 241;
+		super(container, inventoryPlayer, component, TEXTURE, 176, 241);
 	}
 
 	protected void init()

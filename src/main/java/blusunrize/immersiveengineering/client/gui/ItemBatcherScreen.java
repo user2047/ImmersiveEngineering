@@ -38,8 +38,7 @@ public class ItemBatcherScreen extends IEContainerScreen<ItemBatcherMenu>
 
 	public ItemBatcherScreen(ItemBatcherMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageHeight = 199;
+		super(container, inventoryPlayer, title, TEXTURE, 176, 199);
 	}
 
 	public void init()

@@ -18,8 +18,7 @@ public class CraftingTableScreen extends IEContainerScreen<CraftingTableMenu>
 {
 	public CraftingTableScreen(CraftingTableMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, makeTextureLocation("craftingtable"));
-		this.imageHeight = 210;
+		super(container, inventoryPlayer, title, makeTextureLocation("craftingtable"), 176, 210);
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 

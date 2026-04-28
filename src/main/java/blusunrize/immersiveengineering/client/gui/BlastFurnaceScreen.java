@@ -26,7 +26,12 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 
 	public BlastFurnaceScreen(BlastFurnaceMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
+		this(container, inventoryPlayer, title, 176);
+	}
+
+	protected BlastFurnaceScreen(BlastFurnaceMenu container, Inventory inventoryPlayer, Component title, int imageWidth)
+	{
+		super(container, inventoryPlayer, title, TEXTURE, imageWidth, 166);
 	}
 
 	public static void drawFlameAndArrow(
@@ -59,8 +64,7 @@ public class BlastFurnaceScreen extends IEContainerScreen<BlastFurnaceMenu>
 	{
 		public Advanced(BlastFurnaceMenu container, Inventory inventoryPlayer, Component title)
 		{
-			super(container, inventoryPlayer, title);
-			this.imageWidth = 210;
+			super(container, inventoryPlayer, title, 210);
 		}
 
 		protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float f, int mx, int my)

@@ -42,16 +42,14 @@ public class ShelfScreen extends IEContainerScreen<ShelfMenu>
 
 	public ShelfScreen(ShelfMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
+		super(container, inventoryPlayer, title, TEXTURE, COLUMN_WIDTH*2, 2*CRATE_SEGMENT+INV_SEGMENT);
 		this.titleLabelY = 3;
 	}
 
 	protected void init()
 	{
 		this.playerInvX = COLUMN_WIDTH/2;
-		this.imageWidth = COLUMN_WIDTH*2;
 		this.playerInvY = 2*CRATE_SEGMENT;
-		this.imageHeight = this.playerInvY+INV_SEGMENT;
 		super.init();
 
 		this.inventoryLabelY = this.playerInvY+3;

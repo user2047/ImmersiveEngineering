@@ -35,6 +35,13 @@ public abstract class ToolModificationScreen<C extends AbstractContainerMenu> ex
 		super(inventorySlotsIn, inv, title, background);
 	}
 
+	public ToolModificationScreen(
+			C inventorySlotsIn, Inventory inv, Component title, Identifier background, int imageWidth, int imageHeight
+	)
+	{
+		super(inventorySlotsIn, inv, title, background, imageWidth, imageHeight);
+	}
+
 
 	public void init()
 	{

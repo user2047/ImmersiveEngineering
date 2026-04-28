@@ -56,9 +56,7 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 
 	public RadioTowerScreen(RadioTowerMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageWidth = 240;
-		this.imageHeight = 150;
+		super(container, inventoryPlayer, title, TEXTURE, 240, 150);
 		this.inventoryLabelY = 116;
 	}
 

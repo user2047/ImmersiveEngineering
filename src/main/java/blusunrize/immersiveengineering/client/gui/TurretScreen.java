@@ -40,8 +40,7 @@ public abstract class TurretScreen<C extends TurretMenu> extends IEContainerScre
 
 	public TurretScreen(C container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageHeight = 190;
+		super(container, inventoryPlayer, title, TEXTURE, 176, 190);
 		this.inventoryLabelY = 99;
 	}
 

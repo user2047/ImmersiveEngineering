@@ -78,9 +78,7 @@ public class CircuitTableScreen extends IEContainerScreen<CircuitTableMenu>
 
 	public CircuitTableScreen(CircuitTableMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageWidth = 234;
-		this.imageHeight = 182;
+		super(container, inventoryPlayer, title, TEXTURE, 234, 182);
 		this.copyArea = new Rect2i(52, 7, 48, 63);
 	}
 

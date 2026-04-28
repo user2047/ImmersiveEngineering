@@ -36,7 +36,7 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 
 	public RevolverScreen(RevolverContainer container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
+		super(container, inventoryPlayer, title, TEXTURE, getImageWidth(container, inventoryPlayer), 166);
 		ItemStack revolver = inventoryPlayer.player.getItemBySlot(container.entityEquipmentSlot);
 		if(!revolver.isEmpty()&&revolver.getItem() instanceof IBulletContainer)
 			this.bullets[0] = ((IBulletContainer)revolver.getItem()).getBulletCount(revolver);
@@ -44,12 +44,34 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 		if(this.otherRevolver)
 		{
 			this.bullets[1] = ((IBulletContainer)this.menu.secondRevolver.getItem()).getBulletCount(this.menu.secondRevolver);
-			this.offset = ((bullets[0] >= 18?150: bullets[0] > 8?136: 74)+(bullets[1] >= 18?150: bullets[1] > 8?136: 74)+4-176)/2;
-			if(this.offset > 0)
-				this.imageWidth += this.offset*2;
+			this.offset = (getDrumWidth(bullets[0])+getDrumWidth(bullets[1])+4-176)/2;
 		}
 		else
-			this.offset = ((bullets[0] >= 18?150: bullets[0] > 8?136: 74)-176)/2;
+			this.offset = (getDrumWidth(bullets[0])-176)/2;
+	}
+
+	private static int getImageWidth(RevolverContainer container, Inventory inventoryPlayer)
+	{
+		int bullets = getBulletCount(inventoryPlayer.player.getItemBySlot(container.entityEquipmentSlot));
+		if(!container.secondRevolver.isEmpty())
+		{
+			int secondBullets = getBulletCount(container.secondRevolver);
+			int offset = (getDrumWidth(bullets)+getDrumWidth(secondBullets)+4-176)/2;
+			return offset > 0?176+offset*2: 176;
+		}
+		return 176;
+	}
+
+	private static int getBulletCount(ItemStack stack)
+	{
+		if(!stack.isEmpty()&&stack.getItem() instanceof IBulletContainer bulletContainer)
+			return bulletContainer.getBulletCount(stack);
+		return 0;
+	}
+
+	private static int getDrumWidth(int bulletCount)
+	{
+		return bulletCount >= 18?150: bulletCount > 8?136: 74;
 	}
 
 	protected void drawContainerBackgroundPre(@Nonnull GuiGraphicsExtractor graphics, float par1, int par2, int par3)
@@ -63,13 +85,13 @@ public class RevolverScreen extends IEContainerScreen<RevolverContainer>
 				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SECOND_DRUM, leftPos+off+47, topPos+1, 74, 103);
 			else if(bullets[side] > 8)
 				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, EXTENDED_MAG, leftPos+off+57, topPos+1, 79, 39);
-			off += (bullets[side] >= 18?150: bullets[side] > 8?136: 74)+4;
+			off += getDrumWidth(bullets[side])+4;
 		}
 	}
 
 	protected void drawBackgroundTexture(GuiGraphicsExtractor graphics)
 	{
-		graphics.blit(TEXTURE, leftPos+Math.max(offset, 0), topPos+77, 0, 125, 176, 89);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos+Math.max(offset, 0), topPos+77, 0, 125, 176, 89, 256, 256);
 	}
 
 	public static void drawExternalGUI(NonNullList<ItemStack> bullets, int bulletAmount, GuiGraphicsExtractor graphics)

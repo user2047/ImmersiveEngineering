@@ -25,8 +25,7 @@ public class MaintenanceKitScreen extends ToolModificationScreen<MaintenanceKitC
 {
 	public MaintenanceKitScreen(MaintenanceKitContainer container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, makeTextureLocation("maintenance_kit"));
-		this.imageWidth = 195;
+		super(container, inventoryPlayer, title, makeTextureLocation("maintenance_kit"), 195, 166);
 	}
 
 	protected void sendMessage(CompoundTag data)

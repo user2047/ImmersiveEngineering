@@ -59,8 +59,7 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 
 	public SorterScreen(SorterMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageHeight = 244;
+		super(container, inventoryPlayer, title, TEXTURE, 176, 244);
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 

@@ -51,9 +51,7 @@ public class AssemblerScreen extends IEContainerScreen<AssemblerMenu>
 
 	public AssemblerScreen(AssemblerMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, BACKGROUND);
-		this.imageWidth = 230;
-		this.imageHeight = 218;
+		super(container, inventoryPlayer, title, BACKGROUND, 230, 218);
 		this.inventoryLabelY = 127;
 	}
 

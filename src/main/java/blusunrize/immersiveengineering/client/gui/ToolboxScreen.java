@@ -21,8 +21,7 @@ public class ToolboxScreen extends IEContainerScreen<ToolboxMenu>
 {
 	public ToolboxScreen(ToolboxMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, makeTextureLocation("toolbox"));
-		this.imageHeight = 238;
+		super(container, inventoryPlayer, title, makeTextureLocation("toolbox"), 176, 238);
 	}
 
 	protected void gatherAdditionalTooltips(int mouseX, int mouseY, Consumer<Component> addLine, Consumer<Component> addGray)

@@ -39,8 +39,7 @@ public class MixerScreen extends IEContainerScreen<MixerMenu>
 
 	public MixerScreen(MixerMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageHeight = 167;
+		super(container, inventoryPlayer, title, TEXTURE, 176, 167);
 		this.inventoryLabelY = this.imageHeight-91;
 	}
 

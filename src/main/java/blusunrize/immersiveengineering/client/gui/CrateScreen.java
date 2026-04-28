@@ -29,8 +29,7 @@ public abstract class CrateScreen<C extends CrateMenu> extends IEContainerScreen
 
 	public CrateScreen(C container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, makeTextureLocation("crate"));
-		this.imageHeight = 168;
+		super(container, inventoryPlayer, title, makeTextureLocation("crate"), 176, 168);
 	}
 
 	protected void init()

@@ -42,8 +42,7 @@ public class ArcFurnaceScreen extends IEContainerScreen<ArcFurnaceMenu>
 
 	public ArcFurnaceScreen(ArcFurnaceMenu container, Inventory inventoryPlayer, Component title)
 	{
-		super(container, inventoryPlayer, title, TEXTURE);
-		this.imageHeight = 207;
+		super(container, inventoryPlayer, title, TEXTURE, 176, 207);
 		this.inventoryLabelY = 116;
 	}
 

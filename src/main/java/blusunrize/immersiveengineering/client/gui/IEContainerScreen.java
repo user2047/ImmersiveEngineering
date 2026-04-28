@@ -43,7 +43,12 @@ public abstract class IEContainerScreen<C extends AbstractContainerMenu> extends
 
 	public IEContainerScreen(C inventorySlotsIn, Inventory inv, Component title, Identifier background)
 	{
-		super(inventorySlotsIn, inv, title);
+		this(inventorySlotsIn, inv, title, background, 176, 166);
+	}
+
+	public IEContainerScreen(C inventorySlotsIn, Inventory inv, Component title, Identifier background, int imageWidth, int imageHeight)
+	{
+		super(inventorySlotsIn, inv, title, imageWidth, imageHeight);
 		this.background = background;
 		this.infoAreas = new ResettableLazy<>(this::makeInfoAreas);
 	}
