@@ -9,8 +9,6 @@
     }
   ],
   "type": "immersiveengineering:blast_furnace_fuel",
-  "input": {
-    "tag": "c:storage_blocks/charcoal"
-  },
+  "input": "#c:storage_blocks/charcoal",
   "time": 3000
 }

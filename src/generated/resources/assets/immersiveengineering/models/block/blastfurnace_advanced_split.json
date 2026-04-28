@@ -8,7 +8,8 @@
     "loader": "neoforge:obj",
     "model": "immersiveengineering:models/block/blastfurnace_advanced.obj",
     "textures": {
-      "particle": "immersiveengineering:block/multiblocks/blast_furnace_advanced"
+      "particle": "immersiveengineering:block/multiblocks/blast_furnace_advanced",
+      "immersiveengineering:block/multiblocks/blast_furnace_advanced": "immersiveengineering:block/multiblocks/blast_furnace_advanced"
     }
   },
   "loader": "immersiveengineering:basic_split",
@@ -155,6 +156,7 @@
     ]
   ],
   "textures": {
-    "particle": "immersiveengineering:block/multiblocks/blast_furnace_advanced"
+    "particle": "immersiveengineering:block/multiblocks/blast_furnace_advanced",
+    "immersiveengineering:block/multiblocks/blast_furnace_advanced": "immersiveengineering:block/multiblocks/blast_furnace_advanced"
   }
 }

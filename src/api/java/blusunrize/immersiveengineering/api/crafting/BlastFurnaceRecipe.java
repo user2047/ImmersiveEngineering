@@ -59,9 +59,9 @@ public class BlastFurnaceRecipe extends IESerializableRecipe
 		return this.input.test(input);
 	}
 
-	public static BlastFurnaceRecipe findRecipe(Level level, ItemStack input, @Nullable BlastFurnaceRecipe hint)
+	public static BlastFurnaceRecipe findRecipe(@Nullable Level level, ItemStack input, @Nullable BlastFurnaceRecipe hint)
 	{
-		if (input.isEmpty())
+		if (level==null||input.isEmpty())
 			return null;
 		if (hint != null && hint.matches(input))
 			return hint;

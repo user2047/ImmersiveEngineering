@@ -42,6 +42,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,6 +57,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 	protected static final List<Vec3i> COLUMN_THREE = ImmutableList.of(BlockPos.ZERO, BlockPos.ZERO.above(), BlockPos.ZERO.above(2));
 
 	protected static final Map<Identifier, String> generatedParticleTextures = new HashMap<>();
+	protected static final Map<Identifier, Map<String, String>> generatedModelTextures = new HashMap<>();
 	protected final ExistingFileHelper existingFileHelper;
 	protected final NongeneratedModels innerModels;
 
@@ -481,16 +483,25 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 				.modelLocation(addModelsPrefix(model))
 				.flipV(true)
 				.end();
+		Map<String, String> modelTextures = new LinkedHashMap<>();
 		String particleTex = objTextures.get(0);
 		if(particleTex.charAt(0)=='#')
 			particleTex = textures.get(particleTex.substring(1)).toString();
 		ret.texture("particle", particleTex);
+		modelTextures.put("particle", particleTex);
 		generatedParticleTextures.put(ret.getLocation(), particleTex);
 		for(String objTexture : objTextures)
 			if(objTexture.charAt(0)!='#'&&!textures.containsKey(objTexture))
+			{
 				ret.texture(objTexture, objTexture);
+				modelTextures.put(objTexture, objTexture);
+			}
 		for(Entry<String, Identifier> e : textures.entrySet())
+		{
 			ret.texture(e.getKey(), e.getValue());
+			modelTextures.put(e.getKey(), e.getValue().toString());
+		}
+		generatedModelTextures.put(ret.getLocation(), modelTextures);
 		return ret;
 	}
 
@@ -502,7 +513,7 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 				.parts(parts)
 				.dynamic(dynamic)
 				.end();
-		addParticleTextureFrom(result, model);
+		addTexturesFrom(result, model);
 		return result;
 	}
 
@@ -529,6 +540,22 @@ public abstract class ExtendedBlockstateProvider extends BlockStateProvider
 			result.texture("particle", particles);
 			generatedParticleTextures.put(result.getLocation(), particles);
 		}
+	}
+
+	protected void addTexturesFrom(BlockModelBuilder result, ModelFile model)
+	{
+		Map<String, String> textures = generatedModelTextures.get(model.getLocation());
+		if(textures!=null)
+		{
+			for(Entry<String, String> entry : textures.entrySet())
+				result.texture(entry.getKey(), entry.getValue());
+			generatedModelTextures.put(result.getLocation(), new LinkedHashMap<>(textures));
+			String particleTexture = textures.get("particle");
+			if(particleTexture!=null)
+				generatedParticleTextures.put(result.getLocation(), particleTexture);
+		}
+		else
+			addParticleTextureFrom(result, model);
 	}
 
 	protected ConfiguredModel emptyWithParticles(String name, String particleTexture)

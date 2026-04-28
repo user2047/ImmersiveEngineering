@@ -45,6 +45,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.neoforged.neoforge.model.data.ModelData;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -213,6 +214,7 @@ public class ManualElementMultiblock extends SpecialManualElements
 
 					transform.translate(transX, transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
 					transform.scale(scale, -scale, 1);
+					applyAdditionalTransform(transform);
 					transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.HALF_PI, 0));
 
 					transform.translate(structureLength/-2f, structureHeight/-2f, structureWidth/-2f);
@@ -302,6 +304,16 @@ public class ManualElementMultiblock extends SpecialManualElements
 		float angle = (float)Math.sqrt(axis.dot(axis));
 		axis.normalize();
 		return new Transformation(null, new Quaternionf().rotateAxis((float)Math.toRadians(angle), axis), null, null);
+	}
+
+	private void applyAdditionalTransform(PoseStack transform)
+	{
+		Vector3fc translation = additionalTransform.translation();
+		Vector3fc scale = additionalTransform.scale();
+		transform.translate(translation.x(), translation.y(), translation.z());
+		transform.mulPose(additionalTransform.leftRotation());
+		transform.scale(scale.x(), scale.y(), scale.z());
+		transform.mulPose(additionalTransform.rightRotation());
 	}
 
 	public boolean listForSearch(String searchTag)

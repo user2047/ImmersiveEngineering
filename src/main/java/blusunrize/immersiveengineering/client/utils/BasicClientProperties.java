@@ -103,6 +103,11 @@ public class BasicClientProperties implements MultiblockManualData
 			transform.mulPose(rotation.get());
 			transform.translate(-0.5, 0, -0.5);
 		}
+		List<BakedQuad> nullQuads = model.get().getNullQuads();
+		VertexConsumer buffer = bufferSource.getBuffer(IERenderTypes.TRANSLUCENT_FULLBRIGHT);
+		RenderUtils.renderModelTESRFast(
+				nullQuads, buffer, transform, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
+		);
 		transform.popPose();
 	}
 
