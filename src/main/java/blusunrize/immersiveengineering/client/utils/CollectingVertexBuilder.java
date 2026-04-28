@@ -92,6 +92,8 @@ public class CollectingVertexBuilder implements VertexConsumer
 	@Nonnull
 	public VertexConsumer setLineWidth(float width)
 	{
+		currentVertex.order.add(Element.LINE_WIDTH);
+		currentVertex.lineWidth = width;
 		return this;
 	}
 
@@ -136,6 +138,7 @@ public class CollectingVertexBuilder implements VertexConsumer
 		private final int[] overlay = new int[2];
 		private final int[] uv2 = new int[2];
 		private final float[] normal = new float[3];
+		private float lineWidth;
 		private final List<Element> order = new ArrayList<>();
 
 		public void pipe(VertexConsumer out)
@@ -149,6 +152,7 @@ public class CollectingVertexBuilder implements VertexConsumer
 					case OVERLAY -> out.setUv1(overlay[0], overlay[1]);
 					case UV2 -> out.setUv2(uv2[0], uv2[1]);
 					case NORMAL -> out.setNormal(normal[0], normal[1], normal[2]);
+					case LINE_WIDTH -> out.setLineWidth(lineWidth);
 				}
 		}
 	}
@@ -160,6 +164,7 @@ public class CollectingVertexBuilder implements VertexConsumer
 		UV,
 		OVERLAY,
 		UV2,
-		NORMAL
+		NORMAL,
+		LINE_WIDTH
 	}
 }

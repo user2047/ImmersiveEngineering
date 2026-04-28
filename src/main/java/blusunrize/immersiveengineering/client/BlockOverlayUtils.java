@@ -276,7 +276,8 @@ public class BlockOverlayUtils
 				for(Vec2 v : ImmutableList.of(here, next))
 					builder.addVertex(mat, v.x, 0, v.y)
 							.setColor(0, 0, 0, 0.4F)
-							.setNormal(transform.last(), diff.x, 0, diff.y);
+							.setNormal(transform.last(), diff.x, 0, diff.y)
+							.setLineWidth(1);
 			}
 			transform.mulPose(new Quaternionf().rotateXYZ(0, Mth.PI, 0));
 		}
@@ -345,7 +346,8 @@ public class BlockOverlayUtils
 			for(Vec3 p : ImmutableList.of(point, next))
 				lineBuilder.addVertex(transform.pose(), (float)p.x, (float)p.y, (float)p.z)
 						.setColor(0, 0, 0, 0.4F)
-						.setNormal(transform, (float)diff.x, (float)diff.y, (float)diff.z);
+						.setNormal(transform, (float)diff.x, (float)diff.y, (float)diff.z)
+						.setLineWidth(1);
 		}
 	}
 
@@ -357,16 +359,20 @@ public class BlockOverlayUtils
 		float sqrt2Half = (float)(Math.sqrt(2)/2);
 		lineBuilder.addVertex(mat, 0-eps, y, 0-eps)
 				.setColor(0, 0, 0, 0.4F)
-				.setNormal(transform.last(), sqrt2Half, 0, sqrt2Half);
+				.setNormal(transform.last(), sqrt2Half, 0, sqrt2Half)
+				.setLineWidth(1);
 		lineBuilder.addVertex(mat, 1+eps, y, 1+eps)
 				.setColor(0, 0, 0, 0.4F)
-				.setNormal(transform.last(), sqrt2Half, 0, sqrt2Half);
+				.setNormal(transform.last(), sqrt2Half, 0, sqrt2Half)
+				.setLineWidth(1);
 		lineBuilder.addVertex(mat, 0-eps, y, 1+eps)
 				.setColor(0, 0, 0, 0.4F)
-				.setNormal(transform.last(), sqrt2Half, 0, -sqrt2Half);
+				.setNormal(transform.last(), sqrt2Half, 0, -sqrt2Half)
+				.setLineWidth(1);
 		lineBuilder.addVertex(mat, 1+eps, y, 0-eps)
 				.setColor(0, 0, 0, 0.4F)
-				.setNormal(transform.last(), sqrt2Half, 0, -sqrt2Half);
+				.setNormal(transform.last(), sqrt2Half, 0, -sqrt2Half)
+				.setLineWidth(1);
 	}
 
 	/**

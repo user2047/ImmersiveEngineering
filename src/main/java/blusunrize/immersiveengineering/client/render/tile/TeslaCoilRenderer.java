@@ -48,20 +48,22 @@ public class TeslaCoilRenderer extends IEBlockEntityRenderer<TeslaCoilBlockEntit
 		TransformingVertexBuilder builder = new TransformingVertexBuilder(buffers, type, transform);
 		builder.defaultColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 
-		drawLine(animation.startPos, animation.subPoints.get(0), tileX, tileY, tileZ, builder);
+		drawLine(animation.startPos, animation.subPoints.get(0), tileX, tileY, tileZ, lineWidth, builder);
 		for(int i = 0; i < animation.subPoints.size()-1; i++)
-			drawLine(animation.subPoints.get(i), animation.subPoints.get(i+1), tileX, tileY, tileZ, builder);
+			drawLine(animation.subPoints.get(i), animation.subPoints.get(i+1), tileX, tileY, tileZ, lineWidth, builder);
 		Vec3 end = (animation.targetEntity!=null?animation.targetEntity.position(): animation.targetPos);
-		drawLine(animation.subPoints.get(animation.subPoints.size()-1), end, tileX, tileY, tileZ, builder);
+		drawLine(animation.subPoints.get(animation.subPoints.size()-1), end, tileX, tileY, tileZ, lineWidth, builder);
 	}
 
-	private static void drawLine(Vec3 start, Vec3 end, double offX, double offY, double offZ, VertexConsumer out)
+	private static void drawLine(Vec3 start, Vec3 end, double offX, double offY, double offZ, float lineWidth, VertexConsumer out)
 	{
 		Vec3 normal = new Vec3(start.x()-end.x(), start.y()-end.y(), start.z()-end.z()).normalize();
 		out.addVertex((float)(start.x-offX), (float)(start.y-offY), (float)(start.z-offZ))
-				.setNormal((float)normal.x, (float)normal.y, (float)normal.z);
+				.setNormal((float)normal.x, (float)normal.y, (float)normal.z)
+				.setLineWidth(lineWidth);
 		out.addVertex((float)(end.x-offX), (float)(end.y-offY), (float)(end.z-offZ))
-				.setNormal((float)normal.x, (float)normal.y, (float)normal.z);
+				.setNormal((float)normal.x, (float)normal.y, (float)normal.z)
+				.setLineWidth(lineWidth);
 	}
 
 	public AABB getRenderBoundingBox(TeslaCoilBlockEntity blockEntity)

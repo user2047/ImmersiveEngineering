@@ -109,30 +109,30 @@ public class FractalParticle extends Particle
 		Matrix3f transformN = matrixStack.last().normal();
 		matrixStack.popPose();
 
-		LinePointProcessor putLinePoint = (buffer, i, color) -> {
+		LinePointProcessor putLinePoint = (buffer, i, color, lineWidth) -> {
 			int correctIndex = getCyclicIndexInRange(iStart, iEnd, i);
 			Vector3f vecRender = pointsList[correctIndex];
 			if(i!=iStart)
 			{
 				Vector3f last = pointsList[getCyclicIndexInRange(iStart, iEnd, i-1)];
-				renderLinePoint(transformN, transform, vecRender, last, color, buffer, false);
+				renderLinePoint(transformN, transform, vecRender, last, color, lineWidth, buffer, false);
 			}
 			if(i!=iEnd)
 			{
 				Vector3f next = pointsList[getCyclicIndexInRange(iStart, iEnd, i+1)];
-				renderLinePoint(transformN, transform, next, vecRender, color, buffer, true);
+				renderLinePoint(transformN, transform, next, vecRender, color, lineWidth, buffer, true);
 			}
 		};
 
 		List<Pair<RenderType, Consumer<VertexConsumer>>> ret = new ArrayList<>();
 		ret.add(Pair.of(IERenderTypes.getParticleLines(4f), buffer -> {
 			for(int i = iStart; i <= iEnd; i++)
-				putLinePoint.draw(buffer, i, colourOut);
+				putLinePoint.draw(buffer, i, colourOut, 4f);
 		}));
 
 		ret.add(Pair.of(IERenderTypes.getParticleLines(1f), buffer -> {
 			for(int i = iStart; i <= iEnd; i++)
-				putLinePoint.draw(buffer, i, colourIn);
+				putLinePoint.draw(buffer, i, colourIn, 1f);
 		}));
 
 		ret.add(Pair.of(IERenderTypes.POINTS, buffer -> {
@@ -153,7 +153,8 @@ public class FractalParticle extends Particle
 	}
 
 	private static void renderLinePoint(
-			Matrix3f transformN, Matrix4f transform, Vector3f start, Vector3f end, Color4 color, VertexConsumer buffer, boolean atStart
+			Matrix3f transformN, Matrix4f transform, Vector3f start, Vector3f end, Color4 color, float lineWidth,
+			VertexConsumer buffer, boolean atStart
 	)
 	{
 		Vector3f normal = new Vector3f(start.x()-end.x(), start.y()-end.y(), start.z()-end.z());
@@ -162,7 +163,8 @@ public class FractalParticle extends Particle
 		Vector3f here = atStart?start: end;
 		buffer.addVertex(transform, here.x(), here.y(), here.z())
 				.setColor(color.r(), color.b(), color.g(), color.a())
-				.setNormal(normal.x(), normal.y(), normal.z());
+				.setNormal(normal.x(), normal.y(), normal.z())
+				.setLineWidth(lineWidth);
 	}
 
 	private static final Vector3f[] POINT_NORMALS = {
@@ -187,7 +189,7 @@ public class FractalParticle extends Particle
 
 	private interface LinePointProcessor
 	{
-		void draw(VertexConsumer builder, int index, Color4 color);
+		void draw(VertexConsumer builder, int index, Color4 color, float lineWidth);
 	}
 
 	public static class Factory implements ParticleProvider<FractalOptions>

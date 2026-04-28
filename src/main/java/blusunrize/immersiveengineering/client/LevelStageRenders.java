@@ -149,8 +149,8 @@ public class LevelStageRenders
 				transform.translate(pos.x(), 0, pos.z());
 				VertexConsumer bufferBuilder = context.getSecond().getBuffer(IERenderTypes.CHUNK_MARKER);
 				Matrix4f mat = transform.last().pose();
-				bufferBuilder.addVertex(mat, 0, minHeight, 0).setColor(rgb.x, rgb.y, rgb.z, .75f).setNormal(transform.last(), 0, 1, 0);
-				bufferBuilder.addVertex(mat, 0, maxHeight, 0).setColor(rgb.x, rgb.y, rgb.z, .75f).setNormal(transform.last(), 0, 1, 0);
+				bufferBuilder.addVertex(mat, 0, minHeight, 0).setColor(rgb.x, rgb.y, rgb.z, .75f).setNormal(transform.last(), 0, 1, 0).setLineWidth(1);
+				bufferBuilder.addVertex(mat, 0, maxHeight, 0).setColor(rgb.x, rgb.y, rgb.z, .75f).setNormal(transform.last(), 0, 1, 0).setLineWidth(1);
 				int radius = vein.getRadius();
 				List<Vector3f> positions = new ArrayList<>();
 				for(int p = 0; p < 12; p++)
@@ -171,7 +171,8 @@ public class LevelStageRenders
 						bufferBuilder.addVertex(mat, point.x(), point.y(), point.z())
 								.setColor(rgb.x, rgb.y, rgb.z, .75f)
 								//Not actually a normal, just the direction of the line
-								.setNormal(transform.last(), diff.x(), diff.y(), diff.z());
+								.setNormal(transform.last(), diff.x(), diff.y(), diff.z())
+								.setLineWidth(1);
 				}
 				transform.popPose();
 			}
@@ -199,11 +200,13 @@ public class LevelStageRenders
 				Vec3 diff = next.subtract(prev).normalize();
 				builder.addVertex(mat, (float)prev.x, (float)prev.y, (float)prev.z)
 						.setColor(1, 0, 0, alpha)
-						.setNormal(transform.last(), (float)diff.x, (float)diff.y, (float)diff.z);
+						.setNormal(transform.last(), (float)diff.x, (float)diff.y, (float)diff.z)
+						.setLineWidth(1);
 				alpha = (float)Math.min((2+Math.sin((time+(i+1)*8)*Math.PI/40))/3, time/20F);
 				builder.addVertex(mat, (float)next.x, (float)next.y, (float)next.z)
 						.setColor(1, 0, 0, alpha)
-						.setNormal(transform.last(), (float)diff.x, (float)diff.y, (float)diff.z);
+						.setNormal(transform.last(), (float)diff.x, (float)diff.y, (float)diff.z)
+						.setLineWidth(1);
 				prev = next;
 			}
 			transform.popPose();
