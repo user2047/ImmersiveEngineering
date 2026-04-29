@@ -13,6 +13,7 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockState;
 import blusunrize.immersiveengineering.common.blocks.metal.ClocheBlockEntity;
+import blusunrize.immersiveengineering.common.blocks.metal.CreativeFluidTankBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.ToolboxBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.TurretChemBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.TurretGunBlockEntity;
@@ -121,6 +122,9 @@ public class IEMenuTypes
 	);
 	public static final ArgContainer<ClocheBlockEntity, ClocheMenu> CLOCHE = registerArg(
 			Lib.GUIID_Cloche, ClocheMenu::makeServer, ClocheMenu::makeClient
+	);
+	public static final ArgContainer<CreativeFluidTankBlockEntity, CreativeFluidTankMenu> CREATIVE_FLUID_TANK = registerArg(
+			Lib.GUIID_CreativeFluidTank, CreativeFluidTankMenu::makeServer, CreativeFluidTankMenu::makeClient
 	);
 	public static final ArgContainer<ToolboxBlockEntity, ToolboxMenu> TOOLBOX_BLOCK = registerArg(
 			Lib.GUIID_ToolboxBlock, ToolboxMenu::makeFromBE, ToolboxMenu::makeClient

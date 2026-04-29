@@ -99,6 +99,7 @@ public class Lib
 	public static final String GUIID_Turret_Chem = "turret_chem";
 	public static final String GUIID_FluidSorter = "fluidsorter";
 	public static final String GUIID_Cloche = "cloche";
+	public static final String GUIID_CreativeFluidTank = "creativefluidtank";
 	public static final String GUIID_ToolboxBlock = "toolboxblock";
 	public static final String GUIID_RedstoneConnector = "redstoneconnector";
 	public static final String GUIID_RedstoneProbe = "redstoneprobe";

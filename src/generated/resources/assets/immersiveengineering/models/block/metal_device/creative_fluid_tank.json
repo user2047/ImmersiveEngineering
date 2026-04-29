@@ -1,8 +1,7 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "render_type": "minecraft:translucent",
+  "parent": "minecraft:block/cube_all",
   "textures": {
-    "bottom": "immersiveengineering:block/metal_device/capacitor_creative_down_out",
-    "side": "immersiveengineering:block/metal_device/barrel_side",
-    "top": "immersiveengineering:block/metal_device/capacitor_creative_up_out"
+    "all": "minecraft:block/glass"
   }
 }

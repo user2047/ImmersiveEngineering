@@ -483,9 +483,14 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		connections &= ~mask;
 		if(sideConfig.getOrDefault(dir, false))
 		{
-			IFluidHandler handler = neighbors.get(dir).getCapability();
-			if(handler!=null&&handler.getTanks() > 0)
+			if(level.getBlockEntity(worldPosition.relative(dir)) instanceof FluidPipeBlockEntity)
 				connections |= mask;
+			else
+			{
+				IFluidHandler handler = neighbors.get(dir).getCapability();
+				if(handler!=null&&handler.getTanks() > 0)
+					connections |= mask;
+			}
 		}
 		return oldConn!=connections;
 	}
@@ -551,8 +556,12 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		if(firstPipe)
 		{
 			BlockEntity neighborTile = level.getBlockEntity(getBlockPos().relative(side));
-			if(neighborTile instanceof FluidPipeBlockEntity)
-				((FluidPipeBlockEntity)neighborTile).setSide(side.getOpposite(), connectable, false);
+			if(neighborTile instanceof FluidPipeBlockEntity neighborPipe)
+			{
+				neighborPipe.setSide(side.getOpposite(), connectable, false);
+				neighborPipe.updateConnectionByte(side.getOpposite());
+				neighborPipe.markContainingBlockForUpdate(null);
+			}
 			updateConnectionByte(side); //yes, this is not meant for neighborTile
 		}
 		level.blockEvent(getBlockPos(), getBlockState().getBlock(), 0, 0);

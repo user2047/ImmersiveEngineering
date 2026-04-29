@@ -16,15 +16,20 @@ import blusunrize.immersiveengineering.common.blocks.IEBaseBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IBlockEntityDrop;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IBlockOverlayText;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IComparatorOverride;
+import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IInteractionObjectIE;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IPlayerInteraction;
 import blusunrize.immersiveengineering.common.register.IEBlockEntities;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes.ArgContainer;
 import blusunrize.immersiveengineering.common.util.FluidStackCompat;
+import blusunrize.immersiveengineering.common.util.ItemHandlerCompat;
 import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -36,21 +41,46 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements IBlockOverlayText,
-		IPlayerInteraction, IBlockEntityDrop, IComparatorOverride
+		IPlayerInteraction, IBlockEntityDrop, IComparatorOverride, IInteractionObjectIE<CreativeFluidTankBlockEntity>
 {
-	private FluidStack fluid = FluidStack.EMPTY;
+	public static final int SLOT_INPUT = 0;
+	public static final int SLOT_OUTPUT = 1;
+	public static final int NUM_SLOTS = 2;
+
+	private final FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME);
 	private final IFluidHandler pipeHandler = new CreativeTankFluidHandler(false);
 	private final IFluidHandler bucketHandler = new CreativeTankFluidHandler(true);
+	private boolean processingContainerSlots;
+	private final ItemStackHandler inventory = new ItemStackHandler(NUM_SLOTS)
+	{
+		public int getSlotLimit(int slot)
+		{
+			return 1;
+		}
+
+		protected void onContentsChanged(int slot)
+		{
+			if(!processingContainerSlots&&slot==SLOT_INPUT)
+				processInputSlot();
+			setChanged();
+			if(level!=null&&!level.isClientSide())
+				markContainingBlockForUpdate(null);
+		}
+	};
 
 	public CreativeFluidTankBlockEntity(BlockPos pos, BlockState state)
 	{
@@ -59,13 +89,32 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		fluid = normalizeFluid(FluidStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("fluid")));
+		setFluid(FluidStackCompat.parseOptional(provider, nbt.getCompoundOrEmpty("fluid")), false);
+		if(!descPacket)
+		{
+			processingContainerSlots = true;
+			ItemHandlerCompat.deserializeNBT(inventory, provider, nbt.getCompoundOrEmpty("inventory"));
+			if(inventory.getSlots() < NUM_SLOTS)
+			{
+				ItemStack oldInput = inventory.getStackInSlot(0).copy();
+				inventory.setSize(NUM_SLOTS);
+				inventory.setStackInSlot(SLOT_INPUT, oldInput);
+			}
+			processingContainerSlots = false;
+			processInputSlot();
+		}
 	}
 
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
-		if(!fluid.isEmpty())
-			nbt.put("fluid", FluidStackCompat.saveOptional(fluid, provider));
+		FluidStack stored = getStoredFluid();
+		if(!stored.isEmpty())
+			nbt.put("fluid", FluidStackCompat.saveOptional(stored, provider));
+		if(!descPacket&&hasContainerItems())
+		{
+			Tag inventoryNBT = ItemHandlerCompat.serializeNBT(inventory, provider);
+			nbt.put("inventory", inventoryNBT);
+		}
 	}
 
 	public static void registerCapabilities(BECapabilityRegistrar<CreativeFluidTankBlockEntity> registrar)
@@ -75,7 +124,7 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 
 	public InteractionResult interact(Direction side, Player player, InteractionHand hand, ItemStack heldItem, float hitX, float hitY, float hitZ)
 	{
-		if(FluidUtils.interactWithFluidHandler(player, hand, bucketHandler))
+		if(player.isShiftKeyDown()&&FluidUtils.interactWithFluidHandler(player, hand, bucketHandler))
 			return InteractionResult.SUCCESS;
 		return InteractionResult.PASS;
 	}
@@ -87,9 +136,10 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 			return null;
 		if(Utils.isFluidRelatedItemStack(player.getItemInHand(InteractionHand.MAIN_HAND)))
 		{
-			if(fluid.isEmpty())
+			FluidStack stored = getStoredFluid();
+			if(stored.isEmpty())
 				return new Component[]{TextUtils.formatFluidStack(FluidStack.EMPTY)};
-			return new Component[]{Component.translatable(Lib.DESC_INFO+"creativeFluidTank", fluid.getHoverName())};
+			return new Component[]{Component.translatable(Lib.DESC_INFO+"creativeFluidTank", stored.getHoverName())};
 		}
 		return null;
 	}
@@ -97,9 +147,16 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 	public void getBlockEntityDrop(LootContext context, Consumer<ItemStack> drop)
 	{
 		ItemStack stack = new ItemStack(getBlockState().getBlock(), 1);
-		if(!fluid.isEmpty())
-			stack.set(IEDataComponents.GENERIC_FLUID, SimpleFluidContent.copyOf(fluid));
+		FluidStack stored = getStoredFluid();
+		if(!stored.isEmpty())
+			stack.set(IEDataComponents.GENERIC_FLUID, SimpleFluidContent.copyOf(stored));
 		drop.accept(stack);
+		for(int slot = 0; slot < inventory.getSlots(); ++slot)
+		{
+			ItemStack slotStack = inventory.getStackInSlot(slot);
+			if(!slotStack.isEmpty())
+				drop.accept(slotStack.copy());
+		}
 	}
 
 	public void onBEPlaced(BlockPlaceContext ctx)
@@ -109,18 +166,124 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 
 	public int getComparatorInputOverride()
 	{
-		return fluid.isEmpty()?0: 15;
+		return getStoredFluid().isEmpty()?0: 15;
 	}
 
-	private void setFluid(FluidStack newFluid, boolean notify)
+	public FluidTank getTank()
+	{
+		return tank;
+	}
+
+	public ItemStackHandler getInventory()
+	{
+		return inventory;
+	}
+
+	public FluidStack getStoredFluid()
+	{
+		return tank.getFluid();
+	}
+
+	public void clearFluid()
+	{
+		setFluid(FluidStack.EMPTY, true);
+	}
+
+	public void setFluid(FluidStack newFluid, boolean notify)
 	{
 		newFluid = normalizeFluid(newFluid);
-		if(FluidStack.isSameFluidSameComponents(fluid, newFluid))
+		if(FluidStack.isSameFluidSameComponents(tank.getFluid(), newFluid))
 			return;
-		fluid = newFluid;
+		tank.setFluid(newFluid);
 		setChanged();
 		if(notify)
 			markContainingBlockForUpdate(null);
+	}
+
+	private boolean hasContainerItems()
+	{
+		for(int slot = 0; slot < inventory.getSlots(); ++slot)
+			if(!inventory.getStackInSlot(slot).isEmpty())
+				return true;
+		return false;
+	}
+
+	private void processInputSlot()
+	{
+		if(level==null||level.isClientSide())
+			return;
+		ItemStack stack = inventory.getStackInSlot(SLOT_INPUT);
+		if(stack.isEmpty())
+			return;
+
+		boolean filledContainer = FluidUtil.getFluidContained(stack).filter(fluid -> !fluid.isEmpty()).isPresent();
+		FluidActionResult simulated = FluidActionResult.FAILURE;
+		if(filledContainer)
+			simulated = FluidUtil.tryEmptyContainer(stack, bucketHandler, Integer.MAX_VALUE, null, false);
+		else if(!getStoredFluid().isEmpty())
+			simulated = FluidUtil.tryFillContainer(stack, pipeHandler, Integer.MAX_VALUE, null, false);
+		if(!simulated.isSuccess()||!canMoveToOutput(simulated.getResult()))
+			return;
+
+		FluidActionResult result = filledContainer?
+				FluidUtil.tryEmptyContainer(stack, bucketHandler, Integer.MAX_VALUE, null, true):
+				FluidUtil.tryFillContainer(stack, pipeHandler, Integer.MAX_VALUE, null, true);
+		if(!result.isSuccess())
+			return;
+
+		processingContainerSlots = true;
+		inventory.setStackInSlot(SLOT_INPUT, ItemStack.EMPTY);
+		moveToOutput(result.getResult());
+		processingContainerSlots = false;
+		setChanged();
+		markContainingBlockForUpdate(null);
+	}
+
+	private boolean canMoveToOutput(ItemStack result)
+	{
+		if(result.isEmpty())
+			return true;
+		ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
+		if(output.isEmpty())
+			return true;
+		if(!ItemStack.isSameItemSameComponents(output, result))
+			return false;
+		return output.getCount()+result.getCount() <= Math.min(output.getMaxStackSize(), inventory.getSlotLimit(SLOT_OUTPUT));
+	}
+
+	private void moveToOutput(ItemStack result)
+	{
+		if(result.isEmpty())
+			return;
+		ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
+		if(output.isEmpty())
+			inventory.setStackInSlot(SLOT_OUTPUT, result.copy());
+		else
+		{
+			output.grow(result.getCount());
+			inventory.setStackInSlot(SLOT_OUTPUT, output);
+		}
+	}
+
+	@Nonnull
+	public Component getDisplayName()
+	{
+		return Component.translatable("block."+Lib.MODID+".creative_fluid_tank");
+	}
+
+	public boolean canUseGui(Player player)
+	{
+		return true;
+	}
+
+	public CreativeFluidTankBlockEntity getGuiMaster()
+	{
+		return this;
+	}
+
+	public ArgContainer<CreativeFluidTankBlockEntity, ?> getContainerType()
+	{
+		return IEMenuTypes.CREATIVE_FLUID_TANK;
 	}
 
 	private static FluidStack normalizeFluid(FluidStack stack)
@@ -147,9 +310,10 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 		@Nonnull
 		public FluidStack getFluidInTank(int tank)
 		{
-			if(tank!=0||fluid.isEmpty())
+			FluidStack stored = getStoredFluid();
+			if(tank!=0||stored.isEmpty())
 				return FluidStack.EMPTY;
-			return fluid.copyWithAmount(Integer.MAX_VALUE);
+			return stored.copyWithAmount(Integer.MAX_VALUE);
 		}
 
 		public int getTankCapacity(int tank)
@@ -174,17 +338,19 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 		@Nonnull
 		public FluidStack drain(FluidStack resource, FluidAction action)
 		{
-			if(resource.isEmpty()||fluid.isEmpty()||!FluidStack.isSameFluidSameComponents(resource, fluid))
+			FluidStack stored = getStoredFluid();
+			if(resource.isEmpty()||stored.isEmpty()||!FluidStack.isSameFluidSameComponents(resource, stored))
 				return FluidStack.EMPTY;
-			return fluid.copyWithAmount(resource.getAmount());
+			return stored.copyWithAmount(resource.getAmount());
 		}
 
 		@Nonnull
 		public FluidStack drain(int maxDrain, FluidAction action)
 		{
-			if(maxDrain <= 0||fluid.isEmpty())
+			FluidStack stored = getStoredFluid();
+			if(maxDrain <= 0||stored.isEmpty())
 				return FluidStack.EMPTY;
-			return fluid.copyWithAmount(maxDrain);
+			return stored.copyWithAmount(maxDrain);
 		}
 	}
 }

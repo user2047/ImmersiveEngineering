@@ -34,10 +34,10 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.transfer.fluid.BucketResourceHandler;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -108,6 +108,12 @@ public class IEFluids
 
 	public static void registerBucketCapabilities(RegisterCapabilitiesEvent event)
 	{
+		for(FluidEntry entry : ALL_ENTRIES)
+			event.registerItem(
+					Capabilities.Fluid.ITEM,
+					(stack, itemAccess) -> new BucketResourceHandler(itemAccess),
+					entry.getBucket()
+			);
 	}
 
 	public record FluidEntry(

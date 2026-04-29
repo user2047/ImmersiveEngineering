@@ -1530,6 +1530,7 @@
   "gui.immersiveengineering.config.turret.neutrals": "Neutrals",
   "gui.immersiveengineering.config.turret.players": "Players",
   "gui.immersiveengineering.empty": "Empty",
+  "gui.immersiveengineering.config.creativeFluidTank.clear": "Clear Fluid",
   "gui.immersiveengineering.left": "Left:",
   "gui.immersiveengineering.right": "Right:",
   "gui.immersiveengineering.toast.eureka": "EUREKA!!",

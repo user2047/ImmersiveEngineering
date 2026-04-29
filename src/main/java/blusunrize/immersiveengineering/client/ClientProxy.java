@@ -507,6 +507,7 @@ public class ClientProxy extends CommonProxy
 		ev.register(IEMenuTypes.CHEM_TURRET.getType(), ChemTurretScreen::new);
 		ev.register(IEMenuTypes.FLUID_SORTER.getType(), FluidSorterScreen::new);
 		ev.register(IEMenuTypes.CLOCHE.getType(), ClocheScreen::new);
+		ev.register(IEMenuTypes.CREATIVE_FLUID_TANK.getType(), CreativeFluidTankScreen::new);
 		ev.register(IEMenuTypes.TOOLBOX_BLOCK.getType(), ToolboxScreen::new);
 		ev.register(IEMenuTypes.TOOLBOX.getType(), ToolboxScreen::new);
 
@@ -541,6 +542,7 @@ public class ClientProxy extends CommonProxy
 		registerBERenderNoContext(event, IEBlockEntities.TURRET_GUN.master(), TurretRenderer::new);
 		registerBERenderNoContext(event, IEBlockEntities.CLOCHE.master(), ClocheRenderer::new);
 		registerBERenderNoContext(event, IEBlockEntities.BLASTFURNACE_PREHEATER.master(), BlastFurnacePreheaterRenderer::new);
+		registerBERenderNoContext(event, IEBlockEntities.CREATIVE_FLUID_TANK.get(), CreativeFluidTankRenderer::new);
 		// MULTIBLOCKS
 		registerBERenderNoContext(event, IEMultiblockLogic.METAL_PRESS.masterBE(), MetalPressRenderer::new);
 		registerBERenderNoContext(event, IEMultiblockLogic.CRUSHER.masterBE(), CrusherRenderer::new);
