@@ -44,12 +44,17 @@ public class SheetmetalTankRenderer extends IEMultiblockRenderer<State>
 			matrixStack.pushPose();
 			matrixStack.translate(xx, 0, zz);
 
-			Matrix4f mat = matrixStack.last().pose();
+			PoseStack.Pose pose = matrixStack.last();
+			Matrix4f mat = pose.pose();
 			final VertexConsumer builder = bufferIn.getBuffer(IERenderTypes.TRANSLUCENT_POSITION_COLOR);
-			builder.addVertex(mat, -4, -4, 0).setColor(0x22, 0x22, 0x22, 0xff);
-			builder.addVertex(mat, -4, 20, 0).setColor(0x22, 0x22, 0x22, 0xff);
-			builder.addVertex(mat, 20, 20, 0).setColor(0x22, 0x22, 0x22, 0xff);
-			builder.addVertex(mat, 20, -4, 0).setColor(0x22, 0x22, 0x22, 0xff);
+			builder.addVertex(mat, -4, -4, 0).setColor(0x22, 0x22, 0x22, 0xff)
+					.setUv(0, 0).setOverlay(combinedOverlayIn).setLight(combinedLightIn).setNormal(pose, 0, 0, 1);
+			builder.addVertex(mat, -4, 20, 0).setColor(0x22, 0x22, 0x22, 0xff)
+					.setUv(0, 0).setOverlay(combinedOverlayIn).setLight(combinedLightIn).setNormal(pose, 0, 0, 1);
+			builder.addVertex(mat, 20, 20, 0).setColor(0x22, 0x22, 0x22, 0xff)
+					.setUv(0, 0).setOverlay(combinedOverlayIn).setLight(combinedLightIn).setNormal(pose, 0, 0, 1);
+			builder.addVertex(mat, 20, -4, 0).setColor(0x22, 0x22, 0x22, 0xff)
+					.setUv(0, 0).setOverlay(combinedOverlayIn).setLight(combinedLightIn).setNormal(pose, 0, 0, 1);
 
 			if(!fs.isEmpty())
 			{

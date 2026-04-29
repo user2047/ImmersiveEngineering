@@ -613,6 +613,9 @@ public final class IEBlocks
 		public static final BlockEntry<IEEntityBlock<CapacitorCreativeBlockEntity>> CAPACITOR_CREATIVE = new BlockEntry<>(
 				"capacitor_creative", DEFAULT_METAL_PROPERTIES, p -> new IEEntityBlock<>(IEBlockEntities.CAPACITOR_CREATIVE, p)
 		);
+		public static final BlockEntry<IEEntityBlock<CreativeFluidTankBlockEntity>> CREATIVE_FLUID_TANK = new BlockEntry<>(
+				"creative_fluid_tank", DEFAULT_METAL_PROPERTIES, p -> new IEEntityBlock<>(IEBlockEntities.CREATIVE_FLUID_TANK, p)
+		);
 		public static final BlockEntry<IEEntityBlock<?>> BARREL = BlockEntry.barrel("metal_barrel", true);
 		public static final BlockEntry<FluidPumpBlock> FLUID_PUMP = new BlockEntry<>(
 				// TODO make non-dynamic

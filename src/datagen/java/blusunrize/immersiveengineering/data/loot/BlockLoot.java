@@ -116,6 +116,7 @@ public class BlockLoot implements LootTableSubProvider
 				MetalDevices.CAPACITOR_LV, MetalDevices.CAPACITOR_MV, MetalDevices.CAPACITOR_HV, MetalDevices.CAPACITOR_CREATIVE
 		))
 			register(cap, tileDrop());
+		register(MetalDevices.CREATIVE_FLUID_TANK, tileDrop());
 		register(Connectors.FEEDTHROUGH, tileDrop());
 		register(MetalDevices.TURRET_CHEM, tileDrop());
 		register(MetalDevices.TURRET_GUN, tileDrop(), dropInv());

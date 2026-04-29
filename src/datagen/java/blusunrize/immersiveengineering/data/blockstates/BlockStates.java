@@ -608,6 +608,12 @@ public class BlockStates extends ExtendedBlockstateProvider
 					.renderType(ModelProviderUtils.getName(cutout()));
 			simpleBlockAndItem(MetalDevices.FLUID_PLACER, model);
 		}
+		simpleBlockAndItem(MetalDevices.CREATIVE_FLUID_TANK,
+				models().cubeBottomTop("block/metal_device/creative_fluid_tank",
+						modLoc("block/metal_device/barrel_side"),
+						modLoc("block/metal_device/capacitor_creative_down_out"),
+						modLoc("block/metal_device/capacitor_creative_up_out")
+				));
 		{
 			BlockModelBuilder furnaceHeaterOn = models().withExistingParent("furnace_heater_on", rl("block/ie_six_sides_overlay_all_but_one"))
 					.texture("block_all", rl("block/metal_device/furnace_heater_active"))

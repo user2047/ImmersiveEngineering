@@ -178,6 +178,9 @@ public class IEBlockEntities
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CapacitorCreativeBlockEntity>> CAPACITOR_CREATIVE = REGISTER.register(
 			"capacitorcreative", makeType(CapacitorCreativeBlockEntity::new, MetalDevices.CAPACITOR_CREATIVE)
 	);
+	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CreativeFluidTankBlockEntity>> CREATIVE_FLUID_TANK = REGISTER.register(
+			"creativefluidtank", makeType(CreativeFluidTankBlockEntity::new, MetalDevices.CREATIVE_FLUID_TANK)
+	);
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MetalBarrelBlockEntity>> METAL_BARREL = REGISTER.register(
 			"metalbarrel", makeType(MetalBarrelBlockEntity::new, MetalDevices.BARREL)
 	);

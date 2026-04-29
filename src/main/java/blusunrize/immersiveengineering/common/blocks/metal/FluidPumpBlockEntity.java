@@ -343,8 +343,9 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideConfigArray = nbt.getIntArray("sideConfig").orElse(new int[0]);
+		sideConfig.clear();
 		for(Direction d : DirectionUtils.VALUES)
-			sideConfig.put(d, IOSideConfig.VALUES[sideConfigArray[d.ordinal()]]);
+			sideConfig.put(d, readSideConfig(sideConfigArray, d));
 		if(nbt.contains("placeCobble"))
 			placeCobble = nbt.getBooleanOr("placeCobble", false);
 		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
@@ -354,11 +355,26 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			this.markContainingBlockForUpdate(null);
 	}
 
+	private static IOSideConfig readSideConfig(int[] sideConfigArray, Direction side)
+	{
+		if(side.ordinal() >= sideConfigArray.length)
+			return getDefaultSideConfig(side);
+		int value = sideConfigArray[side.ordinal()];
+		if(value < 0||value >= IOSideConfig.VALUES.length)
+			return getDefaultSideConfig(side);
+		return IOSideConfig.VALUES[value];
+	}
+
+	private static IOSideConfig getDefaultSideConfig(Direction side)
+	{
+		return side==Direction.DOWN?IOSideConfig.INPUT: IOSideConfig.NONE;
+	}
+
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideConfigArray = new int[6];
 		for(Direction d : DirectionUtils.VALUES)
-			sideConfigArray[d.ordinal()] = sideConfig.get(d).ordinal();
+			sideConfigArray[d.ordinal()] = sideConfig.getOrDefault(d, getDefaultSideConfig(d)).ordinal();
 		nbt.putIntArray("sideConfig", sideConfigArray);
 		nbt.putBoolean("placeCobble", placeCobble);
 		nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
@@ -368,7 +384,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public IOSideConfig getSideConfig(Direction side)
 	{
-		return sideConfig.get(side);
+		return sideConfig.getOrDefault(side, getDefaultSideConfig(side));
 	}
 
 	public boolean toggleSide(Direction side, Player p)

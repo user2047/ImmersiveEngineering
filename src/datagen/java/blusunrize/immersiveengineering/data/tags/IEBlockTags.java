@@ -301,6 +301,7 @@ public class IEBlockTags extends BlockTagsProvider
 				.add(MetalDevices.CAPACITOR_MV.get())
 				.add(MetalDevices.CAPACITOR_HV.get())
 				.add(MetalDevices.CAPACITOR_CREATIVE.get())
+				.add(MetalDevices.CREATIVE_FLUID_TANK.get())
 				.add(MetalDevices.BARREL.get())
 				.add(MetalDevices.FURNACE_HEATER.get())
 				.add(MetalDevices.DYNAMO.get())
@@ -406,7 +407,7 @@ public class IEBlockTags extends BlockTagsProvider
 		MetalDevices.CHUTES.values().forEach(entry -> tag.add(entry.get()));
 		MetalDevices.DYED_CHUTES.values().forEach(entry -> tag.add(entry.get()));
 		// fluid machines
-		tag.add(MetalDevices.BARREL.get(), MetalDevices.FLUID_PUMP.get(), MetalDevices.FLUID_PIPE.get(), MetalDevices.FLUID_PLACER.get(), MetalDevices.PIPE_VALVE.get(), MetalDevices.HATCH.get());
+		tag.add(MetalDevices.BARREL.get(), MetalDevices.CREATIVE_FLUID_TANK.get(), MetalDevices.FLUID_PUMP.get(), MetalDevices.FLUID_PIPE.get(), MetalDevices.FLUID_PLACER.get(), MetalDevices.PIPE_VALVE.get(), MetalDevices.HATCH.get());
 		// other machines
 		tag.add(MetalDevices.BLAST_FURNACE_PREHEATER.get(), MetalDevices.FURNACE_HEATER.get(), MetalDevices.DYNAMO.get(), MetalDevices.THERMOELECTRIC_GEN.get(),
 				MetalDevices.ELECTRIC_LANTERN.get(), MetalDevices.SAMPLE_DRILL.get(), MetalDevices.FLOODLIGHT.get(), MetalDevices.ELECTROMAGNET.get());
@@ -572,6 +573,7 @@ public class IEBlockTags extends BlockTagsProvider
 				MetalDevices.CAPACITOR_MV,
 				MetalDevices.CAPACITOR_HV,
 				MetalDevices.CAPACITOR_CREATIVE,
+				MetalDevices.CREATIVE_FLUID_TANK,
 				MetalDevices.BARREL,
 				MetalDevices.FLUID_PUMP,
 				MetalDevices.FLUID_PLACER,

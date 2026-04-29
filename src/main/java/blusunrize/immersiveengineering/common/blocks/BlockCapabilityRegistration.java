@@ -49,6 +49,7 @@ public class BlockCapabilityRegistration
 		ChargingStationBlockEntity.registerCapabilities(forType(event, IEBlockEntities.CHARGING_STATION));
 		ChuteBlockEntity.registerCapabilities(forType(event, IEBlockEntities.CHUTE));
 		ClocheBlockEntity.registerCapabilities(forType(event, IEBlockEntities.CLOCHE));
+		CreativeFluidTankBlockEntity.registerCapabilities(forType(event, IEBlockEntities.CREATIVE_FLUID_TANK));
 		for(Supplier<BlockEntityType<?>> beType : ConveyorBeltBlockEntity.BE_TYPES.values())
 			ConveyorBeltBlockEntity.registerCapabilities(
 					forType(event, () -> (BlockEntityType<ConveyorBeltBlockEntity<?>>)beType.get())

@@ -139,7 +139,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 							openList.add(nextPos);
 						else
 						{
-							IFluidHandler handler = null;
+							IFluidHandler handler = pipe.neighbors.get(fd).getCapability();
 							if(handler!=null&&handler.getTanks() > 0)
 								fluidHandlers.add(new DirectionalFluidOutput(handler, fd, adjacentTile, nextPos));
 						}
@@ -216,8 +216,8 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 			}
 			else
 			{
-				sideConfig.put(curDir, false);
-				invalidateHandler(curDir);
+				sideConfig.put(curDir, true);
+				setValidHandler(curDir);
 			}
 		}
 		final Block oldCover = cover;

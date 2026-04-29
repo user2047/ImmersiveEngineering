@@ -203,11 +203,10 @@ public class ModelUtils
 
 	public static BakedQuad reverseOrder(BakedQuad in)
 	{
-		int[] oldData = in.getVertices();
-		int[] newData = new int[oldData.length];
-		final int vertexLength = oldData.length/4;
-		for(int i = 0; i < 4; ++i)
-			System.arraycopy(oldData, i*vertexLength, newData, (3-i)*vertexLength, vertexLength);
-		return new BakedQuad(newData, in.getTintIndex(), in.getDirection(), in.getSprite(), in.isShade());
+		return new BakedQuad(
+				in.position(3), in.position(2), in.position(1), in.position(0),
+				in.packedUV(3), in.packedUV(2), in.packedUV(1), in.packedUV(0),
+				in.direction(), in.materialInfo()
+		);
 	}
 }

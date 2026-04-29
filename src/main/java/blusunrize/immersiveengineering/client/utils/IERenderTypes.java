@@ -25,11 +25,11 @@ public class IERenderTypes
 	public static final RenderType LINES_NONTRANSLUCENT = RenderTypes.lines();
 	public static final RenderType POINTS = RenderTypes.debugPoint();
 	public static final RenderType TRANSLUCENT_TRIANGLES = RenderTypeCompat.translucent();
-	public static final RenderType TRANSLUCENT_POSITION_COLOR = RenderTypeCompat.translucent();
+	public static final RenderType TRANSLUCENT_POSITION_COLOR = RenderTypes.debugQuads();
 	public static final RenderType TRANSLUCENT_NO_DEPTH = RenderTypeCompat.translucent();
 	public static final RenderType CHUNK_MARKER = RenderTypes.linesTranslucent();
 	public static final RenderType POSITION_COLOR_LIGHTMAP = RenderTypeCompat.solid();
-	public static final RenderType ITEM_DAMAGE_BAR = RenderTypeCompat.solid();
+	public static final RenderType ITEM_DAMAGE_BAR = RenderTypes.debugQuads();
 	public static final RenderType PARTICLES = RenderTypeCompat.translucent();
 
 	public static RenderType getGui(Identifier texture)

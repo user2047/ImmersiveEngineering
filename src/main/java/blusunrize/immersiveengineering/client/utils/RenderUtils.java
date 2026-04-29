@@ -13,6 +13,7 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.mixin.accessors.client.PlayerControllerAccess;
 import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -48,11 +49,6 @@ public class RenderUtils
 	// The light vectors created from neighbourBrightness aren't "normalized" (to length 255), the length needs to be divided by this factor to normalize it.
 	// The indices are generated as follows: a 1 bit indicates a positive facing normal, a 0 a negative one. 1=x, 2=y, 4=z
 	private static final float[][] normalizationFactors = new float[2][8];
-
-	private static final VertexFormat FORMAT = DefaultVertexFormat.BLOCK;
-	private static final int VERTEX_SIZE = FORMAT.getVertexSize()/4;
-	private static final int UV_OFFSET = ClientUtils.findTextureOffset(FORMAT);
-	private static final int POSITION_OFFSET = ClientUtils.findPositionOffset(FORMAT);
 
 	/**
 	 * Renders the given quads. Uses the local and neighbour brightnesses to calculate lighting
@@ -108,15 +104,12 @@ public class RenderUtils
 			final Matrix3fc normalTransform = transform.last().normal();
 			for(BakedQuad quad : quads)
 			{
-				int[] vData = quad.getVertices();
 				// extract position info from the quad
 				for(int i = 0; i < 4; i++)
-					quadCoords[i].set(
-							Float.intBitsToFloat(vData[VERTEX_SIZE*i+POSITION_OFFSET]),
-							Float.intBitsToFloat(vData[VERTEX_SIZE*i+POSITION_OFFSET+1]),
-							Float.intBitsToFloat(vData[VERTEX_SIZE*i+POSITION_OFFSET+2]),
-							1
-					);
+				{
+					Vector3fc position = quad.position(i);
+					quadCoords[i].set(position.x(), position.y(), position.z(), 1);
+				}
 				//generate the normal vector
 				Vector3f normal = new Vector3f(quadCoords[1].x, quadCoords[1].y, quadCoords[1].z);
 				Vector3f side2 = new Vector3f(quadCoords[2].x, quadCoords[2].y, quadCoords[2].z);
@@ -131,11 +124,12 @@ public class RenderUtils
 				for(int i = 0; i < 4; ++i)
 				{
 					final Vector4f vertexPos = quadCoords[i];
+					long packedUv = quad.packedUV(i);
 					vertexPos.mul(positionTransform);
 					renderer.addVertex(
 							vertexPos.x(), vertexPos.y(), vertexPos.z(),
 							rgba,
-							Float.intBitsToFloat(vData[VERTEX_SIZE*i+UV_OFFSET]), Float.intBitsToFloat(vData[VERTEX_SIZE*i+UV_OFFSET+1]),
+							UVPair.unpackU(packedUv), UVPair.unpackV(packedUv),
 							OverlayTexture.NO_OVERLAY,
 							LightTexture.pack(l1>>4, l2>>4),
 							normal.x(), normal.y(), normal.z()

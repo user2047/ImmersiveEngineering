@@ -141,12 +141,20 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 	public void readCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideCfgArray = nbt.getIntArray("sideConfig").orElse(new int[0]);
-		if(sideCfgArray.length < 2)
-			sideCfgArray = new int[]{-1, 0};
 		sideConfig.clear();
-		for(int i = 0; i < sideCfgArray.length; ++i)
-			sideConfig.put(Direction.from3DDataValue(i), IOSideConfig.VALUES[sideCfgArray[i]]);
+		sideConfig.put(Direction.DOWN, readSideConfig(sideCfgArray, 0, OUTPUT));
+		sideConfig.put(Direction.UP, readSideConfig(sideCfgArray, 1, IOSideConfig.INPUT));
 		this.readTank(provider, nbt);
+	}
+
+	private static IOSideConfig readSideConfig(int[] sideCfgArray, int index, IOSideConfig fallback)
+	{
+		if(index >= sideCfgArray.length)
+			return fallback;
+		int value = sideCfgArray[index];
+		if(value < 0||value >= IOSideConfig.VALUES.length)
+			return fallback;
+		return IOSideConfig.VALUES[value];
 	}
 
 	public void readTank(Provider provider, CompoundTag nbt)
@@ -157,8 +165,8 @@ public class WoodenBarrelBlockEntity extends IEBaseBlockEntity implements IEServ
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		int[] sideCfgArray = new int[2];
-		sideCfgArray[0] = sideConfig.get(Direction.DOWN).ordinal();
-		sideCfgArray[1] = sideConfig.get(Direction.UP).ordinal();
+		sideCfgArray[0] = sideConfig.getOrDefault(Direction.DOWN, OUTPUT).ordinal();
+		sideCfgArray[1] = sideConfig.getOrDefault(Direction.UP, IOSideConfig.INPUT).ordinal();
 		nbt.putIntArray("sideConfig", sideCfgArray);
 		this.writeTank(provider, nbt, false);
 	}
