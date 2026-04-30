@@ -18,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -68,7 +67,7 @@ public class GuiHelper
 	{
 		TransformingVertexBuilder innerBuilder = new TransformingVertexBuilder(builder, transform);
 		innerBuilder.defaultColor(r, g, b, alpha);
-		innerBuilder.setDefaultLight(LightTexture.FULL_BRIGHT);
+		innerBuilder.setDefaultLight(LightTextureCompat.FULL_BRIGHT);
 		innerBuilder.setDefaultOverlay(OverlayTexture.NO_OVERLAY);
 		innerBuilder.setDefaultNormal(1, 1, 1);
 		innerBuilder.addVertex(x, y+h, 0).setUv(u0, v1);

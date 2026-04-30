@@ -12,7 +12,6 @@ import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
 import blusunrize.immersiveengineering.client.utils.GuiGraphicsPose;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -128,9 +127,6 @@ public class GuiSelectBox<E> extends GuiButtonState<E>
 		{
 			Font fontrenderer = mc.font;
 			this.isHovered = mouseX >= this.getX()&&mouseY >= this.getY()&&mouseX < this.getX()+this.width&&mouseY < this.getY()+this.height;
-			RenderSystem.enableBlend();
-			RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-			RenderSystem.blendFunc(770, 771);
 
 			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON, getX()+width-WIDTH_BUTTON, getY(), WIDTH_BUTTON, HEIGHT_BASE);
 			if(!this.opened)

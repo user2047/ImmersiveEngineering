@@ -38,7 +38,6 @@ public class GuiButtonItem extends Button
 		if(this.visible)
 		{
 			this.isHovered = mouseX >= this.getX()&&mouseY >= this.getY()&&mouseX < this.getX()+this.width&&mouseY < this.getY()+this.height;
-			RenderSystem.defaultBlendFunc();
 			graphics.blitSprite(
 					RenderPipelines.GUI_TEXTURED, state?TRUE_TEXTURE: FALSE_TEXTURE, getX(), getY(), width, height
 			);

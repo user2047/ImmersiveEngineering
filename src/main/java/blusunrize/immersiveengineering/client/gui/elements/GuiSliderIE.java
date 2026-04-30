@@ -8,7 +8,6 @@
 
 package blusunrize.immersiveengineering.client.gui.elements;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -52,9 +51,6 @@ public class GuiSliderIE extends ExtendedSlider
 	public void renderWidget(@Nonnull GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick)
 	{
 		Font fontrenderer = Minecraft.getInstance().font;
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-		RenderSystem.blendFunc(770, 771);
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, LEFT, getX(), getY(), 4, height);
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, RIGHT, getX()+width-4, getY(), 4, height);
 		for(int i = 0; i < width-8; i += 2)
@@ -66,6 +62,11 @@ public class GuiSliderIE extends ExtendedSlider
 		else if(this.isHovered)
 			color = 0xffffa0;
 		graphics.centeredText(fontrenderer, getMessage(), getX()+width/2, getY()-10+height/2-3, color);
+	}
+
+	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
+	{
+		renderWidget(graphics, mouseX, mouseY, partialTick);
 	}
 
 	protected void applyValue()

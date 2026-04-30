@@ -218,8 +218,6 @@ public class RadioTowerScreen extends IEContainerScreen<RadioTowerMenu>
 		{
 			Minecraft minecraft = Minecraft.getInstance();
 			graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
 			RenderSystem.enableDepthTest();
 
 			// render background

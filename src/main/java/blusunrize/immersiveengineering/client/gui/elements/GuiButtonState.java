@@ -11,7 +11,6 @@ package blusunrize.immersiveengineering.client.gui.elements;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.ButtonTexture;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonIE.IIEPressable;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -106,9 +105,6 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 		Minecraft mc = Minecraft.getInstance();
 		Font fontrenderer = mc.font;
 		this.isHovered = mouseX >= this.getX()&&mouseY >= this.getY()&&mouseX < this.getX()+this.width&&mouseY < this.getY()+this.height;
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-		RenderSystem.blendFunc(770, 771);
 		graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED,
 				texture.get(this.states[state.getAsInt()]).get(this.isHovered), getX(), getY(), width, height
@@ -118,6 +114,11 @@ public class GuiButtonState<E> extends Button implements ITooltipWidget
 			int[] offset = getTextOffset(fontrenderer);
 			graphics.text(fontrenderer, getMessage(), getX()+offset[0], getY()+offset[1], getTextColor(this.isHovered), false);
 		}
+	}
+
+	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
+	{
+		renderWidget(graphics, mouseX, mouseY, partialTicks);
 	}
 
 	public void gatherTooltip(int mouseX, int mouseY, List<Component> tooltip)

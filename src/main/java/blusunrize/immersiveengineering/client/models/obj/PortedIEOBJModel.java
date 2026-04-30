@@ -151,6 +151,13 @@ public record PortedIEOBJModel(
 		return result.build();
 	}
 
+	public QuadCollection bakeForKey(
+			Object key, TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState, ModelDebugName name
+	)
+	{
+		return bakeForCallback(cast(callback), key, textureSlots, modelBaker, modelState, name);
+	}
+
 	private <T> DynamicModel.BakedDynamicModel makeStandaloneModel(
 			IEOBJCallback<T> callback, TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState,
 			ModelDebugName name

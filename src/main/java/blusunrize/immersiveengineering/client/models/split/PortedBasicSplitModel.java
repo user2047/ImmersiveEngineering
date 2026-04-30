@@ -12,6 +12,9 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.IEProperties.Model;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
+import blusunrize.immersiveengineering.api.client.ieobj.BlockCallback;
+import blusunrize.immersiveengineering.api.client.ieobj.IEOBJCallback;
+import blusunrize.immersiveengineering.client.models.obj.PortedIEOBJModel;
 import blusunrize.immersiveengineering.client.models.split.PolygonUtils.ExtraQuadData;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -193,11 +196,18 @@ public record PortedBasicSplitModel(
 			Map<BlockPos, BlockStateModelPart> splitParts = splitToParts(
 					unrotatedQuads.getAll(), parts, finalTransform, ambientOcclusion, particleMaterial
 			);
+			DynamicSplitBaker dynamicBaker = null;
+			if(splitModel.innerModel instanceof PortedIEOBJModel objModel&&objModel.callback() instanceof BlockCallback<?>)
+				dynamicBaker = new DynamicSplitBaker(
+						objModel, textureSlots, modelBaker, finalTransform, () -> model.toString(),
+						parts, ambientOcclusion, particleMaterial
+				);
 			return new SplitBlockStateModel(
 					splitModel.size,
 					splitParts,
 					new StaticPart(fallbackQuads, ambientOcclusion, particleMaterial),
-					particleMaterial
+					particleMaterial,
+					dynamicBaker
 			);
 		}
 
@@ -218,7 +228,8 @@ public record PortedBasicSplitModel(
 			Vec3i size,
 			Map<BlockPos, BlockStateModelPart> splitParts,
 			BlockStateModelPart fallback,
-			Material.Baked particleMaterial
+			Material.Baked particleMaterial,
+			@Nullable DynamicSplitBaker dynamicBaker
 	) implements DynamicBlockStateModel
 	{
 		@Override
@@ -241,7 +252,9 @@ public record PortedBasicSplitModel(
 			}
 			else
 			{
-				BlockStateModelPart splitPart = splitParts.get(offset);
+				BlockStateModelPart splitPart = dynamicBaker!=null?
+						dynamicBaker.getPart(level, pos, state, offset):
+						splitParts.get(offset);
 				if(splitPart!=null)
 					parts.add(splitPart);
 			}
@@ -253,7 +266,8 @@ public record PortedBasicSplitModel(
 		)
 		{
 			BlockPos offset = getModelOffset(level, pos, state);
-			return new GeometryKey(this, offset==null?null: offset.immutable());
+			Object callbackKey = dynamicBaker!=null?dynamicBaker.getCallbackKey(level, pos, state): null;
+			return new GeometryKey(this, offset==null?null: offset.immutable(), callbackKey);
 		}
 
 		private @Nullable BlockPos getModelOffset(BlockAndTintGetter level, BlockPos pos, BlockState state)
@@ -287,7 +301,66 @@ public record PortedBasicSplitModel(
 		}
 	}
 
-	private record GeometryKey(SplitBlockStateModel model, @Nullable BlockPos offset)
+	private static class DynamicSplitBaker
+	{
+		private final PortedIEOBJModel objModel;
+		private final TextureSlots textureSlots;
+		private final ModelBaker modelBaker;
+		private final ModelState finalTransform;
+		private final ModelDebugName name;
+		private final Set<Vec3i> parts;
+		private final boolean ambientOcclusion;
+		private final Material.Baked particleMaterial;
+		private final Map<Object, Map<BlockPos, BlockStateModelPart>> bakedParts = new HashMap<>();
+
+		private DynamicSplitBaker(
+				PortedIEOBJModel objModel, TextureSlots textureSlots, ModelBaker modelBaker,
+				ModelState finalTransform, ModelDebugName name, Set<Vec3i> parts,
+				boolean ambientOcclusion, Material.Baked particleMaterial
+		)
+		{
+			this.objModel = objModel;
+			this.textureSlots = textureSlots;
+			this.modelBaker = modelBaker;
+			this.finalTransform = finalTransform;
+			this.name = name;
+			this.parts = Set.copyOf(parts);
+			this.ambientOcclusion = ambientOcclusion;
+			this.particleMaterial = particleMaterial;
+		}
+
+		private Object getCallbackKey(BlockAndTintGetter level, BlockPos pos, BlockState state)
+		{
+			IEOBJCallback<?> callback = objModel.callback();
+			BlockCallback<Object> blockCallback = BlockCallback.castOrDefault(cast(callback));
+			return blockCallback.extractKey(level, pos, state, level.getBlockEntity(pos));
+		}
+
+		private BlockStateModelPart getPart(BlockAndTintGetter level, BlockPos pos, BlockState state, BlockPos offset)
+		{
+			Object key = getCallbackKey(level, pos, state);
+			Map<BlockPos, BlockStateModelPart> partsForKey = bakedParts.computeIfAbsent(key, this::bakePartsForKey);
+			return partsForKey.get(offset);
+		}
+
+		private Map<BlockPos, BlockStateModelPart> bakePartsForKey(Object key)
+		{
+			QuadCollection quads = objModel.bakeForKey(
+					key, textureSlots, modelBaker, BlockModelRotation.IDENTITY, name
+			);
+			return splitToParts(
+					quads.getAll(), parts, finalTransform, ambientOcclusion, particleMaterial
+			);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> IEOBJCallback<T> cast(IEOBJCallback<?> callback)
+	{
+		return (IEOBJCallback<T>)callback;
+	}
+
+	private record GeometryKey(SplitBlockStateModel model, @Nullable BlockPos offset, @Nullable Object callbackKey)
 	{
 	}
 

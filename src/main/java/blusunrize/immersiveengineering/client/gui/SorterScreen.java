@@ -20,7 +20,6 @@ import blusunrize.immersiveengineering.common.gui.IESlot;
 import blusunrize.immersiveengineering.common.gui.SorterMenu;
 import blusunrize.immersiveengineering.common.gui.sync.GetterAndSetter;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
@@ -70,7 +69,6 @@ public class SorterScreen extends IEContainerScreen<SorterMenu>
 			int x = leftPos+30+(side/2)*58;
 			int y = topPos+44+(side%2)*76;
 			String s = I18n.get(Lib.DESC_INFO+"blockSide."+Direction.from3DDataValue(side)).substring(0, 1);
-			RenderSystem.enableBlend();
 			graphics.text(ClientUtils.font(), s, x-(ClientUtils.font().width(s)/2), y, 0xaacccccc, true);
 		}
 	}

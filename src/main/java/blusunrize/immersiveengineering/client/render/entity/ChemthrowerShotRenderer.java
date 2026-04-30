@@ -10,10 +10,10 @@ package blusunrize.immersiveengineering.client.render.entity;
 
 import blusunrize.immersiveengineering.api.IEApi;
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
+import blusunrize.immersiveengineering.client.utils.LightTextureCompat;
 import blusunrize.immersiveengineering.client.utils.TransformingVertexBuilder;
 import blusunrize.immersiveengineering.common.entities.ChemthrowerShotEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -53,9 +53,9 @@ public class ChemthrowerShotRenderer extends IEEntityRenderer<ChemthrowerShotEnt
 		float g = (colour>>8&255)/255f;
 		float b = (colour&255)/255f;
 		int lightAll = entity.getBrightnessForRender();
-		int blockLight = Math.max(LightTexture.block(lightAll), LightTexture.block(packedLightIn));
-		int skyLight = Math.max(LightTexture.sky(lightAll), LightTexture.sky(packedLightIn));
-		packedLightIn = LightTexture.pack(blockLight, skyLight);
+		int blockLight = Math.max(LightTextureCompat.block(lightAll), LightTextureCompat.block(packedLightIn));
+		int skyLight = Math.max(LightTextureCompat.sky(lightAll), LightTextureCompat.sky(packedLightIn));
+		packedLightIn = LightTextureCompat.pack(blockLight, skyLight);
 		matrixStackIn.scale(.25f, .25f, .25f);
 		TransformingVertexBuilder builder = new TransformingVertexBuilder(
 				bufferIn, blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entityTranslucent(TextureAtlas.LOCATION_BLOCKS), matrixStackIn

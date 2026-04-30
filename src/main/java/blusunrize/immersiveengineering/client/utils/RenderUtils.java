@@ -18,7 +18,6 @@ import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -131,7 +130,7 @@ public class RenderUtils
 							rgba,
 							UVPair.unpackU(packedUv), UVPair.unpackV(packedUv),
 							OverlayTexture.NO_OVERLAY,
-							LightTexture.pack(l1>>4, l2>>4),
+							LightTextureCompat.pack(l1>>4, l2>>4),
 							normal.x(), normal.y(), normal.z()
 					);
 				}
@@ -257,7 +256,7 @@ public class RenderUtils
 		float maxU = tex.getU(x1);
 		float minV = tex.getV(yForV?y1: z0);
 		float maxV = tex.getV(yForV?y0: z1);
-		renderTexturedBox(wr, stack, x0, y0, z0, x1, y1, z1, minU, minV, maxU, maxV, LightTexture.FULL_BRIGHT);
+		renderTexturedBox(wr, stack, x0, y0, z0, x1, y1, z1, minU, minV, maxU, maxV, LightTextureCompat.FULL_BRIGHT);
 	}
 
 	public static void renderTexturedBox(
