@@ -16,16 +16,16 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.Mth;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 
 public class CreativeFluidTankRenderer extends IEBlockEntityRenderer<CreativeFluidTankBlockEntity>
 {
-	private static final float MIN = 2;
-	private static final float MAX = 14;
-	private static final float SIZE = MAX-MIN;
+	private static final float MIN = 3/16f;
+	private static final float MAX = 13/16f;
+	private static final int FLUID_ALPHA = 176;
 
 	public void submit(
 			RenderState<CreativeFluidTankBlockEntity> state, PoseStack poseStack,
@@ -61,32 +61,60 @@ public class CreativeFluidTankRenderer extends IEBlockEntityRenderer<CreativeFlu
 		if(fluid.isEmpty())
 			return;
 
+		TextureAtlasSprite sprite = GuiHelper.getFluidStillSprite(fluid);
+		int color = GuiHelper.getFluidColor(fluid);
+		int red = color>>16&255;
+		int green = color>>8&255;
+		int blue = color&255;
+		int alpha = color>>>24;
+		if(alpha <= 0)
+			alpha = 255;
+		alpha = Math.min(alpha, FLUID_ALPHA);
 		VertexConsumer builder = bufferIn.getBuffer(RenderTypeCompat.translucent());
-		matrixStack.pushPose();
-		matrixStack.scale(1/16f, 1/16f, 1/16f);
+		PoseStack.Pose pose = matrixStack.last();
+		Matrix4f mat = pose.pose();
 
-		drawFace(builder, matrixStack, fluid, MIN, MIN, MAX+.01f, 0, 0);
-		drawFace(builder, matrixStack, fluid, MAX, MIN, MIN-.01f, 0, Mth.PI);
-		drawFace(builder, matrixStack, fluid, MAX+.01f, MIN, MIN, 0, -Mth.HALF_PI);
-		drawFace(builder, matrixStack, fluid, MIN-.01f, MIN, MAX, 0, Mth.HALF_PI);
-		drawFace(builder, matrixStack, fluid, MIN, MAX+.01f, MIN, Mth.HALF_PI, 0);
-		drawFace(builder, matrixStack, fluid, MIN, MIN-.01f, MAX, -Mth.HALF_PI, 0);
-
-		matrixStack.popPose();
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, 0, 0, 1,
+				MIN, MIN, MAX, MAX, MIN, MAX, MAX, MAX, MAX, MIN, MAX, MAX,
+				sprite, red, green, blue, alpha);
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, 0, 0, -1,
+				MAX, MIN, MIN, MIN, MIN, MIN, MIN, MAX, MIN, MAX, MAX, MIN,
+				sprite, red, green, blue, alpha);
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, 1, 0, 0,
+				MAX, MIN, MAX, MAX, MIN, MIN, MAX, MAX, MIN, MAX, MAX, MAX,
+				sprite, red, green, blue, alpha);
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, -1, 0, 0,
+				MIN, MIN, MIN, MIN, MIN, MAX, MIN, MAX, MAX, MIN, MAX, MIN,
+				sprite, red, green, blue, alpha);
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, 0, 1, 0,
+				MIN, MAX, MAX, MAX, MAX, MAX, MAX, MAX, MIN, MIN, MAX, MIN,
+				sprite, red, green, blue, alpha);
+		quad(builder, pose, mat, combinedLightIn, combinedOverlayIn, 0, -1, 0,
+				MIN, MIN, MIN, MAX, MIN, MIN, MAX, MIN, MAX, MIN, MIN, MAX,
+				sprite, red, green, blue, alpha);
 	}
 
-	private static void drawFace(
-			VertexConsumer builder, PoseStack matrixStack, FluidStack fluid,
-			float x, float y, float z, float xRot, float yRot
+	private static void quad(
+			VertexConsumer builder, PoseStack.Pose pose, Matrix4f mat,
+			int light, int overlay, float normalX, float normalY, float normalZ,
+			float x0, float y0, float z0, float x1, float y1, float z1,
+			float x2, float y2, float z2, float x3, float y3, float z3,
+			TextureAtlasSprite sprite, int red, int green, int blue, int alpha
 	)
 	{
-		matrixStack.pushPose();
-		matrixStack.translate(x, y, z);
-		if(yRot!=0)
-			matrixStack.mulPose(new Quaternionf().rotateY(yRot));
-		if(xRot!=0)
-			matrixStack.mulPose(new Quaternionf().rotateX(xRot));
-		GuiHelper.drawRepeatedFluidSprite(builder, matrixStack, fluid, 0, 0, SIZE, SIZE);
-		matrixStack.popPose();
+		vertex(builder, pose, mat, x0, y0, z0, light, overlay, normalX, normalY, normalZ, red, green, blue, alpha, sprite.getU0(), sprite.getV1());
+		vertex(builder, pose, mat, x1, y1, z1, light, overlay, normalX, normalY, normalZ, red, green, blue, alpha, sprite.getU1(), sprite.getV1());
+		vertex(builder, pose, mat, x2, y2, z2, light, overlay, normalX, normalY, normalZ, red, green, blue, alpha, sprite.getU1(), sprite.getV0());
+		vertex(builder, pose, mat, x3, y3, z3, light, overlay, normalX, normalY, normalZ, red, green, blue, alpha, sprite.getU0(), sprite.getV0());
+	}
+
+	private static void vertex(
+			VertexConsumer builder, PoseStack.Pose pose, Matrix4f mat,
+			float x, float y, float z, int light, int overlay,
+			float normalX, float normalY, float normalZ, int red, int green, int blue, int alpha, float u, float v
+	)
+	{
+		builder.addVertex(mat, x, y, z).setColor(red, green, blue, alpha)
+				.setUv(u, v).setOverlay(overlay).setLight(light).setNormal(pose, normalX, normalY, normalZ);
 	}
 }

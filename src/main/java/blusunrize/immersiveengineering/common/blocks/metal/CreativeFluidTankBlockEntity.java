@@ -69,12 +69,12 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 	{
 		public int getSlotLimit(int slot)
 		{
-			return 1;
+			return slot==SLOT_INPUT?64: 1;
 		}
 
 		protected void onContentsChanged(int slot)
 		{
-			if(!processingContainerSlots&&slot==SLOT_INPUT)
+			if(!processingContainerSlots&&(slot==SLOT_INPUT||slot==SLOT_OUTPUT))
 				processInputSlot();
 			setChanged();
 			if(level!=null&&!level.isClientSide())
@@ -232,9 +232,16 @@ public class CreativeFluidTankBlockEntity extends IEBaseBlockEntity implements I
 			return;
 
 		processingContainerSlots = true;
-		inventory.setStackInSlot(SLOT_INPUT, ItemStack.EMPTY);
-		moveToOutput(result.getResult());
-		processingContainerSlots = false;
+		try
+		{
+			ItemStack remainingInput = stack.copy();
+			remainingInput.shrink(1);
+			inventory.setStackInSlot(SLOT_INPUT, remainingInput);
+			moveToOutput(result.getResult());
+		} finally
+		{
+			processingContainerSlots = false;
+		}
 		setChanged();
 		markContainingBlockForUpdate(null);
 	}
