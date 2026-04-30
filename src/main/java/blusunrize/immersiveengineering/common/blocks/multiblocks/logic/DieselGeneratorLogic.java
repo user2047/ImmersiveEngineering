@@ -11,6 +11,7 @@ package blusunrize.immersiveengineering.common.blocks.multiblocks.logic;
 import blusunrize.immersiveengineering.api.ApiUtils;
 import blusunrize.immersiveengineering.api.energy.GeneratorFuel;
 import blusunrize.immersiveengineering.api.energy.NullEnergyStorage;
+import blusunrize.immersiveengineering.api.fluid.FluidUtils;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IClientTickableComponent;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IServerTickableComponent;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.RedstoneControl.RSState;
@@ -27,6 +28,7 @@ import blusunrize.immersiveengineering.api.tool.MachineInterfaceHandler.MachineC
 import blusunrize.immersiveengineering.common.blocks.multiblocks.logic.DieselGeneratorLogic.State;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.shapes.DieselGeneratorShapes;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes;
 import blusunrize.immersiveengineering.common.util.CachedRecipe;
 import blusunrize.immersiveengineering.common.util.EnergyHelper;
 import blusunrize.immersiveengineering.common.util.IESounds;
@@ -36,8 +38,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities.Energy;
@@ -181,6 +187,25 @@ public class DieselGeneratorLogic
 				return null;
 		});
 		register.registerAtBlockPos(IMachineInterfaceConnection.CAPABILITY, REDSTONE_POS, state -> state.mifHandler);
+	}
+
+	public InteractionResult click(
+			IMultiblockContext<State> ctx, BlockPos posInMultiblock,
+			Player player, InteractionHand hand, BlockHitResult absoluteHit, boolean isClient
+	)
+	{
+		if(FluidUtils.interactWithFluidHandler(player, hand, ctx.getState().tank))
+		{
+			ctx.markMasterDirty();
+			return InteractionResult.SUCCESS;
+		}
+		else if(hand==InteractionHand.MAIN_HAND&&!player.isShiftKeyDown())
+		{
+			if(!isClient)
+				player.openMenu(IEMenuTypes.DIESEL_GENERATOR.provide(ctx, posInMultiblock));
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.PASS;
 	}
 
 	public Function<BlockPos, VoxelShape> shapeGetter(ShapeType forType)

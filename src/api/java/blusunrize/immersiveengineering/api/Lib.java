@@ -87,6 +87,7 @@ public class Lib
 	public static final String GUIID_LogicUnit = "logic_unit";
 	public static final String GUIID_MachineInterface = "machineinterface";
 	public static final String GUIID_Shelf = "shelf";
+	public static final String GUIID_Tank = "tank";
 	public static final String GUIID_Squeezer = "squeezer";
 	public static final String GUIID_Fermenter = "fermenter";
 	public static final String GUIID_Refinery = "refinery";
@@ -100,6 +101,9 @@ public class Lib
 	public static final String GUIID_FluidSorter = "fluidsorter";
 	public static final String GUIID_Cloche = "cloche";
 	public static final String GUIID_CreativeFluidTank = "creativefluidtank";
+	public static final String GUIID_CreativeCapacitor = "creativecapacitor";
+	public static final String GUIID_FluidPump = "fluidpump";
+	public static final String GUIID_DieselGenerator = "dieselgenerator";
 	public static final String GUIID_ToolboxBlock = "toolboxblock";
 	public static final String GUIID_RedstoneConnector = "redstoneconnector";
 	public static final String GUIID_RedstoneProbe = "redstoneprobe";

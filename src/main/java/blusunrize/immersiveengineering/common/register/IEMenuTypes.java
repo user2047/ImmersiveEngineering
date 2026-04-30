@@ -87,6 +87,9 @@ public class IEMenuTypes
 	public static final MultiblockContainer<ShelfLogic.State, ShelfMenu> SHELF = registerMultiblock(
 			Lib.GUIID_Shelf, ShelfMenu::makeServer, ShelfMenu::makeClient
 	);
+	public static final MultiblockContainer<SheetmetalTankLogic.State, SheetmetalTankMenu> TANK = registerMultiblock(
+			Lib.GUIID_Tank, SheetmetalTankMenu::makeServer, SheetmetalTankMenu::makeClient
+	);
 	public static final MultiblockContainer<SqueezerLogic.State, SqueezerMenu> SQUEEZER = registerMultiblock(
 			Lib.GUIID_Squeezer, SqueezerMenu::makeServer, SqueezerMenu::makeClient
 	);
@@ -95,6 +98,9 @@ public class IEMenuTypes
 	);
 	public static final MultiblockContainer<RefineryLogic.State, RefineryMenu> REFINERY = registerMultiblock(
 			Lib.GUIID_Refinery, RefineryMenu::makeServer, RefineryMenu::makeClient
+	);
+	public static final MultiblockContainer<DieselGeneratorLogic.State, DieselGeneratorMenu> DIESEL_GENERATOR = registerMultiblock(
+			Lib.GUIID_DieselGenerator, DieselGeneratorMenu::makeServer, DieselGeneratorMenu::makeClient
 	);
 	public static final MultiblockContainer<ArcFurnaceLogic.State, ArcFurnaceMenu> ARC_FURNACE = registerMultiblock(
 			Lib.GUIID_ArcFurnace, ArcFurnaceMenu::makeServer, ArcFurnaceMenu::makeClient
