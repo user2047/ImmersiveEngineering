@@ -129,11 +129,16 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public boolean toggleSide(Direction side, Player player)
 	{
-		sideConfig.put(side, IOSideConfig.next(sideConfig.get(side)));
+		setSideConfig(side, IOSideConfig.next(sideConfig.get(side)));
+		return true;
+	}
+
+	public void setSideConfig(Direction side, IOSideConfig config)
+	{
+		sideConfig.put(side, config);
 		this.setChanged();
 		this.markContainingBlockForUpdate(null);
 		level.blockEvent(getBlockPos(), this.getBlockState().getBlock(), 0, 0);
-		return true;
 	}
 
 	public boolean triggerEvent(int id, int arg)

@@ -25,6 +25,8 @@ import blusunrize.immersiveengineering.common.blocks.ticking.IEServerTickableBE;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
 import blusunrize.immersiveengineering.common.register.IEBlocks.MetalDevices;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes.ArgContainer;
 import blusunrize.immersiveengineering.common.util.EnergyHelper;
 import blusunrize.immersiveengineering.common.util.IEBlockCapabilityCaches;
 import blusunrize.immersiveengineering.common.util.IEBlockCapabilityCaches.IEBlockCapabilityCache;
@@ -69,8 +71,12 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerTickableBE, IBlockBounds, IHasDummyBlocks,
-		IConfigurableSides, IScrewdriverInteraction, IFluidPipe, IBlockOverlayText
+		IConfigurableSides, IScrewdriverInteraction, IFluidPipe, IBlockOverlayText, IPlacementInteraction,
+		IInteractionObjectIE<FluidPumpBlockEntity>
 {
+	public static final int MIN_PUMP_SPEED = 1;
+	public static final int MAX_PUMP_SPEED = 4;
+
 	public Map<Direction, IOSideConfig> sideConfig = new EnumMap<>(Direction.class);
 
 	{
@@ -86,6 +92,8 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	private final FluidTank tank = new FluidTank(4*FluidType.BUCKET_VOLUME);
 	private final MutableEnergyStorage energyStorage = new MutableEnergyStorage(8000);
 	private boolean placeCobble = true;
+	private boolean pumpEnabled = true;
+	private int pumpSpeed = MIN_PUMP_SPEED;
 	private final MultiblockCapability<IEnergyStorage> energyCap = MultiblockCapability.make(
 			this, be -> be.energyCap, FluidPumpBlockEntity::master, makeEnergyInput(energyStorage)
 	);
@@ -110,9 +118,10 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		if(isDummy())
 			return;
-		if(tank.getFluidAmount() > 0)
+		if(pumpEnabled&&tank.getFluidAmount() > 0)
 		{
-			int i = outputFluid(tank.getFluid(), FluidAction.EXECUTE);
+			int amount = Math.min(tank.getFluidAmount(), getTransferRate(canOutputPressurized(false)));
+			int i = amount > 0?outputFluid(Utils.copyFluidStackWithAmount(tank.getFluid(), amount, true), FluidAction.EXECUTE): 0;
 			tank.drain(i, FluidAction.EXECUTE);
 		}
 
@@ -120,7 +129,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		if(canRun())
 		{
 			for(Direction f : Direction.values())
-				if(sideConfig.get(f)==IOSideConfig.INPUT)
+				if(getSideConfig(f)==IOSideConfig.INPUT)
 				{
 					IFluidHandler input = blockFluidHandlers.get(f).getCapability();
 					// attempt to find an adjacent entity fluid handler
@@ -128,7 +137,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 						input = getEntityFluidHandler(f);
 					if(input!=null)
 					{
-						int drainAmount = IFluidPipe.getTransferableAmount(this.canOutputPressurized(false));
+						int drainAmount = getTransferRate(this.canOutputPressurized(false));
 						FluidStack drain = input.drain(drainAmount, FluidAction.SIMULATE);
 						if(drain.isEmpty())
 							continue;
@@ -144,21 +153,8 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 					prepareAreaCheck();
 				else
 				{
-					int target = closedList.size()-1;
-					BlockPos pos = closedList.get(target);
-					FluidStack fs = Utils.drainFluidBlock(level, pos, FluidAction.SIMULATE);
-					if(fs==null)
-						closedList.remove(target);
-					else if(tank.fill(fs, FluidAction.SIMULATE)==fs.getAmount()
-							&&this.energyStorage.extractEnergy(consumption, true) >= consumption)
-					{
-						this.energyStorage.extractEnergy(consumption, false);
-						fs = Utils.drainFluidBlock(level, pos, FluidAction.EXECUTE);
-						if(IEServerConfig.MACHINES.pump_placeCobble.get()&&placeCobble)
-							level.setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
-						this.tank.fill(fs, FluidAction.EXECUTE);
-						closedList.remove(target);
-					}
+					for(int i = 0; i < getSpeedMultiplier()&&!closedList.isEmpty(); i++)
+						drainWorldFluidBlock(consumption);
 				}
 			}
 		}
@@ -172,11 +168,257 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		boolean isPowered = isRSPowered();
 		if(!isPowered)
 		{
-			BlockEntity above = level.getBlockEntity(getBlockPos().above());
-			if(above instanceof FluidPumpBlockEntity dummy)
-				isPowered = dummy.isRSPowered();
+			BlockEntity dummy = level.getBlockEntity(getDummyPos());
+			if(dummy instanceof FluidPumpBlockEntity pumpDummy)
+				isPowered = pumpDummy.isRSPowered();
+			else if(getFacing()!=Direction.UP&&level.getBlockEntity(getBlockPos().above()) instanceof FluidPumpBlockEntity legacyDummy)
+				isPowered = legacyDummy.isRSPowered();
 		}
-		return (isPowered^redstoneControlInverted);
+		return pumpEnabled&&(isPowered^redstoneControlInverted);
+	}
+
+	private void drainWorldFluidBlock(int consumption)
+	{
+		int target = closedList.size()-1;
+		BlockPos pos = closedList.get(target);
+		FluidStack fs = Utils.drainFluidBlock(level, pos, FluidAction.SIMULATE);
+		if(fs==null)
+			closedList.remove(target);
+		else if(tank.fill(fs, FluidAction.SIMULATE)==fs.getAmount()
+				&&this.energyStorage.extractEnergy(consumption, true) >= consumption)
+		{
+			this.energyStorage.extractEnergy(consumption, false);
+			fs = Utils.drainFluidBlock(level, pos, FluidAction.EXECUTE);
+			if(IEServerConfig.MACHINES.pump_placeCobble.get()&&placeCobble)
+				level.setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
+			this.tank.fill(fs, FluidAction.EXECUTE);
+			closedList.remove(target);
+		}
+	}
+
+	private Direction getFacing()
+	{
+		BlockState state = getBlockState();
+		if(state.hasProperty(IEProperties.FACING_ALL))
+			return state.getValue(IEProperties.FACING_ALL);
+		if(state.hasProperty(IEProperties.FACING_HORIZONTAL))
+			return state.getValue(IEProperties.FACING_HORIZONTAL);
+		return Direction.UP;
+	}
+
+	private boolean isPumpAt(BlockPos pos)
+	{
+		return Utils.isBlockAt(level, pos, MetalDevices.FLUID_PUMP.get());
+	}
+
+	private BlockPos getMasterPos()
+	{
+		if(!isDummy())
+			return worldPosition;
+		BlockPos vertical = worldPosition.below();
+		if(isPumpAt(vertical))
+			return vertical;
+		Direction facing = getFacing();
+		BlockPos configured = worldPosition.relative(facing);
+		if(isPumpAt(configured))
+			return configured;
+		BlockPos previousHorizontal = worldPosition.relative(facing.getOpposite());
+		if(isPumpAt(previousHorizontal))
+			return previousHorizontal;
+		return vertical;
+	}
+
+	private BlockPos getDummyPos()
+	{
+		BlockPos masterPos = getMasterPos();
+		BlockPos vertical = masterPos.above();
+		if(isPumpAt(vertical))
+			return vertical;
+		Direction facing = getFacing();
+		BlockEntity master = Utils.getExistingTileEntity(level, masterPos);
+		if(master instanceof FluidPumpBlockEntity pump)
+			facing = pump.getFacing();
+		BlockPos configured = masterPos.relative(facing.getOpposite());
+		if(isPumpAt(configured))
+			return configured;
+		BlockPos previousHorizontal = masterPos.relative(facing);
+		if(isPumpAt(previousHorizontal))
+			return previousHorizontal;
+		return vertical;
+	}
+
+	private boolean hasLegacyVerticalDummy()
+	{
+		return isDummy()?isPumpAt(worldPosition.below()): isPumpAt(worldPosition.above());
+	}
+
+	private Direction getShapeFacing()
+	{
+		return hasLegacyVerticalDummy()?Direction.UP: getFacing();
+	}
+
+	private boolean removePumpPart(BlockPos pos)
+	{
+		if(isPumpAt(pos))
+		{
+			level.removeBlock(pos, false);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean setSideConfig(Direction side, IOSideConfig config)
+	{
+		if(isDummy())
+		{
+			FluidPumpBlockEntity master = master();
+			return master!=null&&master.setSideConfig(side, config);
+		}
+		if(!isFluidSideConfigurable(side))
+			return false;
+		if(getSideConfig(side)==config)
+			return true;
+		sideConfig.put(side, config);
+		this.setChanged();
+		this.markContainingBlockForUpdate(null);
+		getLevelNonnull().blockEvent(getBlockPos(), this.getBlockState().getBlock(), 0, 0);
+		return true;
+	}
+
+	private boolean toggleSideConfig(Direction side)
+	{
+		return setSideConfig(side, IOSideConfig.next(getSideConfig(side)));
+	}
+
+	private void notifyPlaceCobble(Player player)
+	{
+		if(player!=null)
+			player.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"pump.placeCobble."+placeCobble));
+	}
+
+	private void notifyRedstone(Player player)
+	{
+		if(player!=null)
+			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
+	}
+
+	public void onBEPlaced(BlockPlaceContext ctx)
+	{
+		if(level==null||level.isClientSide()||isDummy())
+			return;
+		sideConfig.clear();
+		for(Direction d : DirectionUtils.VALUES)
+			sideConfig.put(d, IOSideConfig.NONE);
+		sideConfig.put(Direction.DOWN, IOSideConfig.INPUT);
+		setChanged();
+		markContainingBlockForUpdate(null);
+	}
+
+	public FluidTank getTank()
+	{
+		return tank;
+	}
+
+	public MutableEnergyStorage getEnergyStorage()
+	{
+		return energyStorage;
+	}
+
+	public boolean isPlaceCobble()
+	{
+		return placeCobble;
+	}
+
+	public boolean isPumpEnabled()
+	{
+		return pumpEnabled;
+	}
+
+	public int getPumpSpeed()
+	{
+		return getSpeedMultiplier();
+	}
+
+	public int getDisplayedFluidRate()
+	{
+		return getTransferRate(true);
+	}
+
+	public int getDisplayedPowerRate()
+	{
+		return getAccelerationEnergyCost();
+	}
+
+	private int getSpeedMultiplier()
+	{
+		return Mth.clamp(pumpSpeed, MIN_PUMP_SPEED, MAX_PUMP_SPEED);
+	}
+
+	private int getTransferRate(boolean pressurized)
+	{
+		return IFluidPipe.getTransferableAmount(pressurized)*getSpeedMultiplier();
+	}
+
+	private int getAccelerationEnergyCost()
+	{
+		return IEServerConfig.MACHINES.pump_consumption_accelerate.get()*getSpeedMultiplier();
+	}
+
+	public void setPumpEnabled(boolean pumpEnabled)
+	{
+		if(this.pumpEnabled!=pumpEnabled)
+		{
+			this.pumpEnabled = pumpEnabled;
+			setChanged();
+			markContainingBlockForUpdate(null);
+		}
+	}
+
+	public void setPumpSpeed(int speed)
+	{
+		int clamped = Mth.clamp(speed, MIN_PUMP_SPEED, MAX_PUMP_SPEED);
+		if(this.pumpSpeed!=clamped)
+		{
+			this.pumpSpeed = clamped;
+			setChanged();
+			markContainingBlockForUpdate(null);
+		}
+	}
+
+	public void togglePlaceCobble()
+	{
+		placeCobble = !placeCobble;
+		setChanged();
+		markContainingBlockForUpdate(null);
+	}
+
+	public void toggleRedstoneControl()
+	{
+		redstoneControlInverted = !redstoneControlInverted;
+		setChanged();
+		markContainingBlockForUpdate(null);
+	}
+
+	@Nonnull
+	public Component getDisplayName()
+	{
+		return Component.translatable("block."+Lib.MODID+".fluid_pump");
+	}
+
+	public boolean canUseGui(Player player)
+	{
+		return true;
+	}
+
+	public FluidPumpBlockEntity getGuiMaster()
+	{
+		FluidPumpBlockEntity master = master();
+		return master!=null?master: this;
+	}
+
+	public ArgContainer<FluidPumpBlockEntity, ?> getContainerType()
+	{
+		return IEMenuTypes.FLUID_PUMP;
 	}
 
 	public void prepareAreaCheck()
@@ -186,7 +428,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		checked.clear();
 		searchFluid = null;
 		for(Direction f : Direction.values())
-			if(sideConfig.get(f)==IOSideConfig.INPUT)
+			if(getSideConfig(f)==IOSideConfig.INPUT)
 			{
 				openList.add(getBlockPos().relative(f));
 				checkingArea = true;
@@ -198,14 +440,18 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		if(level.getGameTime()%20!=Mth.positiveModulo(getBlockPos().getX()^getBlockPos().getZ(), 20))
 			return;
 		int consumption = IEServerConfig.MACHINES.pump_consumption.get();
-		if(this.energyStorage.extractEnergy(consumption, true) < consumption)
-			return;
 		final BlockPos neighborPos = getBlockPos().relative(gatherFrom);
 		final FluidState neighborFluidState = level.getFluidState(neighborPos);
 		if(!neighborFluidState.isSource()||!neighborFluidState.canConvertToSource((net.minecraft.server.level.ServerLevel)getLevelNonnull(), neighborPos))
 			return;
 		final Fluid fluid = neighborFluidState.getType();
-		final FluidStack gatheredFluid = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
+		int buckets = Math.min(getSpeedMultiplier(), (tank.getCapacity()-tank.getFluidAmount())/FluidType.BUCKET_VOLUME);
+		if(buckets <= 0)
+			return;
+		int cost = consumption*buckets;
+		if(this.energyStorage.extractEnergy(cost, true) < cost)
+			return;
+		final FluidStack gatheredFluid = new FluidStack(fluid, FluidType.BUCKET_VOLUME*buckets);
 		if(tank.fill(gatheredFluid, FluidAction.SIMULATE)!=gatheredFluid.getAmount())
 			return;
 		int connectedSources = 0;
@@ -217,7 +463,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		}
 		if(connectedSources > 1)
 		{
-			this.energyStorage.extractEnergy(consumption, false);
+			this.energyStorage.extractEnergy(cost, false);
 			this.tank.fill(gatheredFluid, FluidAction.EXECUTE);
 		}
 	}
@@ -269,12 +515,12 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		if(canAccept <= 0)
 			return 0;
 
-		int accelPower = IEServerConfig.MACHINES.pump_consumption_accelerate.get();
+		int accelPower = getAccelerationEnergyCost();
 		final int fluidForSort = canAccept;
 		int sum = 0;
 		HashMap<DirectionalFluidOutput, Integer> sorting = new HashMap<>();
 		for(Direction f : Direction.values())
-			if(sideConfig.get(f)==IOSideConfig.OUTPUT)
+			if(getSideConfig(f)==IOSideConfig.OUTPUT)
 			{
 				IFluidHandler handler = blockFluidHandlers.get(f).getCapability();
 				if(handler!=null)
@@ -282,7 +528,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 					// TODO check if there are bad BE assumptions here
 					BlockEntity tile = getLevelNonnull().getBlockEntity(worldPosition.relative(f));
 					FluidStack insertResource = Utils.copyFluidStackWithAmount(fs, fs.getAmount(), true);
-					if(tile instanceof FluidPipeBlockEntity&&this.energyStorage.extractEnergy(accelPower, true) >= accelPower)
+					if(tile instanceof FluidPipeBlockEntity&&canAccelerateOutput(insertResource, accelPower))
 						insertResource.set(IEApiDataComponents.FLUID_PRESSURIZED, Unit.INSTANCE);
 					int temp = handler.fill(insertResource, FluidAction.SIMULATE);
 					if(temp > 0)
@@ -316,13 +562,14 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 				int amount = (int)(fluidForSort*prio);
 				if(i++==sorting.size()-1)
 					amount = canAccept;
-				FluidStack insertResource = Utils.copyFluidStackWithAmount(fs, amount, true);
-				if(output.containingTile() instanceof FluidPipeBlockEntity&&this.energyStorage.extractEnergy(accelPower, true) >= accelPower)
-				{
-					this.energyStorage.extractEnergy(accelPower, false);
+				boolean accelerated = canAccelerateOutput(amount, accelPower);
+				int outputAmount = accelerated?amount: Math.min(amount, getTransferRate(false));
+				FluidStack insertResource = Utils.copyFluidStackWithAmount(fs, outputAmount, true);
+				if(output.containingTile() instanceof FluidPipeBlockEntity&&accelerated)
 					insertResource.set(IEApiDataComponents.FLUID_PRESSURIZED, Unit.INSTANCE);
-				}
 				int r = output.output().fill(insertResource, action);
+				if(r > 0&&accelerated&&action.execute())
+					this.energyStorage.extractEnergy(accelPower, false);
 				f += r;
 				canAccept -= r;
 				if(canAccept <= 0)
@@ -331,6 +578,16 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			return f;
 		}
 		return 0;
+	}
+
+	private boolean canAccelerateOutput(FluidStack stack, int accelPower)
+	{
+		return canAccelerateOutput(stack.getAmount(), accelPower);
+	}
+
+	private boolean canAccelerateOutput(int amount, int accelPower)
+	{
+		return amount > getTransferRate(false)&&this.energyStorage.extractEnergy(accelPower, true) >= accelPower;
 	}
 
 	@Nullable
@@ -348,6 +605,8 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 			sideConfig.put(d, readSideConfig(sideConfigArray, d));
 		if(nbt.contains("placeCobble"))
 			placeCobble = nbt.getBooleanOr("placeCobble", false);
+		pumpEnabled = nbt.getBooleanOr("pumpEnabled", true);
+		pumpSpeed = Mth.clamp(nbt.getIntOr("pumpSpeed", MIN_PUMP_SPEED), MIN_PUMP_SPEED, MAX_PUMP_SPEED);
 		blusunrize.immersiveengineering.common.util.FluidTankCompat.readFromNBT(tank, provider, nbt.getCompoundOrEmpty("tank"));
 		EnergyHelper.deserializeFrom(energyStorage, nbt, provider);
 		redstoneControlInverted = nbt.getBooleanOr("redstoneInverted", false);
@@ -374,9 +633,11 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		int[] sideConfigArray = new int[6];
 		for(Direction d : DirectionUtils.VALUES)
-			sideConfigArray[d.ordinal()] = sideConfig.getOrDefault(d, getDefaultSideConfig(d)).ordinal();
+			sideConfigArray[d.ordinal()] = getSideConfig(d).ordinal();
 		nbt.putIntArray("sideConfig", sideConfigArray);
 		nbt.putBoolean("placeCobble", placeCobble);
+		nbt.putBoolean("pumpEnabled", pumpEnabled);
+		nbt.putInt("pumpSpeed", getSpeedMultiplier());
 		nbt.put("tank", blusunrize.immersiveengineering.common.util.FluidTankCompat.writeToNBT(tank, provider));
 		EnergyHelper.serializeTo(energyStorage, nbt, provider);
 		nbt.putBoolean("redstoneInverted", redstoneControlInverted);
@@ -384,50 +645,54 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public IOSideConfig getSideConfig(Direction side)
 	{
+		if(side==Direction.DOWN)
+			return IOSideConfig.INPUT;
+		if(side==Direction.UP)
+			return IOSideConfig.NONE;
 		return sideConfig.getOrDefault(side, getDefaultSideConfig(side));
+	}
+
+	public boolean isFluidSideConfigurable(Direction side)
+	{
+		return side.getAxis().isHorizontal();
+	}
+
+	public boolean canConnectFluidSide(Direction side)
+	{
+		return side==Direction.DOWN||isFluidSideConfigurable(side);
 	}
 
 	public boolean toggleSide(Direction side, Player p)
 	{
-		if(side!=Direction.UP&&!isDummy())
+		if(isDummy())
 		{
-			sideConfig.put(side, IOSideConfig.next(sideConfig.get(side)));
-			this.setChanged();
-			this.markContainingBlockForUpdate(null);
-			getLevelNonnull().blockEvent(getBlockPos(), this.getBlockState().getBlock(), 0, 0);
+			FluidPumpBlockEntity master = master();
+			return master!=null&&master.toggleSide(side, p);
+		}
+		if(p!=null&&p.isShiftKeyDown())
+		{
+			togglePlaceCobble();
+			notifyPlaceCobble(p);
 			return true;
 		}
-		else if(p.isShiftKeyDown())
-		{
-			FluidPumpBlockEntity master = this;
-			if(isDummy())
-			{
-				BlockEntity tmp = level.getBlockEntity(worldPosition.below());
-				if(tmp instanceof FluidPumpBlockEntity)
-					master = (FluidPumpBlockEntity)tmp;
-			}
-			master.placeCobble = !master.placeCobble;
-			p.sendOverlayMessage(Component.translatable(Lib.CHAT_INFO+"pump.placeCobble."+master.placeCobble));
-			return true;
-		}
-		return false;
+		if(!isFluidSideConfigurable(side))
+			return false;
+		return toggleSideConfig(side);
 	}
 
 	public InteractionResult screwdriverUseSide(Direction side, Player player, InteractionHand hand, Vec3 hitVec)
 	{
 		if(isDummy())
 		{
-			BlockEntity te = level.getBlockEntity(worldPosition.below());
-			if(te instanceof FluidPumpBlockEntity master)
+			FluidPumpBlockEntity master = master();
+			if(master!=null)
 				return master.screwdriverUseSide(side, player, hand, hitVec);
 			return InteractionResult.PASS;
 		}
 		if(!level.isClientSide())
 		{
-			redstoneControlInverted = !redstoneControlInverted;
-			player.sendSystemMessage(Component.translatable(Lib.CHAT_INFO+"rsControl."+(redstoneControlInverted?"invertedOn": "invertedOff")));
-			setChanged();
-			this.markContainingBlockForUpdate(null);
+			toggleRedstoneControl();
+			notifyRedstone(player);
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -437,7 +702,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	public static void registerCapabilities(BECapabilityRegistrar<FluidPumpBlockEntity> registrar)
 	{
 		registrar.register(Capabilities.Fluid.BLOCK, (be, facing) -> {
-			if(facing!=null&&!be.isDummy())
+			if(facing!=null&&!be.isDummy()&&be.canConnectFluidSide(facing))
 			{
 				if(!be.sidedFluidHandler.containsKey(facing))
 					be.sidedFluidHandler.put(facing, new SidedFluidHandler(be, facing));
@@ -448,8 +713,33 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		});
 		registrar.register(
 				Energy.BLOCK,
-				(be, facing) -> facing==null||(facing==Direction.UP&&be.isDummy())?be.energyCap.get(): null
+				(be, facing) -> be.isDummy()&&facing==Direction.UP?be.energyCap.get(): null
 		);
+	}
+
+	private Direction getEnergyConnectorSide()
+	{
+		if(isDummy())
+		{
+			if(isPumpAt(worldPosition.below()))
+				return Direction.UP;
+			Direction facing = getFacing();
+			if(isPumpAt(worldPosition.relative(facing)))
+				return facing.getOpposite();
+			if(isPumpAt(worldPosition.relative(facing.getOpposite())))
+				return facing;
+		}
+		return Direction.UP;
+	}
+
+	public Direction getEnergyInputSide()
+	{
+		return Direction.UP;
+	}
+
+	public Direction getJoinedSide()
+	{
+		return Direction.UP;
 	}
 
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)
@@ -457,8 +747,8 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 		if(hammer&&IEClientConfig.showTextOverlay.get()&&!isDummy()&&mop instanceof BlockHitResult)
 		{
 			BlockHitResult brtr = (BlockHitResult)mop;
-			IOSideConfig i = sideConfig.get(brtr.getDirection());
-			IOSideConfig j = sideConfig.get(brtr.getDirection().getOpposite());
+			IOSideConfig i = getSideConfig(brtr.getDirection());
+			IOSideConfig j = getSideConfig(brtr.getDirection().getOpposite());
 			return TextUtils.sideConfigWithOpposite(Lib.DESC_INFO+"blockSide.connectCapabilities.Fluid.", i, j);
 		}
 		return null;
@@ -500,14 +790,14 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 		public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
 		{
-			if(pump.sideConfig.get(facing)!=IOSideConfig.INPUT)
+			if(pump.getSideConfig(facing)!=IOSideConfig.INPUT)
 				return false;
 			return pump.tank.isFluidValid(tank, stack);
 		}
 
 		public int fill(FluidStack resource, FluidAction action)
 		{
-			if(resource.isEmpty()||pump.sideConfig.get(facing)!=IOSideConfig.INPUT)
+			if(resource.isEmpty()||pump.getSideConfig(facing)!=IOSideConfig.INPUT)
 				return 0;
 			return pump.tank.fill(resource, action);
 		}
@@ -519,7 +809,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 		public FluidStack drain(int maxDrain, FluidAction action)
 		{
-			if(pump.sideConfig.get(facing)!=IOSideConfig.OUTPUT)
+			if(!pump.pumpEnabled||pump.getSideConfig(facing)!=IOSideConfig.OUTPUT)
 				return FluidStack.EMPTY;
 			return pump.tank.drain(maxDrain, action);
 		}
@@ -535,7 +825,7 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		if(!isDummy())
 			return this;
-		BlockPos masterPos = getBlockPos().below();
+		BlockPos masterPos = getMasterPos();
 		BlockEntity te = Utils.getExistingTileEntity(level, masterPos);
 		return te instanceof FluidPumpBlockEntity pump?pump: null;
 	}
@@ -550,21 +840,27 @@ public class FluidPumpBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 	public void breakDummies(BlockPos pos, BlockState state)
 	{
-		for(int i = 0; i <= 1; i++)
-			if(Utils.isBlockAt(level, getBlockPos().offset(0, isDummy()?-1: 0, 0).offset(0, i, 0), MetalDevices.FLUID_PUMP.get()))
-				level.removeBlock(getBlockPos().offset(0, isDummy()?-1: 0, 0).offset(0, i, 0), false);
+		BlockPos masterPos = getMasterPos();
+		BlockPos dummyPos = getDummyPos();
+		removePumpPart(dummyPos);
+		removePumpPart(masterPos);
 	}
 
 	public VoxelShape getBlockBounds(@Nullable CollisionContext ctx)
 	{
 		if(!isDummy())
 			return Shapes.block();
-		return Shapes.box(.1875f, 0, .1875f, .8125f, 1, .8125f);
+		return switch(getShapeFacing().getAxis())
+		{
+			case X -> Shapes.box(0, .1875f, .1875f, 1, .8125f, .8125f);
+			case Y -> Shapes.box(.1875f, 0, .1875f, .8125f, 1, .8125f);
+			case Z -> Shapes.box(.1875f, .1875f, 0, .8125f, .8125f, 1);
+		};
 	}
 
 	public boolean canOutputPressurized(boolean consumePower)
 	{
-		int accelPower = IEServerConfig.MACHINES.pump_consumption_accelerate.get();
+		int accelPower = getAccelerationEnergyCost();
 		if(energyStorage.extractEnergy(accelPower, true) >= accelPower)
 		{
 			if(consumePower)

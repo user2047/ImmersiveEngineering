@@ -511,6 +511,8 @@ public class ClientProxy extends CommonProxy
 		ev.register(IEMenuTypes.FLUID_SORTER.getType(), FluidSorterScreen::new);
 		ev.register(IEMenuTypes.CLOCHE.getType(), ClocheScreen::new);
 		ev.register(IEMenuTypes.CREATIVE_FLUID_TANK.getType(), CreativeFluidTankScreen::new);
+		ev.register(IEMenuTypes.CREATIVE_CAPACITOR.getType(), CreativeCapacitorScreen::new);
+		ev.register(IEMenuTypes.FLUID_PUMP.getType(), FluidPumpScreen::new);
 		ev.register(IEMenuTypes.TOOLBOX_BLOCK.getType(), ToolboxScreen::new);
 		ev.register(IEMenuTypes.TOOLBOX.getType(), ToolboxScreen::new);
 

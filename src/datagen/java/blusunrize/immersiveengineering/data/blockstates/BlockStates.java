@@ -302,7 +302,7 @@ public class BlockStates extends ExtendedBlockstateProvider
 		);
 		simpleBlock(
 				MetalDevices.FLUID_PIPE.get(),
-				ieObjBuilder("block/metal_device/fluid_pipe.obj.ie").callback(PipeCallbacks.INSTANCE).layer(cutout()).end()
+				emptyWithParticles("block/metal_device/fluid_pipe", "block/metal_device/fluid_pipe")
 		);
 
 		TurretRenderer.MODEL_FILE_BY_BLOCK.forEach(this::turret);
@@ -754,20 +754,17 @@ public class BlockStates extends ExtendedBlockstateProvider
 
 	private void createPump()
 	{
-		VariantBlockStateBuilder builder = getVariantBuilder(MetalDevices.FLUID_PUMP.get());
-		builder.partialState()
-				.with(IEProperties.MULTIBLOCKSLAVE, true)
-				.setModels(new ConfiguredModel(obj("block/metal_device/fluid_pump.obj"),
-						0, 0, false));
-		builder.partialState()
-				.with(IEProperties.MULTIBLOCKSLAVE, false)
-				.setModels(new ConfiguredModel(
-						models().getBuilder("metal_device/pump_bottom")
-								.customLoader(SideConfigBuilder::begin)
-								.type(Type.SIDE_VERTICAL)
-								.baseName(modLoc("block/metal_device/fluid_pump"))
-								.end()
-				));
+		ModelFile dummy = obj("block/metal_device/fluid_pump.obj");
+		ModelFile bottom = models().getBuilder("metal_device/pump_bottom")
+				.customLoader(SideConfigBuilder::begin)
+				.type(Type.SIDE_VERTICAL)
+				.baseName(modLoc("block/metal_device/fluid_pump"))
+				.end();
+		createRotatedBlock(
+				MetalDevices.FLUID_PUMP,
+				state -> state.getSetStates().get(IEProperties.MULTIBLOCKSLAVE)==Boolean.TRUE?dummy: bottom,
+				IEProperties.FACING_ALL, ImmutableList.of(IEProperties.MULTIBLOCKSLAVE), -90, 0
+		);
 	}
 
 	public ModelFile createMetalLadder(String name, @Nullable Identifier bottomTop, @Nullable Identifier sides, @Nullable Identifier front)
