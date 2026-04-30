@@ -157,9 +157,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		if(level instanceof ServerLevel serverLevel)
 		{
 			EventHandler.SERVER_TASKS.add(() -> {
-				boolean changed = false;
-				for(Direction f : DirectionUtils.VALUES)
-					changed |= updateConnectionByte(f);
+				boolean changed = updateAllConnectionBytes();
 				if(changed)
 				{
 					level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
@@ -231,6 +229,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		connections = nbt.getByteOr("connections", (byte)0);
 		if(level!=null&&level.isClientSide()&&(connections!=oldConns||color!=oldColor||cover!=oldCover))
 		{
+			requestModelDataUpdate();
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
 		}
@@ -312,15 +311,29 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 	public void onNeighborBlockChange(BlockPos otherPos)
 	{
 		super.onNeighborBlockChange(otherPos);
+		Level world = getLevelNonnull();
 		Direction dir = Direction.getNearest(otherPos.getX()-worldPosition.getX(),
 				otherPos.getY()-worldPosition.getY(), otherPos.getZ()-worldPosition.getZ(), null);
-		if(updateConnectionByte(dir))
+		if(dir==null)
+			return;
+		boolean changed = updateConnectionByte(dir);
+		boolean neighborChanged = false;
+		if(!world.isClientSide())
 		{
-			Level world = getLevelNonnull();
+			BlockEntity neighborTile = world.getBlockEntity(worldPosition.relative(dir));
+			if(neighborTile instanceof FluidPipeBlockEntity neighborPipe)
+			{
+				neighborChanged = neighborPipe.updateConnectionByte(dir.getOpposite());
+				if(neighborChanged)
+					neighborPipe.markContainingBlockForUpdate(null);
+			}
+			if(changed||neighborChanged)
+				indirectConnections.clearDimension(world);
+		}
+		if(changed)
+		{
 			world.updateNeighborsAtExceptFromFacing(worldPosition, getBlockState().getBlock(), dir, null);
 			markContainingBlockForUpdate(null);
-			if(!world.isClientSide())
-				indirectConnections.clearDimension(world);
 		}
 	}
 
@@ -495,9 +508,17 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return oldConn!=connections;
 	}
 
+	private boolean updateAllConnectionBytes()
+	{
+		boolean changed = false;
+		for(Direction f : DirectionUtils.VALUES)
+			changed |= updateConnectionByte(f);
+		return changed;
+	}
+
 	public byte getAvailableConnectionByte()
 	{
-		byte availableConnections = connections;
+		byte availableConnections = getVisualConnectionByte();
 		int mask = 1;
 		for(Direction dir : DirectionUtils.VALUES)
 		{
@@ -517,18 +538,47 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		return availableConnections;
 	}
 
+	private byte getVisualConnectionByte()
+	{
+		byte visualConnections = connections;
+		if(level==null||!level.isClientSide())
+			return visualConnections;
+
+		for(Direction dir : DirectionUtils.VALUES)
+		{
+			int mask = 1<<dir.get3DDataValue();
+			if((visualConnections&mask)!=0||!sideConfig.getOrDefault(dir, false))
+				continue;
+
+			BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
+			if(neighbor instanceof FluidPipeBlockEntity pipe)
+			{
+				if(pipe.sideConfig.getOrDefault(dir.getOpposite(), false))
+					visualConnections |= mask;
+			}
+			else
+			{
+				IFluidHandler handler = neighbors.get(dir).getCapability();
+				if(handler!=null&&handler.getTanks() > 0)
+					visualConnections |= mask;
+			}
+		}
+		return visualConnections;
+	}
+
 	public ConnectionStyle getConnectionStyle(Direction connection)
 	{
-		if((connections&(1<<connection.get3DDataValue()))==0)
+		byte visualConnections = getVisualConnectionByte();
+		if((visualConnections&(1<<connection.get3DDataValue()))==0)
 			return ConnectionStyle.NO_CONNECTION;
 
-		if(connections!=3&&connections!=12&&connections!=48) //add flange if not a straight pipe
+		if(visualConnections!=3&&visualConnections!=12&&visualConnections!=48) //add flange if not a straight pipe
 			return ConnectionStyle.FLANGE;
 		BlockEntity con = SafeChunkUtils.getSafeBE(level, getBlockPos().relative(connection));
 		if(con instanceof FluidPipeBlockEntity pipe)
 		{
-			int tileConnections = pipe.connections|(1<<connection.getOpposite().get3DDataValue());
-			if(connections==tileConnections) //if neighbor pipe is also straight and in same direction, don't add flanges
+			int tileConnections = pipe.getVisualConnectionByte()|(1<<connection.getOpposite().get3DDataValue());
+			if(visualConnections==tileConnections) //if neighbor pipe is also straight and in same direction, don't add flanges
 				return ConnectionStyle.PLAIN;
 		}
 		return ConnectionStyle.FLANGE;
@@ -638,7 +688,7 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 		private BoundingBoxKey(boolean showToolView, FluidPipeBlockEntity te)
 		{
 			this.showToolView = showToolView;
-			this.connections = te.connections;
+			this.connections = te.getVisualConnectionByte();
 			this.availableConnections = te.getAvailableConnectionByte();
 			this.hasCover = te.hasCover();
 			for(Direction d : DirectionUtils.VALUES)
@@ -781,6 +831,22 @@ public class FluidPipeBlockEntity extends IEBaseBlockEntity implements IFluidPip
 			if(level.getBlockEntity(pos.relative(dir)) instanceof FluidPipeBlockEntity neighborPipe)
 				if(neighborPipe.color!=this.color||!neighborPipe.sideConfig.getOrDefault(dir.getOpposite(), false))
 					this.setSide(dir, false);
+		boolean changed = updateAllConnectionBytes();
+		for(Direction dir : DirectionUtils.VALUES)
+		{
+			BlockEntity neighborTile = level.getBlockEntity(pos.relative(dir));
+			if(neighborTile instanceof FluidPipeBlockEntity neighborPipe&&neighborPipe.updateConnectionByte(dir.getOpposite()))
+			{
+				neighborPipe.markContainingBlockForUpdate(null);
+				changed = true;
+			}
+		}
+		if(changed)
+		{
+			level.updateNeighborsAt(pos, getBlockState().getBlock());
+			markContainingBlockForUpdate(null);
+			indirectConnections.clearDimension(level);
+		}
 	}
 
 	public boolean hasOutputConnection(Direction side)

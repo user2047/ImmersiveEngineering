@@ -231,6 +231,7 @@ public class ClientProxy extends CommonProxy
 		MixerRenderer.AGITATOR = new DynamicModel(MixerRenderer.NAME);
 		SampleDrillRenderer.DRILL = new DynamicModel(SampleDrillRenderer.NAME);
 		SqueezerRenderer.PISTON = new DynamicModel(SqueezerRenderer.NAME);
+		FluidPipeRenderer.MODEL = new DynamicModel(FluidPipeRenderer.NAME);
 		WatermillRenderer.MODEL = new DynamicModel(WatermillRenderer.NAME);
 		WindmillRenderer.MODEL = new DynamicModel(WindmillRenderer.NAME);
 		RedstoneConveyorRender.MODEL_PANEL = new DynamicModel(RedstoneConveyorRender.MODEL_NAME);
@@ -543,6 +544,7 @@ public class ClientProxy extends CommonProxy
 		registerBERenderNoContext(event, IEBlockEntities.CLOCHE.master(), ClocheRenderer::new);
 		registerBERenderNoContext(event, IEBlockEntities.BLASTFURNACE_PREHEATER.master(), BlastFurnacePreheaterRenderer::new);
 		registerBERenderNoContext(event, IEBlockEntities.CREATIVE_FLUID_TANK.get(), CreativeFluidTankRenderer::new);
+		registerBERenderNoContext(event, IEBlockEntities.FLUID_PIPE.get(), FluidPipeRenderer::new);
 		// MULTIBLOCKS
 		registerBERenderNoContext(event, IEMultiblockLogic.METAL_PRESS.masterBE(), MetalPressRenderer::new);
 		registerBERenderNoContext(event, IEMultiblockLogic.CRUSHER.masterBE(), CrusherRenderer::new);
