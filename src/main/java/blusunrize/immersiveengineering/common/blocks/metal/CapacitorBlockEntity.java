@@ -12,7 +12,6 @@ import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.energy.MutableEnergyStorage;
 import blusunrize.immersiveengineering.api.energy.NullEnergyStorage;
-import blusunrize.immersiveengineering.api.energy.WrappingEnergyStorage;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
 import blusunrize.immersiveengineering.api.utils.codec.IEDualCodecs;
 import blusunrize.immersiveengineering.client.utils.TextUtils;
@@ -48,6 +47,9 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
@@ -62,10 +64,10 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 	private final CapacitorConfig configValues;
 	private final IEnergyStorage energyStorage;
 	protected final Map<Direction, IEnergyStorage> energyCaps = new EnumMap<>(Direction.class);
-	private final Map<Direction, IEBlockCapabilityCache<IEnergyStorage>> connectedCaps = IEBlockCapabilityCaches.allNeighbors(
+	private final Map<Direction, IEBlockCapabilityCache<?>> connectedCaps = IEBlockCapabilityCaches.allNeighbors(
 			Capabilities.Energy.BLOCK, this
 	);
-	protected final IEnergyStorage nullEnergyCap;
+	protected final CapacitorEnergyHandler nullEnergyCap;
 
 	public int comparatorOutput = 0;
 
@@ -85,7 +87,7 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 				sideConfig.put(f, IOSideConfig.NONE);
 			energyCaps.put(f, new CapacitorEnergyHandler(f, this::getSideConfig, energyStorage));
 		}
-		nullEnergyCap = new WrappingEnergyStorage(energyStorage, false, false);
+		nullEnergyCap = new CapacitorEnergyHandler(null, this::getSideConfig, energyStorage);
 	}
 
 	public void tickServer()
@@ -114,7 +116,7 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		if(this.sideConfig.get(side)!=IOSideConfig.OUTPUT)
 			return;
 		int out = Math.min(getMaxOutput(), this.energyStorage.getEnergyStored());
-		IEnergyStorage neighborCap = this.connectedCaps.get(side).getCapability();
+		IEnergyStorage neighborCap = asLegacyEnergy(this.connectedCaps.get(side).getCapability());
 		if(neighborCap!=null)
 		{
 			int inserted = neighborCap.receiveEnergy(out, false);
@@ -137,6 +139,7 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 	{
 		sideConfig.put(side, config);
 		this.setChanged();
+		this.invalidateCapabilities();
 		this.markContainingBlockForUpdate(null);
 		level.blockEvent(getBlockPos(), this.getBlockState().getBlock(), 0, 0);
 	}
@@ -230,9 +233,19 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return new MutableEnergyStorage(getMaxStorage(), getMaxInput(), getMaxOutput());
 	}
 
+	@Nullable
+	private static IEnergyStorage asLegacyEnergy(@Nullable Object capability)
+	{
+		if(capability instanceof IEnergyStorage legacy)
+			return legacy;
+		else if(capability instanceof EnergyHandler handler)
+			return IEnergyStorage.of(handler);
+		return null;
+	}
+
 	private record CapacitorEnergyHandler(
-			Direction side, Function<Direction, IOSideConfig> sideConfig, IEnergyStorage base
-	) implements IEnergyStorage
+			@Nullable Direction side, Function<Direction, IOSideConfig> sideConfig, IEnergyStorage base
+	) implements IEnergyStorage, EnergyHandler
 	{
 
 		public int receiveEnergy(int maxReceive, boolean simulate)
@@ -261,12 +274,38 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 
 		public boolean canExtract()
 		{
-			return sideConfig.apply(side)==IOSideConfig.OUTPUT;
+			return side!=null&&sideConfig.apply(side)==IOSideConfig.OUTPUT;
 		}
 
 		public boolean canReceive()
 		{
-			return sideConfig.apply(side)==IOSideConfig.INPUT;
+			return side!=null&&sideConfig.apply(side)==IOSideConfig.INPUT;
+		}
+
+		@Override
+		public long getAmountAsLong()
+		{
+			return getEnergyStored();
+		}
+
+		@Override
+		public long getCapacityAsLong()
+		{
+			return getMaxEnergyStored();
+		}
+
+		@Override
+		public int insert(int amount, TransactionContext transaction)
+		{
+			TransferPreconditions.checkNonNegative(amount);
+			return receiveEnergy(amount, false);
+		}
+
+		@Override
+		public int extract(int amount, TransactionContext transaction)
+		{
+			TransferPreconditions.checkNonNegative(amount);
+			return extractEnergy(amount, false);
 		}
 	}
 

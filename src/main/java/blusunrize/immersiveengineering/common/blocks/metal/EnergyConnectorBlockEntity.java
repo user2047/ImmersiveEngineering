@@ -51,6 +51,10 @@ import net.neoforged.neoforge.capabilities.Capabilities.Energy;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -94,9 +98,9 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 	public int currentTickToNet = 0;
 	private final MutableEnergyStorage storageToNet;
 	private final MutableEnergyStorage storageToMachine;
-	private final IEnergyStorage energyCap;
+	private final ConnectorEnergyStorage energyCap;
 
-	private final IEBlockCapabilityCache<IEnergyStorage> output = IEBlockCapabilityCaches.forNeighbor(
+	private final IEBlockCapabilityCache<?> output = IEBlockCapabilityCaches.forNeighbor(
 			Energy.BLOCK, this, this::getFacing
 	);
 
@@ -121,7 +125,7 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		int maxOut = Math.min(storageToMachine.getEnergyStored(), getMaxOutput()-currentTickToMachine);
 		if(maxOut > 0)
 		{
-			IEnergyStorage target = output.getCapability();
+			IEnergyStorage target = asLegacyEnergy(output.getCapability());
 			if(target!=null)
 			{
 				int inserted = target.receiveEnergy(maxOut, false);
@@ -194,6 +198,14 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 
 	public static void registerCapabilities(RegisterCapabilitiesEvent event)
 	{
+		SPEC_TO_TYPE.forEach((spec, type) -> {
+			if(!spec.getSecond())
+				event.registerBlockEntity(
+						Energy.BLOCK,
+						type.get(),
+						(be, side) -> side==null||side==be.getFacing()?be.energyCap: null
+				);
+		});
 	}
 
 	private IEWireType getWireType()
@@ -282,7 +294,17 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		return ImmutableList.of(EnergyTransferHandler.ID);
 	}
 
-	private class ConnectorEnergyStorage implements IEnergyStorage
+	@Nullable
+	private static IEnergyStorage asLegacyEnergy(@Nullable Object capability)
+	{
+		if(capability instanceof IEnergyStorage legacy)
+			return legacy;
+		else if(capability instanceof EnergyHandler handler)
+			return IEnergyStorage.of(handler);
+		return null;
+	}
+
+	private class ConnectorEnergyStorage extends SnapshotJournal<ConnectorEnergySnapshot> implements IEnergyStorage, EnergyHandler
 	{
 
 		public int receiveEnergy(int maxReceive, boolean simulate)
@@ -332,5 +354,75 @@ public class EnergyConnectorBlockEntity extends ImmersiveConnectableBlockEntity 
 		{
 			return true;
 		}
+
+		@Override
+		public long getAmountAsLong()
+		{
+			return getEnergyStored();
+		}
+
+		@Override
+		public long getCapacityAsLong()
+		{
+			return getMaxEnergyStored();
+		}
+
+		@Override
+		public int insert(int amount, TransactionContext transaction)
+		{
+			TransferPreconditions.checkNonNegative(amount);
+			if(amount==0)
+				return 0;
+
+			int accepted = receiveEnergy(amount, true);
+			if(accepted <= 0)
+				return 0;
+
+			updateSnapshots(transaction);
+			return receiveEnergy(accepted, false);
+		}
+
+		@Override
+		public int extract(int amount, TransactionContext transaction)
+		{
+			TransferPreconditions.checkNonNegative(amount);
+			if(amount==0)
+				return 0;
+
+			int extracted = extractEnergy(amount, true);
+			if(extracted <= 0)
+				return 0;
+
+			updateSnapshots(transaction);
+			return extractEnergy(extracted, false);
+		}
+
+		@Override
+		protected ConnectorEnergySnapshot createSnapshot()
+		{
+			return new ConnectorEnergySnapshot(
+					storageToNet.getEnergyStored(), storageToMachine.getEnergyStored(),
+					currentTickToNet, currentTickToMachine
+			);
+		}
+
+		@Override
+		protected void revertToSnapshot(ConnectorEnergySnapshot snapshot)
+		{
+			storageToNet.setStoredEnergy(snapshot.toNet());
+			storageToMachine.setStoredEnergy(snapshot.toMachine());
+			currentTickToNet = snapshot.currentTickToNet();
+			currentTickToMachine = snapshot.currentTickToMachine();
+		}
+
+		@Override
+		protected void onRootCommit(ConnectorEnergySnapshot originalState)
+		{
+			setChanged();
+		}
+	}
+
+	private record ConnectorEnergySnapshot(int toNet, int toMachine, int currentTickToNet, int currentTickToMachine)
+	{
 	}
 }
