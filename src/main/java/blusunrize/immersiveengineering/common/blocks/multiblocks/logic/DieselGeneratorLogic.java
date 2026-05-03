@@ -51,6 +51,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -82,6 +83,7 @@ public class DieselGeneratorLogic
 			int output = IEServerConfig.MACHINES.dieselGen_output.get();
 			List<IEnergyStorage> presentOutputs = state.energyOutputs.stream()
 					.map(Supplier::get)
+					.map(DieselGeneratorLogic::asLegacyEnergy)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
 			GeneratorFuel recipe = state.recipeGetter.apply(
@@ -165,6 +167,16 @@ public class DieselGeneratorLogic
 		return ApiUtils.getRandom().nextDouble(-0.015625, 0.015625);
 	}
 
+	@Nullable
+	private static IEnergyStorage asLegacyEnergy(@Nullable Object capability)
+	{
+		if(capability instanceof IEnergyStorage legacy)
+			return legacy;
+		else if(capability instanceof EnergyHandler handler)
+			return IEnergyStorage.of(handler);
+		return null;
+	}
+
 	public State createInitialState(IInitialMultiblockContext<State> capabilitySource)
 	{
 		return new State(capabilitySource);
@@ -233,14 +245,14 @@ public class DieselGeneratorLogic
 
 		// Utils
 		private final BiFunction<Level, Fluid, GeneratorFuel> recipeGetter = CachedRecipe.cached(GeneratorFuel::getRecipeFor);
-		private final List<Supplier<@Nullable IEnergyStorage>> energyOutputs;
+		private final List<Supplier<?>> energyOutputs;
 		private final IMachineInterfaceConnection mifHandler;
 
 		public State(IInitialMultiblockContext<State> ctx)
 		{
-			ImmutableList.Builder<Supplier<@Nullable IEnergyStorage>> outputs = ImmutableList.builder();
+			ImmutableList.Builder<Supplier<?>> outputs = ImmutableList.builder();
 			for(BlockPos pos : ENERGY_OUTPUTS)
-				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos, RelativeBlockFace.DOWN));
+				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos.above(), RelativeBlockFace.DOWN));
 			this.energyOutputs = outputs.build();
 			this.mifHandler = () -> new MachineCheckImplementation[]{
 					new MachineCheckImplementation<>((BooleanSupplier)() -> this.active, MachineInterfaceHandler.BASIC_ACTIVE),
