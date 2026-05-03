@@ -200,6 +200,7 @@ public class ClientProxy extends CommonProxy
 	public static void registerBlockStateModels(RegisterBlockStateModels ev)
 	{
 		ev.registerModel(IEApi.ieLoc("basic_split"), PortedBasicSplitModel.BLOCK_STATE_CODEC);
+		ev.registerModel(IEApi.ieLoc("conf_sides"), PortedConfigurableSidesModel.BLOCK_STATE_CODEC);
 	}
 
 	private static void registerEmptyPortModelLoader(ModelEvent.RegisterLoaders ev, Identifier id)

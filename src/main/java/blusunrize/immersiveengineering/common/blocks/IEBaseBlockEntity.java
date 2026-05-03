@@ -9,12 +9,14 @@
 package blusunrize.immersiveengineering.common.blocks;
 
 import blusunrize.immersiveengineering.api.IEProperties.Model;
+import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
 import blusunrize.immersiveengineering.api.client.IModelOffsetProvider;
 import blusunrize.immersiveengineering.api.energy.WrappingEnergyStorage;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
 import blusunrize.immersiveengineering.api.utils.SafeChunkUtils;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.BlockstateProvider;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IGeneralMultiblock;
+import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IConfigurableSides;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IRedstoneOutput;
 import blusunrize.immersiveengineering.common.fluids.ArrayFluidHandler;
 import com.google.common.base.Preconditions;
@@ -105,14 +107,14 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, Provider provider)
 	{
 		this.readCustomNBT(pkt.getTag(), true, provider);
-		if(this instanceof IModelOffsetProvider)
+		if(this instanceof IModelOffsetProvider||this instanceof IConfigurableSides)
 			requestModelDataUpdate();
 	}
 
 	public void handleUpdateTag(CompoundTag tag, Provider provider)
 	{
 		this.readCustomNBT(tag, true, provider);
-		if(this instanceof IModelOffsetProvider)
+		if(this instanceof IModelOffsetProvider||this instanceof IConfigurableSides)
 			requestModelDataUpdate();
 	}
 
@@ -134,6 +136,15 @@ public abstract class IEBaseBlockEntity extends BlockEntity implements Blockstat
 				modelData = modelData.derive()
 						.with(Model.SUBMODEL_OFFSET, offset)
 						.build();
+		}
+		if(this instanceof IConfigurableSides configurableSides)
+		{
+			EnumMap<Direction, IOSideConfig> sideConfig = new EnumMap<>(Direction.class);
+			for(Direction d : DirectionUtils.VALUES)
+				sideConfig.put(d, configurableSides.getSideConfig(d));
+			modelData = modelData.derive()
+					.with(Model.SIDECONFIG, sideConfig)
+					.build();
 		}
 		return modelData;
 	}
