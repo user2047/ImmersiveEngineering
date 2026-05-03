@@ -87,14 +87,12 @@ public class FluidPumpScreen extends IEContainerScreen<FluidPumpMenu>
 	protected void init()
 	{
 		super.init();
-		addSideButton(Direction.DOWN, 10, 84);
-		addSideButton(Direction.UP, 50, 84);
-		addSideButton(Direction.NORTH, 90, 84);
-		addSideButton(Direction.SOUTH, 130, 84);
-		addSideButton(Direction.WEST, 10, 101);
-		addSideButton(Direction.EAST, 50, 101);
+		addSideButton(Direction.NORTH, 10, 84);
+		addSideButton(Direction.SOUTH, 50, 84);
+		addSideButton(Direction.WEST, 90, 84);
+		addSideButton(Direction.EAST, 130, 84);
 		this.addRenderableWidget(new PumpStatusIndicator(
-				leftPos+90, topPos+101, "IF",
+				leftPos+10, topPos+101, "IF",
 				() -> shortSideName(menu.getEnergyInputSide()),
 				0xff2f6fa3,
 				() -> ImmutableList.of(
@@ -103,7 +101,7 @@ public class FluidPumpScreen extends IEContainerScreen<FluidPumpMenu>
 				)
 		));
 		this.addRenderableWidget(new PumpStatusIndicator(
-				leftPos+130, topPos+101, "RS",
+				leftPos+50, topPos+101, "RS",
 				() -> "IN",
 				0xff7f5aa8,
 				() -> ImmutableList.of(Component.literal("Redstone signal input"))
