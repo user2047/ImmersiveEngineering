@@ -33,7 +33,8 @@ public class EnergyInfoArea extends InfoArea
 	public void draw(GuiGraphicsExtractor graphics)
 	{
 		final int height = area.getHeight();
-		int stored = (int)(height*(energy.getEnergyStored()/(float)energy.getMaxEnergyStored()));
+		int capacity = energy.getMaxEnergyStored();
+		int stored = capacity > 0?(int)(height*(energy.getEnergyStored()/(float)capacity)): 0;
 		graphics.fillGradient(
 				area.getX(), area.getY()+(height-stored),
 				area.getX()+area.getWidth(), area.getY()+area.getHeight(),

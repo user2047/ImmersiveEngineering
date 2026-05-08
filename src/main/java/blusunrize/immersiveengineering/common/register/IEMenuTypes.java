@@ -12,8 +12,8 @@ import blusunrize.immersiveengineering.ImmersiveEngineering;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockState;
+import blusunrize.immersiveengineering.common.blocks.metal.CapacitorBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.ClocheBlockEntity;
-import blusunrize.immersiveengineering.common.blocks.metal.CapacitorCreativeBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.CreativeFluidTankBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.FluidPumpBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.ToolboxBlockEntity;
@@ -134,7 +134,7 @@ public class IEMenuTypes
 	public static final ArgContainer<CreativeFluidTankBlockEntity, CreativeFluidTankMenu> CREATIVE_FLUID_TANK = registerArg(
 			Lib.GUIID_CreativeFluidTank, CreativeFluidTankMenu::makeServer, CreativeFluidTankMenu::makeClient
 	);
-	public static final ArgContainer<CapacitorCreativeBlockEntity, CreativeCapacitorMenu> CREATIVE_CAPACITOR = registerArg(
+	public static final ArgContainer<CapacitorBlockEntity, CreativeCapacitorMenu> CREATIVE_CAPACITOR = registerArg(
 			Lib.GUIID_CreativeCapacitor, CreativeCapacitorMenu::makeServer, CreativeCapacitorMenu::makeClient
 	);
 	public static final ArgContainer<FluidPumpBlockEntity, FluidPumpMenu> FLUID_PUMP = registerArg(

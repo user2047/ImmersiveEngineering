@@ -83,6 +83,8 @@ public class DieselGeneratorLogic
 			int output = IEServerConfig.MACHINES.dieselGen_output.get();
 			List<IEnergyStorage> presentOutputs = state.energyOutputs.stream()
 					.map(Supplier::get)
+					.filter(Objects::nonNull)
+					.distinct()
 					.map(DieselGeneratorLogic::asLegacyEnergy)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
@@ -252,7 +254,10 @@ public class DieselGeneratorLogic
 		{
 			ImmutableList.Builder<Supplier<?>> outputs = ImmutableList.builder();
 			for(BlockPos pos : ENERGY_OUTPUTS)
-				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos.above(), RelativeBlockFace.DOWN));
+			{
+				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos, RelativeBlockFace.DOWN));
+				outputs.add(ctx.getCapabilityAt(Energy.BLOCK, pos, (Object)null));
+			}
 			this.energyOutputs = outputs.build();
 			this.mifHandler = () -> new MachineCheckImplementation[]{
 					new MachineCheckImplementation<>((BooleanSupplier)() -> this.active, MachineInterfaceHandler.BASIC_ACTIVE),

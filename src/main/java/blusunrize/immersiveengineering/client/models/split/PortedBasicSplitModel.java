@@ -339,7 +339,16 @@ public record PortedBasicSplitModel(
 		private BlockStateModelPart getPart(BlockAndTintGetter level, BlockPos pos, BlockState state, BlockPos offset)
 		{
 			Object key = getCallbackKey(level, pos, state);
-			Map<BlockPos, BlockStateModelPart> partsForKey = bakedParts.computeIfAbsent(key, this::bakePartsForKey);
+			Map<BlockPos, BlockStateModelPart> partsForKey;
+			synchronized(bakedParts)
+			{
+				partsForKey = bakedParts.get(key);
+				if(partsForKey==null)
+				{
+					partsForKey = bakePartsForKey(key);
+					bakedParts.put(key, partsForKey);
+				}
+			}
 			return partsForKey.get(offset);
 		}
 
@@ -348,9 +357,9 @@ public record PortedBasicSplitModel(
 			QuadCollection quads = objModel.bakeForKey(
 					key, textureSlots, modelBaker, BlockModelRotation.IDENTITY, name
 			);
-			return splitToParts(
+			return Map.copyOf(splitToParts(
 					quads.getAll(), parts, finalTransform, ambientOcclusion, particleMaterial
-			);
+			));
 		}
 	}
 

@@ -21,11 +21,14 @@ import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IBlockEnt
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IBlockOverlayText;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IComparatorOverride;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IConfigurableSides;
+import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IInteractionObjectIE;
 import blusunrize.immersiveengineering.common.blocks.ticking.IEServerTickableBE;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
 import blusunrize.immersiveengineering.common.config.IEServerConfig.Machines.CapacitorConfig;
 import blusunrize.immersiveengineering.common.register.IEDataComponents;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes;
+import blusunrize.immersiveengineering.common.register.IEMenuTypes.ArgContainer;
 import blusunrize.immersiveengineering.common.util.EnergyHelper;
 import blusunrize.immersiveengineering.common.util.IEBlockCapabilityCaches;
 import blusunrize.immersiveengineering.common.util.IEBlockCapabilityCaches.IEBlockCapabilityCache;
@@ -58,7 +61,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerTickableBE, IBlockOverlayText,
-		IConfigurableSides, IComparatorOverride, IBlockEntityDrop
+		IConfigurableSides, IComparatorOverride, IBlockEntityDrop, IInteractionObjectIE<CapacitorBlockEntity>
 {
 	public EnumMap<Direction, IOSideConfig> sideConfig = new EnumMap<>(Direction.class);
 	private final CapacitorConfig configValues;
@@ -169,6 +172,11 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 		return configValues.output.getAsInt();
 	}
 
+	public IEnergyStorage getEnergyStorage()
+	{
+		return energyStorage;
+	}
+
 	public void writeCustomNBT(CompoundTag nbt, boolean descPacket, Provider provider)
 	{
 		for(Direction f : DirectionUtils.VALUES)
@@ -191,6 +199,27 @@ public class CapacitorBlockEntity extends IEBaseBlockEntity implements IEServerT
 				Capabilities.Energy.BLOCK,
 				(be, side) -> side==null?be.nullEnergyCap: be.energyCaps.get(side)
 		);
+	}
+
+	@Nullable
+	public CapacitorBlockEntity getGuiMaster()
+	{
+		return this;
+	}
+
+	public ArgContainer<CapacitorBlockEntity, ?> getContainerType()
+	{
+		return IEMenuTypes.CREATIVE_CAPACITOR;
+	}
+
+	public boolean canUseGui(Player player)
+	{
+		return true;
+	}
+
+	public Component getDisplayName()
+	{
+		return Component.translatable(getBlockState().getBlock().getDescriptionId());
 	}
 
 	public Component[] getOverlayText(@Nullable BlockState blockState, Player player, HitResult mop, boolean hammer)

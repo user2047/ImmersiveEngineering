@@ -9,25 +9,16 @@
 package blusunrize.immersiveengineering.common.blocks.metal;
 
 import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
-import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.utils.DirectionUtils;
-import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IInteractionObjectIE;
 import blusunrize.immersiveengineering.common.config.IEServerConfig.Machines.CapacitorConfig;
-import blusunrize.immersiveengineering.common.register.IEMenuTypes;
-import blusunrize.immersiveengineering.common.register.IEMenuTypes.ArgContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-import javax.annotation.Nullable;
-
 public class CapacitorCreativeBlockEntity extends CapacitorBlockEntity
-		implements IInteractionObjectIE<CapacitorCreativeBlockEntity>
 {
 	public CapacitorCreativeBlockEntity(BlockPos pos, BlockState state)
 	{
@@ -42,27 +33,6 @@ public class CapacitorCreativeBlockEntity extends CapacitorBlockEntity
 		for(Direction d : DirectionUtils.VALUES)
 			if(!nbt.contains("sideConfig_"+d.ordinal()))
 				sideConfig.put(d, IOSideConfig.OUTPUT);
-	}
-
-	@Nullable
-	public CapacitorCreativeBlockEntity getGuiMaster()
-	{
-		return this;
-	}
-
-	public ArgContainer<? super CapacitorCreativeBlockEntity, ?> getContainerType()
-	{
-		return IEMenuTypes.CREATIVE_CAPACITOR;
-	}
-
-	public boolean canUseGui(Player player)
-	{
-		return true;
-	}
-
-	public Component getDisplayName()
-	{
-		return Component.translatable("block."+Lib.MODID+".capacitor_creative");
 	}
 
 	protected IEnergyStorage makeMainEnergyStorage()

@@ -11,6 +11,8 @@ package blusunrize.immersiveengineering.client.gui;
 import blusunrize.immersiveengineering.api.IEEnums.IOSideConfig;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.client.gui.elements.ITooltipWidget;
+import blusunrize.immersiveengineering.client.gui.info.EnergyInfoArea;
+import blusunrize.immersiveengineering.client.gui.info.InfoArea;
 import blusunrize.immersiveengineering.common.gui.CreativeCapacitorMenu;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -31,10 +33,20 @@ import java.util.function.Supplier;
 public class CreativeCapacitorScreen extends IEContainerScreen<CreativeCapacitorMenu>
 {
 	private static final Identifier BACKGROUND = makeTextureLocation("creative_capacitor");
+	private static final long RATE_SAMPLE_TIME = 1000;
+
+	private int lastSampledEnergy = Integer.MIN_VALUE;
+	private long lastSampleTime = -1;
+	private float energyRatePerTick = 0;
 
 	public CreativeCapacitorScreen(CreativeCapacitorMenu container, Inventory inventoryPlayer, Component title)
 	{
 		super(container, inventoryPlayer, title, BACKGROUND, 176, 186);
+	}
+
+	protected List<InfoArea> makeInfoAreas()
+	{
+		return List.of(new EnergyInfoArea(leftPos+151, topPos+21, menu.energy));
 	}
 
 	protected void init()
@@ -68,14 +80,96 @@ public class CreativeCapacitorScreen extends IEContainerScreen<CreativeCapacitor
 		graphics.fill(leftPos+1, topPos+1, leftPos+imageWidth-1, topPos+imageHeight-1, 0xff2b3235);
 		graphics.fill(leftPos+7, topPos+16, leftPos+169, topPos+98, 0xff22282b);
 		graphics.fill(leftPos+7, topPos+103, leftPos+169, topPos+180, 0xff22282b);
+		graphics.fill(leftPos+150, topPos+20, leftPos+159, topPos+68, 0xff111719);
+		graphics.fill(leftPos+151, topPos+21, leftPos+158, topPos+67, 0xff15191b);
 		graphics.fill(leftPos, topPos, leftPos+imageWidth, topPos+1, Lib.COLOUR_I_ImmersiveOrange);
 	}
 
 	protected void renderLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
 	{
 		super.renderLabels(graphics, mouseX, mouseY);
-		graphics.text(this.font, Component.literal("Output: Infinite IF/t"), 8, 22, 0xe0e0e0, false);
+		updateEnergyRate();
+		graphics.text(this.font, Component.literal("Energy"), 8, 22, 0xe0e0e0, false);
 		graphics.text(this.font, Component.literal("Sides"), 8, 36, 0xe0e0e0, false);
+		graphics.text(this.font, Component.literal(getFillText()), 126, 22, 0xe0e0e0, false);
+		graphics.text(this.font, Component.literal(getRateText()), 108, 36, 0xe0e0e0, false);
+		graphics.text(this.font, Component.literal(getEtaText()), 108, 48, 0xe0e0e0, false);
+	}
+
+	private String getFillText()
+	{
+		int capacity = menu.energy.getMaxEnergyStored();
+		if(capacity <= 0)
+			return "0%";
+		int stored = menu.energy.getEnergyStored();
+		return Math.round(stored*100/(float)capacity)+"%";
+	}
+
+	private void updateEnergyRate()
+	{
+		int currentEnergy = menu.energy.getEnergyStored();
+		long now = System.currentTimeMillis();
+		if(lastSampleTime < 0)
+		{
+			lastSampledEnergy = currentEnergy;
+			lastSampleTime = now;
+			return;
+		}
+		long elapsed = now-lastSampleTime;
+		if(elapsed < RATE_SAMPLE_TIME)
+			return;
+		energyRatePerTick = (currentEnergy-lastSampledEnergy)/(elapsed/50f);
+		lastSampledEnergy = currentEnergy;
+		lastSampleTime = now;
+	}
+
+	private String getRateText()
+	{
+		int roundedRate = Math.round(energyRatePerTick);
+		if(roundedRate > 0)
+			return "+"+formatEnergy(roundedRate)+"/t";
+		return formatEnergy(roundedRate)+"/t";
+	}
+
+	private String getEtaText()
+	{
+		int stored = menu.energy.getEnergyStored();
+		int capacity = menu.energy.getMaxEnergyStored();
+		if(capacity <= 0)
+			return "--";
+		if(stored >= capacity&&energyRatePerTick >= 0)
+			return "Full";
+		if(stored <= 0&&energyRatePerTick <= 0)
+			return "Empty";
+		if(Math.abs(energyRatePerTick) < 0.01f)
+			return "--";
+		int remaining = energyRatePerTick > 0?capacity-stored: stored;
+		int ticks = (int)Math.ceil(remaining/Math.abs(energyRatePerTick));
+		return "ETA "+formatTicks(ticks);
+	}
+
+	private static String formatEnergy(int amount)
+	{
+		int absolute = Math.abs(amount);
+		if(absolute < 1000)
+			return Integer.toString(amount);
+		if(absolute < 1000000)
+			return String.format(java.util.Locale.ROOT, "%.1fk", amount/1000f);
+		return String.format(java.util.Locale.ROOT, "%.1fm", amount/1000000f);
+	}
+
+	private static String formatTicks(int ticks)
+	{
+		int seconds = Math.max(1, (int)Math.ceil(ticks/20f));
+		if(seconds < 60)
+			return seconds+"s";
+		int minutes = seconds/60;
+		seconds %= 60;
+		if(minutes < 60)
+			return minutes+"m"+(seconds > 0?seconds+"s": "");
+		int hours = minutes/60;
+		minutes %= 60;
+		return hours+"h"+(minutes > 0?minutes+"m": "");
 	}
 
 	private static class SideConfigButton extends Button implements ITooltipWidget
