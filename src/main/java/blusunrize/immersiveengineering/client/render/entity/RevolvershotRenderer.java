@@ -16,6 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -70,6 +71,12 @@ public class RevolvershotRenderer extends IEEntityRenderer<RevolvershotEntity>
 	public Identifier getTextureLocation(@Nonnull RevolvershotEntity entity)
 	{
 		return IEApi.ieLoc("textures/models/bullet.png");
+	}
+
+	@Override
+	protected RenderType getRenderType(RevolvershotEntity entity)
+	{
+		return RenderTypeCompat.entityCutout(getTextureLocation(entity));
 	}
 
 }

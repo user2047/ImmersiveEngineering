@@ -19,6 +19,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -136,6 +137,12 @@ public class RailgunShotRenderer extends IEEntityRenderer<RailgunShotEntity>
 	public Identifier getTextureLocation(@Nonnull RailgunShotEntity entity)
 	{
 		return WHITE_TEXTURE;
+	}
+
+	@Override
+	protected RenderType getRenderType(RailgunShotEntity entity)
+	{
+		return RenderTypeCompat.entitySolid(WHITE_TEXTURE);
 	}
 
 }

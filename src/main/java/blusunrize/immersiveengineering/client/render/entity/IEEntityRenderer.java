@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -36,13 +37,23 @@ public class IEEntityRenderer<T extends Entity> extends EntityRenderer<T, IEEnti
 	{
 		if(state.entity==null)
 			return;
+		RenderType renderType = getRenderType(state.entity);
 		nodes.submitCustomGeometry(
 				poseStack,
-				RenderTypeCompat.solid(),
-				(pose, consumer) -> render(
-						state.entity, 0, state.partialTicks, poseStack, type -> consumer, state.lightCoords
-				)
+				renderType,
+				(pose, consumer) -> {
+					PoseStack renderPose = new PoseStack();
+					renderPose.last().set(pose);
+					render(
+							state.entity, 0, state.partialTicks, renderPose, type -> consumer, state.lightCoords
+					);
+				}
 		);
+	}
+
+	protected RenderType getRenderType(T entity)
+	{
+		return RenderTypeCompat.solid();
 	}
 
 	public void render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int packedLight)

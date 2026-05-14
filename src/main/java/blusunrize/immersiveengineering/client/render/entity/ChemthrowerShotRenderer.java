@@ -81,4 +81,10 @@ public class ChemthrowerShotRenderer extends IEEntityRenderer<ChemthrowerShotEnt
 		return IEApi.ieLoc("textures/models/bullet.png");
 	}
 
+	@Override
+	protected RenderType getRenderType(ChemthrowerShotEntity entity)
+	{
+		return blusunrize.immersiveengineering.client.utils.RenderTypeCompat.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
+	}
+
 }
