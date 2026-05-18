@@ -267,7 +267,8 @@ dependencies {
 }
 
 String buildVersionString() {
-    String ie_output_version = "${version_ie}-${version_buildnumber}"
+    String build_number = "${version_buildnumber}".trim()
+    String ie_output_version = build_number.isEmpty() ? "${version_ie}" : "${version_ie}-${build_number}"
     boolean jenkins_build = System.getenv("ie_add_git_rev") != null
     if (jenkins_build) {
         File changelog = new File("changelog.md")
