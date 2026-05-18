@@ -35,6 +35,7 @@ public class ChoppingBlockBlock extends IEEntityBlock<ChoppingBlockBlockEntity>
 	public static final float LOG_RENDER_SCALE = (LOG_MAX-LOG_MIN)/16F;
 	public static final float LOG_RENDER_ITEM_SCALE = LOG_RENDER_SCALE*2;
 	public static final float LOG_RENDER_Y = (BASE_HEIGHT+(LOG_MAX-LOG_MIN)/2F)/16F;
+	public static final float LOG_TOP_Y = (BASE_HEIGHT+LOG_MAX-LOG_MIN)/16F;
 	public static final Supplier<BlockBehaviour.Properties> PROPERTIES = () -> Block.Properties.of()
 			.mapColor(MapColor.WOOD)
 			.ignitedByLava()

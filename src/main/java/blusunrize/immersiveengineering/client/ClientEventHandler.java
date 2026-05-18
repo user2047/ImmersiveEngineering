@@ -280,8 +280,8 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 			PoseStack transform, int invert, float x, float y, float reach, float angle
 	)
 	{
-		transform.mulPose(Axis.ZP.rotationDegrees(invert*angle));
 		transform.translate(x, y, -reach);
+		transform.mulPose(Axis.ZP.rotationDegrees(invert*angle));
 	}
 
 	private static void applyFirstPersonChopFixedItemPose(PoseStack transform)
@@ -336,8 +336,8 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 
 	private static Vec3 getFirstPersonChopImpactTarget(Player player, float partialTicks, int invert)
 	{
-		Vec3 logCenter = getTargetedChoppingLogCenter();
-		if(logCenter==null)
+		Vec3 logTopCenter = getTargetedChoppingLogTopCenter();
+		if(logTopCenter==null)
 			return new Vec3(
 					invert*ChopAnimationTuning.TARGET_SIDE_BASE.get(),
 					ChopAnimationTuning.TARGET_Y.get(),
@@ -351,7 +351,7 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 			right = Vec3.directionFromRotation(0, player.getYRot()).cross(new Vec3(0, 1, 0));
 		right = right.normalize();
 		Vec3 up = right.cross(forward).normalize();
-		Vec3 eyeToLog = logCenter.subtract(eye);
+		Vec3 eyeToLog = logTopCenter.subtract(eye);
 
 		float reach = Mth.clamp(
 				(float)eyeToLog.dot(forward)+ChopAnimationTuning.TARGET_REACH_OFFSET.get(),
@@ -375,7 +375,7 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 		);
 	}
 
-	private static Vec3 getTargetedChoppingLogCenter()
+	private static Vec3 getTargetedChoppingLogTopCenter()
 	{
 		Minecraft mc = Minecraft.getInstance();
 		if(mc.level==null||!(mc.hitResult instanceof BlockHitResult blockHit)||blockHit.getType()!=Type.BLOCK)
@@ -385,7 +385,7 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 		if(!(state.getBlock() instanceof ChoppingBlockBlock)
 				||!state.hasProperty(ChoppingBlockBlock.HAS_LOG)||!state.getValue(ChoppingBlockBlock.HAS_LOG))
 			return null;
-		return new Vec3(pos.getX()+.5, pos.getY()+ChoppingBlockBlock.LOG_RENDER_Y, pos.getZ()+.5);
+		return new Vec3(pos.getX()+.5, pos.getY()+ChoppingBlockBlock.LOG_TOP_Y, pos.getZ()+.5);
 	}
 
 	private static float getChopImpactAmount(float progress)
