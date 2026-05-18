@@ -45,11 +45,6 @@ public class ChoppingBlockBlockEntity extends IEBaseBlockEntity implements IIEIn
 	private static final int CHOP_ANIMATION_EVENT = 1;
 	private static final int CHOP_ANIMATION_TICKS = 8;
 	private final NonNullList<ItemStack> inventory = NonNullList.withSize(1, ItemStack.EMPTY);
-	private static int prevFirstPersonChopAnimationTicks = -1;
-	private static int firstPersonChopAnimationTicks = -1;
-	private static int firstPersonChopPlayer = -1;
-	private static InteractionHand firstPersonChopHand = InteractionHand.MAIN_HAND;
-	private static BlockPos firstPersonChopPos = null;
 	private ItemStack animationLog = ItemStack.EMPTY;
 	private int prevChopAnimationTicks = -1;
 	private int chopAnimationTicks = -1;
@@ -151,11 +146,9 @@ public class ChoppingBlockBlockEntity extends IEBaseBlockEntity implements IIEIn
 		clampStoredLog();
 		if(inventory.get(0).isEmpty())
 			return false;
+		player.swing(hand);
 		if(getLevelNonnull().isClientSide())
-		{
 			startChopAnimation(inventory.get(0));
-			startFirstPersonChopAnimation(player, hand, getBlockPos());
-		}
 		else
 			chopStoredLog(player, hand, tool);
 		return true;
@@ -241,7 +234,6 @@ public class ChoppingBlockBlockEntity extends IEBaseBlockEntity implements IIEIn
 				if(renderedLog.isEmpty())
 					renderedLog = new ItemStack(Items.OAK_LOG);
 				startChopAnimation(renderedLog);
-				startFirstPersonChopAnimation(null, InteractionHand.MAIN_HAND, getBlockPos());
 			}
 			return true;
 		}
@@ -287,44 +279,6 @@ public class ChoppingBlockBlockEntity extends IEBaseBlockEntity implements IIEIn
 		if(Math.abs(dx) > Math.abs(dz))
 			return dx < 0?Direction.WEST: Direction.EAST;
 		return dz < 0?Direction.NORTH: Direction.SOUTH;
-	}
-
-	private static void startFirstPersonChopAnimation(Player player, InteractionHand hand, BlockPos pos)
-	{
-		prevFirstPersonChopAnimationTicks = CHOP_ANIMATION_TICKS;
-		firstPersonChopAnimationTicks = CHOP_ANIMATION_TICKS;
-		firstPersonChopPlayer = player!=null?player.getId(): -1;
-		firstPersonChopHand = hand;
-		firstPersonChopPos = pos;
-	}
-
-	public static void tickFirstPersonChopAnimation()
-	{
-		if(firstPersonChopAnimationTicks < 0)
-			return;
-		prevFirstPersonChopAnimationTicks = firstPersonChopAnimationTicks;
-		firstPersonChopAnimationTicks--;
-		if(firstPersonChopAnimationTicks < 0)
-		{
-			prevFirstPersonChopAnimationTicks = -1;
-			firstPersonChopPlayer = -1;
-			firstPersonChopHand = InteractionHand.MAIN_HAND;
-			firstPersonChopPos = null;
-		}
-	}
-
-	public static float getFirstPersonChopAnimation(Player player, InteractionHand hand, ItemStack stack, float partialTicks)
-	{
-		if(firstPersonChopAnimationTicks < 0||player==null||hand!=firstPersonChopHand||!stack.is(ItemTags.AXES))
-			return -1;
-		if(firstPersonChopPlayer >= 0&&player.getId()!=firstPersonChopPlayer)
-			return -1;
-		if(firstPersonChopPlayer < 0&&firstPersonChopPos!=null&&player.distanceToSqr(
-				firstPersonChopPos.getX()+.5, firstPersonChopPos.getY()+.5, firstPersonChopPos.getZ()+.5
-		) > 25)
-			return -1;
-		float ticksRemaining = Mth.lerp(partialTicks, prevFirstPersonChopAnimationTicks, firstPersonChopAnimationTicks);
-		return 1-Mth.clamp(ticksRemaining/CHOP_ANIMATION_TICKS, 0, 1);
 	}
 
 	@EventBusSubscriber(modid = MODID)
