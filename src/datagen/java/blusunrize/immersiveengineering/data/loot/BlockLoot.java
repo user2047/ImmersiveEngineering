@@ -138,6 +138,7 @@ public class BlockLoot implements LootTableSubProvider
 		registerSelfDropping(WoodenDevices.WORKBENCH, dropInv());
 		registerSelfDropping(WoodenDevices.BLUEPRINT_SHELF, dropInv());
 		registerSelfDropping(WoodenDevices.CIRCUIT_TABLE, dropInv());
+		registerSelfDropping(WoodenDevices.CHOPPING_BLOCK, dropInv());
 		registerSelfDropping(WoodenDevices.ITEM_BATCHER, dropInv());
 		registerSelfDropping(MetalDevices.CLOCHE, dropInv());
 		registerSelfDropping(MetalDevices.CHARGING_STATION, dropInv());

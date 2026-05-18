@@ -30,6 +30,8 @@ import blusunrize.immersiveengineering.client.utils.IERenderTypes;
 import blusunrize.immersiveengineering.common.blocks.CrateItem;
 import blusunrize.immersiveengineering.common.blocks.generic.CatwalkBlock;
 import blusunrize.immersiveengineering.common.blocks.generic.WindowBlock;
+import blusunrize.immersiveengineering.common.blocks.wooden.ChoppingBlockBlock;
+import blusunrize.immersiveengineering.common.blocks.wooden.ChoppingBlockBlockEntity;
 import blusunrize.immersiveengineering.common.blocks.wooden.TurntableBlockEntity;
 import blusunrize.immersiveengineering.common.config.IEClientConfig;
 import blusunrize.immersiveengineering.common.config.IEServerConfig;
@@ -49,23 +51,26 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.tags.TagKey;
@@ -74,10 +79,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -101,7 +109,6 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -186,10 +193,207 @@ public class ClientEventHandler implements ResourceManagerReloadListener
 	@SubscribeEvent
 	public void onClientTick(ClientTickEvent.Pre event)
 	{
+		ChoppingBlockBlockEntity.tickFirstPersonChopAnimation();
+		ChopAnimationTuning.tickAutoReload();
 		LevelStageRenders.FAILED_CONNECTIONS.entrySet().removeIf(entry -> entry.getValue().getSecond().decrementAndGet() <= 0);
 		ClientLevel world = Minecraft.getInstance().level;
 		if(world!=null)
 			GlobalWireNetwork.getNetwork(world).update(world);
+	}
+
+	@SubscribeEvent
+	public void onRenderHand(RenderHandEvent event)
+	{
+		Player player = ClientUtils.mc().player;
+		float chopProgress = ChoppingBlockBlockEntity.getFirstPersonChopAnimation(
+				player, event.getHand(), event.getItemStack(), event.getPartialTick()
+		);
+		if(chopProgress >= 0)
+		{
+			renderFirstPersonChopTool(event, player, chopProgress);
+			event.setCanceled(true);
+		}
+	}
+
+	private static void renderFirstPersonChopTool(RenderHandEvent event, Player player, float progress)
+	{
+		ItemStack stack = event.getItemStack();
+		boolean mainHand = event.getHand()==InteractionHand.MAIN_HAND;
+		HumanoidArm arm = mainHand?player.getMainArm(): player.getMainArm().getOpposite();
+		boolean rightArm = arm==HumanoidArm.RIGHT;
+		int invert = rightArm?1: -1;
+		float impact = getChopImpactAmount(progress);
+		float armAngle = Mth.lerp(impact, ChopAnimationTuning.ARM_START.get(), ChopAnimationTuning.ARM_END.get());
+		float axeAngle = Mth.lerp(impact, ChopAnimationTuning.AXE_START.get(), ChopAnimationTuning.AXE_END.get());
+		Vec3 impactTarget = getFirstPersonChopImpactTarget(player, event.getPartialTick(), invert);
+		float targetReach = (float)-impactTarget.z;
+		float handTargetX = invert*ChopAnimationTuning.HAND_TARGET_BASE_X.get()
+				+((float)impactTarget.x-invert*ChopAnimationTuning.TARGET_SIDE_BASE.get())
+				*ChopAnimationTuning.HAND_TARGET_SIDE_SCALE.get();
+		float handTargetY = ChopAnimationTuning.HAND_TARGET_BASE_Y.get()
+				+((float)impactTarget.y-ChopAnimationTuning.TARGET_Y.get())
+				*ChopAnimationTuning.HAND_TARGET_VERTICAL_SCALE.get();
+		float handTargetReach = Mth.clamp(
+				targetReach+ChopAnimationTuning.HAND_TARGET_REACH_OFFSET.get(),
+				ChopAnimationTuning.HAND_TARGET_REACH_MIN.get(),
+				ChopAnimationTuning.HAND_TARGET_REACH_MAX.get()
+		);
+		float handX = Mth.lerp(impact, invert*ChopAnimationTuning.HAND_START_X.get(), handTargetX);
+		float handY = Mth.lerp(impact, ChopAnimationTuning.HAND_START_Y.get(), handTargetY)
+				-event.getEquipProgress()*ChopAnimationTuning.EQUIP_DROP.get();
+		float handReach = Mth.lerp(impact, ChopAnimationTuning.HAND_START_REACH.get(), handTargetReach);
+
+		PoseStack transform = event.getPoseStack();
+		transform.pushPose();
+		applyFirstPersonChopToolPose(transform, invert, handX, handY, handReach, armAngle, axeAngle);
+		Minecraft.getInstance().gameRenderer.itemInHandRenderer.renderItem(
+				player, stack, ItemDisplayContext.FIXED,
+				transform, event.getSubmitNodeCollector(), event.getPackedLight()
+		);
+		transform.popPose();
+
+		if(player instanceof AbstractClientPlayer clientPlayer)
+			renderFirstPersonChopArm(event, clientPlayer, arm, invert, handX, handY, handReach, armAngle);
+	}
+
+	private static void applyFirstPersonChopToolPose(
+			PoseStack transform, int invert, float x, float y, float reach, float armAngle, float axeAngle
+	)
+	{
+		applyFirstPersonChopArmSwingPose(transform, invert, x, y, reach, armAngle);
+		applyFirstPersonChopAxeGripSwing(transform, invert, axeAngle-armAngle);
+		transform.mulPose(Axis.YP.rotationDegrees(ChopAnimationTuning.ITEM_YAW.get()));
+		transform.mulPose(Axis.XP.rotationDegrees(ChopAnimationTuning.ITEM_PITCH.get()));
+		transform.mulPose(Axis.ZP.rotationDegrees(ChopAnimationTuning.ITEM_ROLL.get()));
+		float scale = ChopAnimationTuning.ITEM_SCALE.get();
+		transform.scale(scale, scale, scale);
+	}
+
+	private static void applyFirstPersonChopAxeGripSwing(PoseStack transform, int invert, float angle)
+	{
+		transform.translate(invert*ChopAnimationTuning.AXE_GRIP_PIVOT_X.get(), ChopAnimationTuning.AXE_GRIP_PIVOT_Y.get(), 0);
+		transform.mulPose(Axis.ZP.rotationDegrees(invert*angle));
+		transform.translate(invert*-ChopAnimationTuning.AXE_GRIP_PIVOT_X.get(), -ChopAnimationTuning.AXE_GRIP_PIVOT_Y.get(), 0);
+	}
+
+	private static void applyFirstPersonChopArmSwingPose(
+			PoseStack transform, int invert, float x, float y, float reach, float angle
+	)
+	{
+		transform.mulPose(Axis.ZP.rotationDegrees(invert*angle));
+		transform.translate(x, y, -reach);
+	}
+
+	private static void applyFirstPersonChopFixedItemPose(PoseStack transform)
+	{
+		transform.mulPose(Axis.YP.rotationDegrees(180));
+	}
+
+	private static void renderFirstPersonChopArm(
+			RenderHandEvent event, AbstractClientPlayer player, HumanoidArm arm, int invert,
+			float handX, float handY, float handReach, float armAngle
+	)
+	{
+		if(player.isInvisible())
+			return;
+
+		PoseStack transform = event.getPoseStack();
+		transform.pushPose();
+		applyFirstPersonChopArmSwingPose(transform, invert, handX, handY, handReach, armAngle);
+		applyFirstPersonChopFixedItemPose(transform);
+		transform.translate(
+				invert*-ChopAnimationTuning.ARM_MODEL_OFFSET_X.get(),
+				ChopAnimationTuning.ARM_MODEL_OFFSET_Y.get(),
+				ChopAnimationTuning.ARM_MODEL_OFFSET_Z.get()
+		);
+		transform.mulPose(Axis.YP.rotationDegrees(invert*ChopAnimationTuning.ARM_MODEL_YAW.get()));
+		transform.translate(
+				invert*ChopAnimationTuning.ARM_MODEL_PIVOT_X.get(),
+				ChopAnimationTuning.ARM_MODEL_PIVOT_Y.get(),
+				ChopAnimationTuning.ARM_MODEL_PIVOT_Z.get()
+		);
+		transform.mulPose(Axis.ZP.rotationDegrees(invert*ChopAnimationTuning.ARM_MODEL_ROLL.get()));
+		transform.mulPose(Axis.XP.rotationDegrees(ChopAnimationTuning.ARM_MODEL_PITCH.get()));
+		transform.mulPose(Axis.YP.rotationDegrees(invert*ChopAnimationTuning.ARM_MODEL_YAW_2.get()));
+		transform.translate(invert*ChopAnimationTuning.ARM_MODEL_FINAL_X.get(), 0, 0);
+
+		AvatarRenderer<AbstractClientPlayer> avatarRenderer = Minecraft.getInstance()
+				.getEntityRenderDispatcher()
+				.getPlayerRenderer(player);
+		Identifier skinTexture = player.getSkin().body().texturePath();
+		if(arm==HumanoidArm.RIGHT)
+			avatarRenderer.renderRightHand(
+					transform, event.getSubmitNodeCollector(), event.getPackedLight(), skinTexture,
+					player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE), player
+			);
+		else
+			avatarRenderer.renderLeftHand(
+					transform, event.getSubmitNodeCollector(), event.getPackedLight(), skinTexture,
+					player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE), player
+			);
+		transform.popPose();
+	}
+
+	private static Vec3 getFirstPersonChopImpactTarget(Player player, float partialTicks, int invert)
+	{
+		Vec3 logCenter = getTargetedChoppingLogCenter();
+		if(logCenter==null)
+			return new Vec3(
+					invert*ChopAnimationTuning.TARGET_SIDE_BASE.get(),
+					ChopAnimationTuning.TARGET_Y.get(),
+					-ChopAnimationTuning.TARGET_FALLBACK_REACH.get()
+			);
+
+		Vec3 eye = player.getEyePosition(partialTicks);
+		Vec3 forward = player.getViewVector(partialTicks).normalize();
+		Vec3 right = forward.cross(new Vec3(0, 1, 0));
+		if(right.lengthSqr() < 1e-4)
+			right = Vec3.directionFromRotation(0, player.getYRot()).cross(new Vec3(0, 1, 0));
+		right = right.normalize();
+		Vec3 up = right.cross(forward).normalize();
+		Vec3 eyeToLog = logCenter.subtract(eye);
+
+		float reach = Mth.clamp(
+				(float)eyeToLog.dot(forward)+ChopAnimationTuning.TARGET_REACH_OFFSET.get(),
+				ChopAnimationTuning.TARGET_REACH_MIN.get(),
+				ChopAnimationTuning.TARGET_REACH_MAX.get()
+		);
+		float sideClamp = ChopAnimationTuning.TARGET_SIDE_CLAMP.get();
+		float side = Mth.clamp(
+				(float)eyeToLog.dot(right)*ChopAnimationTuning.TARGET_SIDE_SCALE.get(),
+				-sideClamp, sideClamp
+		);
+		float vertical = Mth.clamp(
+				(float)eyeToLog.dot(up)*ChopAnimationTuning.TARGET_VERTICAL_SCALE.get(),
+				ChopAnimationTuning.TARGET_VERTICAL_MIN.get(),
+				ChopAnimationTuning.TARGET_VERTICAL_MAX.get()
+		);
+		return new Vec3(
+				invert*ChopAnimationTuning.TARGET_SIDE_BASE.get()+side,
+				ChopAnimationTuning.TARGET_Y.get()+vertical,
+				-reach
+		);
+	}
+
+	private static Vec3 getTargetedChoppingLogCenter()
+	{
+		Minecraft mc = Minecraft.getInstance();
+		if(mc.level==null||!(mc.hitResult instanceof BlockHitResult blockHit)||blockHit.getType()!=Type.BLOCK)
+			return null;
+		BlockPos pos = blockHit.getBlockPos();
+		BlockState state = mc.level.getBlockState(pos);
+		if(!(state.getBlock() instanceof ChoppingBlockBlock)
+				||!state.hasProperty(ChoppingBlockBlock.HAS_LOG)||!state.getValue(ChoppingBlockBlock.HAS_LOG))
+			return null;
+		return new Vec3(pos.getX()+.5, pos.getY()+ChoppingBlockBlock.LOG_RENDER_Y, pos.getZ()+.5);
+	}
+
+	private static float getChopImpactAmount(float progress)
+	{
+		progress = Mth.clamp(progress, 0, 1);
+		if(progress < .45F)
+			return Mth.sin(progress/.45F*Mth.HALF_PI);
+		return Mth.cos((progress-.45F)/.55F*Mth.HALF_PI);
 	}
 
 	@SubscribeEvent

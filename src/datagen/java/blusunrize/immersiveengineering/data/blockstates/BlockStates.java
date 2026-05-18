@@ -406,6 +406,18 @@ public class BlockStates extends ExtendedBlockstateProvider
 			createRotatedBlock(WoodenDevices.TURNTABLE, turntableModel, IEProperties.FACING_ALL, ImmutableList.of(), -90, 0);
 			itemModel(WoodenDevices.TURNTABLE, turntableModel);
 		}
+		{
+			ModelFile choppingBlockModel = models().getExistingFile(modLoc("block/wooden_device/chopping_block"));
+			ModelFile woodPileModel = models().getExistingFile(modLoc("block/wooden_device/wood_pile"));
+			ModelFile charcoalLogPileModel = models().getExistingFile(modLoc("block/wooden_device/charcoal_log_pile"));
+			getMultipartBuilder(WoodenDevices.CHOPPING_BLOCK.get())
+					.part().modelFile(choppingBlockModel).addModel().end();
+			itemModel(WoodenDevices.CHOPPING_BLOCK, choppingBlockModel);
+			getMultipartBuilder(WoodenDevices.WOOD_PILE.get()).part().modelFile(woodPileModel).addModel().end();
+			itemModel(WoodenDevices.WOOD_PILE, woodPileModel);
+			getMultipartBuilder(WoodenDevices.CHARCOAL_LOG_PILE.get()).part().modelFile(charcoalLogPileModel).addModel().end();
+			itemModel(WoodenDevices.CHARCOAL_LOG_PILE, charcoalLogPileModel);
+		}
 		createWallmount(MetalDecoration.ALU_WALLMOUNT, rl("block/metal_decoration/aluminum_wallmount"));
 		createWallmount(MetalDecoration.STEEL_WALLMOUNT, rl("block/metal_decoration/steel_wallmount"));
 		createStructuralArm("block/metal_decoration/steel_scaffolding", MetalDecoration.STEEL_SLOPE);

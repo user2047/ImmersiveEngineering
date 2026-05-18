@@ -29,6 +29,7 @@ import blusunrize.immersiveengineering.common.register.IEItems.Weapons;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -224,6 +225,19 @@ public class DeviceRecipes extends IERecipeProvider
 				.define('s', IETags.getItemTag(IETags.treatedWoodSlab))
 				.unlockedBy("has_treated_planks", has(IETags.getItemTag(IETags.treatedWood)))
 				.save(out, toRL(toPath(WoodenDevices.WOODEN_BARREL)));
+		shapedMisc(WoodenDevices.CHOPPING_BLOCK)
+				.pattern("p")
+				.pattern("l")
+				.define('p', ItemTags.PLANKS)
+				.define('l', ItemTags.LOGS_THAT_BURN)
+				.unlockedBy("has_log", has(ItemTags.LOGS_THAT_BURN))
+				.save(out, toRL(toPath(WoodenDevices.CHOPPING_BLOCK)));
+		shapedMisc(WoodenDevices.WOOD_PILE)
+				.pattern("kk")
+				.pattern("kk")
+				.define('k', Ingredients.KINDLING)
+				.unlockedBy("has_kindling", has(Ingredients.KINDLING))
+				.save(out, toRL(toPath(WoodenDevices.WOOD_PILE)));
 	}
 
 	private void connectors(@Nonnull RecipeOutput out)

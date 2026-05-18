@@ -433,6 +433,9 @@ public final class IEBlocks
 		);
 		public static final BlockEntry<IEEntityBlock<?>> WOODEN_BARREL = BlockEntry.barrel("wooden_barrel", false);
 		public static final BlockEntry<TurntableBlock> TURNTABLE = new BlockEntry<>("turntable", STANDARD_WOOD_PROPERTIES, TurntableBlock::new);
+		public static final BlockEntry<ChoppingBlockBlock> CHOPPING_BLOCK = new BlockEntry<>(
+				"chopping_block", ChoppingBlockBlock.PROPERTIES, ChoppingBlockBlock::new
+		);
 		public static final BlockEntry<IEEntityBlock<WoodenCrateBlockEntity>> CRATE = new BlockEntry<>(
 				"crate", STANDARD_WOOD_PROPERTIES, CrateBlock::new
 		);
@@ -454,6 +457,12 @@ public final class IEBlocks
 		);
 		public static final BlockEntry<IEEntityBlock<FluidSorterBlockEntity>> FLUID_SORTER = new BlockEntry<>(
 				"fluid_sorter", STANDARD_WOOD_PROPERTIES, p -> new IEEntityBlock<>(IEBlockEntities.FLUID_SORTER, p)
+		);
+		public static final BlockEntry<WoodPileBlock> WOOD_PILE = new BlockEntry<>(
+				"wood_pile", WoodPileBlock.PROPERTIES, WoodPileBlock::new
+		);
+		public static final BlockEntry<CharcoalLogPileBlock> CHARCOAL_LOG_PILE = new BlockEntry<>(
+				"charcoal_log_pile", CharcoalLogPileBlock.PROPERTIES, CharcoalLogPileBlock::new
 		);
 		public static final BlockEntry<WindmillBlock> WINDMILL = new BlockEntry<>(
 				// TODO move shape into block impl and get rid of dynamic shapes

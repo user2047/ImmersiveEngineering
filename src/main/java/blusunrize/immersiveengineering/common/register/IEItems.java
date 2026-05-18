@@ -102,6 +102,7 @@ public final class IEItems
 		public static final ItemRegObject<IEBaseItem> DUST_SALTPETER = simple("dust_saltpeter");
 		public static final ItemRegObject<IEBaseItem> DUST_SULFUR = simple("dust_sulfur");
 		public static final ItemRegObject<IEBaseItem> DUST_WOOD = simple("dust_wood", nothing(), i -> i.setBurnTime(100));
+		public static final ItemRegObject<IEBaseItem> KINDLING = simple("kindling", nothing(), i -> i.setBurnTime(100));
 		public static final ItemRegObject<IEBaseItem> LIGHT_BULB = simple("light_bulb");
 		public static final ItemRegObject<IEBaseItem> ELECTRON_TUBE = simple("electron_tube");
 		public static final ItemRegObject<IEBaseItem> CIRCUIT_BOARD = simple("circuit_board");

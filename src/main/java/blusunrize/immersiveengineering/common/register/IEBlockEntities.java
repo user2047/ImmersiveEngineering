@@ -96,6 +96,9 @@ public class IEBlockEntities
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TurntableBlockEntity>> TURNTABLE = REGISTER.register(
 			"turntable", makeType(TurntableBlockEntity::new, WoodenDevices.TURNTABLE)
 	);
+	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ChoppingBlockBlockEntity>> CHOPPING_BLOCK = REGISTER.register(
+			"chopping_block", makeType(ChoppingBlockBlockEntity::new, WoodenDevices.CHOPPING_BLOCK)
+	);
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FluidSorterBlockEntity>> FLUID_SORTER = REGISTER.register(
 			"fluidsorter", makeType(FluidSorterBlockEntity::new, WoodenDevices.FLUID_SORTER)
 	);

@@ -276,6 +276,8 @@ public class ItemModels extends TRSRItemModelProvider
 				Ingredients.LIGHT_BULB, Ingredients.ELECTRON_TUBE, Ingredients.CIRCUIT_BOARD,
 				Ingredients.DUROPLAST_PLATE, Ingredients.COMPONENT_ELECTRONIC, Ingredients.COMPONENT_ELECTRONIC_ADV
 		);
+		withExistingParent(name(Ingredients.KINDLING), mcLoc("item/generated"))
+				.texture("layer0", modLoc("item/kindling"));
 		addItemModels("metal_", Ingredients.NUGGET_NETHERITE);
 
 		addItemModels(
